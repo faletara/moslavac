@@ -5,12 +5,19 @@ import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { TrackEvent } from "@/components/analytics/TrackEvent";
 import { formatDateLong } from "@/lib/helpers/date";
-import { fetchNewsById } from "@/lib/payload/getNews";
+import { fetchNewsById, fetchNewsPaginated } from "@/lib/payload/getNews";
 import { tenantSlug } from "@/lib/payload/getTenant";
 import { adaptPayloadNews } from "@/lib/payload/news-adapter";
 
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3001";
+
 interface Props {
   params: Promise<{ id: string }>;
+}
+
+export async function generateStaticParams() {
+  const result = await fetchNewsPaginated({ page: 1, size: 200 });
+  return result.docs.map((doc) => ({ id: String(doc.id) }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -19,9 +26,28 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!doc) return { title: "Vijest nije pronađena" };
   const news = adaptPayloadNews(doc, tenantSlug);
   const text = news.content.replace(/<[^>]+>/g, "").trim();
+  const description = text.slice(0, 160);
   return {
     title: news.title,
-    description: text.slice(0, 160),
+    description,
+    alternates: {
+      canonical: `${BASE_URL}/news/${id}`,
+    },
+    openGraph: {
+      type: "article",
+      title: news.title,
+      description,
+      publishedTime: doc.publishedAt ?? doc.createdAt,
+      ...(news.thumbnailPath
+        ? { images: [{ url: news.thumbnailPath, alt: news.title }] }
+        : {}),
+    },
+    twitter: {
+      card: news.thumbnailPath ? "summary_large_image" : "summary",
+      title: news.title,
+      description,
+      ...(news.thumbnailPath ? { images: [news.thumbnailPath] } : {}),
+    },
   };
 }
 

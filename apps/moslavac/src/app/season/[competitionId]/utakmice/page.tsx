@@ -1,22 +1,14 @@
-"use client";
-
-import { useParams } from "next/navigation";
-import { Skeleton } from "@/components/ui/skeleton";
-import { api } from "@/lib/api";
 import MatchesList from "@/components/features/competition/MatchesList";
+import { fetchCompetitionMatches } from "@/lib/hns/competitions";
 
-export default function CompetitionMatchesPage() {
-	const params = useParams();
-	const competitionId = Number(params.competitionId);
+interface Props {
+  params: Promise<{ competitionId: string }>;
+}
 
-	const { data: matches, isLoading } = api.competitions.useGetCompetitionMatches({
-		competitionId,
-		enabled: !!competitionId,
-	});
-
-	if (isLoading) {
-		return <Skeleton className="h-112 w-full" />;
-	}
-
-	return <MatchesList matches={matches} />;
+export default async function CompetitionMatchesPage({ params }: Props) {
+  const { competitionId } = await params;
+  const matches = await fetchCompetitionMatches({
+    competitionId: Number(competitionId),
+  });
+  return <MatchesList matches={matches} />;
 }

@@ -1,79 +1,36 @@
-"use client";
-
-import { track } from "@vercel/analytics";
-import { useParams } from "next/navigation";
-import { useEffect } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { notFound } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { TrackEvent } from "@/components/analytics/TrackEvent";
 import MatchTabs from "@/components/features/matches/tabs/MatchTabs";
-import { api, getCometImageUrl } from "@/lib/api";
+import { getCometImageUrl } from "@/lib/api";
+import {
+  fetchMatchEvents,
+  fetchMatchInfo,
+  fetchMatchLineups,
+  fetchMatchReferees,
+} from "@/lib/hns/matches";
 import { formatDateTime } from "@/lib/helpers/date";
 
-export default function MatchInfoPage() {
-  const params = useParams();
-  const matchId = Number(params.matchId);
+interface Props {
+  params: Promise<{ matchId: string }>;
+}
 
-  const {
-    data: matchInfo,
-    isLoading,
-    error,
-  } = api.matches.useGetMatchInfo({
-    matchId,
-    enabled: !!matchId,
-  });
+export default async function MatchInfoPage({ params }: Props) {
+  const { matchId } = await params;
+  const mid = Number(matchId);
 
-  const { data: events } = api.matches.useGetMatchEvents({
-    matchId,
-    enabled: !!matchId,
-  });
+  const [matchInfo, events, lineups, refereeData] = await Promise.all([
+    fetchMatchInfo({ matchId: mid }),
+    fetchMatchEvents({ matchId: mid }),
+    fetchMatchLineups({ matchId: mid }),
+    fetchMatchReferees({ matchId: mid }),
+  ]);
 
-  const { data: lineups } = api.matches.useGetMatchLineups({
-    matchId,
-    enabled: !!matchId,
-  });
-
-  const { data: refereeData, isLoading: refereesLoading } =
-    api.matches.useGetMatchReferees({
-      matchId,
-      enabled: !!matchId,
-    });
-
-  useEffect(() => {
-    if (matchInfo) {
-      track("Match View", {
-        matchId,
-        competition: matchInfo.competition?.name ?? "",
-      });
-    }
-  }, [matchInfo, matchId]);
-
-  if (isLoading) {
-    return (
-      <div className="container mx-auto mt-16 max-w-4xl space-y-12 px-4 sm:px-6 lg:px-8">
-        <Skeleton className="h-48" />
-        <Skeleton className="h-64" />
-      </div>
-    );
-  }
-
-  if (error || !matchInfo) {
-    return (
-      <Alert
-        variant="destructive"
-        className="container mx-auto mt-16 max-w-4xl"
-      >
-        <AlertDescription>
-          Greška pri učitavanju podataka o utakmici.
-        </AlertDescription>
-      </Alert>
-    );
-  }
+  if (!matchInfo) notFound();
 
   const { date, time } = formatDateTime(matchInfo.dateTimeUTC ?? 0);
   const hasResult =
     matchInfo.homeTeamResult != null && matchInfo.awayTeamResult != null;
-
   const halfHome = matchInfo.homeTeamResult?.half;
   const halfAway = matchInfo.awayTeamResult?.half;
   const showHalfTime = hasResult && halfHome != null && halfAway != null;
@@ -81,11 +38,15 @@ export default function MatchInfoPage() {
 
   return (
     <div className="container mx-auto mt-16 max-w-4xl px-4 pb-24 sm:px-6 lg:px-8">
+      <TrackEvent
+        event="Match View"
+        props={{ matchId: mid, competition: matchInfo.competition?.name ?? "" }}
+      />
+
       <p className="text-center text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
         {matchInfo.competition?.name ?? ""}
       </p>
 
-      {/* Score */}
       <div className="mt-12 grid grid-cols-3 items-center gap-4 sm:mt-16 sm:gap-10">
         <TeamDisplay
           name={matchInfo.homeTeam?.name ?? "N/A"}
@@ -141,10 +102,10 @@ export default function MatchInfoPage() {
 
       <MatchTabs
         match={matchInfo}
-        events={events}
-        lineups={lineups}
-        refereeData={refereeData}
-        refereesLoading={refereesLoading}
+        events={events ?? undefined}
+        lineups={lineups ?? undefined}
+        refereeData={refereeData ?? undefined}
+        refereesLoading={false}
       />
     </div>
   );

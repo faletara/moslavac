@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Prva momčad",
+  description: "Igrači i stručni stožer prve momčadi NK Moslavac.",
+};
 import { FirstTeamHero } from "@/components/features/first-team/FirstTeamHero";
 import { PlayerGrid, PlayerGridItem } from "@/components/features/first-team/PlayerGrid";
 import { FadeInView } from "@/components/animations";

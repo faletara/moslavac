@@ -1,22 +1,14 @@
-"use client";
-
-import { useParams } from "next/navigation";
-import { Skeleton } from "@/components/ui/skeleton";
-import { api } from "@/lib/api";
 import StandingsTable from "@/components/features/competition/StandingsTable";
+import { fetchTeamStandings } from "@/lib/hns/standings";
 
-export default function CompetitionStandingsPage() {
-	const params = useParams();
-	const competitionId = Number(params.competitionId);
+interface Props {
+  params: Promise<{ competitionId: string }>;
+}
 
-	const { data: standings, isLoading } = api.competitions.useGetTeamStandings({
-		competitionId,
-		enabled: !!competitionId,
-	});
-
-	if (isLoading) {
-		return <Skeleton className="h-112 w-full" />;
-	}
-
-	return <StandingsTable standings={standings} />;
+export default async function CompetitionStandingsPage({ params }: Props) {
+  const { competitionId } = await params;
+  const standings = await fetchTeamStandings({
+    competitionId: Number(competitionId),
+  });
+  return <StandingsTable standings={standings} />;
 }

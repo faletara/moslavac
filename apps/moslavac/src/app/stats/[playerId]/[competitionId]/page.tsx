@@ -1,69 +1,25 @@
-"use client";
-
-import { track } from "@vercel/analytics";
-import { useParams } from "next/navigation";
-import { useEffect } from "react";
+import { notFound } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
-import { Skeleton } from "@/components/ui/skeleton";
-import { api, getCometImageUrl } from "@/lib/api";
+import { TrackEvent } from "@/components/analytics/TrackEvent";
+import { getCometImageUrl } from "@/lib/api";
+import { fetchPlayerDetails, fetchPlayerStats } from "@/lib/hns/players";
 import { cn } from "@/lib/utils";
 
-const skeletonKeys = ["stat1", "stat2", "stat3", "stat4"];
+interface Props {
+  params: Promise<{ playerId: string; competitionId: string }>;
+}
 
-export default function PlayerStatsPage() {
-  const params = useParams();
-  const playerId = String(params.playerId);
-  const competitionId = Number(params.competitionId);
+export default async function PlayerStatsPage({ params }: Props) {
+  const { playerId, competitionId } = await params;
+  const cid = Number(competitionId);
 
-  const { data: playerDetails, isLoading: detailsLoading } =
-    api.players.useGetPlayerDetails({
-      personId: playerId,
-      enabled: !!playerId,
-    });
+  const [playerDetails, playerStats] = await Promise.all([
+    fetchPlayerDetails({ personId: playerId }),
+    fetchPlayerStats({ personId: playerId, competitionId: cid }),
+  ]);
 
-  const { data: playerStats, isLoading: statsLoading } =
-    api.players.useGetPlayerStats({
-      personId: playerId,
-      competitionId,
-      enabled: !!playerId && !!competitionId,
-    });
-
-  useEffect(() => {
-    if (playerDetails) {
-      track("Player Profile View", {
-        player: playerDetails.name ?? "",
-        playerId,
-      });
-    }
-  }, [playerDetails, playerId]);
-
-  if (detailsLoading || statsLoading) {
-    return (
-      <section className="mx-auto w-full max-w-5xl space-y-16 px-4 py-16 sm:py-24">
-        <div className="flex flex-col items-center gap-8 text-center">
-          <Skeleton className="size-32 rounded-full sm:size-40" />
-          <Skeleton className="h-16 w-72" />
-          <Skeleton className="h-3 w-40" />
-        </div>
-        <div className="grid grid-cols-2 gap-px bg-border/40 md:grid-cols-4">
-          {skeletonKeys.map((key) => (
-            <Skeleton key={key} className="h-32 rounded-none" />
-          ))}
-        </div>
-      </section>
-    );
-  }
-
-  if (!playerDetails) {
-    return (
-      <section className="mx-auto w-full max-w-5xl px-4 py-24 text-center">
-        <p className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
-          Igrač nije pronađen
-        </p>
-      </section>
-    );
-  }
+  if (!playerDetails) notFound();
 
   const playerName = playerDetails.name ?? "";
   const position = playerDetails.position ?? "";
@@ -104,7 +60,11 @@ export default function PlayerStatsPage() {
 
   return (
     <section className="mx-auto w-full max-w-5xl space-y-16 px-4 py-16 sm:space-y-20 sm:py-24">
-      {/* Identity */}
+      <TrackEvent
+        event="Player Profile View"
+        props={{ player: playerName, playerId }}
+      />
+
       <header className="flex flex-col items-center gap-8 text-center">
         <span className="h-px w-12 bg-foreground" />
 
@@ -136,7 +96,6 @@ export default function PlayerStatsPage() {
         )}
       </header>
 
-      {/* Stats */}
       {playerStats ? (
         <div className="space-y-px">
           <div className="grid grid-cols-2 divide-x divide-y divide-border/40 border-y border-border/60 md:grid-cols-4 md:divide-y-0">
@@ -146,11 +105,7 @@ export default function PlayerStatsPage() {
             <StatCell label="Crveni kartoni" value={redCards} tier="primary" />
           </div>
           <div className="grid grid-cols-3 divide-x divide-border/40 border-b border-border/60">
-            <StatCell
-              label="Pune utakmice"
-              value={fullMatches}
-              tier="secondary"
-            />
+            <StatCell label="Pune utakmice" value={fullMatches} tier="secondary" />
             <StatCell label="Penali" value={penalties} tier="secondary" />
             <StatCell label="Autogolovi" value={ownGoals} tier="secondary" />
           </div>
@@ -161,7 +116,6 @@ export default function PlayerStatsPage() {
         </p>
       )}
 
-      {/* Minutes */}
       {playerStats && maxMinutes > 0 && (
         <div className="space-y-6">
           <div className="flex items-end justify-between gap-4 border-b border-border/60 pb-4">
@@ -176,7 +130,6 @@ export default function PlayerStatsPage() {
               </span>
             </span>
           </div>
-
           <Progress
             value={Math.min(100, Math.max(0, minutesPct))}
             className="h-[2px] rounded-none bg-border/40 *:data-[slot=progress-indicator]:bg-foreground"

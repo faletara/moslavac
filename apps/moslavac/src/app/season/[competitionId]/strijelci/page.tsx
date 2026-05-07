@@ -1,24 +1,19 @@
-"use client";
-
-import { useParams } from "next/navigation";
 import TopScorersTable from "@/components/features/competition/TopScorersTable";
-import { api } from "@/lib/api";
+import { fetchAllCompetitionScorers } from "@/lib/hns/standings";
 
-export default function CompetitionScorersPage() {
-  const params = useParams();
-  const competitionId = Number(params.competitionId);
+interface Props {
+  params: Promise<{ competitionId: string }>;
+}
 
-  const { data: scorers, isLoading } =
-    api.competitions.useGetAllCompetitionScorers({
-      competitionId,
-      enabled: !!competitionId,
-    });
-
+export default async function CompetitionScorersPage({ params }: Props) {
+  const { competitionId } = await params;
+  const cid = Number(competitionId);
+  const scorers = await fetchAllCompetitionScorers({ competitionId: cid });
   return (
     <TopScorersTable
       scorers={scorers}
-      isLoading={isLoading}
-      competitionId={competitionId}
+      isLoading={false}
+      competitionId={cid}
     />
   );
 }

@@ -1,31 +1,26 @@
-"use client";
-
-import { useParams } from "next/navigation";
 import CardsTable from "@/components/features/competition/CardsTable";
-import { api } from "@/lib/api";
+import {
+  fetchAllCompetitionRedCards,
+  fetchAllCompetitionYellowCards,
+} from "@/lib/hns/standings";
 
-export default function CompetitionCardsPage() {
-  const params = useParams();
-  const competitionId = Number(params.competitionId);
+interface Props {
+  params: Promise<{ competitionId: string }>;
+}
 
-  const { data: yellowCards, isLoading: yellowLoading } =
-    api.competitions.useGetAllCompetitionYellowCards({
-      competitionId,
-      enabled: !!competitionId,
-    });
-
-  const { data: redCards, isLoading: redLoading } =
-    api.competitions.useGetAllCompetitionRedCards({
-      competitionId,
-      enabled: !!competitionId,
-    });
-
+export default async function CompetitionCardsPage({ params }: Props) {
+  const { competitionId } = await params;
+  const cid = Number(competitionId);
+  const [yellowCards, redCards] = await Promise.all([
+    fetchAllCompetitionYellowCards({ competitionId: cid }),
+    fetchAllCompetitionRedCards({ competitionId: cid }),
+  ]);
   return (
     <CardsTable
       yellowCards={yellowCards}
       redCards={redCards}
-      isLoading={yellowLoading || redLoading}
-      competitionId={competitionId}
+      isLoading={false}
+      competitionId={cid}
     />
   );
 }
