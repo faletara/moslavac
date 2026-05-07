@@ -1,53 +1,41 @@
-HELP.md
-target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+# Dependencies
+node_modules/
+.pnpm-store/
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
+# Build outputs
+.next/
+.turbo/
+dist/
+out/
+build/
 
-### IntelliJ IDEA ###
-.idea
+# Env
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
 *.iws
 *.iml
 *.ipr
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-/uploads/
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
 
-### VS Code ###
-.vscode/
-
-
-### Firebase Configuration ###
-src/main/resources/moslavac-9d4c8-firebase-adminsdk-jgmzm-f2fb4aecb9.json
-
-
-# Ignore build output
-target/
-
-# Ignore all files in src/main/resources/static/assets/
-src/main/resources/static/assets/*
-
-# Do not ignore folders in case they're needed
-!src/main/resources/static/assets/.keep
-
-# Ignore service worker files
-src/main/resources/static/firebase-messaging-sw.js
-
-.env
+# Test
+coverage/

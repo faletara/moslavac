@@ -1,0 +1,35 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "ui": "tui",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"],
+      "env": [
+        "NODE_ENV",
+        "NEXT_PUBLIC_*",
+        "PAYLOAD_*",
+        "DATABASE_URI",
+        "S3_*",
+        "HNS_*",
+        "CORS_ORIGINS"
+      ]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "dependsOn": ["^build"]
+    },
+    "generate:types": {
+      "cache": false
+    },
+    "generate:importmap": {
+      "cache": false
+    },
+    "clean": {
+      "cache": false
+    }
+  }
+}

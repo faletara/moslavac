@@ -1,0 +1,37 @@
+{
+  "name": "@moslavac/monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Multi-tenant clubs platform: shared Payload CMS + per-club Next.js frontends",
+  "type": "module",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "generate:types": "turbo run generate:types --filter=@moslavac/cms",
+    "generate:importmap": "turbo run generate:importmap --filter=@moslavac/cms",
+    "clean": "turbo run clean && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.0",
+    "typescript": "^5.7.3",
+    "prettier": "^3.4.2"
+  },
+  "engines": {
+    "node": ">=20.9.0",
+    "pnpm": "^9.0.0 || ^10.0.0"
+  },
+  "packageManager": "pnpm@10.0.0",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "sharp",
+      "esbuild",
+      "unrs-resolver"
+    ],
+    "peerDependencyRules": {
+      "ignoreMissing": [
+        "monaco-editor"
+      ]
+    }
+  }
+}
