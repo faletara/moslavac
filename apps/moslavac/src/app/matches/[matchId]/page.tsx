@@ -1,6 +1,8 @@
 "use client";
 
+import { track } from "@vercel/analytics";
 import { useParams } from "next/navigation";
+import { useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -36,6 +38,15 @@ export default function MatchInfoPage() {
       matchId,
       enabled: !!matchId,
     });
+
+  useEffect(() => {
+    if (matchInfo) {
+      track("Match View", {
+        matchId,
+        competition: matchInfo.competition?.name ?? "",
+      });
+    }
+  }, [matchInfo, matchId]);
 
   if (isLoading) {
     return (

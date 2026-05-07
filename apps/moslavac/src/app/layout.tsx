@@ -1,9 +1,11 @@
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
-import Providers from "@/components/providers/Providers";
-import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import Header from "@/components/layout/Header";
+import Providers from "@/components/providers/Providers";
 import { getTenant } from "@/lib/payload/getTenant";
 
 const geistSans = Geist({
@@ -39,6 +41,8 @@ export default async function RootLayout({
           <main className="flex-1">{children}</main>
           <Footer tenant={tenant} />
         </Providers>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

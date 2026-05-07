@@ -1,6 +1,8 @@
 "use client";
 
+import { track } from "@vercel/analytics";
 import { useParams } from "next/navigation";
+import { useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -26,6 +28,15 @@ export default function PlayerStatsPage() {
       competitionId,
       enabled: !!playerId && !!competitionId,
     });
+
+  useEffect(() => {
+    if (playerDetails) {
+      track("Player Profile View", {
+        player: playerDetails.name ?? "",
+        playerId,
+      });
+    }
+  }, [playerDetails, playerId]);
 
   if (detailsLoading || statsLoading) {
     return (

@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
+import { TrackEvent } from "@/components/analytics/TrackEvent";
 import { formatDateLong } from "@/lib/helpers/date";
 import { fetchNewsById } from "@/lib/payload/getNews";
 import { tenantSlug } from "@/lib/payload/getTenant";
@@ -46,6 +47,7 @@ export default async function NewsDetailPage({ params }: Props) {
 
   return (
     <article className="mx-auto w-full max-w-3xl px-6 pt-12 pb-24 sm:pt-16 lg:px-8">
+      <TrackEvent event="News Article View" props={{ title: news.title }} />
       <Link
         href="/news"
         className="group inline-flex items-center gap-3 text-[0.65rem] font-medium uppercase tracking-[0.3em] text-muted-foreground transition-colors hover:text-foreground sm:text-xs"

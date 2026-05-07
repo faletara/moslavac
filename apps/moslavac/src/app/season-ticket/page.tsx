@@ -1,7 +1,8 @@
 import Image from "next/image";
 import { ArrowDown } from "lucide-react";
-import { getTenant } from "@/lib/payload/getTenant";
 import type { Metadata } from "next";
+import { TrackEvent } from "@/components/analytics/TrackEvent";
+import { getTenant } from "@/lib/payload/getTenant";
 
 export const metadata: Metadata = {
   title: "Sezonska ulaznica",
@@ -27,6 +28,7 @@ export default async function SeasonTicketPage() {
 
   return (
     <div className="mx-auto w-full max-w-screen-xl space-y-24 px-6 py-16 sm:space-y-32 sm:py-24 lg:px-8">
+      <TrackEvent event="Season Ticket Page" />
       <PageHero price={price} />
 
       <SectionBlock
