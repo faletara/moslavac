@@ -44,7 +44,12 @@ export default async function MatchInfoPage({ params }: Props) {
       />
 
       <p className="text-center text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
-        {matchInfo.competition?.name ?? ""}
+        {[
+          matchInfo.roundOrder != null ? `Kolo ${matchInfo.roundOrder}` : null,
+          matchInfo.competition?.name?.trim() || null,
+        ]
+          .filter(Boolean)
+          .join(" · ")}
       </p>
 
       <div className="mt-12 grid grid-cols-3 items-center gap-4 sm:mt-16 sm:gap-10">

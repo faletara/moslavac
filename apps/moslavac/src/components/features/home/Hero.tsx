@@ -23,7 +23,7 @@ export default function Hero({ tenant }: HeroProps) {
 	const taglinePrefix = founded ? `Osnovan ${founded}` : tenant.displayName;
 
 	return (
-		<section className="relative isolate flex min-h-svh w-full flex-col overflow-hidden md:min-h-screen md:items-center md:justify-center md:py-24">
+		<section className="relative isolate flex min-h-svh w-full flex-col items-center justify-center overflow-hidden md:min-h-screen md:py-24">
 			{/* Background image */}
 			<motion.div
 				className="absolute inset-0 -z-20"
@@ -54,15 +54,15 @@ export default function Hero({ tenant }: HeroProps) {
 				</motion.span>
 			)}
 
-			<div className="relative z-10 flex flex-1 flex-col justify-center px-6 py-16 sm:px-10 md:max-w-6xl md:flex-none md:items-center md:px-6 md:py-0 md:text-center">
-				<div className="flex flex-col items-start gap-4 md:items-center">
+			<div className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 py-16 text-center sm:px-10 md:max-w-6xl md:flex-none md:px-6 md:py-0">
+				<div className="flex flex-col items-center gap-4">
 					{/* Decorative line */}
 					<motion.span
 						className="h-px w-12 bg-foreground"
 						initial={{ scaleX: 0 }}
 						animate={{ scaleX: 1 }}
 						transition={{ duration: 0.4, delay: 0.1, ease: EASE }}
-						style={{ transformOrigin: "left" }}
+						style={{ transformOrigin: "center" }}
 					/>
 
 					{/* Grb + tagline */}
@@ -111,7 +111,7 @@ export default function Hero({ tenant }: HeroProps) {
 
 				{/* Motto */}
 				<motion.p
-					className="mt-8 max-w-md text-balance text-sm leading-relaxed text-muted-foreground md:mx-auto md:mt-10 md:max-w-xl md:text-center md:text-base"
+					className="mx-auto mt-8 max-w-md text-balance text-sm leading-relaxed text-muted-foreground md:mt-10 md:max-w-xl md:text-base"
 					initial={{ opacity: 0, y: reduced ? 0 : 16 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.6, delay: 0.6, ease: EASE }}

@@ -22,6 +22,9 @@ export const isYellowCardEvent = (event: HnsMatchEvent): boolean =>
 export const isRedCardEvent = (event: HnsMatchEvent): boolean =>
   matchesType(event, "crveni");
 
+export const isSubstitutionEvent = (event: HnsMatchEvent): boolean =>
+  matchesType(event, "zamjena", "substitut");
+
 export interface ScorerGoal {
   minute: number;
   isPenalty: boolean;
@@ -29,6 +32,8 @@ export interface ScorerGoal {
 
 export interface ScorerEntry {
   name: string;
+  personId: number | null;
+  picture: string | null;
   goals: ScorerGoal[];
 }
 
@@ -50,8 +55,22 @@ const groupScorersForSide = (
       isPenalty: isPenaltyGoalEvent(goal),
     };
     const existing = map.get(name);
-    if (existing) existing.goals.push(entry);
-    else map.set(name, { name, goals: [entry] });
+    if (existing) {
+      existing.goals.push(entry);
+      if (existing.personId == null && goal.player?.personId != null) {
+        existing.personId = goal.player.personId;
+      }
+      if (!existing.picture && goal.player?.picture) {
+        existing.picture = goal.player.picture;
+      }
+    } else {
+      map.set(name, {
+        name,
+        personId: goal.player?.personId ?? null,
+        picture: goal.player?.picture ?? null,
+        goals: [entry],
+      });
+    }
   }
   return Array.from(map.values()).map((s) => ({
     ...s,
@@ -94,4 +113,37 @@ export const getCardCounts = (
     }
   }
   return counts;
+};
+
+export const countSubstitutions = (
+  events: HnsMatchEvent[] | undefined,
+): number => (events ?? []).filter(isSubstitutionEvent).length;
+
+export interface ScoreSnapshot {
+  home: number;
+  away: number;
+}
+
+export const buildScoreProgression = (
+  events: HnsMatchEvent[] | undefined,
+): Map<number, ScoreSnapshot> => {
+  const map = new Map<number, ScoreSnapshot>();
+  if (!events) return map;
+
+  const sorted = [...events].sort((a, b) => {
+    const aMin = a.minuteFull ?? a.minute ?? 0;
+    const bMin = b.minuteFull ?? b.minute ?? 0;
+    if (aMin !== bMin) return aMin - bMin;
+    return (a.orderNumber ?? 0) - (b.orderNumber ?? 0);
+  });
+
+  let home = 0;
+  let away = 0;
+  for (const e of sorted) {
+    if (!isGoalEvent(e)) continue;
+    if (e.homeTeam === true) home += 1;
+    else if (e.homeTeam === false) away += 1;
+    if (e.eventId != null) map.set(e.eventId, { home, away });
+  }
+  return map;
 };

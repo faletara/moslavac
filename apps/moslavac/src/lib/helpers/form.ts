@@ -84,6 +84,27 @@ export function getRecentForm(
   return getTeamPlayedMatches(matches, teamId).slice(0, limit);
 }
 
+export function getMatchOutcome(
+  match: HnsMatch | null | undefined,
+  ourTeamId: number,
+): FormResult | null {
+  if (!match || !isPlayed(match) || !involvesTeam(match, ourTeamId)) return null;
+
+  const isHome = match.homeTeam?.id === ourTeamId;
+  const goalsFor =
+    (isHome
+      ? match.homeTeamResult?.current
+      : match.awayTeamResult?.current) ?? 0;
+  const goalsAgainst =
+    (isHome
+      ? match.awayTeamResult?.current
+      : match.homeTeamResult?.current) ?? 0;
+
+  if (goalsFor > goalsAgainst) return "W";
+  if (goalsFor < goalsAgainst) return "L";
+  return "D";
+}
+
 export function getHeadToHead(
   matches: HnsMatch[],
   teamAId: number,

@@ -17,9 +17,9 @@ export default async function HomePage() {
 			<Hero tenant={tenant} />
 			<PreviousAndNextMatchSection />
 			<LatestNewsSection />
+			<UpcomingMatchesSection />
 			<LeagueStandingsSection />
 			<TopScorersSection />
-			<UpcomingMatchesSection />
 			<YouTubePromoSection />
 			<WebShopCarousel />
 			<SeasonTicketPromoSection />

@@ -1,10 +1,11 @@
 "use client";
 
 import type { HnsMatch, HnsMatchEvent, HnsMatchInfo } from "@/types/hns";
+import RichScorersSection from "../played/RichScorersSection";
+import VenueLocationHero from "../played/VenueLocationHero";
 import MatchCountdown from "../upcoming/MatchCountdown";
 import MatchOfficials from "../upcoming/MatchOfficials";
 import VenueLocation from "../upcoming/VenueLocation";
-import PlayedMatchSummary from "../played/PlayedMatchSummary";
 import EventsTimeline from "./EventsTimeline";
 
 interface MatchOverviewTabProps {
@@ -26,20 +27,13 @@ export default function MatchOverviewTab({
   if (hasResult) {
     return (
       <>
-        <PlayedMatchSummary
-          events={events}
-          homeTeamName={match.homeTeam?.name ?? "Domaći"}
-          awayTeamName={match.awayTeam?.name ?? "Gosti"}
-        />
-        <EventsTimeline
-          events={events}
-          competitionId={match.competition?.id ?? null}
-        />
+        <RichScorersSection match={match} events={events} />
+        <EventsTimeline match={match} events={events} />
         <MatchOfficials
           refereeData={refereeData}
           isLoading={refereesLoading}
         />
-        <VenueLocation facility={match.facility} />
+        <VenueLocationHero facility={match.facility} />
       </>
     );
   }
@@ -72,4 +66,3 @@ function UpcomingOverview({
     </>
   );
 }
-

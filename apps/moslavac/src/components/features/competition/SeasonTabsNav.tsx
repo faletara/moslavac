@@ -20,8 +20,8 @@ export default function SeasonTabsNav({ competitionId }: SeasonTabsNavProps) {
 	const isStandings = !isMatches && !isScorers && !isCards;
 
 	const tabs = [
-		{ href: standingsHref, label: "Tablica", active: isStandings },
 		{ href: matchesHref, label: "Utakmice", active: isMatches },
+		{ href: standingsHref, label: "Tablica", active: isStandings },
 		{ href: scorersHref, label: "Strijelci", active: isScorers },
 		{ href: cardsHref, label: "Kartoni", active: isCards },
 	];

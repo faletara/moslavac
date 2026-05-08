@@ -1,5 +1,9 @@
+"use client";
+
 import Link from "next/link";
+import { AnimatedLine, FadeInView } from "@/components/animations";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getCometImageUrl } from "@/lib/api";
 import type { HnsLineups, HnsMatch, HnsTeamPlayer } from "@/types/hns";
 
@@ -19,7 +23,7 @@ export default function MatchLineupsTab({
 
   if (!hasLineups) {
     return (
-      <section className="mt-16 border-t border-border/60 pt-12 sm:mt-20">
+      <section className="mt-20 sm:mt-28">
         <p className="text-center text-sm text-muted-foreground">
           Postave će biti objavljene neposredno prije utakmice.
         </p>
@@ -27,33 +31,79 @@ export default function MatchLineupsTab({
     );
   }
 
+  const homeName = match.homeTeam?.name ?? "Domaći";
+  const awayName = match.awayTeam?.name ?? "Gosti";
+
+  const homeColumn = (
+    <LineupColumn
+      teamName={homeName}
+      teamPicture={match.homeTeam?.picture ?? null}
+      teamLineup={lineups?.home ?? null}
+      competitionId={competitionId}
+    />
+  );
+
+  const awayColumn = (
+    <LineupColumn
+      teamName={awayName}
+      teamPicture={match.awayTeam?.picture ?? null}
+      teamLineup={lineups?.away ?? null}
+      competitionId={competitionId}
+    />
+  );
+
   return (
-    <section className="mt-16 border-t border-border/60 pt-12 sm:mt-20">
-      <h2 className="text-center text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
-        Postave
-      </h2>
-      <div className="mt-10 grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-16">
-        <LineupColumn
-          teamName={match.homeTeam?.name ?? "N/A"}
-          teamLineup={lineups?.home ?? null}
-          competitionId={competitionId}
-        />
-        <LineupColumn
-          teamName={match.awayTeam?.name ?? "N/A"}
-          teamLineup={lineups?.away ?? null}
-          competitionId={competitionId}
-        />
-      </div>
+    <section className="mt-20 sm:mt-28">
+      <FadeInView>
+        <div className="flex flex-col items-center gap-6 text-center">
+          <AnimatedLine className="mx-auto" />
+          <p className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
+            Tko je u igri
+          </p>
+          <h2 className="select-none font-black uppercase leading-[0.85] tracking-tighter text-[14vw] sm:text-6xl md:text-7xl">
+            Postave
+          </h2>
+        </div>
+      </FadeInView>
+
+      <FadeInView delay={0.1}>
+        <Tabs
+          defaultValue="home"
+          className="mx-auto mt-12 max-w-5xl md:hidden"
+        >
+          <TabsList variant="line" className="mx-auto w-full justify-center">
+            <TabsTrigger value="home" className="px-3 text-xs uppercase tracking-tight">
+              {homeName}
+            </TabsTrigger>
+            <TabsTrigger value="away" className="px-3 text-xs uppercase tracking-tight">
+              {awayName}
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="home" className="mt-8">
+            {homeColumn}
+          </TabsContent>
+          <TabsContent value="away" className="mt-8">
+            {awayColumn}
+          </TabsContent>
+        </Tabs>
+
+        <div className="mx-auto mt-12 hidden max-w-5xl gap-12 md:grid md:grid-cols-2 md:gap-16">
+          {homeColumn}
+          {awayColumn}
+        </div>
+      </FadeInView>
     </section>
   );
 }
 
 function LineupColumn({
   teamName,
+  teamPicture,
   teamLineup,
   competitionId,
 }: {
   teamName: string;
+  teamPicture: string | null;
   teamLineup: HnsLineups["home"];
   competitionId: number | null;
 }) {
@@ -62,12 +112,23 @@ function LineupColumn({
   const players = teamLineup.players ?? [];
   const starters = players.filter((p) => p.starting === true);
   const substitutes = players.filter((p) => p.starting !== true);
+  const teamInitials = teamName.slice(0, 2).toUpperCase();
 
   return (
     <div>
-      <h3 className="border-b border-border/60 pb-3 text-[0.65rem] font-semibold uppercase tracking-[0.25em]">
-        {teamName}
-      </h3>
+      <div className="flex items-center gap-3 border-b border-border/60 pb-3">
+        <Avatar className="size-9 shrink-0">
+          {teamPicture && (
+            <AvatarImage src={getCometImageUrl(teamPicture)} alt={teamName} />
+          )}
+          <AvatarFallback className="text-[0.55rem] font-semibold uppercase tracking-[0.15em]">
+            {teamInitials}
+          </AvatarFallback>
+        </Avatar>
+        <h3 className="line-clamp-1 text-sm font-black uppercase tracking-tight">
+          {teamName}
+        </h3>
+      </div>
 
       <ul className="mt-2">
         {starters.map((player, i) => (

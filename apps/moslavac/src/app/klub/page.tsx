@@ -266,7 +266,7 @@ function StadiumPanel({ facility }: { facility: HnsFacility }) {
           <iframe
             title={`Lokacija: ${name || "stadion"}`}
             src={`https://www.openstreetmap.org/export/embed.html?bbox=${(facility.longitude ?? 0) - 0.005},${(facility.latitude ?? 0) - 0.003},${(facility.longitude ?? 0) + 0.005},${(facility.latitude ?? 0) + 0.003}&layer=mapnik&marker=${facility.latitude},${facility.longitude}`}
-            className="h-full w-full grayscale"
+            className="h-full w-full"
             loading="lazy"
             referrerPolicy="no-referrer"
           />
