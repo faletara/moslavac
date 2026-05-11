@@ -1,13 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { queries } from "../../queries";
 
-type UseGetNextMatchProps = {
+type UseGetMatchSlotsProps = {
   enabled?: boolean;
 };
 
-export function useGetNextMatch(props?: UseGetNextMatchProps) {
+export function useGetMatchSlots(props?: UseGetMatchSlotsProps) {
   return useQuery({
-    ...queries.competitions.nextMatch(),
+    ...queries.competitions.matchSlots(),
     enabled: props?.enabled,
   });
 }

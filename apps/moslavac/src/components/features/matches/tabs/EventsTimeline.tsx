@@ -103,7 +103,7 @@ function TeamsHeader({
           <span className="text-[0.55rem] font-medium uppercase tracking-[0.3em] text-muted-foreground">
             Domaći
           </span>
-          <span className="line-clamp-1 text-[0.7rem] font-black uppercase tracking-tight sm:text-sm">
+          <span className="text-[0.7rem] font-black uppercase tracking-tight sm:text-sm">
             {homeName}
           </span>
         </div>
@@ -134,7 +134,7 @@ function TeamsHeader({
           <span className="text-[0.55rem] font-medium uppercase tracking-[0.3em] text-muted-foreground">
             Gosti
           </span>
-          <span className="line-clamp-1 text-[0.7rem] font-black uppercase tracking-tight sm:text-sm">
+          <span className="text-[0.7rem] font-black uppercase tracking-tight sm:text-sm">
             {awayName}
           </span>
         </div>
@@ -172,12 +172,12 @@ function EventRow({
   const NameNode = isLinkable ? (
     <Link
       href={`/stats/${personId}/${competitionId}`}
-      className="line-clamp-1 font-black uppercase leading-tight tracking-tight transition-colors hover:underline text-sm sm:text-base"
+      className="font-black uppercase leading-tight tracking-tight transition-colors hover:underline text-sm sm:text-base"
     >
       {playerName}
     </Link>
   ) : (
-    <span className="line-clamp-1 font-black uppercase leading-tight tracking-tight text-sm sm:text-base">
+    <span className="font-black uppercase leading-tight tracking-tight text-sm sm:text-base">
       {playerName}
     </span>
   );
@@ -219,16 +219,12 @@ function EventRow({
           )}
         >
           <EventIcon eventType={eventTypeName} />
-          <span className="line-clamp-1 text-[0.55rem] font-medium uppercase tracking-[0.25em] text-muted-foreground">
+          <span className="text-[0.55rem] font-medium uppercase tracking-[0.25em] text-muted-foreground">
             {eventTypeName}
           </span>
         </div>
         {isSub && player2Name && (
-          <span
-            className={cn(
-              "line-clamp-1 text-[0.6rem] uppercase tracking-[0.2em] text-muted-foreground/70",
-            )}
-          >
+          <span className="text-[0.6rem] uppercase tracking-[0.2em] text-muted-foreground/70">
             ↔ {player2Name}
           </span>
         )}

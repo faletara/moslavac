@@ -45,12 +45,9 @@ function PreviousSkeleton() {
 }
 
 export default function PreviousAndNextMatchSection() {
-  const { data: nextMatch, isLoading: nextLoading } =
-    api.competitions.useGetNextMatch();
-  const { data: previousMatch, isLoading: prevLoading } =
-    api.competitions.useGetPreviousMatch();
+  const { data, isLoading } = api.competitions.useGetMatchSlots();
 
-  if (nextLoading || prevLoading) {
+  if (isLoading) {
     return (
       <section>
         <div className="mx-auto w-full max-w-4xl px-4 py-12 md:py-20">
@@ -65,6 +62,8 @@ export default function PreviousAndNextMatchSection() {
     );
   }
 
+  const nextMatch = data?.next ?? null;
+  const previousMatch = data?.previous ?? null;
   const hasNext = isValidMatch(nextMatch);
   const hasPrev = isValidMatch(previousMatch);
 

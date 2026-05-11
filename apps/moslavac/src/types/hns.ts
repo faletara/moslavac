@@ -101,6 +101,11 @@ export interface HnsMatch {
   allowDetail: boolean | null;
 }
 
+export interface MatchSlots {
+  next: HnsMatch | null;
+  previous: HnsMatch | null;
+}
+
 export interface HnsMatchEvent {
   eventId: number | null;
   eventType: HnsEventType | null;

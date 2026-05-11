@@ -19,6 +19,12 @@ const OUTCOME_LABEL: Record<FormResult, string> = {
   L: "Poraz",
 };
 
+const OUTCOME_CHIP: Record<FormResult, string> = {
+  W: "bg-foreground text-background border-foreground",
+  D: "border-foreground/50 text-foreground/70",
+  L: "border-foreground/30 text-foreground/40",
+};
+
 function isMoslavac(name: string | null | undefined): boolean {
   return !!name && /moslavac/i.test(name);
 }
@@ -85,17 +91,13 @@ export function PreviousMatchCard({ match }: PreviousMatchCardProps) {
           <p className="text-center text-sm font-black uppercase tracking-[0.4em] sm:text-base">
             Zadnji rezultat
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
-            {outcomeLabel && (
-              <span className="text-[0.65rem] font-black uppercase tracking-[0.35em] sm:text-xs">
+          <div className="flex flex-col items-center gap-2">
+            {outcome && outcomeLabel && (
+              <span
+                className={`inline-flex items-center rounded-full border px-3 py-1 text-[0.6rem] font-black uppercase tracking-[0.35em] sm:text-xs ${OUTCOME_CHIP[outcome]}`}
+              >
                 {outcomeLabel}
               </span>
-            )}
-            {outcomeLabel && subInfo.length > 0 && (
-              <span
-                aria-hidden
-                className="hidden h-3 w-px bg-foreground/30 sm:block"
-              />
             )}
             {subInfo.length > 0 && (
               <p className="text-center text-sm font-light text-muted-foreground sm:text-base">
@@ -107,12 +109,29 @@ export function PreviousMatchCard({ match }: PreviousMatchCardProps) {
       </FadeInView>
 
       <FadeInView delay={0.1}>
-        <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-4 sm:gap-10 md:gap-14">
+        <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-4 sm:gap-8 md:gap-12">
           <TeamCrest team={match.homeTeam} size="md" className="w-full" />
-          <div className="flex flex-col items-center gap-2">
-            <span className="text-4xl font-black tabular-nums leading-none sm:text-5xl md:text-6xl">
-              {hasResult ? `${home} — ${away}` : "—"}
-            </span>
+          <div className="flex flex-col items-center gap-3">
+            {hasResult ? (
+              <div className="flex items-center gap-3 sm:gap-5 md:gap-6">
+                <span className="text-6xl font-black tabular-nums leading-none sm:text-7xl md:text-8xl">
+                  {home}
+                </span>
+                <span
+                  aria-hidden
+                  className="text-3xl font-black leading-none text-foreground/25 sm:text-4xl md:text-5xl"
+                >
+                  —
+                </span>
+                <span className="text-6xl font-black tabular-nums leading-none sm:text-7xl md:text-8xl">
+                  {away}
+                </span>
+              </div>
+            ) : (
+              <span className="text-5xl font-black tabular-nums leading-none text-foreground/40 sm:text-6xl md:text-7xl">
+                —
+              </span>
+            )}
             {halfTime && (
               <span className="text-xs font-light text-muted-foreground sm:text-sm">
                 Poluvrijeme {halfTime}
