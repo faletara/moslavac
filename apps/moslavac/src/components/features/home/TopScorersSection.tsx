@@ -148,7 +148,7 @@ function ScorerRow({
 	if (personId) {
 		return (
 			<Link
-				href={`/stats/${personId}/${competitionId}`}
+				href={`/statistika/${personId}/${competitionId}`}
 				className="block hover:opacity-80"
 			>
 				{inner}

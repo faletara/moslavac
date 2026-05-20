@@ -45,7 +45,7 @@ export default function SeasonTicketPromoSection() {
 						</p>
 
 						<Link
-							href="/season-ticket"
+							href="/sezonska-iskaznica"
 							className="group inline-flex items-center gap-3 text-xs font-medium uppercase tracking-[0.3em] text-foreground transition-colors hover:text-muted-foreground"
 						>
 							Kupi iskaznicu

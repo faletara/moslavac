@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: news.title,
     description,
     alternates: {
-      canonical: `${BASE_URL}/news/${id}`,
+      canonical: `${BASE_URL}/novosti/${id}`,
     },
     openGraph: {
       type: "article",
@@ -75,7 +75,7 @@ export default async function NewsDetailPage({ params }: Props) {
     <article className="mx-auto w-full max-w-3xl px-6 pt-12 pb-24 sm:pt-16 lg:px-8">
       <TrackEvent event="News Article View" props={{ title: news.title }} />
       <Link
-        href="/news"
+        href="/novosti"
         className="group inline-flex items-center gap-3 text-[0.65rem] font-medium uppercase tracking-[0.3em] text-muted-foreground transition-colors hover:text-foreground sm:text-xs"
       >
         <ArrowLeft className="size-4 transition-transform duration-300 group-hover:-translate-x-1" />

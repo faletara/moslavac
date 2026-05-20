@@ -10,14 +10,14 @@ interface SeasonTabsNavProps {
 
 export default function SeasonTabsNav({ competitionId }: SeasonTabsNavProps) {
 	const pathname = usePathname();
-	const standingsHref = `/season/${competitionId}`;
-	const matchesHref = `/season/${competitionId}/utakmice`;
-	const scorersHref = `/season/${competitionId}/strijelci`;
-	const cardsHref = `/season/${competitionId}/kartoni`;
-	const isMatches = pathname?.endsWith("/utakmice") ?? false;
+	const standingsHref = `/sezona/${competitionId}/tablica`;
+	const matchesHref = `/sezona/${competitionId}`;
+	const scorersHref = `/sezona/${competitionId}/strijelci`;
+	const cardsHref = `/sezona/${competitionId}/kartoni`;
+	const isStandings = pathname?.endsWith("/tablica") ?? false;
 	const isScorers = pathname?.endsWith("/strijelci") ?? false;
 	const isCards = pathname?.endsWith("/kartoni") ?? false;
-	const isStandings = !isMatches && !isScorers && !isCards;
+	const isMatches = !isStandings && !isScorers && !isCards;
 
 	const tabs = [
 		{ href: matchesHref, label: "Utakmice", active: isMatches },

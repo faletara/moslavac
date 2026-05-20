@@ -7,9 +7,28 @@ import { FadeInView } from "@/components/animations";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { api, getCometImageUrl } from "@/lib/api";
-import { formatDateTime } from "@/lib/helpers/date";
+import {
+  getCategoryChipClass,
+  getCategoryShortLabel,
+  getCompetitionCategory,
+} from "@/lib/helpers/competition";
+import { formatDateParts } from "@/lib/helpers/date";
 
-function TeamRow({ name, picture }: { name: string; picture: string }) {
+const OUR_TEAM_KEYWORD = "moslavac";
+
+function isOurTeam(name: string | null | undefined): boolean {
+  return !!name && name.toLowerCase().includes(OUR_TEAM_KEYWORD);
+}
+
+function TeamRow({
+  name,
+  picture,
+  isUs,
+}: {
+  name: string;
+  picture: string;
+  isUs: boolean;
+}) {
   return (
     <div className="flex items-center gap-3">
       <Avatar className="size-8 shrink-0">
@@ -18,7 +37,11 @@ function TeamRow({ name, picture }: { name: string; picture: string }) {
           {name.slice(0, 2).toUpperCase()}
         </AvatarFallback>
       </Avatar>
-      <span className="line-clamp-1 text-xs font-semibold uppercase tracking-[0.12em]">
+      <span
+        className={`line-clamp-1 text-xs uppercase tracking-[0.12em] ${
+          isUs ? "font-black text-foreground" : "font-semibold"
+        }`}
+      >
         {name}
       </span>
     </div>
@@ -137,24 +160,49 @@ export default function UpcomingMatchesSection() {
       <FadeInView delay={0.1}>
         <ScrollableRow>
           {matches.map((match) => {
-            const { date, time } = formatDateTime(match.dateTimeUTC ?? 0);
+            const { day, monthShort, weekdayShort, time } = formatDateParts(
+              match.dateTimeUTC ?? 0,
+            );
+            const category = getCompetitionCategory(match.competition?.name);
+            const categoryLabel = getCategoryShortLabel(category);
+            const chipClass = getCategoryChipClass(category);
+            const homeIsUs = isOurTeam(match.homeTeam?.name);
+            const awayIsUs = isOurTeam(match.awayTeam?.name);
+            const venueIndicator = homeIsUs ? "D" : awayIsUs ? "G" : null;
 
             return (
               <Link
                 key={match.id}
-                href={`/matches/${match.id}`}
-                aria-label={`${match.homeTeam?.name ?? ""} vs ${match.awayTeam?.name ?? ""} — ${date} ${time}`}
+                href={`/utakmice/${match.id}`}
+                aria-label={`${match.homeTeam?.name ?? ""} vs ${match.awayTeam?.name ?? ""} — ${day}. ${monthShort} ${time}`}
                 className="group flex w-72 shrink-0 snap-start flex-col gap-5 rounded-sm outline-none transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-4"
               >
-                <p className="line-clamp-2 text-xs font-medium uppercase tracking-[0.25em] text-muted-foreground">
-                  {match.competition?.name ?? ""}
-                </p>
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] ${chipClass}`}
+                  >
+                    {categoryLabel}
+                  </span>
+                  {venueIndicator && (
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                      · {venueIndicator === "D" ? "Doma" : "Gost"}
+                    </span>
+                  )}
+                </div>
 
                 <div className="flex items-baseline justify-between gap-3">
-                  <span className="text-3xl font-black uppercase leading-none tracking-tighter tabular-nums">
-                    {date}
-                  </span>
-                  <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-4xl font-black leading-none tracking-tighter tabular-nums">
+                      {day}
+                    </span>
+                    <span className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                      {monthShort}
+                      <span className="ml-2 text-muted-foreground/70">
+                        {weekdayShort}
+                      </span>
+                    </span>
+                  </div>
+                  <span className="text-sm font-bold uppercase tracking-[0.2em] tabular-nums">
                     {time}
                   </span>
                 </div>
@@ -163,10 +211,12 @@ export default function UpcomingMatchesSection() {
                   <TeamRow
                     name={match.homeTeam?.name ?? "N/A"}
                     picture={match.homeTeam?.picture ?? ""}
+                    isUs={homeIsUs}
                   />
                   <TeamRow
                     name={match.awayTeam?.name ?? "N/A"}
                     picture={match.awayTeam?.picture ?? ""}
+                    isUs={awayIsUs}
                   />
                 </div>
               </Link>

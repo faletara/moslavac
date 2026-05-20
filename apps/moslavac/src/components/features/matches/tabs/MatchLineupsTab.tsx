@@ -209,7 +209,7 @@ function PlayerRow({
     <li>
       {isLinkable ? (
         <Link
-          href={`/stats/${player.personId}/${competitionId}`}
+          href={`/statistika/${player.personId}/${competitionId}`}
           className="block transition-colors hover:bg-muted/30"
         >
           {inner}

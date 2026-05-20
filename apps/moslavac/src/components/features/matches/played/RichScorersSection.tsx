@@ -166,7 +166,7 @@ function ScorerRow({
 
   const NameNode = isLinkable ? (
     <Link
-      href={`/stats/${scorer.personId}/${competitionId}`}
+      href={`/statistika/${scorer.personId}/${competitionId}`}
       className="line-clamp-2 font-black uppercase leading-tight tracking-tight text-xs sm:text-sm md:text-base transition-colors hover:underline"
     >
       {scorer.name}
@@ -210,10 +210,22 @@ function ScorerRow({
         >
           {scorer.goals.map((g, i) => (
             <span
-              key={i}
-              className="rounded-full border border-border bg-background px-1.5 py-0.5 text-[0.55rem] font-medium tabular-nums text-foreground sm:px-2 sm:text-[0.6rem]"
+              key={`${g.minute}-${g.isMissedPenalty ? "m" : g.isPenalty ? "p" : "g"}-${i}`}
+              title={
+                g.isMissedPenalty
+                  ? "Promašen kazneni udarac"
+                  : g.isPenalty
+                    ? "Pogodak iz kaznenog udarca"
+                    : undefined
+              }
+              className={cn(
+                "rounded-full border px-1.5 py-0.5 text-[0.55rem] font-medium tabular-nums sm:px-2 sm:text-[0.6rem]",
+                g.isMissedPenalty
+                  ? "border-dashed border-muted-foreground/40 bg-transparent text-muted-foreground/60 line-through"
+                  : "border-border bg-background text-foreground",
+              )}
             >
-              {g.minute}&apos;{g.isPenalty ? " p" : ""}
+              {g.minute}&apos;{g.isMissedPenalty ? " p×" : g.isPenalty ? " p" : ""}
             </span>
           ))}
         </div>

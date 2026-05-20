@@ -32,7 +32,7 @@ export async function generateMetadata({
     title: name,
     description: `Ljestvica, utakmice i statistike za natjecanje ${name}.`,
     alternates: {
-      canonical: `${BASE_URL}/season/${competitionId}`,
+      canonical: `${BASE_URL}/sezona/${competitionId}`,
     },
   };
 }

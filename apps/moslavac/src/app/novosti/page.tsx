@@ -69,7 +69,7 @@ export default async function NewsPage({ searchParams }: Props) {
               return (
                 <StaggerItem key={doc.id}>
                   <Link
-                    href={`/news/${doc.id}`}
+                    href={`/novosti/${doc.id}`}
                     className="group grid grid-cols-[auto_1fr_auto] items-center gap-4 py-6 sm:gap-8 sm:py-8"
                   >
                     <div className="relative size-20 shrink-0 overflow-hidden rounded-sm bg-muted sm:size-28">
@@ -102,7 +102,7 @@ export default async function NewsPage({ searchParams }: Props) {
         {totalPages > 1 && (
           <nav className="mt-12 flex items-center justify-between gap-4 sm:mt-16">
             <Link
-              href={page > 2 ? `/news?page=${page - 1}` : "/news"}
+              href={page > 2 ? `/novosti?page=${page - 1}` : "/novosti"}
               aria-disabled={page <= 1}
               className={`group flex items-center gap-3 text-[0.65rem] font-medium uppercase tracking-[0.3em] text-muted-foreground transition-colors hover:text-foreground sm:text-xs ${
                 page <= 1 ? "pointer-events-none opacity-30" : ""
@@ -118,7 +118,7 @@ export default async function NewsPage({ searchParams }: Props) {
             </span>
 
             <Link
-              href={`/news?page=${page + 1}`}
+              href={`/novosti?page=${page + 1}`}
               aria-disabled={page >= totalPages}
               className={`group flex items-center gap-3 text-[0.65rem] font-medium uppercase tracking-[0.3em] text-muted-foreground transition-colors hover:text-foreground sm:text-xs ${
                 page >= totalPages ? "pointer-events-none opacity-30" : ""

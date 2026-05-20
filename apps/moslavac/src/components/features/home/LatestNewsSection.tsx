@@ -71,7 +71,7 @@ export default function LatestNewsSection() {
 					<StaggerItem key={item.id}>
 						<motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }}>
 							<Link
-								href={`/news/${item.id}`}
+								href={`/novosti/${item.id}`}
 								className="group flex flex-col gap-6"
 							>
 								<div className="relative aspect-4/3 w-full overflow-hidden">
@@ -109,7 +109,7 @@ export default function LatestNewsSection() {
 			<FadeInView>
 				<div className="flex justify-center pt-4">
 					<Link
-						href="/news"
+						href="/novosti"
 						className="group inline-flex items-center gap-3 text-xs font-medium uppercase tracking-[0.3em] text-foreground transition-colors hover:text-muted-foreground"
 					>
 						Sve vijesti

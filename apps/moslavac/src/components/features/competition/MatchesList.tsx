@@ -87,7 +87,7 @@ function MatchRow({ match }: { match: HnsMatch }) {
 	return (
 		<li>
 			<Link
-				href={`/matches/${match.id}`}
+				href={`/utakmice/${match.id}`}
 				className="group grid grid-cols-[1fr_auto_1fr] items-center gap-3 px-1 py-5 transition-colors hover:bg-muted/30 sm:gap-8 sm:py-6"
 			>
 				<TeamSide

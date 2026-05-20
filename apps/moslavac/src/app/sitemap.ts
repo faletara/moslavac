@@ -11,12 +11,12 @@ const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3001";
 
 const STATIC_ROUTES: MetadataRoute.Sitemap = [
   { url: `${BASE_URL}/`, changeFrequency: "daily", priority: 1 },
-  { url: `${BASE_URL}/news`, changeFrequency: "daily", priority: 0.9 },
-  { url: `${BASE_URL}/matches`, changeFrequency: "weekly", priority: 0.8 },
-  { url: `${BASE_URL}/first-team`, changeFrequency: "monthly", priority: 0.7 },
+  { url: `${BASE_URL}/novosti`, changeFrequency: "daily", priority: 0.9 },
+  { url: `${BASE_URL}/utakmice`, changeFrequency: "weekly", priority: 0.8 },
+  { url: `${BASE_URL}/prva-momcad`, changeFrequency: "monthly", priority: 0.7 },
   { url: `${BASE_URL}/klub`, changeFrequency: "yearly", priority: 0.6 },
   { url: `${BASE_URL}/oprema`, changeFrequency: "monthly", priority: 0.5 },
-  { url: `${BASE_URL}/season-ticket`, changeFrequency: "monthly", priority: 0.5 },
+  { url: `${BASE_URL}/sezonska-iskaznica`, changeFrequency: "monthly", priority: 0.5 },
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -28,7 +28,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const newsUrls: MetadataRoute.Sitemap =
     newsResult.status === "fulfilled"
       ? newsResult.value.docs.map((article) => ({
-          url: `${BASE_URL}/news/${article.id}`,
+          url: `${BASE_URL}/novosti/${article.id}`,
           lastModified: new Date(article.updatedAt),
           changeFrequency: "monthly" as const,
           priority: 0.7,
@@ -44,22 +44,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const competitionUrls: MetadataRoute.Sitemap = competitions.flatMap((c) => [
     {
-      url: `${BASE_URL}/season/${c.id}`,
+      url: `${BASE_URL}/sezona/${c.id}`,
       changeFrequency: "daily" as const,
       priority: 0.8,
     },
     {
-      url: `${BASE_URL}/season/${c.id}/utakmice`,
+      url: `${BASE_URL}/sezona/${c.id}/tablica`,
       changeFrequency: "daily" as const,
       priority: 0.7,
     },
     {
-      url: `${BASE_URL}/season/${c.id}/strijelci`,
+      url: `${BASE_URL}/sezona/${c.id}/strijelci`,
       changeFrequency: "weekly" as const,
       priority: 0.6,
     },
     {
-      url: `${BASE_URL}/season/${c.id}/kartoni`,
+      url: `${BASE_URL}/sezona/${c.id}/kartoni`,
       changeFrequency: "weekly" as const,
       priority: 0.6,
     },
@@ -76,7 +76,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return result.value
       .filter((m) => m.id != null && m.allowDetail !== false)
       .map((m) => ({
-        url: `${BASE_URL}/matches/${m.id}`,
+        url: `${BASE_URL}/utakmice/${m.id}`,
         changeFrequency: "weekly" as const,
         priority: 0.6,
       }));

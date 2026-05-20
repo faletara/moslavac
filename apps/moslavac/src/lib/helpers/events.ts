@@ -5,29 +5,43 @@ export const formatEventTime = (
   stoppageTime?: number
 ): string => (stoppageTime ? `${minuteFull}+${stoppageTime}` : `${minuteFull}'`);
 
-const matchesType = (event: HnsMatchEvent, ...needles: string[]): boolean => {
-  const name = (event.eventType?.name ?? "").toLowerCase();
-  return needles.some((n) => name.includes(n));
+// HNS event types — keyed by stable `eventType.fcdName` enum (not the localized `name`,
+// which can vary, e.g. PENALTY_FAILED appears as both "Neiskorišteni kazneni udarac" and
+// "Promašaj"). Verified against /api/live/match/{id}/events.
+const GOAL_FCD_NAMES = new Set(["GOAL", "PENALTY", "PENALTY_GOAL", "OWN_GOAL"]);
+const PENALTY_GOAL_FCD_NAMES = new Set(["PENALTY", "PENALTY_GOAL"]);
+const MISSED_PENALTY_FCD_NAMES = new Set(["PENALTY_FAILED"]);
+const YELLOW_FCD_NAMES = new Set(["YELLOW"]);
+const RED_FCD_NAMES = new Set(["RED", "SECOND_YELLOW"]);
+const SUBSTITUTION_FCD_NAMES = new Set(["SUBSTITUTION"]);
+
+const hasFcd = (event: HnsMatchEvent, set: Set<string>): boolean => {
+  const fcd = event.eventType?.fcdName;
+  return !!fcd && set.has(fcd);
 };
 
 export const isGoalEvent = (event: HnsMatchEvent): boolean =>
-  matchesType(event, "gol", "goal", "pogodak", "kazneni", "penal");
+  hasFcd(event, GOAL_FCD_NAMES);
 
 export const isPenaltyGoalEvent = (event: HnsMatchEvent): boolean =>
-  matchesType(event, "kazneni", "penal");
+  hasFcd(event, PENALTY_GOAL_FCD_NAMES);
+
+export const isMissedPenaltyEvent = (event: HnsMatchEvent): boolean =>
+  hasFcd(event, MISSED_PENALTY_FCD_NAMES);
 
 export const isYellowCardEvent = (event: HnsMatchEvent): boolean =>
-  matchesType(event, "žuti", "zuti");
+  hasFcd(event, YELLOW_FCD_NAMES);
 
 export const isRedCardEvent = (event: HnsMatchEvent): boolean =>
-  matchesType(event, "crveni");
+  hasFcd(event, RED_FCD_NAMES);
 
 export const isSubstitutionEvent = (event: HnsMatchEvent): boolean =>
-  matchesType(event, "zamjena", "substitut");
+  hasFcd(event, SUBSTITUTION_FCD_NAMES);
 
 export interface ScorerGoal {
   minute: number;
   isPenalty: boolean;
+  isMissedPenalty: boolean;
 }
 
 export interface ScorerEntry {
@@ -43,16 +57,18 @@ const groupScorersForSide = (
 ): ScorerEntry[] => {
   const goals = events.filter(
     (e) =>
-      isGoalEvent(e) &&
+      (isGoalEvent(e) || isMissedPenaltyEvent(e)) &&
       (side === "home" ? e.homeTeam === true : e.homeTeam === false),
   );
 
   const map = new Map<string, ScorerEntry>();
   for (const goal of goals) {
     const name = (goal.player?.name ?? "").trim() || "Nepoznat strijelac";
+    const missed = isMissedPenaltyEvent(goal);
     const entry: ScorerGoal = {
       minute: goal.minuteFull ?? goal.minute ?? 0,
-      isPenalty: isPenaltyGoalEvent(goal),
+      isPenalty: missed || isPenaltyGoalEvent(goal),
+      isMissedPenalty: missed,
     };
     const existing = map.get(name);
     if (existing) {

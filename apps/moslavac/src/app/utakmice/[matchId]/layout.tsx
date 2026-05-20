@@ -67,7 +67,7 @@ export async function generateMetadata({
     title,
     description: parts.join(" · "),
     alternates: {
-      canonical: `${BASE_URL}/matches/${matchId}`,
+      canonical: `${BASE_URL}/utakmice/${matchId}`,
     },
     openGraph: {
       type: "website",

@@ -135,7 +135,7 @@ function ScorerRow({
       <TableCell className="min-w-0">
         {isLinkable ? (
           <Link
-            href={`/stats/${personId}/${competitionId}`}
+            href={`/statistika/${personId}/${competitionId}`}
             className="block transition-colors hover:text-foreground"
           >
             {playerCell}

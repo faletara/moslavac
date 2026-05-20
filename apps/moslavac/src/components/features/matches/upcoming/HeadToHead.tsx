@@ -102,7 +102,7 @@ function H2HRow({
   return (
     <li>
       <Link
-        href={`/matches/${match.id}`}
+        href={`/utakmice/${match.id}`}
         className="grid grid-cols-[auto_1fr_auto_auto] items-center gap-3 py-3 transition-colors hover:bg-muted/30 sm:gap-5 sm:py-4"
       >
         <span

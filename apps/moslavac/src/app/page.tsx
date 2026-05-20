@@ -1,3 +1,4 @@
+import ComeToMatchSection from "@/components/features/home/ComeToMatchSection";
 import Hero from "@/components/features/home/Hero";
 import LatestNewsSection from "@/components/features/home/LatestNewsSection";
 import LeagueStandingsSection from "@/components/features/home/LeagueStandingsSection";
@@ -18,6 +19,7 @@ export default async function HomePage() {
 			<PreviousAndNextMatchSection />
 			<LatestNewsSection />
 			<UpcomingMatchesSection />
+			<ComeToMatchSection />
 			<LeagueStandingsSection />
 			<TopScorersSection />
 			<YouTubePromoSection />

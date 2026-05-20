@@ -121,7 +121,7 @@ export default function Footer({ tenant }: FooterProps) {
             <ul className="space-y-2 text-sm leading-relaxed">
               <li>
                 <Link
-                  href="/news"
+                  href="/novosti"
                   className="transition-colors hover:text-muted-foreground"
                 >
                   Vijesti
@@ -129,7 +129,7 @@ export default function Footer({ tenant }: FooterProps) {
               </li>
               <li>
                 <Link
-                  href="/matches"
+                  href="/utakmice"
                   className="transition-colors hover:text-muted-foreground"
                 >
                   Utakmice
@@ -137,7 +137,7 @@ export default function Footer({ tenant }: FooterProps) {
               </li>
               <li>
                 <Link
-                  href="/first-team"
+                  href="/prva-momcad"
                   className="transition-colors hover:text-muted-foreground"
                 >
                   Momčad
@@ -145,7 +145,7 @@ export default function Footer({ tenant }: FooterProps) {
               </li>
               <li>
                 <Link
-                  href="/season-ticket"
+                  href="/sezonska-iskaznica"
                   className="transition-colors hover:text-muted-foreground"
                 >
                   Sezonska ulaznica

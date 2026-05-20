@@ -170,7 +170,7 @@ export function PreviousMatchCard({ match }: PreviousMatchCardProps) {
 
   return (
     <motion.div whileHover={{ y: -2 }} transition={{ duration: 0.2 }}>
-      <Link href={`/matches/${match.id}`} className="block">
+      <Link href={`/utakmice/${match.id}`} className="block">
         {inner}
       </Link>
     </motion.div>

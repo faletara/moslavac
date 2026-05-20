@@ -171,7 +171,7 @@ function EventRow({
 
   const NameNode = isLinkable ? (
     <Link
-      href={`/stats/${personId}/${competitionId}`}
+      href={`/statistika/${personId}/${competitionId}`}
       className="font-black uppercase leading-tight tracking-tight transition-colors hover:underline text-sm sm:text-base"
     >
       {playerName}

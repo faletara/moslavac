@@ -97,7 +97,7 @@ export default function MatchesCalendar({ matches }: MatchesCalendarProps) {
 		return format(cursor, "EEEE, d. LLLL yyyy.", { locale: hr });
 	}, [cursor, view]);
 
-	const handleEventClick = (id: number) => router.push(`/matches/${id}`);
+	const handleEventClick = (id: number) => router.push(`/utakmice/${id}`);
 
 	const handleDayClick = (date: Date) => {
 		setCursor(date);

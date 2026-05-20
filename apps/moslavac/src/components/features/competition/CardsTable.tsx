@@ -197,7 +197,7 @@ function CardRow({
       <TableCell className="min-w-0">
         {isLinkable ? (
           <Link
-            href={`/stats/${row.personId}/${competitionId}`}
+            href={`/statistika/${row.personId}/${competitionId}`}
             className="block transition-colors hover:text-foreground"
           >
             {playerCell}

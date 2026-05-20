@@ -16,9 +16,6 @@ const EASE = [0.25, 0.1, 0.25, 1] as const;
 export default function Hero({ tenant }: HeroProps) {
 	const reduced = useReducedMotion();
 	const founded = tenant.branding?.founded ?? null;
-	const motto =
-		tenant.branding?.motto ??
-		"Više od devet desetljeća popovačkog nogometa. Strast, ponos i klub koji pišemo zajedno.";
 	const nameParts = splitDisplayName(tenant.displayName);
 	const taglinePrefix = founded ? `Osnovan ${founded}` : tenant.displayName;
 
@@ -108,16 +105,6 @@ export default function Hero({ tenant }: HeroProps) {
 						</span>
 					))}
 				</h1>
-
-				{/* Motto */}
-				<motion.p
-					className="mx-auto mt-8 max-w-md text-balance text-sm leading-relaxed text-muted-foreground md:mt-10 md:max-w-xl md:text-base"
-					initial={{ opacity: 0, y: reduced ? 0 : 16 }}
-					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.6, delay: 0.6, ease: EASE }}
-				>
-					{motto}
-				</motion.p>
 
 				{/* CTA */}
 				<motion.div

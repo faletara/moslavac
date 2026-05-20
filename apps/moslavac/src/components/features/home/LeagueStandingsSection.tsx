@@ -244,7 +244,7 @@ export default function LeagueStandingsSection() {
 			<FadeInView>
 				<div className="flex justify-center pt-4">
 					<Link
-						href={`/season/${senior.id}`}
+						href={`/sezona/${senior.id}`}
 						className="group inline-flex items-center gap-3 text-xs font-medium uppercase tracking-[0.3em] text-foreground transition-colors hover:text-muted-foreground"
 					>
 						Cijela sezona

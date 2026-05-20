@@ -1,5 +1,17 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+	title: "Prva momčad",
+	description: "Igrači i stručni stožer prve momčadi NK Moslavac.",
+};
+import { FirstTeamHero } from "@/components/features/first-team/FirstTeamHero";
+import {
+	PlayerGrid,
+	PlayerGridItem,
+} from "@/components/features/first-team/PlayerGrid";
+import { FadeInView } from "@/components/animations";
 import { getCometImageUrl } from "@/lib/api";
 import { fetchSeniorCompetition } from "@/lib/hns/competitions";
 import { fetchPlayerDetails } from "@/lib/hns/players";
@@ -79,8 +91,8 @@ export default async function FirstTeamPage() {
 	}
 
 	return (
-		<div className="mx-auto w-full max-w-screen-xl space-y-24 px-6 py-16 sm:space-y-32 sm:py-24 lg:px-8">
-			<PageHero
+		<div className="mx-auto w-full max-w-7xl space-y-24 px-6 py-16 sm:space-y-32 sm:py-24 lg:px-8">
+			<FirstTeamHero
 				totalPlayers={totalPlayers}
 				clubName={tenant.displayName}
 				founded={tenant.branding?.founded ?? null}
@@ -90,54 +102,26 @@ export default async function FirstTeamPage() {
 				const group = grouped[pos];
 				return (
 					<section key={pos} className="space-y-12 sm:space-y-16">
-						<SectionHeader title={positionLabels[pos]} count={group.length} />
-						<div className="grid grid-cols-2 gap-x-4 gap-y-12 sm:grid-cols-3 sm:gap-x-6 sm:gap-y-16 lg:grid-cols-4 lg:gap-x-8">
+						<FadeInView>
+							<SectionHeader title={positionLabels[pos]} count={group.length} />
+						</FadeInView>
+						<PlayerGrid>
 							{group.map((entry) => (
-								<PlayerCard
-									key={entry.id}
-									entry={entry}
-									competitionId={competitionId}
-									cometPictureUuid={
-										cometPictureByPersonId.get(entry.personId) ?? null
-									}
-								/>
+								<PlayerGridItem key={entry.id}>
+									<PlayerCard
+										entry={entry}
+										competitionId={competitionId}
+										cometPictureUuid={
+											cometPictureByPersonId.get(entry.personId) ?? null
+										}
+									/>
+								</PlayerGridItem>
 							))}
-						</div>
+						</PlayerGrid>
 					</section>
 				);
 			})}
 		</div>
-	);
-}
-
-function PageHero({
-	totalPlayers,
-	clubName,
-	founded,
-}: {
-	totalPlayers: number;
-	clubName: string;
-	founded: number | null;
-}) {
-	return (
-		<header className="flex flex-col items-center gap-8 text-center">
-			<span className="h-px w-12 bg-foreground" />
-			<p className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
-				Prva momčad · Sezona 2025/26
-			</p>
-			<h1
-				aria-label={`Momčad ${clubName}`}
-				className="select-none text-balance font-black uppercase leading-[0.85] tracking-tighter"
-			>
-				<span className="block text-[20vw] sm:text-7xl md:text-8xl lg:text-9xl">
-					Momčad
-				</span>
-			</h1>
-			<p className="max-w-md text-sm leading-relaxed text-muted-foreground">
-				{totalPlayers} igrača i stručni stožer koji nose dres {clubName}.
-				{founded ? ` Klub od ${founded}.` : ""}
-			</p>
-		</header>
 	);
 }
 
@@ -147,9 +131,6 @@ function SectionHeader({ title, count }: { title: string; count: number }) {
 			<h2 className="font-black uppercase leading-[0.85] tracking-tighter text-3xl sm:text-5xl md:text-6xl">
 				{title}
 			</h2>
-			<span className="whitespace-nowrap text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs">
-				{count} {count === 1 ? "član" : "članova"}
-			</span>
 		</div>
 	);
 }
@@ -177,7 +158,7 @@ function PlayerCard({
 
 	const inner = (
 		<article className="group flex flex-col gap-5">
-			<div className="relative aspect-[3/4] w-full overflow-hidden bg-muted">
+			<div className="relative aspect-3/4 w-full overflow-hidden bg-muted">
 				{photoUrl ? (
 					<Image
 						src={photoUrl}
@@ -233,7 +214,7 @@ function PlayerCard({
 	if (linkable && competitionId != null) {
 		return (
 			<Link
-				href={`/stats/${entry.personId}/${competitionId}`}
+				href={`/statistika/${entry.personId}/${competitionId}`}
 				aria-label={`Statistike igrača ${entry.displayName}`}
 			>
 				{inner}
