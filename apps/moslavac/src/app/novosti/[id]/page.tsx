@@ -6,7 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import { TrackEvent } from "@/components/analytics/TrackEvent";
 import { formatDateLong } from "@/lib/helpers/date";
 import { fetchNewsById, fetchNewsPaginated } from "@/lib/payload/getNews";
-import { tenantSlug } from "@/lib/payload/getTenant";
+import { getTenant, tenantSlug } from "@/lib/payload/getTenant";
 import { adaptPayloadNews } from "@/lib/payload/news-adapter";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3001";
@@ -63,6 +63,7 @@ export default async function NewsDetailPage({ params }: Props) {
     notFound();
   }
   const news = adaptPayloadNews(doc, tenantSlug);
+  const tenant = await getTenant();
 
   const date = new Date(news.date);
   const formattedDate = formatDateLong(news.date);
@@ -71,8 +72,40 @@ export default async function NewsDetailPage({ params }: Props) {
     minute: "2-digit",
   });
 
+  const articleJsonLd: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    headline: news.title,
+    datePublished: doc.publishedAt ?? doc.createdAt,
+    dateModified: doc.updatedAt ?? doc.publishedAt ?? doc.createdAt,
+    mainEntityOfPage: `${BASE_URL}/novosti/${id}`,
+    publisher: {
+      "@type": "Organization",
+      name: tenant.displayName,
+    },
+    ...(news.thumbnailPath ? { image: [news.thumbnailPath] } : {}),
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Početna", item: `${BASE_URL}/` },
+      { "@type": "ListItem", position: 2, name: "Vijesti", item: `${BASE_URL}/novosti` },
+      { "@type": "ListItem", position: 3, name: news.title, item: `${BASE_URL}/novosti/${id}` },
+    ],
+  };
+
   return (
     <article className="mx-auto w-full max-w-3xl px-6 pt-12 pb-24 sm:pt-16 lg:px-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <TrackEvent event="News Article View" props={{ title: news.title }} />
       <Link
         href="/novosti"

@@ -5,6 +5,7 @@ import { ArrowUpRight } from "lucide-react";
 export const metadata: Metadata = {
   title: "Oprema",
   description: "Dresovi, oprema i navijački artikli NK Moslavac.",
+  alternates: { canonical: "/oprema" },
 };
 import { fetchEquipment } from "@/lib/payload/getEquipment";
 import { getTenant, tenantSlug } from "@/lib/payload/getTenant";

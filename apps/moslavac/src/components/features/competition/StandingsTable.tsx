@@ -1,9 +1,8 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { HnsCrest } from "@/components/HnsCrest";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useTenant } from "@/components/providers/TenantProvider";
-import { getCometImageUrl } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import type { TeamRanking } from "@/types/hns";
 
@@ -57,13 +56,6 @@ export default function StandingsTable({
 						const teamName = row.team?.name ?? "";
 						const isClub = teamName.includes(shortName);
 						const picture = row.team?.picture ?? "";
-						const initials = teamName
-							.split(/\s+/)
-							.map((p) => p[0] ?? "")
-							.join("")
-							.slice(0, 3)
-							.toUpperCase();
-
 						return (
 							<tr
 								key={`${row.team?.id ?? teamName}-${i}`}
@@ -84,17 +76,12 @@ export default function StandingsTable({
 								</td>
 								<td className="py-3 pr-2">
 									<div className="flex items-center gap-3">
-										<Avatar className="size-7 shrink-0">
-											{picture && (
-												<AvatarImage
-													src={getCometImageUrl(picture)}
-													alt={teamName}
-												/>
-											)}
-											<AvatarFallback className="bg-transparent text-[0.55rem] font-semibold uppercase tracking-wider text-muted-foreground">
-												{initials || teamName.slice(0, 2).toUpperCase()}
-											</AvatarFallback>
-										</Avatar>
+										<HnsCrest
+											picture={picture}
+											name={teamName}
+											size={28}
+											className="size-7 shrink-0"
+										/>
 										<span
 											className={cn(
 												"line-clamp-1",

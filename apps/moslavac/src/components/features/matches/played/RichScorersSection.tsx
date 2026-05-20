@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { AnimatedCounter, AnimatedLine, FadeInView } from "@/components/animations";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getCometImageUrl } from "@/lib/api";
+import { HnsCrest } from "@/components/HnsCrest";
 import { getScorers, type ScorerEntry } from "@/lib/helpers/events";
 import { cn } from "@/lib/utils";
 import type { HnsMatch, HnsMatchEvent } from "@/types/hns";
@@ -79,7 +78,6 @@ function TeamScorersColumn({
   align: "left" | "right";
 }) {
   const isRight = align === "right";
-  const teamInitials = teamName.slice(0, 2).toUpperCase();
 
   return (
     <div
@@ -94,14 +92,12 @@ function TeamScorersColumn({
           isRight ? "flex-row-reverse" : "flex-row",
         )}
       >
-        <Avatar className="size-9 shrink-0 sm:size-10">
-          {teamPicture && (
-            <AvatarImage src={getCometImageUrl(teamPicture)} alt={teamName} />
-          )}
-          <AvatarFallback className="text-[0.55rem] font-semibold uppercase tracking-[0.15em]">
-            {teamInitials}
-          </AvatarFallback>
-        </Avatar>
+        <HnsCrest
+          picture={teamPicture}
+          name={teamName}
+          size={40}
+          className="size-9 shrink-0 sm:size-10"
+        />
         <div
           className={cn(
             "flex min-w-0 flex-1 flex-col gap-0.5",
@@ -156,13 +152,6 @@ function ScorerRow({
 }) {
   const isRight = align === "right";
   const isLinkable = scorer.personId != null && competitionId != null;
-  const initials = scorer.name
-    .split(" ")
-    .map((p) => p[0])
-    .filter(Boolean)
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
 
   const NameNode = isLinkable ? (
     <Link
@@ -184,17 +173,12 @@ function ScorerRow({
         isRight && "flex-row-reverse",
       )}
     >
-      <Avatar className="size-8 shrink-0 sm:size-10">
-        {scorer.picture && (
-          <AvatarImage
-            src={getCometImageUrl(scorer.picture)}
-            alt={scorer.name}
-          />
-        )}
-        <AvatarFallback className="text-[0.55rem] font-semibold uppercase tracking-[0.15em]">
-          {initials}
-        </AvatarFallback>
-      </Avatar>
+      <HnsCrest
+        picture={scorer.picture}
+        name={scorer.name}
+        size={40}
+        className="size-8 shrink-0 sm:size-10"
+      />
       <div
         className={cn(
           "flex min-w-0 flex-1 flex-col gap-1",

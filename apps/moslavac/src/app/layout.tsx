@@ -32,18 +32,22 @@ export async function generateMetadata(): Promise<Metadata> {
       template: `%s | ${name}`,
     },
     description,
+    alternates: {
+      canonical: "/",
+    },
     openGraph: {
       type: "website",
       locale: "hr_HR",
       siteName: name,
       title: name,
       description,
-      images: [{ url: ogImage, alt: name }],
+      images: [{ url: ogImage, alt: name, width: 1200, height: 630 }],
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title: name,
       description,
+      images: [ogImage],
     },
   };
 }

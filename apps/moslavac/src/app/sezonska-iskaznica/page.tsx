@@ -7,6 +7,7 @@ import { getTenant } from "@/lib/payload/getTenant";
 export const metadata: Metadata = {
   title: "Sezonska ulaznica",
   description: "Kupite sezonsku ulaznicu",
+  alternates: { canonical: "/sezonska-iskaznica" },
 };
 
 export default async function SeasonTicketPage() {

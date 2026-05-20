@@ -1,8 +1,7 @@
 import { notFound } from "next/navigation";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { HnsCrest } from "@/components/HnsCrest";
 import { TrackEvent } from "@/components/analytics/TrackEvent";
 import MatchTabs from "@/components/features/matches/tabs/MatchTabs";
-import { getCometImageUrl } from "@/lib/api";
 import {
   fetchMatchEvents,
   fetchMatchInfo,
@@ -14,6 +13,8 @@ import { formatDateTime } from "@/lib/helpers/date";
 interface Props {
   params: Promise<{ matchId: string }>;
 }
+
+export const revalidate = 30;
 
 export default async function MatchInfoPage({ params }: Props) {
   const { matchId } = await params;
@@ -125,12 +126,12 @@ function TeamDisplay({
 }) {
   return (
     <div className="flex flex-col items-center gap-4 text-center">
-      <Avatar className="size-16 sm:size-24">
-        {picture && <AvatarImage src={getCometImageUrl(picture)} alt={name} />}
-        <AvatarFallback className="text-[0.65rem] font-semibold uppercase tracking-[0.2em]">
-          {name.slice(0, 2).toUpperCase()}
-        </AvatarFallback>
-      </Avatar>
+      <HnsCrest
+        picture={picture}
+        name={name}
+        size={96}
+        className="size-16 sm:size-24"
+      />
       <span className="line-clamp-2 text-[0.65rem] font-semibold uppercase leading-tight tracking-[0.2em] sm:text-xs sm:tracking-[0.25em]">
         {name}
       </span>

@@ -10,6 +10,7 @@ import type { HnsFacility } from "@/types/hns";
 export const metadata: Metadata = {
   title: "O klubu",
   description: "Informacije o klubu, kontakt i lokacija stadiona",
+  alternates: { canonical: "/klub" },
 };
 
 export default async function KlubPage() {

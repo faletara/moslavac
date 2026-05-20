@@ -1,8 +1,7 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { HnsCrest } from "@/components/HnsCrest";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getCometImageUrl } from "@/lib/api";
 import { getRecentForm, type FormResult } from "@/lib/helpers/form";
 import { cn } from "@/lib/utils";
 import type { HnsMatch, TeamRanking } from "@/types/hns";
@@ -167,12 +166,12 @@ function TeamHeader({
         isRight ? "flex-row-reverse text-right" : "text-left",
       )}
     >
-      <Avatar className="size-10 shrink-0 sm:size-12">
-        {picture && <AvatarImage src={getCometImageUrl(picture)} alt={name} />}
-        <AvatarFallback className="text-[0.55rem] font-semibold uppercase tracking-[0.15em]">
-          {name.slice(0, 2).toUpperCase()}
-        </AvatarFallback>
-      </Avatar>
+      <HnsCrest
+        picture={picture}
+        name={name}
+        size={48}
+        className="size-10 shrink-0 sm:size-12"
+      />
       <span className="line-clamp-2 text-[0.65rem] font-semibold uppercase leading-tight tracking-[0.15em] sm:text-xs sm:tracking-[0.2em]">
         {name}
       </span>

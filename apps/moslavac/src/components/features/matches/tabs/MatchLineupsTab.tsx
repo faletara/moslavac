@@ -2,9 +2,8 @@
 
 import Link from "next/link";
 import { AnimatedLine, FadeInView } from "@/components/animations";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { HnsCrest } from "@/components/HnsCrest";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getCometImageUrl } from "@/lib/api";
 import type { HnsLineups, HnsMatch, HnsTeamPlayer } from "@/types/hns";
 
 interface MatchLineupsTabProps {
@@ -112,19 +111,16 @@ function LineupColumn({
   const players = teamLineup.players ?? [];
   const starters = players.filter((p) => p.starting === true);
   const substitutes = players.filter((p) => p.starting !== true);
-  const teamInitials = teamName.slice(0, 2).toUpperCase();
 
   return (
     <div>
       <div className="flex items-center gap-3 border-b border-border/60 pb-3">
-        <Avatar className="size-9 shrink-0">
-          {teamPicture && (
-            <AvatarImage src={getCometImageUrl(teamPicture)} alt={teamName} />
-          )}
-          <AvatarFallback className="text-[0.55rem] font-semibold uppercase tracking-[0.15em]">
-            {teamInitials}
-          </AvatarFallback>
-        </Avatar>
+        <HnsCrest
+          picture={teamPicture}
+          name={teamName}
+          size={36}
+          className="size-9 shrink-0"
+        />
         <h3 className="line-clamp-1 text-sm font-black uppercase tracking-tight">
           {teamName}
         </h3>
@@ -185,17 +181,12 @@ function PlayerRow({
       <span className="w-6 text-right font-medium tabular-nums text-xs text-muted-foreground">
         {player.shirtNumber ?? "—"}
       </span>
-      <Avatar className="size-7 shrink-0">
-        {player.picture && (
-          <AvatarImage
-            src={getCometImageUrl(player.picture)}
-            alt={playerName}
-          />
-        )}
-        <AvatarFallback className="text-[0.5rem] font-semibold uppercase">
-          {playerName.slice(0, 2).toUpperCase()}
-        </AvatarFallback>
-      </Avatar>
+      <HnsCrest
+        picture={player.picture}
+        name={playerName}
+        size={28}
+        className="size-7 shrink-0"
+      />
       <span className={muted ? "" : "font-medium"}>{playerName}</span>
       {player.captain && (
         <span className="ml-auto rounded border border-border px-1.5 py-px text-[0.55rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">

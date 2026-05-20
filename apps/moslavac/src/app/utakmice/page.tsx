@@ -2,6 +2,8 @@ import { FadeInView } from "@/components/animations";
 import MatchesCalendar from "@/components/features/matches/MatchesCalendar";
 import { fetchAllMatches } from "@/lib/hns/matches";
 
+export const revalidate = 120;
+
 export default async function MatchesPage() {
   const matches = await fetchAllMatches();
   return (

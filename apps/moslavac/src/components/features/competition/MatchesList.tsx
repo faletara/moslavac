@@ -1,34 +1,20 @@
 "use client";
 
 import Link from "next/link";
+import { HnsCrest } from "@/components/HnsCrest";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getCometImageUrl } from "@/lib/api";
 import { formatDateTime } from "@/lib/helpers/date";
 import { cn } from "@/lib/utils";
 import type { HnsMatch } from "@/types/hns";
 
-function teamInitials(name: string) {
-	return (
-		name
-			.split(/\s+/)
-			.map((p) => p[0] ?? "")
-			.join("")
-			.slice(0, 3)
-			.toUpperCase() || name.slice(0, 2).toUpperCase()
-	);
-}
-
 function TeamCrest({ name, picture }: { name: string; picture: string }) {
 	return (
-		<Avatar className="size-9 shrink-0 sm:size-11">
-			{picture && (
-				<AvatarImage src={getCometImageUrl(picture)} alt={name} />
-			)}
-			<AvatarFallback className="bg-transparent text-[0.55rem] font-semibold uppercase tracking-wider text-muted-foreground">
-				{teamInitials(name)}
-			</AvatarFallback>
-		</Avatar>
+		<HnsCrest
+			picture={picture}
+			name={name}
+			size={44}
+			className="size-9 shrink-0 sm:size-11"
+		/>
 	);
 }
 

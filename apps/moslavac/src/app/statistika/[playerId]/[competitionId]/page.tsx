@@ -1,14 +1,15 @@
 import { notFound } from "next/navigation";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { HnsCrest } from "@/components/HnsCrest";
 import { Progress } from "@/components/ui/progress";
 import { TrackEvent } from "@/components/analytics/TrackEvent";
-import { getCometImageUrl } from "@/lib/api";
 import { fetchPlayerDetails, fetchPlayerStats } from "@/lib/hns/players";
 import { cn } from "@/lib/utils";
 
 interface Props {
   params: Promise<{ playerId: string; competitionId: string }>;
 }
+
+export const revalidate = 600;
 
 export default async function PlayerStatsPage({ params }: Props) {
   const { playerId, competitionId } = await params;
@@ -27,13 +28,6 @@ export default async function PlayerStatsPage({ params }: Props) {
   const picture = playerDetails.picture;
   const shirtNumber = playerDetails.shirtNumber;
   const isCaptain = playerDetails.captain ?? false;
-
-  const initials = playerName
-    .split(/\s+/)
-    .map((p) => p[0] ?? "")
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
 
   const appearances = playerStats?.matchesPlayed ?? 0;
   const goals = playerStats?.goals ?? 0;
@@ -74,14 +68,12 @@ export default async function PlayerStatsPage({ params }: Props) {
           </p>
         )}
 
-        <Avatar className="size-32 sm:size-40">
-          {picture && (
-            <AvatarImage src={getCometImageUrl(picture)} alt={playerName} />
-          )}
-          <AvatarFallback className="bg-transparent text-base font-semibold uppercase tracking-wider text-muted-foreground">
-            {initials || "?"}
-          </AvatarFallback>
-        </Avatar>
+        <HnsCrest
+          picture={picture}
+          name={playerName}
+          size={160}
+          className="size-32 sm:size-40"
+        />
 
         <h1 className="select-none text-balance font-black uppercase leading-[0.85] tracking-tighter">
           <span className="block text-[14vw] sm:text-6xl md:text-7xl lg:text-8xl">

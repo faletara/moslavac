@@ -123,11 +123,30 @@ export default async function MatchLayout({
     jsonLd.awayScore = { "@type": "QuantitativeValue", value: awayScore };
   }
 
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Početna", item: `${BASE_URL}/` },
+      { "@type": "ListItem", position: 2, name: "Utakmice", item: `${BASE_URL}/utakmice` },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: `${home} – ${away}`,
+        item: `${BASE_URL}/utakmice/${matchId}`,
+      },
+    ],
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       {children}
     </>

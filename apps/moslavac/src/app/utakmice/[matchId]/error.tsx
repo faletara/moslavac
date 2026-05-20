@@ -2,7 +2,7 @@
 
 import { ErrorState } from "@/components/feedback/ErrorState";
 
-export default function FirstTeamError({
+export default function MatchError({
   reset,
 }: {
   error: Error & { digest?: string };
@@ -10,8 +10,8 @@ export default function FirstTeamError({
 }) {
   return (
     <ErrorState
-      title="Greška pri učitavanju igrača"
-      description="Nismo uspjeli dohvatiti popis igrača prve momčadi."
+      title="Greška pri učitavanju utakmice"
+      description="Nismo uspjeli dohvatiti podatke o utakmici."
       reset={reset}
     />
   );

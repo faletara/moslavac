@@ -9,7 +9,8 @@ import type {
 import { tenantSlug } from "../payload/getTenant";
 import { getHnsTeamId, hnsFetch } from "./client";
 
-const MATCH_TTL = 300;
+const MATCH_TTL = 60;
+const LIVE_MATCH_TTL = 30;
 
 async function fetchPastTeamMatches(): Promise<HnsMatch[]> {
   const teamId = await getHnsTeamId();
@@ -92,7 +93,7 @@ export async function fetchMatchInfo(params: {
   return hnsFetch<HnsMatch>(
     `/api/live/match/${params.matchId}?teamIdFilter=${teamId}`,
     {
-      revalidate: MATCH_TTL,
+      revalidate: LIVE_MATCH_TTL,
       tags: [`hns-${tenantSlug}-match-${params.matchId}`],
     },
   );
@@ -105,7 +106,7 @@ export async function fetchMatchEvents(params: {
   const result = await hnsFetch<HnsMatchEvent[]>(
     `/api/live/match/${params.matchId}/events?teamIdFilter=${teamId}&showComments=true`,
     {
-      revalidate: 60,
+      revalidate: LIVE_MATCH_TTL,
       tags: [`hns-${tenantSlug}-match-${params.matchId}-events`],
     },
   );

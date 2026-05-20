@@ -10,6 +10,8 @@ import WebShopCarousel from "@/components/features/home/WebShopCarousel";
 import YouTubePromoSection from "@/components/features/home/YouTubePromoSection";
 import { getTenant } from "@/lib/payload/getTenant";
 
+export const revalidate = 60;
+
 export default async function HomePage() {
 	const tenant = await getTenant();
 

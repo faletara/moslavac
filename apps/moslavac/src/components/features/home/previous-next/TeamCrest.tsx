@@ -1,7 +1,6 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getCometImageUrl } from "@/lib/api";
+import { HnsCrest } from "@/components/HnsCrest";
 import { cn } from "@/lib/utils";
 import type { HnsTeam } from "@/types/hns";
 
@@ -14,7 +13,13 @@ interface TeamCrestProps {
   className?: string;
 }
 
-const AVATAR_SIZE: Record<CrestSize, string> = {
+const CREST_PX: Record<CrestSize, number> = {
+  sm: 48,
+  md: 80,
+  lg: 128,
+};
+
+const CREST_CLASS: Record<CrestSize, string> = {
   sm: "size-10 sm:size-12",
   md: "size-14 md:size-20",
   lg: "size-20 sm:size-24 md:size-32",
@@ -32,11 +37,6 @@ const NAME_WIDTH: Record<CrestSize, string> = {
   lg: "max-w-[12ch] md:max-w-[16ch]",
 };
 
-function fallbackInitials(name: string | null | undefined): string {
-  if (!name) return "?";
-  return name.slice(0, 2).toUpperCase();
-}
-
 export function TeamCrest({
   team,
   size = "md",
@@ -48,14 +48,12 @@ export function TeamCrest({
 
   return (
     <div className={cn("flex flex-col items-center gap-2", className)}>
-      <Avatar className={AVATAR_SIZE[size]}>
-        {picture && (
-          <AvatarImage src={getCometImageUrl(picture)} alt={name} />
-        )}
-        <AvatarFallback className="bg-transparent text-xs font-bold opacity-70">
-          {fallbackInitials(name)}
-        </AvatarFallback>
-      </Avatar>
+      <HnsCrest
+        picture={picture}
+        name={name}
+        size={CREST_PX[size]}
+        className={cn(CREST_CLASS[size], "object-contain")}
+      />
       {showName && (
         <span
           className={cn(

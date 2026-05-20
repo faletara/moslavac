@@ -15,7 +15,7 @@ import type {
 } from "@/types/hns";
 
 const COMPETITIONS_TTL = 3600;
-const STANDINGS_TTL = 900;
+const STANDINGS_TTL = 180;
 
 export async function fetchCurrentSeasonCompetitions(): Promise<
   HnsCompetition[]
@@ -130,7 +130,7 @@ export async function fetchAllCompetitionMatches(params: {
   return [...past, ...future];
 }
 
-const MATCH_SLOT_TTL = 300;
+const MATCH_SLOT_TTL = 30;
 
 export async function fetchMatchSlots(): Promise<MatchSlots> {
   const senior = await fetchSeniorCompetition();

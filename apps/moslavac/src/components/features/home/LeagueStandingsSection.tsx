@@ -4,10 +4,10 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { AnimatedLine, FadeInView } from "@/components/animations";
+import { HnsCrest } from "@/components/HnsCrest";
 import { useTenant } from "@/components/providers/TenantProvider";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { api, getCometImageUrl } from "@/lib/api";
+import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import type { TeamRanking } from "@/types/hns";
 
@@ -60,12 +60,6 @@ function StandingsRow({
 }) {
 	const teamName = row.team?.name ?? "";
 	const picture = row.team?.picture ?? "";
-	const initials = teamName
-		.split(/\s+/)
-		.map((p) => p[0] ?? "")
-		.join("")
-		.slice(0, 3)
-		.toUpperCase();
 	const position = row.position ?? index + 1;
 	const positionStr = String(position).padStart(2, "0");
 
@@ -97,14 +91,12 @@ function StandingsRow({
 			</span>
 
 			<div className="flex min-w-0 items-center gap-4">
-				<Avatar className="size-9 shrink-0 sm:size-11">
-					{picture && (
-						<AvatarImage src={getCometImageUrl(picture)} alt={teamName} />
-					)}
-					<AvatarFallback className="bg-transparent text-[0.55rem] font-semibold uppercase tracking-wider text-muted-foreground">
-						{initials || teamName.slice(0, 2).toUpperCase()}
-					</AvatarFallback>
-				</Avatar>
+				<HnsCrest
+					picture={picture}
+					name={teamName}
+					size={44}
+					className="size-9 shrink-0 sm:size-11"
+				/>
 				<span
 					className={cn(
 						"line-clamp-1 uppercase leading-tight tracking-tight",

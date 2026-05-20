@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { HnsCrest } from "@/components/HnsCrest";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -11,7 +11,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getCometImageUrl } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import type { PlayerStats } from "@/types/hns";
 
@@ -105,17 +104,12 @@ function ScorerRow({
 
   const playerCell = (
     <div className="flex items-center gap-2">
-      <Avatar className="size-7 shrink-0">
-        {playerPicture && (
-          <AvatarImage
-            src={getCometImageUrl(playerPicture)}
-            alt={playerName}
-          />
-        )}
-        <AvatarFallback className="text-[0.5rem] font-semibold uppercase">
-          {playerName.slice(0, 2).toUpperCase()}
-        </AvatarFallback>
-      </Avatar>
+      <HnsCrest
+        picture={playerPicture}
+        name={playerName}
+        size={28}
+        className="size-7 shrink-0"
+      />
       <span
         className={cn(
           "truncate text-xs sm:text-sm",
@@ -146,17 +140,12 @@ function ScorerRow({
       </TableCell>
       <TableCell>
         <div className="flex items-center gap-2">
-          <Avatar className="size-5 shrink-0">
-            {scorer.team?.picture && (
-              <AvatarImage
-                src={getCometImageUrl(scorer.team.picture)}
-                alt={teamName}
-              />
-            )}
-            <AvatarFallback className="text-[0.5rem] font-semibold uppercase">
-              {teamName.slice(0, 2).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
+          <HnsCrest
+            picture={scorer.team?.picture}
+            name={teamName}
+            size={20}
+            className="size-5 shrink-0"
+          />
           <span className="truncate text-xs text-muted-foreground">
             {teamName}
           </span>

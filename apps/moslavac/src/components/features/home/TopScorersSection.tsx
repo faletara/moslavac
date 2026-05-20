@@ -3,10 +3,10 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { AnimatedLine, FadeInView } from "@/components/animations";
+import { HnsCrest } from "@/components/HnsCrest";
 import { useTenant } from "@/components/providers/TenantProvider";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { api, getCometImageUrl } from "@/lib/api";
+import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import type { PlayerStats } from "@/types/hns";
 
@@ -67,13 +67,6 @@ function ScorerRow({
 	const goals = row.value ?? 0;
 	const rankStr = String(index + 1).padStart(2, "0");
 
-	const initials = playerName
-		.split(/\s+/)
-		.map((p) => p[0] ?? "")
-		.join("")
-		.slice(0, 2)
-		.toUpperCase();
-
 	const inner = (
 		<motion.div
 			variants={rowVariants}
@@ -102,17 +95,12 @@ function ScorerRow({
 			</span>
 
 			<div className="flex min-w-0 items-center gap-4">
-				<Avatar className="size-10 shrink-0 sm:size-12">
-					{playerPicture && (
-						<AvatarImage
-							src={getCometImageUrl(playerPicture)}
-							alt={playerName}
-						/>
-					)}
-					<AvatarFallback className="bg-transparent text-[0.6rem] font-semibold uppercase tracking-wider text-muted-foreground">
-						{initials || playerName.slice(0, 2).toUpperCase()}
-					</AvatarFallback>
-				</Avatar>
+				<HnsCrest
+					picture={playerPicture}
+					name={playerName}
+					size={48}
+					className="size-10 shrink-0 sm:size-12"
+				/>
 				<div className="flex min-w-0 flex-col gap-1">
 					<span
 						className={cn(

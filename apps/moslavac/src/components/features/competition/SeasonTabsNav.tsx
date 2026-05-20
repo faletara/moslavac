@@ -34,7 +34,7 @@ export default function SeasonTabsNav({ competitionId }: SeasonTabsNavProps) {
 					href={tab.href}
 					prefetch
 					className={cn(
-						"relative flex flex-1 items-center justify-center rounded-full px-4 py-2 text-[0.65rem] font-semibold uppercase tracking-[0.25em] transition-all sm:text-xs sm:tracking-[0.3em]",
+						"relative flex flex-1 items-center justify-center rounded-full px-2 py-2 text-[0.6rem] font-semibold uppercase tracking-[0.1em] transition-all sm:px-4 sm:text-xs sm:tracking-[0.3em]",
 						tab.active
 							? "bg-foreground text-background shadow-sm"
 							: "text-muted-foreground hover:text-foreground",

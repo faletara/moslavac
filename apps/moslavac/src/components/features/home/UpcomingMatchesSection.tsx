@@ -4,9 +4,9 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FadeInView } from "@/components/animations";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { HnsCrest } from "@/components/HnsCrest";
 import { Skeleton } from "@/components/ui/skeleton";
-import { api, getCometImageUrl } from "@/lib/api";
+import { api } from "@/lib/api";
 import {
   getCategoryChipClass,
   getCategoryShortLabel,
@@ -31,12 +31,7 @@ function TeamRow({
 }) {
   return (
     <div className="flex items-center gap-3">
-      <Avatar className="size-8 shrink-0">
-        {picture && <AvatarImage src={getCometImageUrl(picture)} alt={name} />}
-        <AvatarFallback className="bg-transparent text-[10px] font-medium text-muted-foreground">
-          {name.slice(0, 2).toUpperCase()}
-        </AvatarFallback>
-      </Avatar>
+      <HnsCrest picture={picture} name={name} size={32} />
       <span
         className={`line-clamp-1 text-xs uppercase tracking-[0.12em] ${
           isUs ? "font-black text-foreground" : "font-semibold"
