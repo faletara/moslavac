@@ -105,22 +105,6 @@ export default function Hero({ tenant }: HeroProps) {
 						</span>
 					))}
 				</h1>
-
-				{/* CTA */}
-				<motion.div
-					className="mt-10 md:mt-12"
-					initial={{ opacity: 0, y: reduced ? 0 : 16 }}
-					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.5, delay: 0.75, ease: EASE }}
-				>
-					<Link
-						href="#sljedeca-utakmica"
-						className="group inline-flex items-center gap-3 text-xs font-medium uppercase tracking-[0.3em] text-foreground transition-colors hover:text-muted-foreground"
-					>
-						Saznaj više
-						<ArrowDown className="size-3 transition-transform duration-300 group-hover:translate-y-1" />
-					</Link>
-				</motion.div>
 			</div>
 		</section>
 	);
