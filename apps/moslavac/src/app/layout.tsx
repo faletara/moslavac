@@ -7,6 +7,7 @@ import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import Providers from "@/components/providers/Providers";
 import { getTenant } from "@/lib/payload/getTenant";
+import { BASE_URL } from "@/lib/siteUrl";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,9 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const ogImage = logoUrl ?? "/naslovna.jpg";
 
   return {
-    metadataBase: new URL(
-      process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3001",
-    ),
+    metadataBase: new URL(BASE_URL),
     title: {
       default: name,
       template: `%s | ${name}`,
@@ -61,7 +60,7 @@ export default async function RootLayout({
 
   const logo = tenant.branding?.logo;
   const logoUrl = !logo ? null : typeof logo === "string" ? logo : logo.url;
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3001";
+  const baseUrl = BASE_URL;
   const sameAs = [tenant.social?.facebook, tenant.social?.youtube].filter(
     (v): v is string => Boolean(v),
   );

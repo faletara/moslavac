@@ -3,9 +3,8 @@ import {
   fetchCompetitionInfo,
   fetchCurrentSeasonCompetitions,
 } from "@/lib/hns/competitions";
+import { BASE_URL } from "@/lib/siteUrl";
 import SeasonLayoutClient from "./SeasonLayoutClient";
-
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3001";
 
 interface Params {
   competitionId: string;

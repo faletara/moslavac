@@ -5,8 +5,7 @@ import {
 } from "@/lib/hns/competitions";
 import { fetchMatchInfo } from "@/lib/hns/matches";
 import { formatDateTime } from "@/lib/helpers/date";
-
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3001";
+import { BASE_URL } from "@/lib/siteUrl";
 
 interface Params {
   matchId: string;

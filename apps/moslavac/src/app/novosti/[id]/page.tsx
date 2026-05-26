@@ -8,8 +8,7 @@ import { formatDateLong } from "@/lib/helpers/date";
 import { fetchNewsById, fetchNewsPaginated } from "@/lib/payload/getNews";
 import { getTenant, tenantSlug } from "@/lib/payload/getTenant";
 import { adaptPayloadNews } from "@/lib/payload/news-adapter";
-
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3001";
+import { BASE_URL } from "@/lib/siteUrl";
 
 interface Props {
   params: Promise<{ id: string }>;

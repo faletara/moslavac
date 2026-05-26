@@ -4,10 +4,9 @@ import {
   fetchCurrentSeasonCompetitions,
 } from "@/lib/hns/competitions";
 import { fetchNewsPaginated } from "@/lib/payload/getNews";
+import { BASE_URL } from "@/lib/siteUrl";
 
 export const revalidate = 3600;
-
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3001";
 
 const STATIC_ROUTES: MetadataRoute.Sitemap = [
   { url: `${BASE_URL}/`, changeFrequency: "daily", priority: 1 },
