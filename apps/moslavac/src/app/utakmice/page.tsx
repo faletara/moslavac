@@ -1,6 +1,14 @@
+import type { Metadata } from "next";
 import { FadeInView } from "@/components/animations";
 import MatchesCalendar from "@/components/features/matches/MatchesCalendar";
 import { fetchAllMatches } from "@/lib/hns/matches";
+
+export const metadata: Metadata = {
+  title: "Raspored utakmica",
+  description:
+    "Raspored, rezultati i kalendar svih utakmica. Pratite nadolazeće susrete i odigrane mečeve.",
+  alternates: { canonical: "/utakmice" },
+};
 
 export const revalidate = 120;
 

@@ -1,4 +1,5 @@
 import { ArrowRight } from "lucide-react";
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -10,6 +11,13 @@ import {
 import { fetchNewsPaginated } from "@/lib/payload/getNews";
 import { getTenant } from "@/lib/payload/getTenant";
 import { formatDateShort } from "@/lib/helpers/date";
+
+export const metadata: Metadata = {
+  title: "Novosti",
+  description:
+    "Najnovije vijesti, najave i izvještaji s utakmica te sva događanja u klubu.",
+  alternates: { canonical: "/novosti" },
+};
 
 interface Props {
   searchParams: Promise<{ page?: string }>;
