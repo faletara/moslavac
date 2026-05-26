@@ -3,6 +3,7 @@ import {
   fetchAllCompetitionRedCards,
   fetchAllCompetitionYellowCards,
 } from "@/lib/hns/standings";
+import { parseTrailingId } from "@/lib/slug";
 
 interface Props {
   params: Promise<{ competitionId: string }>;
@@ -10,7 +11,7 @@ interface Props {
 
 export default async function CompetitionCardsPage({ params }: Props) {
   const { competitionId } = await params;
-  const cid = Number(competitionId);
+  const cid = parseTrailingId(competitionId);
   const [yellowCards, redCards] = await Promise.all([
     fetchAllCompetitionYellowCards({ competitionId: cid }),
     fetchAllCompetitionRedCards({ competitionId: cid }),

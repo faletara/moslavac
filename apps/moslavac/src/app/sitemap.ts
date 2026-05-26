@@ -5,6 +5,7 @@ import {
 } from "@/lib/hns/competitions";
 import { fetchNewsPaginated } from "@/lib/payload/getNews";
 import { BASE_URL } from "@/lib/siteUrl";
+import { buildCompetitionSlug, buildMatchSlug } from "@/lib/slug";
 
 export const revalidate = 3600;
 
@@ -27,7 +28,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const newsUrls: MetadataRoute.Sitemap =
     newsResult.status === "fulfilled"
       ? newsResult.value.docs.map((article) => ({
-          url: `${BASE_URL}/novosti/${article.id}`,
+          url: `${BASE_URL}/novosti/${article.slug ?? article.id}`,
           lastModified: new Date(article.updatedAt),
           changeFrequency: "monthly" as const,
           priority: 0.7,
@@ -41,28 +42,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         )
       : [];
 
-  const competitionUrls: MetadataRoute.Sitemap = competitions.flatMap((c) => [
-    {
-      url: `${BASE_URL}/sezona/${c.id}`,
-      changeFrequency: "daily" as const,
-      priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/sezona/${c.id}/tablica`,
-      changeFrequency: "daily" as const,
-      priority: 0.7,
-    },
-    {
-      url: `${BASE_URL}/sezona/${c.id}/strijelci`,
-      changeFrequency: "weekly" as const,
-      priority: 0.6,
-    },
-    {
-      url: `${BASE_URL}/sezona/${c.id}/kartoni`,
-      changeFrequency: "weekly" as const,
-      priority: 0.6,
-    },
-  ]);
+  const competitionUrls: MetadataRoute.Sitemap = competitions.flatMap((c) => {
+    const slug = buildCompetitionSlug(c);
+    return [
+      {
+        url: `${BASE_URL}/sezona/${slug}`,
+        changeFrequency: "daily" as const,
+        priority: 0.8,
+      },
+      {
+        url: `${BASE_URL}/sezona/${slug}/tablica`,
+        changeFrequency: "daily" as const,
+        priority: 0.7,
+      },
+      {
+        url: `${BASE_URL}/sezona/${slug}/strijelci`,
+        changeFrequency: "weekly" as const,
+        priority: 0.6,
+      },
+      {
+        url: `${BASE_URL}/sezona/${slug}/kartoni`,
+        changeFrequency: "weekly" as const,
+        priority: 0.6,
+      },
+    ];
+  });
 
   const matchResults = await Promise.allSettled(
     competitions.map((c) =>
@@ -75,7 +79,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return result.value
       .filter((m) => m.id != null && m.allowDetail !== false)
       .map((m) => ({
-        url: `${BASE_URL}/utakmice/${m.id}`,
+        url: `${BASE_URL}/utakmice/${buildMatchSlug(m)}`,
         changeFrequency: "weekly" as const,
         priority: 0.6,
       }));

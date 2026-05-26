@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
 import { fetchCompetitionInfo } from "@/lib/hns/competitions";
 import { fetchPlayerDetails } from "@/lib/hns/players";
+import { BASE_URL } from "@/lib/siteUrl";
+import {
+  buildCompetitionSlug,
+  buildPlayerSlug,
+  parseTrailingId,
+} from "@/lib/slug";
 
 interface Params {
   playerId: string;
@@ -13,23 +19,39 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { playerId, competitionId } = await params;
+  const personId = parseTrailingId(playerId);
+  const cid = parseTrailingId(competitionId);
 
   const [playerResult, competitionResult] = await Promise.allSettled([
-    fetchPlayerDetails({ personId: playerId }),
-    fetchCompetitionInfo({ competitionId: Number(competitionId) }),
+    fetchPlayerDetails({ personId: String(personId) }),
+    fetchCompetitionInfo({ competitionId: cid }),
   ]);
 
-  const playerName =
-    playerResult.status === "fulfilled" ? playerResult.value?.name : null;
-  const competitionName =
-    competitionResult.status === "fulfilled"
-      ? competitionResult.value?.name
-      : null;
+  const player =
+    playerResult.status === "fulfilled" ? playerResult.value : null;
+  const competition =
+    competitionResult.status === "fulfilled" ? competitionResult.value : null;
+
+  const playerName = player?.name ?? null;
+  const competitionName = competition?.name ?? null;
 
   const title = playerName ? `${playerName} – Statistike` : "Statistike igrača";
   const description = [playerName, competitionName].filter(Boolean).join(" · ");
 
-  return { title, description };
+  const playerSlug = player
+    ? buildPlayerSlug({ personId, name: player.name })
+    : playerId;
+  const competitionSlug = competition
+    ? buildCompetitionSlug(competition)
+    : competitionId;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `${BASE_URL}/statistika/${playerSlug}/${competitionSlug}`,
+    },
+  };
 }
 
 export default function StatsLayout({

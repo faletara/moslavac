@@ -4,6 +4,7 @@ import Link from "next/link";
 import { HnsCrest } from "@/components/HnsCrest";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { formatDateTime } from "@/lib/helpers/date";
+import { buildMatchSlug } from "@/lib/slug";
 import { cn } from "@/lib/utils";
 import type { HnsMatch } from "@/types/hns";
 
@@ -73,7 +74,7 @@ function MatchRow({ match }: { match: HnsMatch }) {
 	return (
 		<li>
 			<Link
-				href={`/utakmice/${match.id}`}
+				href={`/utakmice/${buildMatchSlug(match)}`}
 				className="group grid grid-cols-[1fr_auto_1fr] items-center gap-3 px-1 py-5 transition-colors hover:bg-muted/30 sm:gap-8 sm:py-6"
 			>
 				<TeamSide

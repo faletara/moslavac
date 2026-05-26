@@ -2,11 +2,20 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { AnimatedLine, FadeInView } from "@/components/animations";
+import {
+	AnimatedCounter,
+	AnimatedLine,
+	FadeInView,
+	RevealHeading,
+} from "@/components/animations";
 import { HnsCrest } from "@/components/HnsCrest";
-import { useTenant } from "@/components/providers/TenantProvider";
+import {
+	useMoslavacTeamId,
+	useTenant,
+} from "@/components/providers/TenantProvider";
 import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/lib/api";
+import { buildPlayerSlug } from "@/lib/slug";
 import { cn } from "@/lib/utils";
 import type { PlayerStats } from "@/types/hns";
 
@@ -31,13 +40,12 @@ function SectionHeader({ subtitle }: { subtitle?: string }) {
 					Najbolji
 				</p>
 			</FadeInView>
-			<FadeInView delay={0.1}>
-				<h2 className="select-none text-balance font-black uppercase leading-[0.85] tracking-tighter">
-					<span className="block text-[14vw] sm:text-6xl md:text-7xl lg:text-8xl">
-						Strijelci
-					</span>
-				</h2>
-			</FadeInView>
+			<RevealHeading
+				lines={["Strijelci"]}
+				delay={0.1}
+				className="select-none text-balance font-black uppercase leading-[0.85] tracking-tighter"
+				lineClassName="text-[14vw] sm:text-6xl md:text-7xl lg:text-8xl"
+			/>
 			{subtitle && (
 				<FadeInView delay={0.15}>
 					<p className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs">
@@ -53,11 +61,13 @@ function ScorerRow({
 	row,
 	index,
 	isClub,
+	isMoslavac,
 	competitionId,
 }: {
 	row: PlayerStats;
 	index: number;
 	isClub: boolean;
+	isMoslavac: boolean;
 	competitionId: number;
 }) {
 	const playerName = row.player?.name ?? "";
@@ -120,24 +130,23 @@ function ScorerRow({
 				</div>
 			</div>
 
-			<span
+			<AnimatedCounter
+				value={goals}
 				className={cn(
 					"text-right tabular-nums sm:text-center",
 					isClub
 						? "text-2xl font-black sm:text-3xl"
 						: "text-lg font-bold sm:text-2xl",
 				)}
-			>
-				{goals}
-			</span>
+			/>
 		</motion.div>
 	);
 
-	if (personId) {
+	if (personId && isMoslavac) {
 		return (
 			<Link
-				href={`/statistika/${personId}/${competitionId}`}
-				className="block hover:opacity-80"
+				href={`/statistika/${buildPlayerSlug({ personId, name: playerName })}/${competitionId}`}
+				className="-mx-3 block rounded-sm px-3 transition-colors duration-300 hover:bg-foreground/4"
 			>
 				{inner}
 			</Link>
@@ -149,6 +158,7 @@ function ScorerRow({
 
 export default function TopScorersSection() {
 	const tenant = useTenant();
+	const moslavacTeamId = useMoslavacTeamId();
 	const shortName = tenant.branding?.shortName ?? tenant.displayName;
 
 	const { data: senior, isLoading: seniorLoading } =
@@ -222,6 +232,8 @@ export default function TopScorersSection() {
 					{top.map((row, i) => {
 						const teamName = row.team?.name ?? "";
 						const isClub = !!shortName && teamName.includes(shortName);
+						const isMoslavac =
+							moslavacTeamId != null && row.team?.id === moslavacTeamId;
 						const key = `${row.player?.personId ?? row.player?.name ?? i}-${i}`;
 						return (
 							<ScorerRow
@@ -229,6 +241,7 @@ export default function TopScorersSection() {
 								row={row}
 								index={i}
 								isClub={isClub}
+								isMoslavac={isMoslavac}
 								competitionId={senior.id ?? 0}
 							/>
 						);

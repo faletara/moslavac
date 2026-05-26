@@ -21,6 +21,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
+import { buildMatchSlug } from "@/lib/slug";
 import { cn } from "@/lib/utils";
 import type { HnsMatch } from "@/types/hns";
 
@@ -28,6 +29,7 @@ type View = "month" | "week" | "day";
 
 type CalendarEvent = {
 	id: number;
+	slug: string;
 	date: Date;
 	home: string;
 	away: string;
@@ -61,6 +63,7 @@ export default function MatchesCalendar({ matches }: MatchesCalendarProps) {
 				.filter((m) => m.id != null && m.dateTimeUTC != null)
 				.map((m) => ({
 					id: m.id as number,
+					slug: buildMatchSlug(m),
 					date: new Date(m.dateTimeUTC as number),
 					home: m.homeTeam?.name ?? "N/A",
 					away: m.awayTeam?.name ?? "N/A",
@@ -97,7 +100,7 @@ export default function MatchesCalendar({ matches }: MatchesCalendarProps) {
 		return format(cursor, "EEEE, d. LLLL yyyy.", { locale: hr });
 	}, [cursor, view]);
 
-	const handleEventClick = (id: number) => router.push(`/utakmice/${id}`);
+	const handleEventClick = (slug: string) => router.push(`/utakmice/${slug}`);
 
 	const handleDayClick = (date: Date) => {
 		setCursor(date);
@@ -227,7 +230,7 @@ interface MonthViewProps {
 	cursor: Date;
 	events: CalendarEvent[];
 	onDayClick: (date: Date) => void;
-	onEventClick: (id: number) => void;
+	onEventClick: (slug: string) => void;
 }
 
 function MonthView({ cursor, events, onDayClick, onEventClick }: MonthViewProps) {
@@ -305,7 +308,7 @@ function MonthView({ cursor, events, onDayClick, onEventClick }: MonthViewProps)
 									<button
 										key={ev.id}
 										type="button"
-										onClick={() => onEventClick(ev.id)}
+										onClick={() => onEventClick(ev.slug)}
 										className="flex flex-col gap-0.5 border-l-2 border-foreground pl-2 text-left transition-opacity hover:opacity-60"
 									>
 										<span className="text-[0.6rem] font-medium uppercase tracking-[0.2em] tabular-nums text-muted-foreground">
@@ -342,7 +345,7 @@ interface WeekViewProps {
 	cursor: Date;
 	events: CalendarEvent[];
 	onDayClick: (date: Date) => void;
-	onEventClick: (id: number) => void;
+	onEventClick: (slug: string) => void;
 }
 
 function WeekView({ cursor, events, onDayClick, onEventClick }: WeekViewProps) {
@@ -401,7 +404,7 @@ function WeekView({ cursor, events, onDayClick, onEventClick }: WeekViewProps) {
 									<button
 										key={ev.id}
 										type="button"
-										onClick={() => onEventClick(ev.id)}
+										onClick={() => onEventClick(ev.slug)}
 										className="flex flex-col gap-1 border-l-2 border-foreground pl-3 text-left transition-opacity hover:opacity-60"
 									>
 										<span className="text-[0.6rem] font-medium uppercase tracking-[0.2em] tabular-nums text-muted-foreground">
@@ -433,7 +436,7 @@ function WeekView({ cursor, events, onDayClick, onEventClick }: WeekViewProps) {
 interface DayViewProps {
 	cursor: Date;
 	events: CalendarEvent[];
-	onEventClick: (id: number) => void;
+	onEventClick: (slug: string) => void;
 }
 
 function DayView({ cursor, events, onEventClick }: DayViewProps) {
@@ -456,7 +459,7 @@ function DayView({ cursor, events, onEventClick }: DayViewProps) {
 						<li key={ev.id}>
 							<button
 								type="button"
-								onClick={() => onEventClick(ev.id)}
+								onClick={() => onEventClick(ev.slug)}
 								className="grid w-full grid-cols-[auto_1fr] items-center gap-6 px-2 py-6 text-left transition-opacity hover:opacity-60 sm:gap-10 sm:px-4"
 							>
 								<span className="text-2xl font-black uppercase leading-none tracking-tighter tabular-nums sm:text-3xl">

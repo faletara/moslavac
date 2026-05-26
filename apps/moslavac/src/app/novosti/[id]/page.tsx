@@ -5,7 +5,11 @@ import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { TrackEvent } from "@/components/analytics/TrackEvent";
 import { formatDateLong } from "@/lib/helpers/date";
-import { fetchNewsById, fetchNewsPaginated } from "@/lib/payload/getNews";
+import {
+  fetchNewsById,
+  fetchNewsBySlug,
+  fetchNewsPaginated,
+} from "@/lib/payload/getNews";
 import { getTenant, tenantSlug } from "@/lib/payload/getTenant";
 import { adaptPayloadNews } from "@/lib/payload/news-adapter";
 import { BASE_URL } from "@/lib/siteUrl";
@@ -14,23 +18,31 @@ interface Props {
   params: Promise<{ id: string }>;
 }
 
+// Param is the news slug; numeric ids still resolve for backwards compatibility.
+function fetchNewsDoc(idOrSlug: string) {
+  return /^\d+$/.test(idOrSlug)
+    ? fetchNewsById({ id: idOrSlug })
+    : fetchNewsBySlug({ slug: idOrSlug });
+}
+
 export async function generateStaticParams() {
   const result = await fetchNewsPaginated({ page: 1, size: 200 });
-  return result.docs.map((doc) => ({ id: String(doc.id) }));
+  return result.docs.map((doc) => ({ id: doc.slug ?? String(doc.id) }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const doc = await fetchNewsById({ id });
+  const doc = await fetchNewsDoc(id);
   if (!doc) return { title: "Vijest nije pronađena" };
   const news = adaptPayloadNews(doc, tenantSlug);
   const text = news.content.replace(/<[^>]+>/g, "").trim();
   const description = text.slice(0, 160);
+  const slug = doc.slug ?? id;
   return {
     title: news.title,
     description,
     alternates: {
-      canonical: `${BASE_URL}/novosti/${id}`,
+      canonical: `${BASE_URL}/novosti/${slug}`,
     },
     openGraph: {
       type: "article",
@@ -52,8 +64,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function NewsDetailPage({ params }: Props) {
   const { id } = await params;
-  const doc = await fetchNewsById({ id });
+  const doc = await fetchNewsDoc(id);
   if (!doc) notFound();
+  const slug = doc.slug ?? id;
   if (
     doc.tenant &&
     typeof doc.tenant === "object" &&
@@ -77,7 +90,7 @@ export default async function NewsDetailPage({ params }: Props) {
     headline: news.title,
     datePublished: doc.publishedAt ?? doc.createdAt,
     dateModified: doc.updatedAt ?? doc.publishedAt ?? doc.createdAt,
-    mainEntityOfPage: `${BASE_URL}/novosti/${id}`,
+    mainEntityOfPage: `${BASE_URL}/novosti/${slug}`,
     publisher: {
       "@type": "Organization",
       name: tenant.displayName,
@@ -91,7 +104,7 @@ export default async function NewsDetailPage({ params }: Props) {
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Početna", item: `${BASE_URL}/` },
       { "@type": "ListItem", position: 2, name: "Vijesti", item: `${BASE_URL}/novosti` },
-      { "@type": "ListItem", position: 3, name: news.title, item: `${BASE_URL}/novosti/${id}` },
+      { "@type": "ListItem", position: 3, name: news.title, item: `${BASE_URL}/novosti/${slug}` },
     ],
   };
 

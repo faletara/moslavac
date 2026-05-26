@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { HnsCrest } from "@/components/HnsCrest";
+import { useMoslavacTeamId } from "@/components/providers/TenantProvider";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -11,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { buildPlayerSlug } from "@/lib/slug";
 import { cn } from "@/lib/utils";
 import type { PlayerStats } from "@/types/hns";
 
@@ -82,6 +84,8 @@ export default function CardsTable({
   competitionId,
   highlightTeamIds = [],
 }: CardsTableProps) {
+  const moslavacTeamId = useMoslavacTeamId();
+
   if (isLoading) {
     return (
       <div className="mx-auto max-w-2xl space-y-2">
@@ -130,6 +134,8 @@ export default function CardsTable({
           {rows.map((row, i) => {
             const highlight =
               row.teamId != null && highlightSet.has(row.teamId);
+            const isMoslavac =
+              moslavacTeamId != null && row.teamId === moslavacTeamId;
             return (
               <CardRow
                 key={
@@ -140,6 +146,7 @@ export default function CardsTable({
                 row={row}
                 position={i + 1}
                 highlight={highlight}
+                isMoslavac={isMoslavac}
                 competitionId={competitionId}
               />
             );
@@ -154,15 +161,20 @@ function CardRow({
   row,
   position,
   highlight,
+  isMoslavac,
   competitionId,
 }: {
   row: MergedRow;
   position: number;
   highlight: boolean;
+  isMoslavac: boolean;
   competitionId: number | null;
 }) {
   const isLinkable =
-    row.personId != null && competitionId != null && !row.hideProfile;
+    isMoslavac &&
+    row.personId != null &&
+    competitionId != null &&
+    !row.hideProfile;
 
   const playerCell = (
     <div className="flex items-center gap-2">
@@ -191,7 +203,7 @@ function CardRow({
       <TableCell className="min-w-0">
         {isLinkable ? (
           <Link
-            href={`/statistika/${row.personId}/${competitionId}`}
+            href={`/statistika/${buildPlayerSlug({ personId: row.personId, name: row.playerName })}/${competitionId}`}
             className="block transition-colors hover:text-foreground"
           >
             {playerCell}

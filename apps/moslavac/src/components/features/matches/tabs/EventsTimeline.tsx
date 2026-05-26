@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { AnimatedLine, FadeInView } from "@/components/animations";
+import { useMoslavacTeamId } from "@/components/providers/TenantProvider";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getCometImageUrl } from "@/lib/api";
 import {
@@ -10,6 +11,7 @@ import {
   isSubstitutionEvent,
   type ScoreSnapshot,
 } from "@/lib/helpers/events";
+import { buildPlayerSlug } from "@/lib/slug";
 import { cn } from "@/lib/utils";
 import type { HnsMatch, HnsMatchEvent } from "@/types/hns";
 import { EventIcon } from "../shared/EventIcon";
@@ -20,6 +22,7 @@ interface EventsTimelineProps {
 }
 
 export default function EventsTimeline({ match, events }: EventsTimelineProps) {
+  const moslavacTeamId = useMoslavacTeamId();
   const visibleEvents =
     events?.filter(
       (e) =>
@@ -30,6 +33,8 @@ export default function EventsTimeline({ match, events }: EventsTimelineProps) {
   if (visibleEvents.length === 0) return null;
 
   const competitionId = match.competition?.id ?? null;
+  const homeIsMoslavac =
+    moslavacTeamId != null && match.homeTeam?.id === moslavacTeamId;
   const homeName = match.homeTeam?.name ?? "Domaći";
   const awayName = match.awayTeam?.name ?? "Gosti";
   const homePicture = match.homeTeam?.picture ?? null;
@@ -70,6 +75,7 @@ export default function EventsTimeline({ match, events }: EventsTimelineProps) {
                   key={`${event.eventId ?? i}`}
                   event={event}
                   competitionId={competitionId}
+                  homeIsMoslavac={homeIsMoslavac}
                   score={
                     event.eventId != null
                       ? scoreMap.get(event.eventId) ?? null
@@ -146,10 +152,12 @@ function TeamsHeader({
 function EventRow({
   event,
   competitionId,
+  homeIsMoslavac,
   score,
 }: {
   event: HnsMatchEvent;
   competitionId: number | null;
+  homeIsMoslavac: boolean;
   score: ScoreSnapshot | null;
 }) {
   const isHome = event.homeTeam === true;
@@ -161,7 +169,9 @@ function EventRow({
   const player2Name = event.player2?.name?.trim() ?? "";
   const eventTypeName = event.eventType?.name ?? "";
   const personId = event.player?.personId ?? null;
+  const eventIsMoslavac = event.homeTeam === homeIsMoslavac;
   const isLinkable =
+    eventIsMoslavac &&
     personId != null &&
     competitionId != null &&
     event.player?.hideProfile !== true;
@@ -171,7 +181,7 @@ function EventRow({
 
   const NameNode = isLinkable ? (
     <Link
-      href={`/statistika/${personId}/${competitionId}`}
+      href={`/statistika/${buildPlayerSlug({ personId, name: playerName })}/${competitionId}`}
       className="font-black uppercase leading-tight tracking-tight transition-colors hover:underline text-sm sm:text-base"
     >
       {playerName}

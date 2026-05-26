@@ -1,24 +1,26 @@
 "use client";
 
 import { ArrowRight } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
-import { AnimatedLine, FadeInView } from "@/components/animations";
+import {
+	AnimatedLine,
+	FadeInView,
+	ParallaxImage,
+	RevealHeading,
+} from "@/components/animations";
 
 export default function SeasonTicketPromoSection() {
 	return (
 		<section className="w-full px-4 py-16 sm:py-24">
 			<div className="mx-auto grid max-w-6xl items-center gap-12 md:grid-cols-2 md:gap-16">
 				<FadeInView direction="left">
-					<div className="relative aspect-4/3 w-full overflow-hidden md:aspect-square">
-						<Image
-							src="/fans.jpg"
-							alt="SNK Moslavac navijači"
-							fill
-							sizes="(min-width: 768px) 50vw, 100vw"
-							className="object-cover grayscale"
-						/>
-					</div>
+					<ParallaxImage
+						src="/fans.jpg"
+						alt="SNK Moslavac navijači"
+						sizes="(min-width: 768px) 50vw, 100vw"
+						className="aspect-4/3 w-full md:aspect-square"
+						imageClassName="grayscale"
+					/>
 				</FadeInView>
 
 				<FadeInView direction="right" delay={0.15}>
@@ -30,14 +32,11 @@ export default function SeasonTicketPromoSection() {
 							</p>
 						</div>
 
-						<h2 className="select-none text-balance font-black uppercase leading-[0.85] tracking-tighter">
-							<span className="block text-[14vw] sm:text-6xl md:text-6xl lg:text-7xl">
-								Postani naš
-							</span>
-							<span className="block text-[14vw] sm:text-6xl md:text-6xl lg:text-7xl">
-								12. igrač
-							</span>
-						</h2>
+						<RevealHeading
+							lines={["Postani naš", "12. igrač"]}
+							className="select-none text-balance font-black uppercase leading-[0.85] tracking-tighter"
+							lineClassName="text-[14vw] sm:text-6xl md:text-6xl lg:text-7xl"
+						/>
 
 						<p className="max-w-md text-balance text-sm leading-relaxed text-muted-foreground sm:text-base">
 							Osiguraj svoje mjesto na tribinama i podržavaj svoj klub tijekom

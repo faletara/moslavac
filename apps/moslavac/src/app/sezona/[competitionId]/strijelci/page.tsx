@@ -1,5 +1,6 @@
 import TopScorersTable from "@/components/features/competition/TopScorersTable";
 import { fetchAllCompetitionScorers } from "@/lib/hns/standings";
+import { parseTrailingId } from "@/lib/slug";
 
 interface Props {
   params: Promise<{ competitionId: string }>;
@@ -7,7 +8,7 @@ interface Props {
 
 export default async function CompetitionScorersPage({ params }: Props) {
   const { competitionId } = await params;
-  const cid = Number(competitionId);
+  const cid = parseTrailingId(competitionId);
   const scorers = await fetchAllCompetitionScorers({ competitionId: cid });
   return (
     <TopScorersTable

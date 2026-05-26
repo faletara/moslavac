@@ -47,6 +47,101 @@ export function getCategoryShortLabel(category: CompetitionCategory): string {
   }
 }
 
+/** Display order for grouped views: oldest age category first, "unknown" last. */
+export const CATEGORY_ORDER: CompetitionCategory[] = [
+  "seniors",
+  "juniors",
+  "cadets",
+  "older-pioneers",
+  "younger-pioneers",
+  "limaci",
+  "prstici",
+  "unknown",
+];
+
+export interface CompetitionCategoryGroup<T> {
+  category: CompetitionCategory;
+  label: string;
+  items: T[];
+}
+
+/**
+ * Buckets items by their competition category and returns only the non-empty
+ * groups, ordered by {@link CATEGORY_ORDER}. The `getName` accessor lets this
+ * work with any shape that carries a competition name.
+ */
+export function groupByCompetitionCategory<T>(
+  items: T[],
+  getName: (item: T) => string | null | undefined,
+): CompetitionCategoryGroup<T>[] {
+  const buckets = new Map<CompetitionCategory, T[]>();
+  for (const item of items) {
+    const category = getCompetitionCategory(getName(item));
+    const bucket = buckets.get(category);
+    if (bucket) bucket.push(item);
+    else buckets.set(category, [item]);
+  }
+
+  return CATEGORY_ORDER.filter((category) => buckets.has(category)).map(
+    (category) => ({
+      category,
+      label: getCategoryShortLabel(category),
+      items: buckets.get(category) ?? [],
+    }),
+  );
+}
+
+/** Football acronyms that must stay uppercase when prettifying names. */
+const COMPETITION_ACRONYMS = new Set([
+  "NL",
+  "NS",
+  "NK",
+  "HNL",
+  "HNLŽ",
+  "HNLŽM",
+  "ŽNL",
+  "MNL",
+  "HŽNL",
+  "ZNS",
+]);
+
+function capitalizeCompetitionWord(word: string): string {
+  if (!word) return word;
+  // Keep anything with digits intact: "2.", "1", scores, etc.
+  if (/\d/.test(word)) return word;
+
+  const letters = word.replace(/[^\p{L}]/gu, "");
+  // Acronyms (NL, NS, HNLŽM…) stay uppercase.
+  if (letters && COMPETITION_ACRONYMS.has(letters.toLocaleUpperCase("hr"))) {
+    return word.toLocaleUpperCase("hr");
+  }
+  // Single letters are group markers ("A", "B") — keep them uppercase.
+  if (letters.length === 1) return word.toLocaleUpperCase("hr");
+
+  const lower = word.toLocaleLowerCase("hr");
+  return lower.replace(/\p{L}/u, (c) => c.toLocaleUpperCase("hr"));
+}
+
+/**
+ * Turns a raw HNS competition name into something readable in a menu:
+ * drops the repeated season tag (e.g. "25/26") since the whole list is the
+ * current season, and converts SHOUTING CAPS into normal case while keeping
+ * acronyms and group letters intact.
+ */
+export function toReadableCompetitionName(
+  name: string | null | undefined,
+): string {
+  if (!name) return "";
+  return name
+    .replace(/\b\d{2}\/\d{2}\b/g, " ")
+    .split(/\s+/)
+    .filter(Boolean)
+    .map(capitalizeCompetitionWord)
+    .join(" ")
+    .replace(/[\s–-]+$/u, "")
+    .trim();
+}
+
 export function getCategoryChipClass(category: CompetitionCategory): string {
   switch (category) {
     case "seniors":

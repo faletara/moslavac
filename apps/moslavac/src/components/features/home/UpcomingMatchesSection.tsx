@@ -13,6 +13,7 @@ import {
   getCompetitionCategory,
 } from "@/lib/helpers/competition";
 import { formatDateParts } from "@/lib/helpers/date";
+import { buildMatchSlug } from "@/lib/slug";
 
 const OUR_TEAM_KEYWORD = "moslavac";
 
@@ -88,10 +89,10 @@ function ScrollableRow({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-12">
       <div
         ref={scrollRef}
-        className="flex snap-x snap-mandatory gap-8 overflow-x-auto scroll-smooth pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="-mt-4 flex snap-x snap-mandatory gap-8 overflow-x-auto scroll-smooth px-1 pb-2 pt-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {children}
       </div>
@@ -103,7 +104,7 @@ function ScrollableRow({ children }: { children: React.ReactNode }) {
             aria-label="Prethodne utakmice"
             onClick={() => scrollBy(-1)}
             disabled={!canScrollLeft}
-            className="group inline-flex items-center gap-3 text-xs font-medium uppercase tracking-[0.3em] text-foreground transition-colors hover:text-muted-foreground disabled:pointer-events-none disabled:opacity-30"
+            className="group inline-flex cursor-pointer items-center gap-3 text-xs font-medium uppercase tracking-[0.3em] text-foreground transition-colors hover:text-muted-foreground disabled:pointer-events-none disabled:opacity-30"
           >
             <ChevronLeft className="size-3 transition-transform duration-300 group-hover:-translate-x-1" />
             Prethodne
@@ -114,7 +115,7 @@ function ScrollableRow({ children }: { children: React.ReactNode }) {
             aria-label="Sljedeće utakmice"
             onClick={() => scrollBy(1)}
             disabled={!canScrollRight}
-            className="group inline-flex items-center gap-3 text-xs font-medium uppercase tracking-[0.3em] text-foreground transition-colors hover:text-muted-foreground disabled:pointer-events-none disabled:opacity-30"
+            className="group inline-flex cursor-pointer items-center gap-3 text-xs font-medium uppercase tracking-[0.3em] text-foreground transition-colors hover:text-muted-foreground disabled:pointer-events-none disabled:opacity-30"
           >
             Sljedeće
             <ChevronRight className="size-3 transition-transform duration-300 group-hover:translate-x-1" />
@@ -168,9 +169,9 @@ export default function UpcomingMatchesSection() {
             return (
               <Link
                 key={match.id}
-                href={`/utakmice/${match.id}`}
+                href={`/utakmice/${buildMatchSlug(match)}`}
                 aria-label={`${match.homeTeam?.name ?? ""} vs ${match.awayTeam?.name ?? ""} — ${day}. ${monthShort} ${time}`}
-                className="group flex w-72 shrink-0 snap-start flex-col gap-5 rounded-sm outline-none transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-4"
+                className="group flex w-72 shrink-0 snap-start flex-col gap-5 rounded-sm outline-none transition-transform duration-300 ease-out hover:-translate-y-1.5 focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-4"
               >
                 <div className="flex items-center gap-2">
                   <span
@@ -202,7 +203,7 @@ export default function UpcomingMatchesSection() {
                   </span>
                 </div>
 
-                <div className="space-y-3 border-t border-border/60 pt-4">
+                <div className="space-y-3 border-t border-border/60 pt-4 transition-colors duration-300 group-hover:border-foreground/50">
                   <TeamRow
                     name={match.homeTeam?.name ?? "N/A"}
                     picture={match.homeTeam?.picture ?? ""}

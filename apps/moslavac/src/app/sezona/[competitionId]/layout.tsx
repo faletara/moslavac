@@ -4,6 +4,7 @@ import {
   fetchCurrentSeasonCompetitions,
 } from "@/lib/hns/competitions";
 import { BASE_URL } from "@/lib/siteUrl";
+import { buildCompetitionSlug, parseTrailingId } from "@/lib/slug";
 import SeasonLayoutClient from "./SeasonLayoutClient";
 
 interface Params {
@@ -14,7 +15,7 @@ export async function generateStaticParams() {
   const competitions = await fetchCurrentSeasonCompetitions();
   return competitions
     .filter((c): c is typeof c & { id: number } => c.id != null)
-    .map((c) => ({ competitionId: String(c.id) }));
+    .map((c) => ({ competitionId: buildCompetitionSlug(c) }));
 }
 
 export async function generateMetadata({
@@ -23,15 +24,15 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { competitionId } = await params;
-  const info = await fetchCompetitionInfo({
-    competitionId: Number(competitionId),
-  });
+  const id = parseTrailingId(competitionId);
+  const info = await fetchCompetitionInfo({ competitionId: id });
   const name = info?.name ?? "Sezona";
+  const slug = info ? buildCompetitionSlug(info) : competitionId;
   return {
     title: name,
     description: `Ljestvica, utakmice i statistike za natjecanje ${name}.`,
     alternates: {
-      canonical: `${BASE_URL}/sezona/${competitionId}`,
+      canonical: `${BASE_URL}/sezona/${slug}`,
     },
   };
 }
@@ -45,7 +46,7 @@ export default async function SeasonLayout({
 }) {
   const { competitionId } = await params;
   return (
-    <SeasonLayoutClient competitionId={Number(competitionId)}>
+    <SeasonLayoutClient competitionId={parseTrailingId(competitionId)}>
       {children}
     </SeasonLayoutClient>
   );

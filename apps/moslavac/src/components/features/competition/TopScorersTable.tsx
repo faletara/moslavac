@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { HnsCrest } from "@/components/HnsCrest";
+import { useMoslavacTeamId } from "@/components/providers/TenantProvider";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -11,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { buildPlayerSlug } from "@/lib/slug";
 import { cn } from "@/lib/utils";
 import type { PlayerStats } from "@/types/hns";
 
@@ -29,6 +31,8 @@ export default function TopScorersTable({
   highlightTeamIds = [],
   emptyMessage = "Statistike strijelaca nisu dostupne.",
 }: TopScorersTableProps) {
+  const moslavacTeamId = useMoslavacTeamId();
+
   if (isLoading) {
     return (
       <div className="mx-auto max-w-2xl">
@@ -66,12 +70,15 @@ export default function TopScorersTable({
           {scorers.map((s, i) => {
             const teamId = s.team?.id;
             const highlight = teamId != null && highlightSet.has(teamId);
+            const isMoslavac =
+              moslavacTeamId != null && teamId === moslavacTeamId;
             return (
               <ScorerRow
                 key={`${s.player?.personId ?? s.player?.name ?? "x"}-${i}`}
                 scorer={s}
                 position={i + 1}
                 highlight={highlight}
+                isMoslavac={isMoslavac}
                 competitionId={competitionId}
               />
             );
@@ -86,11 +93,13 @@ function ScorerRow({
   scorer,
   position,
   highlight,
+  isMoslavac,
   competitionId,
 }: {
   scorer: PlayerStats;
   position: number;
   highlight: boolean;
+  isMoslavac: boolean;
   competitionId: number | null;
 }) {
   const personId = scorer.player?.personId ?? null;
@@ -98,6 +107,7 @@ function ScorerRow({
   const playerPicture = scorer.player?.picture ?? null;
   const teamName = scorer.team?.name ?? "—";
   const isLinkable =
+    isMoslavac &&
     personId != null &&
     competitionId != null &&
     scorer.player?.hideProfile !== true;
@@ -129,7 +139,7 @@ function ScorerRow({
       <TableCell className="min-w-0">
         {isLinkable ? (
           <Link
-            href={`/statistika/${personId}/${competitionId}`}
+            href={`/statistika/${buildPlayerSlug({ personId, name: playerName })}/${competitionId}`}
             className="block transition-colors hover:text-foreground"
           >
             {playerCell}

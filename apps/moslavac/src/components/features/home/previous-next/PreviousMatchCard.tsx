@@ -6,6 +6,7 @@ import Link from "next/link";
 import { AnimatedLine, FadeInView } from "@/components/animations";
 import { formatDateTime } from "@/lib/helpers/date";
 import type { FormResult } from "@/lib/helpers/form";
+import { buildMatchSlug } from "@/lib/slug";
 import type { HnsMatch } from "@/types/hns";
 import { TeamCrest } from "./TeamCrest";
 
@@ -88,9 +89,9 @@ export function PreviousMatchCard({ match }: PreviousMatchCardProps) {
       <FadeInView>
         <div className="flex flex-col items-center gap-4">
           <AnimatedLine className="mx-auto" />
-          <p className="text-center text-sm font-black uppercase tracking-[0.4em] sm:text-base">
+          <h2 className="text-center text-3xl font-black uppercase leading-none tracking-tighter md:text-4xl">
             Zadnji rezultat
-          </p>
+          </h2>
           <div className="flex flex-col items-center gap-2">
             {outcome && outcomeLabel && (
               <span
@@ -170,7 +171,7 @@ export function PreviousMatchCard({ match }: PreviousMatchCardProps) {
 
   return (
     <motion.div whileHover={{ y: -2 }} transition={{ duration: 0.2 }}>
-      <Link href={`/utakmice/${match.id}`} className="block">
+      <Link href={`/utakmice/${buildMatchSlug(match)}`} className="block">
         {inner}
       </Link>
     </motion.div>

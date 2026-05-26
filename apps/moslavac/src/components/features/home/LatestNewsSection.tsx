@@ -2,9 +2,15 @@
 
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
-import { AnimatedLine, FadeInView, StaggerContainer, StaggerItem } from "@/components/animations";
+import {
+	AnimatedLine,
+	FadeInView,
+	ParallaxImage,
+	RevealHeading,
+	StaggerContainer,
+	StaggerItem,
+} from "@/components/animations";
 import { useTenantLogo } from "@/components/providers/TenantProvider";
 import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/lib/api";
@@ -21,13 +27,12 @@ function SectionHeader() {
 					Najnovije
 				</p>
 			</FadeInView>
-			<FadeInView delay={0.1}>
-				<h2 className="select-none text-balance font-black uppercase leading-[0.85] tracking-tighter">
-					<span className="block text-[14vw] sm:text-6xl md:text-7xl lg:text-8xl">
-						Vijesti
-					</span>
-				</h2>
-			</FadeInView>
+			<RevealHeading
+				lines={["Vijesti"]}
+				delay={0.1}
+				className="select-none text-balance font-black uppercase leading-[0.85] tracking-tighter"
+				lineClassName="text-[14vw] sm:text-6xl md:text-7xl lg:text-8xl"
+			/>
 		</div>
 	);
 }
@@ -71,22 +76,21 @@ export default function LatestNewsSection() {
 					<StaggerItem key={item.id}>
 						<motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }}>
 							<Link
-								href={`/novosti/${item.id}`}
+								href={`/novosti/${item.slug ?? item.id}`}
 								className="group flex flex-col gap-6"
 							>
-								<div className="relative aspect-4/3 w-full overflow-hidden">
-									<Image
-										src={item.thumbnailPath || fallback}
-										alt={item.title}
-										fill
-										sizes="(min-width: 768px) 33vw, 100vw"
-										className={`transition-transform duration-700 ease-out group-hover:scale-[1.03] ${
-											item.thumbnailPath
-												? "object-cover"
-												: "object-contain p-10 opacity-60"
-										}`}
-									/>
-								</div>
+								<ParallaxImage
+									src={item.thumbnailPath || fallback}
+									alt={item.title}
+									sizes="(min-width: 768px) 33vw, 100vw"
+									className="aspect-4/3 w-full"
+									strength={6}
+									imageClassName={`transition-transform duration-700 ease-out group-hover:scale-[1.04] ${
+										item.thumbnailPath
+											? "object-cover"
+											: "object-contain p-10 opacity-60"
+									}`}
+								/>
 
 								<div className="flex flex-col gap-4">
 									<div className="flex items-center gap-3">

@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { AnimatedLine, FadeInView } from "@/components/animations";
 import { HnsCrest } from "@/components/HnsCrest";
+import { useMoslavacTeamId } from "@/components/providers/TenantProvider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { buildPlayerSlug } from "@/lib/slug";
 import type { HnsLineups, HnsMatch, HnsTeamPlayer } from "@/types/hns";
 
 interface MatchLineupsTabProps {
@@ -15,6 +17,7 @@ export default function MatchLineupsTab({
   match,
   lineups,
 }: MatchLineupsTabProps) {
+  const moslavacTeamId = useMoslavacTeamId();
   const competitionId = match.competition?.id ?? null;
   const hasLineups =
     (lineups?.home?.players?.length ?? 0) > 0 ||
@@ -39,6 +42,9 @@ export default function MatchLineupsTab({
       teamPicture={match.homeTeam?.picture ?? null}
       teamLineup={lineups?.home ?? null}
       competitionId={competitionId}
+      isMoslavac={
+        moslavacTeamId != null && match.homeTeam?.id === moslavacTeamId
+      }
     />
   );
 
@@ -48,6 +54,9 @@ export default function MatchLineupsTab({
       teamPicture={match.awayTeam?.picture ?? null}
       teamLineup={lineups?.away ?? null}
       competitionId={competitionId}
+      isMoslavac={
+        moslavacTeamId != null && match.awayTeam?.id === moslavacTeamId
+      }
     />
   );
 
@@ -100,11 +109,13 @@ function LineupColumn({
   teamPicture,
   teamLineup,
   competitionId,
+  isMoslavac,
 }: {
   teamName: string;
   teamPicture: string | null;
   teamLineup: HnsLineups["home"];
   competitionId: number | null;
+  isMoslavac: boolean;
 }) {
   if (!teamLineup) return null;
 
@@ -132,6 +143,7 @@ function LineupColumn({
             key={`s-${player.personId ?? player.shirtNumber ?? "x"}-${player.name ?? i}`}
             player={player}
             competitionId={competitionId}
+            isMoslavac={isMoslavac}
           />
         ))}
       </ul>
@@ -147,6 +159,7 @@ function LineupColumn({
                 key={`sub-${player.personId ?? player.shirtNumber ?? "x"}-${player.name ?? i}`}
                 player={player}
                 competitionId={competitionId}
+                isMoslavac={isMoslavac}
                 muted
               />
             ))}
@@ -160,14 +173,17 @@ function LineupColumn({
 function PlayerRow({
   player,
   competitionId,
+  isMoslavac,
   muted = false,
 }: {
   player: HnsTeamPlayer;
   competitionId: number | null;
+  isMoslavac: boolean;
   muted?: boolean;
 }) {
   const playerName = player.name ?? "";
   const isLinkable =
+    isMoslavac &&
     player.personId != null &&
     competitionId != null &&
     player.hideProfile !== true;
@@ -200,7 +216,7 @@ function PlayerRow({
     <li>
       {isLinkable ? (
         <Link
-          href={`/statistika/${player.personId}/${competitionId}`}
+          href={`/statistika/${buildPlayerSlug({ personId: player.personId, name: playerName })}/${competitionId}`}
           className="block transition-colors hover:bg-muted/30"
         >
           {inner}

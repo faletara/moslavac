@@ -25,6 +25,17 @@ export function useTenant(): FrontendTenant {
   return tenant;
 }
 
+/**
+ * The club's own HNS team id (as a number), used to decide whether a player
+ * belongs to this club. Opponent players are not in our HNS dataset, so linking
+ * to their profile page would 404 — callers use this to gate player links.
+ */
+export function useMoslavacTeamId(): number | null {
+  const tenant = useTenant();
+  const id = Number(tenant.hns.teamId);
+  return Number.isFinite(id) ? id : null;
+}
+
 export function useTenantLogo(): PayloadMedia | null {
   const tenant = useTenant();
   if (

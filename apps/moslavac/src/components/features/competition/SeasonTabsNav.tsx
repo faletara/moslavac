@@ -5,15 +5,15 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 interface SeasonTabsNavProps {
-	competitionId: number;
+	competitionSlug: string;
 }
 
-export default function SeasonTabsNav({ competitionId }: SeasonTabsNavProps) {
+export default function SeasonTabsNav({ competitionSlug }: SeasonTabsNavProps) {
 	const pathname = usePathname();
-	const standingsHref = `/sezona/${competitionId}/tablica`;
-	const matchesHref = `/sezona/${competitionId}`;
-	const scorersHref = `/sezona/${competitionId}/strijelci`;
-	const cardsHref = `/sezona/${competitionId}/kartoni`;
+	const standingsHref = `/sezona/${competitionSlug}/tablica`;
+	const matchesHref = `/sezona/${competitionSlug}`;
+	const scorersHref = `/sezona/${competitionSlug}/strijelci`;
+	const cardsHref = `/sezona/${competitionSlug}/kartoni`;
 	const isStandings = pathname?.endsWith("/tablica") ?? false;
 	const isScorers = pathname?.endsWith("/strijelci") ?? false;
 	const isCards = pathname?.endsWith("/kartoni") ?? false;

@@ -2,7 +2,11 @@
 
 import { motion } from "framer-motion";
 import { FaYoutube } from "react-icons/fa";
-import { AnimatedCounter, FadeInView } from "@/components/animations";
+import {
+  AnimatedCounter,
+  FadeInView,
+  RevealHeading,
+} from "@/components/animations";
 import { useTenant } from "@/components/providers/TenantProvider";
 import { Button } from "@/components/ui/button";
 
@@ -22,14 +26,11 @@ export default function YouTubePromoSection() {
             Uživo · YouTube
           </p>
 
-          <h2 className="select-none text-balance font-black uppercase leading-[0.9] tracking-tighter text-foreground">
-            <span className="block text-[12vw] sm:text-6xl md:text-7xl lg:text-8xl">
-              Gledajte naše
-            </span>
-            <span className="block text-[12vw] sm:text-6xl md:text-7xl lg:text-8xl">
-              utakmice uživo
-            </span>
-          </h2>
+          <RevealHeading
+            lines={["Gledajte naše", "utakmice uživo"]}
+            className="select-none text-balance font-black uppercase leading-[0.9] tracking-tighter text-foreground"
+            lineClassName="text-[12vw] sm:text-6xl md:text-7xl lg:text-8xl"
+          />
 
           <p className="max-w-xl text-balance text-sm leading-relaxed text-muted-foreground sm:text-base">
             Ne propustite nijednu utakmicu. Pretplatite se na naš YouTube kanal za

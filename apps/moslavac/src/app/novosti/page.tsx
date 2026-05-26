@@ -69,7 +69,7 @@ export default async function NewsPage({ searchParams }: Props) {
               return (
                 <StaggerItem key={doc.id}>
                   <Link
-                    href={`/novosti/${doc.id}`}
+                    href={`/novosti/${doc.slug ?? doc.id}`}
                     className="group grid grid-cols-[auto_1fr_auto] items-center gap-4 py-6 sm:gap-8 sm:py-8"
                   >
                     <div className="relative size-20 shrink-0 overflow-hidden rounded-sm bg-muted sm:size-28">

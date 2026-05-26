@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { AnimatedCounter, AnimatedLine, FadeInView } from "@/components/animations";
 import { HnsCrest } from "@/components/HnsCrest";
+import { useMoslavacTeamId } from "@/components/providers/TenantProvider";
 import { getScorers, type ScorerEntry } from "@/lib/helpers/events";
+import { buildPlayerSlug } from "@/lib/slug";
 import { cn } from "@/lib/utils";
 import type { HnsMatch, HnsMatchEvent } from "@/types/hns";
 
@@ -16,6 +18,7 @@ export default function RichScorersSection({
   match,
   events,
 }: RichScorersSectionProps) {
+  const moslavacTeamId = useMoslavacTeamId();
   const scorers = getScorers(events);
   const hasAny = scorers.home.length > 0 || scorers.away.length > 0;
   if (!hasAny) return null;
@@ -46,6 +49,9 @@ export default function RichScorersSection({
             scorers={scorers.home}
             totalGoals={homeGoals}
             competitionId={competitionId}
+            isMoslavac={
+              moslavacTeamId != null && match.homeTeam?.id === moslavacTeamId
+            }
             align="right"
           />
           <TeamScorersColumn
@@ -54,6 +60,9 @@ export default function RichScorersSection({
             scorers={scorers.away}
             totalGoals={awayGoals}
             competitionId={competitionId}
+            isMoslavac={
+              moslavacTeamId != null && match.awayTeam?.id === moslavacTeamId
+            }
             align="left"
           />
         </div>
@@ -68,6 +77,7 @@ function TeamScorersColumn({
   scorers,
   totalGoals,
   competitionId,
+  isMoslavac,
   align,
 }: {
   teamName: string;
@@ -75,6 +85,7 @@ function TeamScorersColumn({
   scorers: ScorerEntry[];
   totalGoals: number;
   competitionId: number | null;
+  isMoslavac: boolean;
   align: "left" | "right";
 }) {
   const isRight = align === "right";
@@ -132,6 +143,7 @@ function TeamScorersColumn({
               key={`${s.name}-${idx}`}
               scorer={s}
               competitionId={competitionId}
+              isMoslavac={isMoslavac}
               align={align}
             />
           ))}
@@ -144,18 +156,21 @@ function TeamScorersColumn({
 function ScorerRow({
   scorer,
   competitionId,
+  isMoslavac,
   align,
 }: {
   scorer: ScorerEntry;
   competitionId: number | null;
+  isMoslavac: boolean;
   align: "left" | "right";
 }) {
   const isRight = align === "right";
-  const isLinkable = scorer.personId != null && competitionId != null;
+  const isLinkable =
+    isMoslavac && scorer.personId != null && competitionId != null;
 
   const NameNode = isLinkable ? (
     <Link
-      href={`/statistika/${scorer.personId}/${competitionId}`}
+      href={`/statistika/${buildPlayerSlug({ personId: scorer.personId, name: scorer.name })}/${competitionId}`}
       className="line-clamp-2 font-black uppercase leading-tight tracking-tight text-xs sm:text-sm md:text-base transition-colors hover:underline"
     >
       {scorer.name}

@@ -3,11 +3,17 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { AnimatedLine, FadeInView } from "@/components/animations";
+import {
+	AnimatedCounter,
+	AnimatedLine,
+	FadeInView,
+	RevealHeading,
+} from "@/components/animations";
 import { HnsCrest } from "@/components/HnsCrest";
 import { useTenant } from "@/components/providers/TenantProvider";
 import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/lib/api";
+import { buildCompetitionSlug } from "@/lib/slug";
 import { cn } from "@/lib/utils";
 import type { TeamRanking } from "@/types/hns";
 
@@ -31,13 +37,12 @@ function SectionHeader({ subtitle }: { subtitle?: string }) {
 					Prvenstvo
 				</p>
 			</FadeInView>
-			<FadeInView delay={0.1}>
-				<h2 className="select-none text-balance font-black uppercase leading-[0.85] tracking-tighter">
-					<span className="block text-[14vw] sm:text-6xl md:text-7xl lg:text-8xl">
-						Tablica
-					</span>
-				</h2>
-			</FadeInView>
+			<RevealHeading
+				lines={["Tablica"]}
+				delay={0.1}
+				className="select-none text-balance font-black uppercase leading-[0.85] tracking-tighter"
+				lineClassName="text-[14vw] sm:text-6xl md:text-7xl lg:text-8xl"
+			/>
 			{subtitle && (
 				<FadeInView delay={0.15}>
 					<p className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs">
@@ -133,16 +138,15 @@ function StandingsRow({
 				<span>{row.goalsAgainst ?? 0}</span>
 			</span>
 
-			<span
+			<AnimatedCounter
+				value={row.points ?? 0}
 				className={cn(
 					"text-right tabular-nums sm:text-center",
 					isClub
 						? "text-2xl font-black sm:text-3xl"
 						: "text-lg font-bold sm:text-2xl",
 				)}
-			>
-				{row.points ?? 0}
-			</span>
+			/>
 		</motion.div>
 	);
 }
@@ -236,7 +240,7 @@ export default function LeagueStandingsSection() {
 			<FadeInView>
 				<div className="flex justify-center pt-4">
 					<Link
-						href={`/sezona/${senior.id}`}
+						href={`/sezona/${buildCompetitionSlug(senior)}`}
 						className="group inline-flex items-center gap-3 text-xs font-medium uppercase tracking-[0.3em] text-foreground transition-colors hover:text-muted-foreground"
 					>
 						Cijela sezona

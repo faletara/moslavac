@@ -6,6 +6,7 @@ import {
 import { fetchMatchInfo } from "@/lib/hns/matches";
 import { formatDateTime } from "@/lib/helpers/date";
 import { BASE_URL } from "@/lib/siteUrl";
+import { buildMatchSlug, parseTrailingId } from "@/lib/slug";
 
 interface Params {
   matchId: string;
@@ -21,18 +22,18 @@ export async function generateStaticParams() {
     validComps.map((c) => fetchAllCompetitionMatches({ competitionId: c.id })),
   );
 
-  const matchIds = new Set<string>();
+  const slugs = new Set<string>();
   for (const result of matchResults) {
     if (result.status === "fulfilled") {
       for (const match of result.value) {
         if (match.id != null && match.allowDetail !== false) {
-          matchIds.add(String(match.id));
+          slugs.add(buildMatchSlug(match));
         }
       }
     }
   }
 
-  return [...matchIds].map((id) => ({ matchId: id }));
+  return [...slugs].map((matchId) => ({ matchId }));
 }
 
 export async function generateMetadata({
@@ -41,7 +42,7 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { matchId } = await params;
-  const match = await fetchMatchInfo({ matchId: Number(matchId) });
+  const match = await fetchMatchInfo({ matchId: parseTrailingId(matchId) });
 
   if (!match) return { title: "Utakmica" };
 
@@ -66,7 +67,7 @@ export async function generateMetadata({
     title,
     description: parts.join(" · "),
     alternates: {
-      canonical: `${BASE_URL}/utakmice/${matchId}`,
+      canonical: `${BASE_URL}/utakmice/${buildMatchSlug(match)}`,
     },
     openGraph: {
       type: "website",
@@ -85,7 +86,7 @@ export default async function MatchLayout({
 }) {
   const { matchId } = await params;
   // fetch is deduplicated with generateMetadata's call (same URL + cache key)
-  const match = await fetchMatchInfo({ matchId: Number(matchId) });
+  const match = await fetchMatchInfo({ matchId: parseTrailingId(matchId) });
 
   if (!match) return <>{children}</>;
 
@@ -132,7 +133,7 @@ export default async function MatchLayout({
         "@type": "ListItem",
         position: 3,
         name: `${home} – ${away}`,
-        item: `${BASE_URL}/utakmice/${matchId}`,
+        item: `${BASE_URL}/utakmice/${buildMatchSlug(match)}`,
       },
     ],
   };

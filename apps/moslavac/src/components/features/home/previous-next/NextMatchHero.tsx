@@ -5,6 +5,7 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { AnimatedLine, FadeInView } from "@/components/animations";
 import { formatDateTime } from "@/lib/helpers/date";
+import { buildMatchSlug } from "@/lib/slug";
 import type { HnsMatch } from "@/types/hns";
 import { CountdownTiles } from "./CountdownTiles";
 import { TeamCrest } from "./TeamCrest";
@@ -38,9 +39,9 @@ export function NextMatchHero({ match }: NextMatchHeroProps) {
       <FadeInView>
         <div className="flex flex-col items-center gap-3">
           <AnimatedLine className="mx-auto" />
-          <p className="text-center text-sm font-black uppercase tracking-[0.4em] sm:text-base">
+          <h2 className="text-center text-3xl font-black uppercase leading-none tracking-tighter md:text-4xl">
             Sljedeća utakmica
-          </p>
+          </h2>
           {subEyebrow.length > 0 && (
             <p className="text-center text-sm font-light text-muted-foreground sm:text-base">
               {subEyebrow.join(", ")}
@@ -87,7 +88,7 @@ export function NextMatchHero({ match }: NextMatchHeroProps) {
 
   return (
     <motion.div whileHover={{ y: -2 }} transition={{ duration: 0.2 }}>
-      <Link href={`/utakmice/${match.id}`} className="block">
+      <Link href={`/utakmice/${buildMatchSlug(match)}`} className="block">
         {inner}
       </Link>
     </motion.div>

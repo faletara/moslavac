@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getHeadToHead } from "@/lib/helpers/form";
 import { formatDateShort } from "@/lib/helpers/date";
+import { buildMatchSlug } from "@/lib/slug";
 import { cn } from "@/lib/utils";
 import type { HnsMatch } from "@/types/hns";
 
@@ -102,7 +103,7 @@ function H2HRow({
   return (
     <li>
       <Link
-        href={`/utakmice/${match.id}`}
+        href={`/utakmice/${buildMatchSlug(match)}`}
         className="grid grid-cols-[auto_1fr_auto_auto] items-center gap-3 py-3 transition-colors hover:bg-muted/30 sm:gap-5 sm:py-4"
       >
         <span

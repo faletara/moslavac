@@ -3,6 +3,7 @@ import { HnsCrest } from "@/components/HnsCrest";
 import { Progress } from "@/components/ui/progress";
 import { TrackEvent } from "@/components/analytics/TrackEvent";
 import { fetchPlayerDetails, fetchPlayerStats } from "@/lib/hns/players";
+import { parseTrailingId } from "@/lib/slug";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -13,11 +14,12 @@ export const revalidate = 600;
 
 export default async function PlayerStatsPage({ params }: Props) {
   const { playerId, competitionId } = await params;
-  const cid = Number(competitionId);
+  const personId = String(parseTrailingId(playerId));
+  const cid = parseTrailingId(competitionId);
 
   const [playerDetails, playerStats] = await Promise.all([
-    fetchPlayerDetails({ personId: playerId }),
-    fetchPlayerStats({ personId: playerId, competitionId: cid }),
+    fetchPlayerDetails({ personId }),
+    fetchPlayerStats({ personId, competitionId: cid }),
   ]);
 
   if (!playerDetails) notFound();

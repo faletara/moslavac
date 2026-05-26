@@ -9,6 +9,7 @@ import {
   fetchMatchReferees,
 } from "@/lib/hns/matches";
 import { formatDateTime } from "@/lib/helpers/date";
+import { parseTrailingId } from "@/lib/slug";
 
 interface Props {
   params: Promise<{ matchId: string }>;
@@ -18,7 +19,7 @@ export const revalidate = 30;
 
 export default async function MatchInfoPage({ params }: Props) {
   const { matchId } = await params;
-  const mid = Number(matchId);
+  const mid = parseTrailingId(matchId);
 
   const [matchInfo, events, lineups, refereeData] = await Promise.all([
     fetchMatchInfo({ matchId: mid }),
