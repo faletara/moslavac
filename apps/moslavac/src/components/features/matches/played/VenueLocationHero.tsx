@@ -37,7 +37,7 @@ export default function VenueLocationHero({ facility }: VenueLocationHeroProps) 
     : null;
 
   return (
-    <section className="mt-20 sm:mt-28">
+    <section className="mt-20 overflow-x-clip sm:mt-28">
       <FadeInView>
         <div className="flex flex-col items-center gap-6 text-center">
           <AnimatedLine className="mx-auto" />

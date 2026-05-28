@@ -11,7 +11,7 @@ import {
 
 export default function SeasonTicketPromoSection() {
 	return (
-		<section className="w-full px-4 py-16 sm:py-24">
+		<section className="w-full overflow-x-clip px-4 py-16 sm:py-24">
 			<div className="mx-auto grid max-w-6xl items-center gap-12 md:grid-cols-2 md:gap-16">
 				<FadeInView direction="left">
 					<ParallaxImage
@@ -34,7 +34,7 @@ export default function SeasonTicketPromoSection() {
 
 						<RevealHeading
 							lines={["Postani naš", "12. igrač"]}
-							className="select-none text-balance font-black uppercase leading-[0.85] tracking-tighter"
+							className="select-none text-balance font-black uppercase leading-none tracking-tighter"
 							lineClassName="text-[14vw] sm:text-6xl md:text-6xl lg:text-7xl"
 						/>
 

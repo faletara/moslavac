@@ -3,7 +3,7 @@
 import { ChevronDown, Menu } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -47,6 +47,37 @@ const dropdownItemClass =
 
 export default function Header({ tenant }: HeaderProps) {
 	const [sheetOpen, setSheetOpen] = useState(false);
+	const [hidden, setHidden] = useState(false);
+
+	useEffect(() => {
+		let lastY = window.scrollY;
+		let ticking = false;
+
+		const update = () => {
+			const currentY = window.scrollY;
+
+			if (currentY <= 80) {
+				setHidden(false);
+			} else if (currentY > lastY) {
+				setHidden(true);
+			} else if (currentY < lastY) {
+				setHidden(false);
+			}
+
+			lastY = currentY;
+			ticking = false;
+		};
+
+		const onScroll = () => {
+			if (!ticking) {
+				window.requestAnimationFrame(update);
+				ticking = true;
+			}
+		};
+
+		window.addEventListener("scroll", onScroll, { passive: true });
+		return () => window.removeEventListener("scroll", onScroll);
+	}, []);
 
 	const { data: competitions = [] } =
 		api.competitions.useGetCurrentSeasonCompetitions();
@@ -93,7 +124,12 @@ export default function Header({ tenant }: HeaderProps) {
 			: null;
 
 	return (
-		<header className="sticky top-0 z-50 h-20 border-b border-border/60 bg-background">
+		<header
+			className={cn(
+				"sticky top-0 z-50 h-20 border-b border-border/60 bg-background transition-transform duration-300 will-change-transform",
+				hidden && "-translate-y-full",
+			)}
+		>
 			<div className="mx-auto flex h-full max-w-7xl items-center justify-between px-6 lg:px-8">
 				{/* Logo */}
 				<Link

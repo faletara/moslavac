@@ -135,6 +135,36 @@ export const Tenants: CollectionConfig = {
             },
           ],
         },
+        {
+          label: 'Legal',
+          description: 'Pravni podaci o udruzi (Impressum, Politika privatnosti)',
+          fields: [
+            {
+              name: 'legal',
+              type: 'group',
+              fields: [
+                {
+                  name: 'oib',
+                  type: 'text',
+                  admin: { description: 'OIB udruge (11 znamenki)' },
+                },
+                {
+                  name: 'registryNumber',
+                  type: 'text',
+                  admin: { description: 'Registarski broj u Registru udruga RH' },
+                },
+                {
+                  name: 'registryAuthority',
+                  type: 'text',
+                  admin: {
+                    description:
+                      'Nadležno tijelo upisa (npr. "Ured državne uprave u Sisačko-moslavačkoj županiji")',
+                  },
+                },
+              ],
+            },
+          ],
+        },
       ],
     },
   ],

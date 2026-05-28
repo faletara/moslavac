@@ -35,7 +35,7 @@ export default function ComeToMatchSection() {
 				<RevealHeading
 					lines={["Dođi na", "utakmicu"]}
 					delay={0.1}
-					className="select-none text-balance font-black uppercase leading-[0.85] tracking-tighter text-white"
+					className="select-none text-balance font-black uppercase leading-none tracking-tighter text-white"
 					lineClassName="text-[14vw] sm:text-6xl md:text-7xl lg:text-8xl"
 				/>
 

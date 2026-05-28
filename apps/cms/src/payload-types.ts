@@ -207,6 +207,20 @@ export interface Tenant {
     recipient?: string | null;
     seasonTicketPrice?: number | null;
   };
+  legal?: {
+    /**
+     * OIB udruge (11 znamenki)
+     */
+    oib?: string | null;
+    /**
+     * Registarski broj u Registru udruga RH
+     */
+    registryNumber?: string | null;
+    /**
+     * Nadležno tijelo upisa (npr. "Ured državne uprave u Sisačko-moslavačkoj županiji")
+     */
+    registryAuthority?: string | null;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -540,6 +554,13 @@ export interface TenantsSelect<T extends boolean = true> {
         iban?: T;
         recipient?: T;
         seasonTicketPrice?: T;
+      };
+  legal?:
+    | T
+    | {
+        oib?: T;
+        registryNumber?: T;
+        registryAuthority?: T;
       };
   updatedAt?: T;
   createdAt?: T;

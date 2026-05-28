@@ -176,15 +176,30 @@ export default function Footer({ tenant }: FooterProps) {
 
         {/* Bottom strip */}
         <FadeInView>
-          <div className="flex flex-col gap-2 border-t border-border/60 py-6 text-[0.6rem] font-medium uppercase tracking-[0.35em] text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-4 border-t border-border/60 py-6 text-[0.6rem] font-medium uppercase tracking-[0.35em] text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
             <p>
               &copy; {new Date().getFullYear()} {tenant.displayName} — Sva prava
               pridržana
             </p>
-            <p>
-              Dizajn{" "}
-              <span className="mx-1 text-foreground/40">/</span> Adriano Faletar
-            </p>
+            <nav className="flex flex-wrap items-center gap-x-5 gap-y-2">
+              <Link
+                href="/politika-privatnosti"
+                className="transition-colors hover:text-foreground"
+              >
+                Politika privatnosti
+              </Link>
+              <Link
+                href="/pravna-napomena"
+                className="transition-colors hover:text-foreground"
+              >
+                Pravna napomena
+              </Link>
+              <p>
+                Dizajn{" "}
+                <span className="mx-1 text-foreground/40">/</span> Adriano
+                Faletar
+              </p>
+            </nav>
           </div>
         </FadeInView>
 

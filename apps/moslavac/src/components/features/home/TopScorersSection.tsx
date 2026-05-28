@@ -43,7 +43,7 @@ function SectionHeader({ subtitle }: { subtitle?: string }) {
 			<RevealHeading
 				lines={["Strijelci"]}
 				delay={0.1}
-				className="select-none text-balance font-black uppercase leading-[0.85] tracking-tighter"
+				className="select-none text-balance font-black uppercase leading-none tracking-tighter"
 				lineClassName="text-[14vw] sm:text-6xl md:text-7xl lg:text-8xl"
 			/>
 			{subtitle && (

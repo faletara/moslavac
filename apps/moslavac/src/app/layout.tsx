@@ -64,14 +64,34 @@ export default async function RootLayout({
   const sameAs = [tenant.social?.facebook, tenant.social?.youtube].filter(
     (v): v is string => Boolean(v),
   );
+  const shortName = tenant.branding?.shortName;
+  const founded = tenant.branding?.founded;
+  const address = tenant.contact?.address;
+  const email = tenant.contact?.email;
+  const phone = tenant.contact?.phone;
 
   const orgJsonLd = {
     "@context": "https://schema.org",
     "@type": "SportsOrganization",
     name: tenant.displayName,
+    ...(shortName ? { alternateName: shortName } : {}),
     sport: "Football",
     url: baseUrl,
     ...(logoUrl ? { logo: logoUrl } : {}),
+    ...(founded ? { foundingDate: String(founded) } : {}),
+    ...(address
+      ? {
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: address,
+            addressLocality: "Popovača",
+            addressRegion: "Sisačko-moslavačka županija",
+            addressCountry: "HR",
+          },
+        }
+      : {}),
+    ...(email ? { email } : {}),
+    ...(phone ? { telephone: phone } : {}),
     ...(sameAs.length > 0 ? { sameAs } : {}),
   };
 

@@ -43,6 +43,11 @@ export interface FrontendTenant {
     recipient?: string | null;
     seasonTicketPrice?: number | null;
   } | null;
+  legal?: {
+    oib?: string | null;
+    registryNumber?: string | null;
+    registryAuthority?: string | null;
+  } | null;
 }
 
 export interface PayloadPaginated<T> {

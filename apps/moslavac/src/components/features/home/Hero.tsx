@@ -72,7 +72,7 @@ export default function Hero({ tenant }: HeroProps) {
 			ref={sectionRef}
 			onPointerMove={handlePointerMove}
 			onPointerLeave={resetPointer}
-			className="relative isolate flex min-h-svh w-full flex-col items-center justify-center overflow-hidden md:min-h-screen md:py-24"
+			className="relative isolate flex min-h-[calc(100svh-7rem)] w-full flex-col items-center justify-center overflow-hidden md:min-h-[calc(100vh-7rem)] md:py-24"
 		>
 			{/* Background image — scroll parallax + Ken Burns drift */}
 			<motion.div

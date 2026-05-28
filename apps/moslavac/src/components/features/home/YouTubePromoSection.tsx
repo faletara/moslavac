@@ -28,7 +28,7 @@ export default function YouTubePromoSection() {
 
           <RevealHeading
             lines={["Gledajte naše", "utakmice uživo"]}
-            className="select-none text-balance font-black uppercase leading-[0.9] tracking-tighter text-foreground"
+            className="select-none text-balance font-black uppercase leading-none tracking-tighter text-foreground"
             lineClassName="text-[12vw] sm:text-6xl md:text-7xl lg:text-8xl"
           />
 
