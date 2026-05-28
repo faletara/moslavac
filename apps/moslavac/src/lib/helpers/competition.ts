@@ -142,23 +142,51 @@ export function toReadableCompetitionName(
     .trim();
 }
 
+/**
+ * Blue palette in the Moslavac brand family (anchored on #026CB6). Steps go
+ * monotonically dark → light following age hierarchy: oldest (seniors) is the
+ * deepest navy, youngest (prstići) the lightest. Brand blue lands on older
+ * pioneers, the midpoint of the scale. Every shade stays saturated — no
+ * pastels — so the chips read as one tight blue family.
+ */
 export function getCategoryChipClass(category: CompetitionCategory): string {
   switch (category) {
     case "seniors":
-      return "bg-foreground text-background";
+      return "bg-[#013F6B] text-white";
     case "juniors":
-      return "bg-foreground/85 text-background";
+      return "bg-[#01497D] text-white";
     case "cadets":
-      return "bg-foreground/70 text-background";
+      return "bg-[#015A99] text-white";
     case "older-pioneers":
-      return "bg-foreground/55 text-background";
+      return "bg-[#026CB6] text-white";
     case "younger-pioneers":
-      return "bg-foreground/40 text-background";
+      return "bg-[#1F7BBF] text-white";
     case "limaci":
-      return "bg-foreground/25 text-foreground";
+      return "bg-[#3389C7] text-white";
     case "prstici":
-      return "bg-foreground/15 text-foreground";
+      return "bg-[#4A98CF] text-white";
     case "unknown":
       return "bg-muted text-muted-foreground";
+  }
+}
+
+export function getCategoryBorderClass(category: CompetitionCategory): string {
+  switch (category) {
+    case "seniors":
+      return "border-[#013F6B]";
+    case "juniors":
+      return "border-[#01497D]";
+    case "cadets":
+      return "border-[#015A99]";
+    case "older-pioneers":
+      return "border-[#026CB6]";
+    case "younger-pioneers":
+      return "border-[#1F7BBF]";
+    case "limaci":
+      return "border-[#3389C7]";
+    case "prstici":
+      return "border-[#4A98CF]";
+    case "unknown":
+      return "border-border";
   }
 }

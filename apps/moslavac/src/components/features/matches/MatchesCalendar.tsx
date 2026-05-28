@@ -19,8 +19,15 @@ import {
 import { hr } from "date-fns/locale";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
+import {
+	type CompetitionCategory,
+	getCategoryBorderClass,
+	getCategoryChipClass,
+	getCategoryShortLabel,
+	getCompetitionCategory,
+} from "@/lib/helpers/competition";
 import { buildMatchSlug } from "@/lib/slug";
 import { cn } from "@/lib/utils";
 import type { HnsMatch } from "@/types/hns";
@@ -34,6 +41,7 @@ type CalendarEvent = {
 	home: string;
 	away: string;
 	competition: string;
+	category: CompetitionCategory;
 };
 
 interface MatchesCalendarProps {
@@ -57,6 +65,14 @@ export default function MatchesCalendar({ matches }: MatchesCalendarProps) {
 	const [view, setView] = useState<View>("month");
 	const [cursor, setCursor] = useState<Date>(() => new Date());
 
+	// Default to week view on mobile. Done in an effect (not the initial state)
+	// to avoid SSR/client hydration mismatch — SSR has no window.matchMedia.
+	useEffect(() => {
+		if (window.matchMedia("(max-width: 639px)").matches) {
+			setView("week");
+		}
+	}, []);
+
 	const events = useMemo<CalendarEvent[]>(
 		() =>
 			matches
@@ -68,6 +84,7 @@ export default function MatchesCalendar({ matches }: MatchesCalendarProps) {
 					home: m.homeTeam?.name ?? "N/A",
 					away: m.awayTeam?.name ?? "N/A",
 					competition: m.competition?.name ?? "",
+					category: getCompetitionCategory(m.competition?.name),
 				}))
 				.sort((a, b) => a.date.getTime() - b.date.getTime()),
 		[matches],
@@ -309,12 +326,15 @@ function MonthView({ cursor, events, onDayClick, onEventClick }: MonthViewProps)
 										key={ev.id}
 										type="button"
 										onClick={() => onEventClick(ev.slug)}
-										className="flex flex-col gap-0.5 border-l-2 border-foreground pl-2 text-left transition-opacity hover:opacity-60"
+										className={cn(
+											"flex flex-col gap-0.5 border-l-2 pl-2 text-left transition-opacity hover:opacity-60",
+											getCategoryBorderClass(ev.category),
+										)}
 									>
 										<span className="text-[0.6rem] font-medium uppercase tracking-[0.2em] tabular-nums text-muted-foreground">
 											{format(ev.date, "HH:mm")}
 										</span>
-										<span className="line-clamp-1 text-[0.7rem] font-semibold uppercase tracking-[0.05em]">
+										<span className="line-clamp-1 text-[0.7rem] font-semibold uppercase tracking-wider">
 											{ev.home} – {ev.away}
 										</span>
 									</button>
@@ -405,11 +425,24 @@ function WeekView({ cursor, events, onDayClick, onEventClick }: WeekViewProps) {
 										key={ev.id}
 										type="button"
 										onClick={() => onEventClick(ev.slug)}
-										className="flex flex-col gap-1 border-l-2 border-foreground pl-3 text-left transition-opacity hover:opacity-60"
+										className={cn(
+											"flex flex-col gap-1 border-l-2 pl-3 text-left transition-opacity hover:opacity-60",
+											getCategoryBorderClass(ev.category),
+										)}
 									>
-										<span className="text-[0.6rem] font-medium uppercase tracking-[0.2em] tabular-nums text-muted-foreground">
-											{format(ev.date, "HH:mm")}
-										</span>
+										<div className="flex items-center gap-2">
+											<span
+												className={cn(
+													"inline-flex items-center rounded-full px-1.5 py-0.5 text-[0.55rem] font-bold uppercase tracking-[0.15em]",
+													getCategoryChipClass(ev.category),
+												)}
+											>
+												{getCategoryShortLabel(ev.category)}
+											</span>
+											<span className="text-[0.6rem] font-medium uppercase tracking-[0.2em] tabular-nums text-muted-foreground">
+												{format(ev.date, "HH:mm")}
+											</span>
+										</div>
 										<span className="line-clamp-2 text-xs font-semibold uppercase tracking-[0.08em]">
 											{ev.home} – {ev.away}
 										</span>
@@ -466,11 +499,21 @@ function DayView({ cursor, events, onEventClick }: DayViewProps) {
 									{format(ev.date, "HH:mm")}
 								</span>
 								<div className="flex flex-col gap-2">
-									{ev.competition && (
-										<span className="line-clamp-1 text-[0.65rem] font-medium uppercase tracking-[0.3em] text-muted-foreground">
-											{ev.competition}
+									<div className="flex items-center gap-2">
+										<span
+											className={cn(
+												"inline-flex items-center rounded-full px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-[0.18em]",
+												getCategoryChipClass(ev.category),
+											)}
+										>
+											{getCategoryShortLabel(ev.category)}
 										</span>
-									)}
+										{ev.competition && (
+											<span className="line-clamp-1 text-[0.65rem] font-medium uppercase tracking-[0.3em] text-muted-foreground">
+												{ev.competition}
+											</span>
+										)}
+									</div>
 									<span className="line-clamp-2 text-sm font-semibold uppercase tracking-widest sm:text-base">
 										{ev.home} – {ev.away}
 									</span>

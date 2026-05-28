@@ -33,15 +33,16 @@ export default function Hero({ tenant }: HeroProps) {
 		offset: ["start start", "end start"],
 	});
 	const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
-	const bgScale = useTransform(scrollYProgress, [0, 1], [1, 1.12]);
-	// 1933 watermark: drifts up and reveals (darkens) as the hero exits.
-	const watermarkY = useTransform(scrollYProgress, [0, 1], ["0%", "-30%"]);
+	// 1933 watermark sits behind the heading — moves slower for depth.
+	const watermarkY = useTransform(scrollYProgress, [0, 1], ["0%", "-12%"]);
 	const watermarkOpacity = useTransform(
 		scrollYProgress,
 		[0, 0.6, 1],
 		[0.33, 0.7, 1],
 	);
-	const contentY = useTransform(scrollYProgress, [0, 1], ["0%", "-28%"]);
+	// Heading is the foreground layer — moves clearly faster than the watermark
+	// so the two visibly separate on scroll.
+	const contentY = useTransform(scrollYProgress, [0, 1], ["0%", "-55%"]);
 	const contentOpacity = useTransform(scrollYProgress, [0, 0.55], [1, 0]);
 	const indicatorOpacity = useTransform(scrollYProgress, [0, 0.12], [1, 0]);
 
@@ -74,37 +75,22 @@ export default function Hero({ tenant }: HeroProps) {
 			onPointerLeave={resetPointer}
 			className="relative isolate flex min-h-[calc(100svh-7rem)] w-full flex-col items-center justify-center overflow-hidden md:min-h-[calc(100vh-7rem)] md:py-24"
 		>
-			{/* Background image — scroll parallax + Ken Burns drift */}
+			{/* Background image — scroll parallax (translate only, no zoom) */}
 			<motion.div
 				className="absolute inset-0 -z-20"
-				style={reduced ? undefined : { y: bgY, scale: bgScale }}
+				style={reduced ? undefined : { y: bgY }}
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 0.06 }}
 				transition={{ duration: 1.2, ease: EASE }}
 			>
-				<motion.div
-					className="absolute inset-0"
-					initial={{ scale: reduced ? 1 : 1.08 }}
-					animate={reduced ? { scale: 1 } : { scale: [1.08, 1, 1.08] }}
-					transition={
-						reduced
-							? { duration: 1.2, ease: EASE }
-							: {
-									duration: 28,
-									ease: "easeInOut",
-									repeat: Number.POSITIVE_INFINITY,
-								}
-					}
-				>
-					<Image
-						src="/naslovna.jpg"
-						alt=""
-						fill
-						priority
-						sizes="100vw"
-						className="object-cover grayscale"
-					/>
-				</motion.div>
+				<Image
+					src="/naslovna.jpg"
+					alt=""
+					fill
+					priority
+					sizes="100vw"
+					className="object-cover grayscale"
+				/>
 			</motion.div>
 
 			{/* Founded year watermark — scales up into a wipe as the hero exits */}

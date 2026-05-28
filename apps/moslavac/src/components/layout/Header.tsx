@@ -3,7 +3,7 @@
 import { ChevronDown, Menu } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -47,7 +47,17 @@ const dropdownItemClass =
 
 export default function Header({ tenant }: HeaderProps) {
 	const [sheetOpen, setSheetOpen] = useState(false);
+	const [desktopSeasonOpen, setDesktopSeasonOpen] = useState(false);
+	const [mobileSeasonOpen, setMobileSeasonOpen] = useState(false);
 	const [hidden, setHidden] = useState(false);
+
+	// Mirror open-state into a ref so the scroll listener can read it without
+	// being rebound on every open/close. Radix dropdowns lock body scroll when
+	// opening, which fires a synthetic scroll event — without this guard the
+	// header would hide itself just as the user clicks the trigger, moving the
+	// anchored menu off-screen.
+	const menuOpenRef = useRef(false);
+	menuOpenRef.current = sheetOpen || desktopSeasonOpen || mobileSeasonOpen;
 
 	useEffect(() => {
 		let lastY = window.scrollY;
@@ -56,12 +66,14 @@ export default function Header({ tenant }: HeaderProps) {
 		const update = () => {
 			const currentY = window.scrollY;
 
-			if (currentY <= 80) {
-				setHidden(false);
-			} else if (currentY > lastY) {
-				setHidden(true);
-			} else if (currentY < lastY) {
-				setHidden(false);
+			if (!menuOpenRef.current) {
+				if (currentY <= 80) {
+					setHidden(false);
+				} else if (currentY > lastY) {
+					setHidden(true);
+				} else if (currentY < lastY) {
+					setHidden(false);
+				}
 			}
 
 			lastY = currentY;
@@ -151,7 +163,11 @@ export default function Header({ tenant }: HeaderProps) {
 				{/* Desktop nav */}
 				<nav className="hidden lg:flex lg:items-center lg:gap-10">
 					<NavLink href="/novosti">Vijesti</NavLink>
-					<DropdownMenu>
+					<DropdownMenu
+						modal={false}
+						open={desktopSeasonOpen}
+						onOpenChange={setDesktopSeasonOpen}
+					>
 						<DropdownMenuTrigger className="flex cursor-pointer items-center gap-1 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground transition-colors hover:text-foreground">
 							Sezona <ChevronDown className="size-3" />
 						</DropdownMenuTrigger>
@@ -189,7 +205,11 @@ export default function Header({ tenant }: HeaderProps) {
 							>
 								Vijesti
 							</Link>
-							<DropdownMenu>
+							<DropdownMenu
+								modal={false}
+								open={mobileSeasonOpen}
+								onOpenChange={setMobileSeasonOpen}
+							>
 								<DropdownMenuTrigger className="flex cursor-pointer items-center gap-2 text-3xl font-black uppercase leading-none tracking-tighter">
 									Sezona <ChevronDown className="size-6" />
 								</DropdownMenuTrigger>
