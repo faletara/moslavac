@@ -1,7 +1,7 @@
 "use client";
 
-import { animate, motion, useInView, useReducedMotion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { animate, motion, useInView, useMotionValue, useTransform } from "framer-motion";
+import { useEffect, useRef } from "react";
 
 interface AnimatedCounterProps {
 	value: number;
@@ -10,56 +10,20 @@ interface AnimatedCounterProps {
 }
 
 export function AnimatedCounter({ value, className, suffix = "" }: AnimatedCounterProps) {
-	const reduced = useReducedMotion();
 	const ref = useRef<HTMLSpanElement>(null);
-	const isInView = useInView(ref, { once: true, margin: "-80px" });
-	const [display, setDisplay] = useState(0);
-	const animated = useRef(false);
+	const inView = useInView(ref, { once: true });
+	const count = useMotionValue(0);
+	const text = useTransform(count, (latest) => `${Math.round(latest)}${suffix}`);
 
-	// Count up once the value scrolls into view.
 	useEffect(() => {
-		if (animated.current || !isInView) return;
-
-		if (reduced) {
-			animated.current = true;
-			setDisplay(value);
-			return;
-		}
-
-		animated.current = true;
-		const controls = animate(0, value, {
-			duration: 1,
-			ease: [0.25, 0.1, 0.25, 1],
-			onUpdate: (latest) => setDisplay(Math.round(latest)),
-		});
-
+		if (!inView) return;
+		const controls = animate(count, value, { duration: 0.9, ease: "easeOut" });
 		return () => controls.stop();
-	}, [isInView, value, reduced]);
-
-	// Safety net: if the IntersectionObserver never fires for an element that is
-	// actually on screen (seen on some mobile browsers), still show the value so
-	// it never stays stuck at 0. Off-screen elements are left for the observer so
-	// the count-up still plays when they're scrolled into view.
-	useEffect(() => {
-		const id = setTimeout(() => {
-			if (animated.current) return;
-			const el = ref.current;
-			if (!el) return;
-			const rect = el.getBoundingClientRect();
-			const onScreen = rect.top < window.innerHeight && rect.bottom > 0;
-			if (onScreen) {
-				animated.current = true;
-				setDisplay(value);
-			}
-		}, 1200);
-
-		return () => clearTimeout(id);
-	}, [value]);
+	}, [inView, value, count]);
 
 	return (
 		<motion.span ref={ref} className={className}>
-			{display}
-			{suffix}
+			{text}
 		</motion.span>
 	);
 }
