@@ -94,38 +94,40 @@ export async function fetchCompetitionMatches(params: {
   return [...past, ...future];
 }
 
-async function fetchPastAllMatches(competitionId: number): Promise<HnsMatch[]> {
-  const teamId = await getHnsTeamId();
-  const result = await hnsFetch<PaginatedResult<HnsMatch>>(
-    `/api/live/competition/${competitionId}/matches/paginated/past/2/${teamId}?page=1&pageSize=300`,
-    {
-      revalidate: COMPETITIONS_TTL,
-      tags: [`hns-${tenantSlug}-competition-${competitionId}-all-matches`],
-    },
-  );
-  return result?.result ?? [];
-}
+// HNS rejects large page sizes (pageSize=300 returns an empty result), so we
+// page through with a proven-good size and stop once a short page comes back.
+const MATCHES_PAGE_SIZE = 75;
+const MATCHES_MAX_PAGES = 10;
 
-async function fetchFutureAllMatches(
+async function fetchAllMatchesPaged(
   competitionId: number,
+  direction: "past" | "future",
 ): Promise<HnsMatch[]> {
   const teamId = await getHnsTeamId();
-  const result = await hnsFetch<PaginatedResult<HnsMatch>>(
-    `/api/live/competition/${competitionId}/matches/paginated/future/2/${teamId}?page=1&pageSize=300`,
-    {
-      revalidate: COMPETITIONS_TTL,
-      tags: [`hns-${tenantSlug}-competition-${competitionId}-all-matches`],
-    },
-  );
-  return result?.result ?? [];
+  const all: HnsMatch[] = [];
+
+  for (let page = 1; page <= MATCHES_MAX_PAGES; page++) {
+    const result = await hnsFetch<PaginatedResult<HnsMatch>>(
+      `/api/live/competition/${competitionId}/matches/paginated/${direction}/2/${teamId}?page=${page}&pageSize=${MATCHES_PAGE_SIZE}&teamIdFilter=${teamId}`,
+      {
+        revalidate: COMPETITIONS_TTL,
+        tags: [`hns-${tenantSlug}-competition-${competitionId}-all-matches`],
+      },
+    );
+    const batch = result?.result ?? [];
+    all.push(...batch);
+    if (batch.length < MATCHES_PAGE_SIZE) break;
+  }
+
+  return all;
 }
 
 export async function fetchAllCompetitionMatches(params: {
   competitionId: number;
 }): Promise<HnsMatch[]> {
   const [past, future] = await Promise.all([
-    fetchPastAllMatches(params.competitionId),
-    fetchFutureAllMatches(params.competitionId),
+    fetchAllMatchesPaged(params.competitionId, "past"),
+    fetchAllMatchesPaged(params.competitionId, "future"),
   ]);
   return [...past, ...future];
 }
