@@ -14,6 +14,28 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
+/**
+ * Common alternate names people actually search for, derived generically from
+ * the club's display name (e.g. "SNK Moslavac" → "Moslavac", "NK Moslavac").
+ * Feeds schema.org `alternateName` so Google links these queries to the club
+ * entity. Tenant-safe: no hardcoded names.
+ */
+function clubNameVariants(
+  displayName: string,
+  shortName?: string | null,
+): string[] {
+  const variants = new Set<string>();
+  const prefixRe = /^(SNK|ŠNK|HNK|GNK|MNK|NK|NŠ|ŠK)\s+/i;
+  const bare = displayName.replace(prefixRe, "").trim();
+  if (bare && bare !== displayName) {
+    variants.add(bare);
+    variants.add(`NK ${bare}`);
+  }
+  if (shortName) variants.add(shortName);
+  variants.delete(displayName);
+  return [...variants];
+}
+
 export async function generateMetadata(): Promise<Metadata> {
   const tenant = await getTenant();
   const name = tenant.displayName;
@@ -65,6 +87,8 @@ export default async function RootLayout({
     (v): v is string => Boolean(v),
   );
   const shortName = tenant.branding?.shortName;
+  const motto = tenant.branding?.motto;
+  const altNames = clubNameVariants(tenant.displayName, shortName);
   const founded = tenant.branding?.founded;
   const address = tenant.contact?.address;
   const email = tenant.contact?.email;
@@ -74,7 +98,8 @@ export default async function RootLayout({
     "@context": "https://schema.org",
     "@type": "SportsOrganization",
     name: tenant.displayName,
-    ...(shortName ? { alternateName: shortName } : {}),
+    ...(altNames.length > 0 ? { alternateName: altNames } : {}),
+    ...(motto ? { slogan: motto } : {}),
     sport: "Football",
     url: baseUrl,
     ...(logoUrl ? { logo: logoUrl } : {}),
