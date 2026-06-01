@@ -37,7 +37,7 @@ export function StaggerContainer({
       className={className}
       initial="hidden"
       whileInView="show"
-      viewport={{ once, margin: "-80px" }}
+      viewport={{ once, amount: 0.2 }}
       variants={{
         hidden: {},
         show: { transition: { staggerChildren, delayChildren } },

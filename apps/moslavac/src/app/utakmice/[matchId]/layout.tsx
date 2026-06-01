@@ -1,15 +1,26 @@
 import type { Metadata } from "next";
+import { getCometImageUrl } from "@/lib/api/images";
 import {
   fetchAllCompetitionMatches,
   fetchCurrentSeasonCompetitions,
 } from "@/lib/hns/competitions";
 import { fetchMatchInfo } from "@/lib/hns/matches";
 import { formatDateTime } from "@/lib/helpers/date";
+import { getTenant } from "@/lib/payload/getTenant";
 import { BASE_URL } from "@/lib/siteUrl";
 import { buildMatchSlug, parseTrailingId } from "@/lib/slug";
+import type { HnsMatch } from "@/types/hns";
 
 interface Params {
   matchId: string;
+}
+
+/** Absolute image URL for a match: home-team logo, falling back to the club OG image. */
+function matchImageUrl(match: HnsMatch): string {
+  const picture = match.homeTeam?.picture ?? match.awayTeam?.picture;
+  return picture
+    ? `${BASE_URL}${getCometImageUrl(picture)}`
+    : `${BASE_URL}/naslovna.jpg`;
 }
 
 export async function generateStaticParams() {
@@ -62,17 +73,19 @@ export async function generateMetadata({
     date,
     match.facility?.place,
   ].filter(Boolean);
+  const description = parts.join(" · ");
 
   return {
     title,
-    description: parts.join(" · "),
+    description,
     alternates: {
       canonical: `${BASE_URL}/utakmice/${buildMatchSlug(match)}`,
     },
     openGraph: {
       type: "website",
       title,
-      description: parts.join(" · "),
+      description,
+      images: [{ url: matchImageUrl(match), alt: `${home} – ${away}` }],
     },
   };
 }
@@ -86,7 +99,10 @@ export default async function MatchLayout({
 }) {
   const { matchId } = await params;
   // fetch is deduplicated with generateMetadata's call (same URL + cache key)
-  const match = await fetchMatchInfo({ matchId: parseTrailingId(matchId) });
+  const [match, tenant] = await Promise.all([
+    fetchMatchInfo({ matchId: parseTrailingId(matchId) }),
+    getTenant(),
+  ]);
 
   if (!match) return <>{children}</>;
 
@@ -95,32 +111,64 @@ export default async function MatchLayout({
   const homeScore = match.homeTeamResult?.current;
   const awayScore = match.awayTeamResult?.current;
 
-  const jsonLd: Record<string, unknown> = {
-    "@context": "https://schema.org",
-    "@type": "SportsEvent",
-    name: `${home} – ${away}`,
-    sport: "Football",
-    homeTeam: { "@type": "SportsTeam", name: home },
-    awayTeam: { "@type": "SportsTeam", name: away },
-  };
+  // schema.org Event requires both startDate and location. Only emit the
+  // SportsEvent when both are present, so we never produce an invalid item.
+  const facility = match.facility;
 
-  if (match.dateTimeUTC) {
-    jsonLd.startDate = new Date(match.dateTimeUTC).toISOString();
-  }
-  if (match.competition?.name) {
-    jsonLd.superEvent = { "@type": "SportsEvent", name: match.competition.name };
-  }
-  if (match.facility) {
-    jsonLd.location = {
-      "@type": "Place",
-      name: match.facility.name ?? "Stadion",
-      ...(match.facility.address ? { streetAddress: match.facility.address } : {}),
-      ...(match.facility.place ? { addressLocality: match.facility.place } : {}),
+  let jsonLd: Record<string, unknown> | null = null;
+  if (match.dateTimeUTC != null && facility?.name) {
+    const start = new Date(match.dateTimeUTC);
+    // Football matches run ~105 min (2×45 + half-time); a reasonable endDate.
+    const end = new Date(start.getTime() + 105 * 60 * 1000);
+
+    const { date } = formatDateTime(match.dateTimeUTC);
+    const description = [match.competition?.name, date, facility.place]
+      .filter(Boolean)
+      .join(" · ");
+
+    jsonLd = {
+      "@context": "https://schema.org",
+      "@type": "SportsEvent",
+      name: `${home} – ${away}`,
+      sport: "Football",
+      startDate: start.toISOString(),
+      endDate: end.toISOString(),
+      eventStatus: "https://schema.org/EventScheduled",
+      ...(description ? { description } : {}),
+      image: [matchImageUrl(match)],
+      location: {
+        "@type": "Place",
+        name: facility.name ?? "Stadion",
+        address: {
+          "@type": "PostalAddress",
+          ...(facility.address ? { streetAddress: facility.address } : {}),
+          ...(facility.place ? { addressLocality: facility.place } : {}),
+          addressCountry: "HR",
+        },
+      },
+      homeTeam: { "@type": "SportsTeam", name: home },
+      awayTeam: { "@type": "SportsTeam", name: away },
+      performer: [
+        { "@type": "SportsTeam", name: home },
+        { "@type": "SportsTeam", name: away },
+      ],
+      organizer: {
+        "@type": "SportsOrganization",
+        name: tenant.displayName,
+        url: BASE_URL,
+      },
     };
-  }
-  if (homeScore != null && awayScore != null) {
-    jsonLd.homeScore = { "@type": "QuantitativeValue", value: homeScore };
-    jsonLd.awayScore = { "@type": "QuantitativeValue", value: awayScore };
+
+    if (match.competition?.name) {
+      jsonLd.superEvent = {
+        "@type": "SportsEvent",
+        name: match.competition.name,
+      };
+    }
+    if (homeScore != null && awayScore != null) {
+      jsonLd.homeScore = { "@type": "QuantitativeValue", value: homeScore };
+      jsonLd.awayScore = { "@type": "QuantitativeValue", value: awayScore };
+    }
   }
 
   const breadcrumbJsonLd = {
@@ -140,10 +188,12 @@ export default async function MatchLayout({
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}

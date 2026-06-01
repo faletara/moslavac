@@ -9,17 +9,21 @@ import { buildCompetitionSlug, buildMatchSlug } from "@/lib/slug";
 
 export const revalidate = 3600;
 
-const STATIC_ROUTES: MetadataRoute.Sitemap = [
-  { url: `${BASE_URL}/`, changeFrequency: "daily", priority: 1 },
-  { url: `${BASE_URL}/novosti`, changeFrequency: "daily", priority: 0.9 },
-  { url: `${BASE_URL}/utakmice`, changeFrequency: "weekly", priority: 0.8 },
-  { url: `${BASE_URL}/prva-momcad`, changeFrequency: "monthly", priority: 0.7 },
-  { url: `${BASE_URL}/klub`, changeFrequency: "yearly", priority: 0.6 },
-  { url: `${BASE_URL}/oprema`, changeFrequency: "monthly", priority: 0.5 },
-  { url: `${BASE_URL}/sezonska-iskaznica`, changeFrequency: "monthly", priority: 0.5 },
-];
-
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  // Regenerated hourly (revalidate); use the generation time as a freshness
+  // signal for routes without their own modification timestamp.
+  const now = new Date();
+
+  const staticRoutes: MetadataRoute.Sitemap = [
+    { url: `${BASE_URL}/`, lastModified: now, changeFrequency: "daily", priority: 1 },
+    { url: `${BASE_URL}/novosti`, lastModified: now, changeFrequency: "daily", priority: 0.9 },
+    { url: `${BASE_URL}/utakmice`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${BASE_URL}/prva-momcad`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${BASE_URL}/klub`, lastModified: now, changeFrequency: "yearly", priority: 0.6 },
+    { url: `${BASE_URL}/oprema`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${BASE_URL}/sezonska-iskaznica`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
+  ];
+
   const [newsResult, competitionsResult] = await Promise.allSettled([
     fetchNewsPaginated({ page: 1, size: 200 }),
     fetchCurrentSeasonCompetitions(),
@@ -47,21 +51,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return [
       {
         url: `${BASE_URL}/sezona/${slug}`,
+        lastModified: now,
         changeFrequency: "daily" as const,
         priority: 0.8,
       },
       {
         url: `${BASE_URL}/sezona/${slug}/tablica`,
+        lastModified: now,
         changeFrequency: "daily" as const,
         priority: 0.7,
       },
       {
         url: `${BASE_URL}/sezona/${slug}/strijelci`,
+        lastModified: now,
         changeFrequency: "weekly" as const,
         priority: 0.6,
       },
       {
         url: `${BASE_URL}/sezona/${slug}/kartoni`,
+        lastModified: now,
         changeFrequency: "weekly" as const,
         priority: 0.6,
       },
@@ -80,10 +88,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .filter((m) => m.id != null && m.allowDetail !== false)
       .map((m) => ({
         url: `${BASE_URL}/utakmice/${buildMatchSlug(m)}`,
+        lastModified: m.dateTimeUTC != null ? new Date(m.dateTimeUTC) : now,
         changeFrequency: "weekly" as const,
         priority: 0.6,
       }));
   });
 
-  return [...STATIC_ROUTES, ...newsUrls, ...competitionUrls, ...matchUrls];
+  return [...staticRoutes, ...newsUrls, ...competitionUrls, ...matchUrls];
 }

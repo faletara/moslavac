@@ -49,7 +49,7 @@ export function FadeInView({
       className={cn(className)}
       initial={initial}
       whileInView={animate}
-      viewport={{ once, margin: "-80px" }}
+      viewport={{ once, amount: 0.2 }}
       transition={{ duration, delay, ease: EASE }}
     >
       {children}

@@ -28,11 +28,18 @@ export async function generateMetadata({
   const info = await fetchCompetitionInfo({ competitionId: id });
   const name = info?.name ?? "Sezona";
   const slug = info ? buildCompetitionSlug(info) : competitionId;
+  const description = `Ljestvica, utakmice i statistike za natjecanje ${name}.`;
   return {
     title: name,
-    description: `Ljestvica, utakmice i statistike za natjecanje ${name}.`,
+    description,
     alternates: {
       canonical: `${BASE_URL}/sezona/${slug}`,
+    },
+    openGraph: {
+      type: "website",
+      title: name,
+      description,
+      images: [{ url: "/naslovna.jpg", alt: name, width: 1200, height: 630 }],
     },
   };
 }
