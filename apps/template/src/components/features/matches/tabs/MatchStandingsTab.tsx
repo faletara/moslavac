@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { HnsCrest } from "@/components/HnsCrest";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -11,9 +11,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { api, getCometImageUrl } from "@/lib/api";
+import { api } from "@/lib/api";
 import { getStandingsForm, type FormResult } from "@/lib/helpers/form";
-import { cn } from "@/lib/utils";
 import type { TeamRanking } from "@/types/hns";
 
 interface MatchStandingsTabProps {
@@ -34,7 +33,7 @@ export default function MatchStandingsTab({
 
   if (isLoading) {
     return (
-      <section className="mt-16 border-t border-border/60 pt-12 sm:mt-20">
+      <section className="mt-16 pt-12 sm:mt-20">
         <Skeleton className="mx-auto h-4 w-32" />
         <div className="mt-8 space-y-2">
           {["a", "b", "c", "d", "e", "f", "g", "h"].map((k) => (
@@ -47,8 +46,8 @@ export default function MatchStandingsTab({
 
   if (!standings || standings.length === 0) {
     return (
-      <section className="mt-16 border-t border-border/60 pt-12 sm:mt-20">
-        <p className="text-center text-sm text-muted-foreground">
+      <section className="mt-16 pt-12 sm:mt-20">
+        <p className="text-center">
           Tablica nije dostupna.
         </p>
       </section>
@@ -56,8 +55,8 @@ export default function MatchStandingsTab({
   }
 
   return (
-    <section className="mt-16 border-t border-border/60 pt-12 sm:mt-20">
-      <h2 className="text-center text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
+    <section className="mt-16 pt-12 sm:mt-20">
+      <h2 className="text-center">
         Tablica
       </h2>
 
@@ -78,7 +77,7 @@ export default function MatchStandingsTab({
                 GP
               </TableHead>
               <TableHead className="text-center">+/−</TableHead>
-              <TableHead className="text-center font-bold">Bod</TableHead>
+              <TableHead className="text-center">Bod</TableHead>
               <TableHead className="hidden text-center md:table-cell">
                 Forma
               </TableHead>
@@ -109,7 +108,8 @@ function StandingsRow({
   isHome: boolean;
   isAway: boolean;
 }) {
-  const highlight = isHome || isAway;
+  void isHome;
+  void isAway;
   const goalsFor = row.goalsFor ?? 0;
   const goalsAgainst = row.goalsAgainst ?? 0;
   const diff = goalsFor - goalsAgainst;
@@ -121,67 +121,54 @@ function StandingsRow({
   const teamId = row.team?.id;
   const cellContent = (
     <div className="flex items-center gap-2">
-      <Avatar className="size-6 shrink-0">
-        {row.team?.picture && (
-          <AvatarImage
-            src={getCometImageUrl(row.team.picture)}
-            alt={teamName}
-          />
-        )}
-        <AvatarFallback className="text-[0.5rem] font-semibold uppercase">
-          {teamName.slice(0, 2).toUpperCase()}
-        </AvatarFallback>
-      </Avatar>
-      <span
-        className={cn(
-          "truncate text-xs sm:text-sm",
-          highlight && "font-semibold",
-        )}
-      >
+      <HnsCrest
+        picture={row.team?.picture}
+        name={teamName}
+        size={24}
+        className="size-6 shrink-0"
+      />
+      <span>
         {teamName}
       </span>
     </div>
   );
 
   return (
-    <TableRow className={cn(highlight && "bg-muted/50 hover:bg-muted/70")}>
-      <TableCell className="text-center text-xs font-medium tabular-nums text-muted-foreground">
+    <TableRow>
+      <TableCell className="text-center">
         {row.position ?? "—"}
       </TableCell>
       <TableCell className="min-w-0">
         {teamId != null && row.team?.allowDetail ? (
-          <Link
-            href={`/team/${teamId}`}
-            className="block transition-colors hover:text-foreground"
-          >
+          <Link href={`/team/${teamId}`} className="block">
             {cellContent}
           </Link>
         ) : (
           cellContent
         )}
       </TableCell>
-      <TableCell className="text-center text-xs tabular-nums">
+      <TableCell className="text-center">
         {row.played ?? 0}
       </TableCell>
-      <TableCell className="text-center text-xs tabular-nums">
+      <TableCell className="text-center">
         {row.wins ?? 0}
       </TableCell>
-      <TableCell className="text-center text-xs tabular-nums">
+      <TableCell className="text-center">
         {row.draws ?? 0}
       </TableCell>
-      <TableCell className="text-center text-xs tabular-nums">
+      <TableCell className="text-center">
         {row.losses ?? 0}
       </TableCell>
-      <TableCell className="hidden text-center text-xs tabular-nums sm:table-cell">
+      <TableCell className="hidden text-center sm:table-cell">
         {goalsFor}
       </TableCell>
-      <TableCell className="hidden text-center text-xs tabular-nums sm:table-cell">
+      <TableCell className="hidden text-center sm:table-cell">
         {goalsAgainst}
       </TableCell>
-      <TableCell className="text-center text-xs tabular-nums">
+      <TableCell className="text-center">
         {diffLabel}
       </TableCell>
-      <TableCell className="text-center text-sm font-bold tabular-nums">
+      <TableCell className="text-center">
         {row.points ?? 0}
       </TableCell>
       <TableCell className="hidden md:table-cell">
@@ -193,7 +180,7 @@ function StandingsRow({
 
 function FormStrip({ form }: { form: FormResult[] }) {
   if (form.length === 0) {
-    return <span className="text-[0.6rem] text-muted-foreground/60">—</span>;
+    return <span>—</span>;
   }
   return (
     <div className="flex justify-center gap-1">
@@ -205,19 +192,9 @@ function FormStrip({ form }: { form: FormResult[] }) {
 }
 
 function FormDot({ result }: { result: FormResult }) {
-  const styles: Record<FormResult, string> = {
-    W: "bg-emerald-500 text-white",
-    D: "bg-muted text-muted-foreground",
-    L: "bg-rose-500 text-white",
-  };
   const label = result === "W" ? "P" : result === "D" ? "N" : "I";
   return (
-    <span
-      className={cn(
-        "flex size-5 items-center justify-center rounded-full text-[0.55rem] font-bold uppercase",
-        styles[result],
-      )}
-    >
+    <span className="flex size-5 items-center justify-center">
       {label}
     </span>
   );

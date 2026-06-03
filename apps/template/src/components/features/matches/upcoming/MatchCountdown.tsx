@@ -39,8 +39,8 @@ export default function MatchCountdown({ dateTimeUTC }: MatchCountdownProps) {
   if (!parts || parts.isPast) return null;
 
   return (
-    <section className="mt-16 border-t border-border/60 pt-12 sm:mt-20">
-      <h2 className="text-center text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
+    <section className="mt-16 pt-12 sm:mt-20">
+      <h2 className="text-center">
         Početak za
       </h2>
 
@@ -57,10 +57,10 @@ export default function MatchCountdown({ dateTimeUTC }: MatchCountdownProps) {
 function CountdownCell({ value, label }: { value: number; label: string }) {
   return (
     <div className="flex flex-col items-center gap-2">
-      <span className="font-black tabular-nums leading-none text-3xl sm:text-5xl">
+      <span>
         {String(value).padStart(2, "0")}
       </span>
-      <span className="text-[0.55rem] font-medium uppercase tracking-[0.25em] text-muted-foreground sm:text-[0.6rem] sm:tracking-[0.3em]">
+      <span>
         {label}
       </span>
     </div>

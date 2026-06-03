@@ -8,6 +8,18 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(dirname, "../.."),
   },
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [{ key: "Link", value: '</sitemap.xml>; rel="sitemap"' }],
+      },
+      {
+        source: "/api/(.*)",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       {

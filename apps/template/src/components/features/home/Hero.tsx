@@ -1,6 +1,7 @@
+"use client";
+
 import { ArrowDown } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import type { FrontendTenant } from "@/lib/payload/types";
 
 type HeroProps = {
@@ -9,37 +10,41 @@ type HeroProps = {
 
 export default function Hero({ tenant }: HeroProps) {
 	const founded = tenant.branding?.founded ?? null;
-	const motto =
-		tenant.branding?.motto ??
-		"Više od devet desetljeća popovačkog nogometa. Strast, ponos i klub koji pišemo zajedno.";
 	const nameParts = splitDisplayName(tenant.displayName);
 	const taglinePrefix = founded ? `Osnovan ${founded}` : tenant.displayName;
 
 	return (
-		<section className="relative isolate flex min-h-svh w-full flex-col overflow-hidden md:min-h-screen md:items-center md:justify-center md:py-24">
-			<div className="absolute inset-0 -z-20 opacity-[0.06]">
+		<section className="relative isolate flex min-h-[calc(100svh-7rem)] w-full flex-col items-center justify-center overflow-hidden md:min-h-[calc(100vh-7rem)] md:py-24">
+			{/* Background image */}
+			<div className="absolute inset-0 -z-20">
 				<Image
 					src="/naslovna.jpg"
 					alt=""
 					fill
 					priority
 					sizes="100vw"
-					className="object-cover grayscale"
+					className="object-cover"
 				/>
 			</div>
 
+			{/* Founded year watermark */}
 			{founded && (
-				<span
+				<div
 					aria-hidden
-					className="pointer-events-none absolute -bottom-6 right-2 -z-10 select-none font-black leading-none tracking-tighter text-foreground/5 text-[42vw] md:-bottom-12 md:right-6 md:text-[26vw]"
+					className="pointer-events-none absolute -bottom-6 right-2 -z-10 select-none md:-bottom-12 md:right-6"
 				>
-					{founded}
-				</span>
+					<span className="block">
+						{founded}
+					</span>
+				</div>
 			)}
 
-			<div className="relative z-10 flex flex-1 flex-col justify-center px-6 py-16 sm:px-10 md:max-w-6xl md:flex-none md:items-center md:px-6 md:py-0 md:text-center">
-				<div className="flex flex-col items-start gap-4 md:items-center">
-					<span className="h-px w-12 bg-foreground" />
+			<div className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 py-16 text-center sm:px-10 md:max-w-6xl md:flex-none md:px-6 md:py-0">
+				<div className="flex flex-col items-center gap-4">
+					{/* Decorative line */}
+					<span />
+
+					{/* Grb + tagline */}
 					<div className="flex items-center gap-3">
 						<Image
 							src="/grb.png"
@@ -49,39 +54,31 @@ export default function Hero({ tenant }: HeroProps) {
 							priority
 							className="h-9 w-9 md:h-10 md:w-10"
 						/>
-						<p className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
-							{taglinePrefix}
-						</p>
+						<p>{taglinePrefix}</p>
 					</div>
 				</div>
 
-				<h1
-					aria-label={tenant.displayName}
-					className="mt-10 select-none text-balance font-black uppercase leading-[0.85] tracking-tighter md:mt-12"
-				>
-					{nameParts.map((part, idx) => (
-						<span
-							key={`${part}-${idx}`}
-							className="block text-[15vw] md:text-[14vw]"
-						>
-							{part}
+				{/* Main heading */}
+				<h1 aria-label={tenant.displayName} className="mt-10 select-none md:mt-12">
+					{nameParts.map((part) => (
+						<span key={part} className="block overflow-hidden">
+							<span className="block">
+								{part}
+							</span>
 						</span>
 					))}
 				</h1>
+			</div>
 
-				<p className="mt-8 max-w-md text-balance text-sm leading-relaxed text-muted-foreground md:mx-auto md:mt-10 md:max-w-xl md:text-center md:text-base">
-					{motto}
-				</p>
-
-				<div className="mt-10 md:mt-12">
-					<Link
-						href="#sljedeca-utakmica"
-						className="group inline-flex items-center gap-3 text-xs font-medium uppercase tracking-[0.3em] text-foreground transition-colors hover:text-muted-foreground"
-					>
-						Saznaj više
-						<ArrowDown className="size-3 transition-transform duration-300 group-hover:translate-y-1" />
-					</Link>
-				</div>
+			{/* Scroll indicator */}
+			<div
+				aria-hidden
+				className="pointer-events-none absolute inset-x-0 bottom-6 z-10 flex flex-col items-center gap-2 md:bottom-10"
+			>
+				<span>Istraži</span>
+				<span>
+					<ArrowDown className="h-4 w-4" strokeWidth={1.5} />
+				</span>
 			</div>
 		</section>
 	);

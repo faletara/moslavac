@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { HnsCrest } from "@/components/HnsCrest";
+import { useOurTeamId } from "@/components/providers/TenantProvider";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -11,25 +12,26 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getCometImageUrl } from "@/lib/api";
-import { cn } from "@/lib/utils";
+import { buildPlayerSlug } from "@/lib/slug";
 import type { PlayerStats } from "@/types/hns";
 
 interface TopScorersTableProps {
   scorers: PlayerStats[] | undefined;
   isLoading: boolean;
   competitionId: number | null;
-  highlightTeamIds?: number[];
   emptyMessage?: string;
+  /** Accepted for API compatibility; highlighting is not rendered in the skeleton. */
+  highlightTeamIds?: number[];
 }
 
 export default function TopScorersTable({
   scorers,
   isLoading,
   competitionId,
-  highlightTeamIds = [],
   emptyMessage = "Statistike strijelaca nisu dostupne.",
 }: TopScorersTableProps) {
+  const ourTeamId = useOurTeamId();
+
   if (isLoading) {
     return (
       <div className="mx-auto max-w-2xl">
@@ -44,13 +46,11 @@ export default function TopScorersTable({
 
   if (!scorers || scorers.length === 0) {
     return (
-      <p className="text-center text-sm text-muted-foreground">
+      <p className="text-center">
         {emptyMessage}
       </p>
     );
   }
-
-  const highlightSet = new Set(highlightTeamIds);
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -66,13 +66,14 @@ export default function TopScorersTable({
         <TableBody>
           {scorers.map((s, i) => {
             const teamId = s.team?.id;
-            const highlight = teamId != null && highlightSet.has(teamId);
+            const isOurTeam =
+              ourTeamId != null && teamId === ourTeamId;
             return (
               <ScorerRow
                 key={`${s.player?.personId ?? s.player?.name ?? "x"}-${i}`}
                 scorer={s}
                 position={i + 1}
-                highlight={highlight}
+                isOurTeam={isOurTeam}
                 competitionId={competitionId}
               />
             );
@@ -86,12 +87,12 @@ export default function TopScorersTable({
 function ScorerRow({
   scorer,
   position,
-  highlight,
+  isOurTeam,
   competitionId,
 }: {
   scorer: PlayerStats;
   position: number;
-  highlight: boolean;
+  isOurTeam: boolean;
   competitionId: number | null;
 }) {
   const personId = scorer.player?.personId ?? null;
@@ -99,44 +100,35 @@ function ScorerRow({
   const playerPicture = scorer.player?.picture ?? null;
   const teamName = scorer.team?.name ?? "—";
   const isLinkable =
+    isOurTeam &&
     personId != null &&
     competitionId != null &&
     scorer.player?.hideProfile !== true;
 
   const playerCell = (
     <div className="flex items-center gap-2">
-      <Avatar className="size-7 shrink-0">
-        {playerPicture && (
-          <AvatarImage
-            src={getCometImageUrl(playerPicture)}
-            alt={playerName}
-          />
-        )}
-        <AvatarFallback className="text-[0.5rem] font-semibold uppercase">
-          {playerName.slice(0, 2).toUpperCase()}
-        </AvatarFallback>
-      </Avatar>
-      <span
-        className={cn(
-          "truncate text-xs sm:text-sm",
-          highlight && "font-semibold",
-        )}
-      >
+      <HnsCrest
+        picture={playerPicture}
+        name={playerName}
+        size={28}
+        className="size-7 shrink-0"
+      />
+      <span className="truncate">
         {playerName}
       </span>
     </div>
   );
 
   return (
-    <TableRow className={cn(highlight && "bg-muted/50 hover:bg-muted/70")}>
-      <TableCell className="text-center text-xs font-medium tabular-nums text-muted-foreground">
+    <TableRow>
+      <TableCell className="text-center">
         {position}
       </TableCell>
       <TableCell className="min-w-0">
         {isLinkable ? (
           <Link
-            href={`/stats/${personId}/${competitionId}`}
-            className="block transition-colors hover:text-foreground"
+            href={`/statistika/${buildPlayerSlug({ personId, name: playerName })}/${competitionId}`}
+            className="block"
           >
             {playerCell}
           </Link>
@@ -146,23 +138,18 @@ function ScorerRow({
       </TableCell>
       <TableCell>
         <div className="flex items-center gap-2">
-          <Avatar className="size-5 shrink-0">
-            {scorer.team?.picture && (
-              <AvatarImage
-                src={getCometImageUrl(scorer.team.picture)}
-                alt={teamName}
-              />
-            )}
-            <AvatarFallback className="text-[0.5rem] font-semibold uppercase">
-              {teamName.slice(0, 2).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          <span className="truncate text-xs text-muted-foreground">
+          <HnsCrest
+            picture={scorer.team?.picture}
+            name={teamName}
+            size={20}
+            className="size-5 shrink-0"
+          />
+          <span className="truncate">
             {teamName}
           </span>
         </div>
       </TableCell>
-      <TableCell className="text-center text-sm font-bold tabular-nums">
+      <TableCell className="text-center">
         {scorer.value ?? 0}
       </TableCell>
     </TableRow>

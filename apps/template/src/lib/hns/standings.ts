@@ -3,7 +3,7 @@ import { getHnsTeamId, hnsFetch } from "./client";
 import { tenantSlug } from "../payload/getTenant";
 import type { PlayerStats, TeamRanking } from "@/types/hns";
 
-const STANDINGS_TTL = 900;
+const STANDINGS_TTL = 180;
 
 export async function fetchTeamStandings(params: {
   competitionId: number;

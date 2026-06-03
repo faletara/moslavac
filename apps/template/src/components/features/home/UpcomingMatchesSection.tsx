@@ -3,21 +3,31 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { HnsCrest } from "@/components/HnsCrest";
+import { useOurTeamId } from "@/components/providers/TenantProvider";
 import { Skeleton } from "@/components/ui/skeleton";
-import { api, getCometImageUrl } from "@/lib/api";
-import { formatDateTime } from "@/lib/helpers/date";
+import { api } from "@/lib/api";
+import {
+  getCategoryChipClass,
+  getCategoryShortLabel,
+  getCompetitionCategory,
+} from "@/lib/helpers/competition";
+import { formatDateParts } from "@/lib/helpers/date";
+import { buildMatchSlug } from "@/lib/slug";
 
-function TeamRow({ name, picture }: { name: string; picture: string }) {
+function TeamRow({
+  name,
+  picture,
+  isUs,
+}: {
+  name: string;
+  picture: string;
+  isUs: boolean;
+}) {
   return (
     <div className="flex items-center gap-3">
-      <Avatar className="size-8 shrink-0">
-        {picture && <AvatarImage src={getCometImageUrl(picture)} alt={name} />}
-        <AvatarFallback className="bg-transparent text-[10px] font-medium text-muted-foreground">
-          {name.slice(0, 2).toUpperCase()}
-        </AvatarFallback>
-      </Avatar>
-      <span className="line-clamp-1 text-xs font-semibold uppercase tracking-[0.12em]">
+      <HnsCrest picture={picture} name={name} size={32} />
+      <span className={`line-clamp-1 ${isUs ? "" : ""}`}>
         {name}
       </span>
     </div>
@@ -26,7 +36,7 @@ function TeamRow({ name, picture }: { name: string; picture: string }) {
 
 function SectionTitle() {
   return (
-    <h2 className="text-center text-3xl font-black uppercase leading-none tracking-tighter md:text-4xl">
+    <h2>
       Sljedeće utakmice
     </h2>
   );
@@ -67,10 +77,10 @@ function ScrollableRow({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="space-y-8">
+    <div>
       <div
         ref={scrollRef}
-        className="flex snap-x snap-mandatory gap-8 overflow-x-auto scroll-smooth pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="-mt-4 flex snap-x snap-mandatory gap-8 overflow-x-auto scroll-smooth px-1 pb-2 pt-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {children}
       </div>
@@ -82,21 +92,21 @@ function ScrollableRow({ children }: { children: React.ReactNode }) {
             aria-label="Prethodne utakmice"
             onClick={() => scrollBy(-1)}
             disabled={!canScrollLeft}
-            className="group inline-flex items-center gap-3 text-xs font-medium uppercase tracking-[0.3em] text-foreground transition-colors hover:text-muted-foreground disabled:pointer-events-none disabled:opacity-30"
+            className="inline-flex items-center gap-3 disabled:pointer-events-none"
           >
-            <ChevronLeft className="size-3 transition-transform duration-300 group-hover:-translate-x-1" />
+            <ChevronLeft className="size-3" />
             Prethodne
           </button>
-          <span aria-hidden className="h-px w-8 bg-foreground" />
+          <span aria-hidden className="h-px w-8" />
           <button
             type="button"
             aria-label="Sljedeće utakmice"
             onClick={() => scrollBy(1)}
             disabled={!canScrollRight}
-            className="group inline-flex items-center gap-3 text-xs font-medium uppercase tracking-[0.3em] text-foreground transition-colors hover:text-muted-foreground disabled:pointer-events-none disabled:opacity-30"
+            className="inline-flex items-center gap-3 disabled:pointer-events-none"
           >
             Sljedeće
-            <ChevronRight className="size-3 transition-transform duration-300 group-hover:translate-x-1" />
+            <ChevronRight className="size-3" />
           </button>
         </div>
       )}
@@ -106,10 +116,11 @@ function ScrollableRow({ children }: { children: React.ReactNode }) {
 
 export default function UpcomingMatchesSection() {
   const { data: matches, isLoading } = api.matches.useGetUpcomingMatches();
+  const ourTeamId = useOurTeamId();
 
   if (isLoading) {
     return (
-      <section className="mx-auto w-full max-w-7xl space-y-12 px-4">
+      <section className="mx-auto w-full max-w-7xl px-4">
         <SectionTitle />
         <div className="flex gap-8 overflow-x-auto pb-2">
           {["u1", "u2", "u3", "u4"].map((key) => (
@@ -129,40 +140,67 @@ export default function UpcomingMatchesSection() {
   if (!matches || matches.length === 0) return null;
 
   return (
-    <section className="mx-auto w-full max-w-7xl space-y-12 px-4">
+    <section className="mx-auto w-full max-w-7xl px-4">
       <SectionTitle />
       <ScrollableRow>
         {matches.map((match) => {
-          const { date, time } = formatDateTime(match.dateTimeUTC ?? 0);
+          const { day, monthShort, weekdayShort, time } = formatDateParts(
+            match.dateTimeUTC ?? 0,
+          );
+          const category = getCompetitionCategory(match.competition?.name);
+          const categoryLabel = getCategoryShortLabel(category);
+          const chipClass = getCategoryChipClass(category);
+          const homeIsUs =
+            ourTeamId != null && match.homeTeam?.id === ourTeamId;
+          const awayIsUs =
+            ourTeamId != null && match.awayTeam?.id === ourTeamId;
+          const venueIndicator = homeIsUs ? "D" : awayIsUs ? "G" : null;
 
           return (
             <Link
               key={match.id}
-              href={`/matches/${match.id}`}
-              aria-label={`${match.homeTeam?.name ?? ""} vs ${match.awayTeam?.name ?? ""} — ${date} ${time}`}
-              className="group flex w-72 shrink-0 snap-start flex-col gap-5 rounded-sm outline-none transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-4"
+              href={`/utakmice/${buildMatchSlug(match)}`}
+              aria-label={`${match.homeTeam?.name ?? ""} vs ${match.awayTeam?.name ?? ""} — ${day}. ${monthShort} ${time}`}
+              className="flex w-72 shrink-0 snap-start flex-col gap-5"
             >
-              <p className="line-clamp-2 text-xs font-medium uppercase tracking-[0.25em] text-muted-foreground">
-                {match.competition?.name ?? ""}
-              </p>
+              <div className="flex items-center gap-2">
+                <span className={`inline-flex items-center px-2.5 py-1 ${chipClass}`}>
+                  {categoryLabel}
+                </span>
+                {venueIndicator && (
+                  <span>
+                    · {venueIndicator === "D" ? "Doma" : "Gost"}
+                  </span>
+                )}
+              </div>
 
               <div className="flex items-baseline justify-between gap-3">
-                <span className="text-3xl font-black uppercase leading-none tracking-tighter tabular-nums">
-                  {date}
-                </span>
-                <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                <div className="flex items-baseline gap-2">
+                  <span>
+                    {day}
+                  </span>
+                  <span>
+                    {monthShort}
+                    <span className="ml-2">
+                      {weekdayShort}
+                    </span>
+                  </span>
+                </div>
+                <span>
                   {time}
                 </span>
               </div>
 
-              <div className="space-y-3 border-t border-border/60 pt-4">
+              <div className="space-y-3 pt-4">
                 <TeamRow
                   name={match.homeTeam?.name ?? "N/A"}
                   picture={match.homeTeam?.picture ?? ""}
+                  isUs={homeIsUs}
                 />
                 <TeamRow
                   name={match.awayTeam?.name ?? "N/A"}
                   picture={match.awayTeam?.picture ?? ""}
+                  isUs={awayIsUs}
                 />
               </div>
             </Link>

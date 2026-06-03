@@ -1,6 +1,10 @@
+"use client";
+
 import Link from "next/link";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getCometImageUrl } from "@/lib/api";
+import { HnsCrest } from "@/components/HnsCrest";
+import { useOurTeamId } from "@/components/providers/TenantProvider";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { buildPlayerSlug } from "@/lib/slug";
 import type { HnsLineups, HnsMatch, HnsTeamPlayer } from "@/types/hns";
 
 interface MatchLineupsTabProps {
@@ -12,6 +16,7 @@ export default function MatchLineupsTab({
   match,
   lineups,
 }: MatchLineupsTabProps) {
+  const ourTeamId = useOurTeamId();
   const competitionId = match.competition?.id ?? null;
   const hasLineups =
     (lineups?.home?.players?.length ?? 0) > 0 ||
@@ -19,30 +24,75 @@ export default function MatchLineupsTab({
 
   if (!hasLineups) {
     return (
-      <section className="mt-16 border-t border-border/60 pt-12 sm:mt-20">
-        <p className="text-center text-sm text-muted-foreground">
+      <section className="mt-20 sm:mt-28">
+        <p className="text-center">
           Postave će biti objavljene neposredno prije utakmice.
         </p>
       </section>
     );
   }
 
+  const homeName = match.homeTeam?.name ?? "Domaći";
+  const awayName = match.awayTeam?.name ?? "Gosti";
+
+  const homeColumn = (
+    <LineupColumn
+      teamName={homeName}
+      teamPicture={match.homeTeam?.picture ?? null}
+      teamLineup={lineups?.home ?? null}
+      competitionId={competitionId}
+      isOurTeam={
+        ourTeamId != null && match.homeTeam?.id === ourTeamId
+      }
+    />
+  );
+
+  const awayColumn = (
+    <LineupColumn
+      teamName={awayName}
+      teamPicture={match.awayTeam?.picture ?? null}
+      teamLineup={lineups?.away ?? null}
+      competitionId={competitionId}
+      isOurTeam={
+        ourTeamId != null && match.awayTeam?.id === ourTeamId
+      }
+    />
+  );
+
   return (
-    <section className="mt-16 border-t border-border/60 pt-12 sm:mt-20">
-      <h2 className="text-center text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
-        Postave
-      </h2>
-      <div className="mt-10 grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-16">
-        <LineupColumn
-          teamName={match.homeTeam?.name ?? "N/A"}
-          teamLineup={lineups?.home ?? null}
-          competitionId={competitionId}
-        />
-        <LineupColumn
-          teamName={match.awayTeam?.name ?? "N/A"}
-          teamLineup={lineups?.away ?? null}
-          competitionId={competitionId}
-        />
+    <section className="mt-20 sm:mt-28">
+      <div className="flex flex-col items-center gap-6 text-center">
+        <p>
+          Tko je u igri
+        </p>
+        <h2>
+          Postave
+        </h2>
+      </div>
+
+      <Tabs
+        defaultValue="home"
+        className="mx-auto mt-12 max-w-5xl md:hidden"
+      >
+        <TabsList variant="line" className="mx-auto w-full justify-center">
+          <TabsTrigger value="home" className="px-3">
+            {homeName}
+          </TabsTrigger>
+          <TabsTrigger value="away" className="px-3">
+            {awayName}
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="home" className="mt-8">
+          {homeColumn}
+        </TabsContent>
+        <TabsContent value="away" className="mt-8">
+          {awayColumn}
+        </TabsContent>
+      </Tabs>
+
+      <div className="mx-auto mt-12 hidden max-w-5xl gap-12 md:grid md:grid-cols-2 md:gap-16">
+        {homeColumn}
+        {awayColumn}
       </div>
     </section>
   );
@@ -50,12 +100,16 @@ export default function MatchLineupsTab({
 
 function LineupColumn({
   teamName,
+  teamPicture,
   teamLineup,
   competitionId,
+  isOurTeam,
 }: {
   teamName: string;
+  teamPicture: string | null;
   teamLineup: HnsLineups["home"];
   competitionId: number | null;
+  isOurTeam: boolean;
 }) {
   if (!teamLineup) return null;
 
@@ -65,9 +119,17 @@ function LineupColumn({
 
   return (
     <div>
-      <h3 className="border-b border-border/60 pb-3 text-[0.65rem] font-semibold uppercase tracking-[0.25em]">
-        {teamName}
-      </h3>
+      <div className="flex items-center gap-3 pb-3">
+        <HnsCrest
+          picture={teamPicture}
+          name={teamName}
+          size={36}
+          className="size-9 shrink-0"
+        />
+        <h3 className="line-clamp-1">
+          {teamName}
+        </h3>
+      </div>
 
       <ul className="mt-2">
         {starters.map((player, i) => (
@@ -75,13 +137,14 @@ function LineupColumn({
             key={`s-${player.personId ?? player.shirtNumber ?? "x"}-${player.name ?? i}`}
             player={player}
             competitionId={competitionId}
+            isOurTeam={isOurTeam}
           />
         ))}
       </ul>
 
       {substitutes.length > 0 && (
         <>
-          <p className="mt-8 text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground">
+          <p className="mt-8">
             Zamjene
           </p>
           <ul className="mt-2">
@@ -90,7 +153,7 @@ function LineupColumn({
                 key={`sub-${player.personId ?? player.shirtNumber ?? "x"}-${player.name ?? i}`}
                 player={player}
                 competitionId={competitionId}
-                muted
+                isOurTeam={isOurTeam}
               />
             ))}
           </ul>
@@ -103,41 +166,33 @@ function LineupColumn({
 function PlayerRow({
   player,
   competitionId,
-  muted = false,
+  isOurTeam,
 }: {
   player: HnsTeamPlayer;
   competitionId: number | null;
-  muted?: boolean;
+  isOurTeam: boolean;
 }) {
   const playerName = player.name ?? "";
   const isLinkable =
+    isOurTeam &&
     player.personId != null &&
     competitionId != null &&
     player.hideProfile !== true;
 
   const inner = (
-    <div
-      className={`flex items-center gap-3 border-b border-border/40 py-2.5 text-sm ${
-        muted ? "text-muted-foreground" : ""
-      }`}
-    >
-      <span className="w-6 text-right font-medium tabular-nums text-xs text-muted-foreground">
+    <div className="flex items-center gap-3 py-2.5">
+      <span className="w-6 text-right">
         {player.shirtNumber ?? "—"}
       </span>
-      <Avatar className="size-7 shrink-0">
-        {player.picture && (
-          <AvatarImage
-            src={getCometImageUrl(player.picture)}
-            alt={playerName}
-          />
-        )}
-        <AvatarFallback className="text-[0.5rem] font-semibold uppercase">
-          {playerName.slice(0, 2).toUpperCase()}
-        </AvatarFallback>
-      </Avatar>
-      <span className={muted ? "" : "font-medium"}>{playerName}</span>
+      <HnsCrest
+        picture={player.picture}
+        name={playerName}
+        size={28}
+        className="size-7 shrink-0"
+      />
+      <span>{playerName}</span>
       {player.captain && (
-        <span className="ml-auto rounded border border-border px-1.5 py-px text-[0.55rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+        <span className="ml-auto px-1.5 py-px">
           K
         </span>
       )}
@@ -148,8 +203,8 @@ function PlayerRow({
     <li>
       {isLinkable ? (
         <Link
-          href={`/stats/${player.personId}/${competitionId}`}
-          className="block transition-colors hover:bg-muted/30"
+          href={`/statistika/${buildPlayerSlug({ personId: player.personId, name: playerName })}/${competitionId}`}
+          className="block"
         >
           {inner}
         </Link>

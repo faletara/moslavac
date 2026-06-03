@@ -1,11 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Skeleton } from "@/components/ui/skeleton";
+import Link from "next/link";
+import { HnsCrest } from "@/components/HnsCrest";
 import { useTenant } from "@/components/providers/TenantProvider";
-import { api, getCometImageUrl } from "@/lib/api";
+import { Skeleton } from "@/components/ui/skeleton";
+import { api } from "@/lib/api";
+import { buildCompetitionSlug } from "@/lib/slug";
 import { cn } from "@/lib/utils";
 import type { TeamRanking } from "@/types/hns";
 
@@ -13,21 +14,10 @@ const SKELETON_KEYS = ["r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8"];
 
 function SectionHeader({ subtitle }: { subtitle?: string }) {
 	return (
-		<div className="flex flex-col items-center gap-6 text-center">
-			<span className="h-px w-12 bg-foreground" />
-			<p className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
-				Prvenstvo
-			</p>
-			<h2 className="select-none text-balance font-black uppercase leading-[0.85] tracking-tighter">
-				<span className="block text-[14vw] sm:text-6xl md:text-7xl lg:text-8xl">
-					Tablica
-				</span>
-			</h2>
-			{subtitle && (
-				<p className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs">
-					{subtitle}
-				</p>
-			)}
+		<div className="flex flex-col items-center gap-6">
+			<p>Prvenstvo</p>
+			<h2>Tablica</h2>
+			{subtitle && <p>{subtitle}</p>}
 		</div>
 	);
 }
@@ -35,7 +25,6 @@ function SectionHeader({ subtitle }: { subtitle?: string }) {
 function StandingsRow({
 	row,
 	index,
-	isClub,
 }: {
 	row: TeamRanking;
 	index: number;
@@ -43,94 +32,37 @@ function StandingsRow({
 }) {
 	const teamName = row.team?.name ?? "";
 	const picture = row.team?.picture ?? "";
-	const initials = teamName
-		.split(/\s+/)
-		.map((p) => p[0] ?? "")
-		.join("")
-		.slice(0, 3)
-		.toUpperCase();
 	const position = row.position ?? index + 1;
 	const positionStr = String(position).padStart(2, "0");
 
 	return (
 		<div
 			className={cn(
-				"relative grid items-center gap-4 py-5 transition-colors sm:gap-8 sm:py-6",
+				"relative grid items-center gap-4 py-5 sm:gap-8 sm:py-6",
 				"grid-cols-[3rem_1fr_auto] sm:grid-cols-[4rem_1fr_5rem_5rem_5rem]",
-				isClub && "border-y-2 border-foreground",
 			)}
 		>
-			{isClub && (
-				<span
-					aria-hidden
-					className="pointer-events-none absolute -left-2 top-1/2 hidden h-10 w-[2px] -translate-y-1/2 bg-foreground sm:block"
-				/>
-			)}
-
-			<span
-				className={cn(
-					"font-black tabular-nums leading-none tracking-tighter",
-					isClub
-						? "text-3xl text-foreground sm:text-5xl"
-						: "text-2xl text-muted-foreground sm:text-4xl",
-				)}
-			>
-				{positionStr}
-			</span>
+			<span>{positionStr}</span>
 
 			<div className="flex min-w-0 items-center gap-4">
-				<Avatar className="size-9 shrink-0 sm:size-11">
-					{picture && (
-						<AvatarImage src={getCometImageUrl(picture)} alt={teamName} />
-					)}
-					<AvatarFallback className="bg-transparent text-[0.55rem] font-semibold uppercase tracking-wider text-muted-foreground">
-						{initials || teamName.slice(0, 2).toUpperCase()}
-					</AvatarFallback>
-				</Avatar>
-				<span
-					className={cn(
-						"line-clamp-1 uppercase leading-tight tracking-tight",
-						isClub
-							? "text-base font-black sm:text-lg"
-							: "text-sm font-bold sm:text-base",
-					)}
-				>
-					{teamName}
-				</span>
+				<HnsCrest
+					picture={picture}
+					name={teamName}
+					size={44}
+					className="size-9 shrink-0 sm:size-11"
+				/>
+				<span className="line-clamp-1">{teamName}</span>
 			</div>
 
-			<span
-				className={cn(
-					"hidden text-center tabular-nums sm:block",
-					isClub
-						? "text-base font-bold"
-						: "text-sm font-medium text-muted-foreground",
-				)}
-			>
-				{row.played ?? 0}
-			</span>
+			<span className="hidden sm:block">{row.played ?? 0}</span>
 
-			<span
-				className={cn(
-					"hidden text-center tabular-nums sm:block",
-					isClub
-						? "text-base font-bold"
-						: "text-sm font-medium text-muted-foreground",
-				)}
-			>
+			<span className="hidden sm:block">
 				<span>{row.goalsFor ?? 0}</span>
-				<span className="px-1 text-muted-foreground">:</span>
+				<span className="px-1">:</span>
 				<span>{row.goalsAgainst ?? 0}</span>
 			</span>
 
-			<span
-				className={cn(
-					"text-right tabular-nums sm:text-center",
-					isClub
-						? "text-2xl font-black sm:text-3xl"
-						: "text-lg font-bold sm:text-2xl",
-				)}
-			>
+			<span className="justify-self-end sm:justify-self-center">
 				{row.points ?? 0}
 			</span>
 		</div>
@@ -157,7 +89,7 @@ export default function LeagueStandingsSection() {
 		return (
 			<section className="mx-auto w-full max-w-5xl space-y-16 px-4 py-8 sm:py-12">
 				<SectionHeader />
-				<div className="divide-y divide-border/40">
+				<div>
 					{SKELETON_KEYS.map((k) => (
 						<div
 							key={k}
@@ -165,7 +97,7 @@ export default function LeagueStandingsSection() {
 						>
 							<Skeleton className="h-10 w-12" />
 							<div className="flex items-center gap-4">
-								<Skeleton className="size-9 rounded-full sm:size-11" />
+								<Skeleton className="size-9 sm:size-11" />
 								<Skeleton className="h-4 w-40" />
 							</div>
 							<Skeleton className="hidden h-4 w-8 justify-self-center sm:block" />
@@ -185,7 +117,7 @@ export default function LeagueStandingsSection() {
 			<SectionHeader subtitle={senior.name ?? undefined} />
 
 			<div>
-				<div className="hidden grid-cols-[4rem_1fr_5rem_5rem_5rem] items-center gap-8 border-b border-border/60 pb-4 text-[0.55rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:grid">
+				<div className="hidden grid-cols-[4rem_1fr_5rem_5rem_5rem] items-center gap-8 pb-4 sm:grid">
 					<span>#</span>
 					<span>Klub</span>
 					<span className="text-center">Ut</span>
@@ -193,12 +125,12 @@ export default function LeagueStandingsSection() {
 					<span className="text-center">Bod</span>
 				</div>
 
-				<div className="flex items-center justify-between border-b border-border/60 pb-4 text-[0.55rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:hidden">
+				<div className="flex items-center justify-between pb-4 sm:hidden">
 					<span>Klub</span>
 					<span>Bod</span>
 				</div>
 
-				<div className="divide-y divide-border/40">
+				<div>
 					{standings.map((row, i) => {
 						const teamName = row.team?.name ?? "";
 						const isClub = !!shortName && teamName.includes(shortName);
@@ -216,11 +148,11 @@ export default function LeagueStandingsSection() {
 
 			<div className="flex justify-center pt-4">
 				<Link
-					href={`/season/${senior.id}`}
-					className="group inline-flex items-center gap-3 text-xs font-medium uppercase tracking-[0.3em] text-foreground transition-colors hover:text-muted-foreground"
+					href={`/sezona/${buildCompetitionSlug(senior)}`}
+					className="inline-flex items-center gap-3"
 				>
 					Cijela sezona
-					<ArrowRight className="size-3 transition-transform duration-300 group-hover:translate-x-1" />
+					<ArrowRight className="size-3" />
 				</Link>
 			</div>
 		</section>

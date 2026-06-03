@@ -1,127 +1,88 @@
 "use client";
 
-import Link from "next/link";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { api, getCometImageUrl } from "@/lib/api";
-import { formatDateTime } from "@/lib/helpers/date";
-import type { HnsMatch } from "@/types/hns";
+import { api } from "@/lib/api";
+import { NextMatchHero } from "./previous-next/NextMatchHero";
+import { PreviousMatchCard } from "./previous-next/PreviousMatchCard";
 
-function TeamColumn({ name, picture }: { name: string; picture: string }) {
-	return (
-		<div className="flex w-2/5 flex-col items-center gap-3">
-			<Avatar className="size-20">
-				{picture && <AvatarImage src={getCometImageUrl(picture)} alt={name} />}
-				<AvatarFallback className="bg-transparent text-xs font-medium text-muted-foreground">
-					{name.slice(0, 2).toUpperCase()}
-				</AvatarFallback>
-			</Avatar>
-			<span className="line-clamp-2 text-center text-xs font-semibold uppercase tracking-[0.15em]">
-				{name}
-			</span>
-		</div>
-	);
+function isValidMatch<T extends object>(match: T | null | undefined): match is T {
+  return match != null && Object.keys(match).length > 0;
 }
 
-function MatchBlock({
-	label,
-	match,
-	isToday,
-}: {
-	label: string;
-	match: HnsMatch;
-	isToday?: boolean;
-}) {
-	const { date, time } = formatDateTime(match.dateTimeUTC ?? 0);
-	const score =
-		match.homeTeamResult && match.awayTeamResult
-			? `${match.homeTeamResult.current}  ${match.awayTeamResult.current}`
-			: null;
+function HeroSkeleton() {
+  return (
+    <div className="flex flex-col items-center gap-10 md:gap-14">
+      <div className="flex flex-col items-center gap-4">
+        <Skeleton className="h-px w-12" />
+        <Skeleton className="h-3 w-64" />
+      </div>
+      <div className="flex w-full items-center justify-center gap-12 md:gap-20">
+        <Skeleton className="size-20 sm:size-24 md:size-32" />
+        <Skeleton className="h-8 w-12" />
+        <Skeleton className="size-20 sm:size-24 md:size-32" />
+      </div>
+      <div className="flex gap-3 sm:gap-4 md:gap-5">
+        {[0, 1, 2, 3].map((i) => (
+          <Skeleton
+            key={i}
+            className="h-24 w-18 sm:h-28 sm:w-24 md:h-32 md:w-28"
+          />
+        ))}
+      </div>
+      <Skeleton className="h-3 w-56" />
+    </div>
+  );
+}
 
-	const meta = [date, time, match.facility?.place].filter(Boolean).join(" · ");
-
-	return (
-		<article className="group flex flex-col items-center gap-8 text-center">
-			<div className="flex flex-col items-center gap-3">
-				<span className="h-px w-12 bg-foreground transition-all duration-300 group-hover:w-24" />
-				<p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.3em] text-muted-foreground">
-					{isToday && (
-						<span className="size-1.5 animate-pulse rounded-full bg-foreground" />
-					)}
-					{label}
-				</p>
-			</div>
-
-			<div className="flex w-full items-center justify-between gap-4">
-				<TeamColumn
-					name={match.homeTeam?.name ?? "N/A"}
-					picture={match.homeTeam?.picture ?? ""}
-				/>
-				<span className="text-4xl font-black uppercase leading-none tracking-tighter tabular-nums md:text-6xl">
-					{score ?? time}
-				</span>
-				<TeamColumn
-					name={match.awayTeam?.name ?? "N/A"}
-					picture={match.awayTeam?.picture ?? ""}
-				/>
-			</div>
-
-			<p className="text-xs uppercase tracking-[0.2em] text-muted-foreground/80">
-				{meta}
-			</p>
-		</article>
-	);
+function PreviousSkeleton() {
+  return (
+    <div className="flex flex-col gap-5">
+      <Skeleton className="h-3 w-40" />
+      <Skeleton className="h-24" />
+      <Skeleton className="h-3 w-48 self-center" />
+    </div>
+  );
 }
 
 export default function PreviousAndNextMatchSection() {
-	const { data: nextMatch, isLoading: nextLoading } =
-		api.competitions.useGetNextMatch();
-	const { data: previousMatch, isLoading: prevLoading } =
-		api.competitions.useGetPreviousMatch();
+  const { data, isLoading } = api.competitions.useGetMatchSlots();
 
-	if (nextLoading || prevLoading) {
-		return (
-			<div className="mx-auto grid max-w-5xl gap-12 md:grid-cols-2 md:gap-16">
-				{[0, 1].map((i) => (
-					<div key={i} className="flex flex-col items-center gap-8">
-						<Skeleton className="h-px w-12" />
-						<Skeleton className="h-3 w-32" />
-						<Skeleton className="h-16 w-3/4" />
-						<Skeleton className="h-3 w-48" />
-					</div>
-				))}
-			</div>
-		);
-	}
+  if (isLoading) {
+    return (
+      <section>
+        <div className="mx-auto w-full max-w-4xl px-4 py-12 md:py-20">
+          <HeroSkeleton />
+        </div>
+        <div>
+          <div className="mx-auto w-full max-w-4xl px-4 py-12 md:py-20">
+            <PreviousSkeleton />
+          </div>
+        </div>
+      </section>
+    );
+  }
 
-	const isNextValid = nextMatch != null && Object.keys(nextMatch).length > 0;
-	const isPrevValid =
-		previousMatch != null && Object.keys(previousMatch).length > 0;
+  const nextMatch = data?.next ?? null;
+  const previousMatch = data?.previous ?? null;
+  const hasNext = isValidMatch(nextMatch);
+  const hasPrev = isValidMatch(previousMatch);
 
-	if (!isNextValid && !isPrevValid) return null;
+  if (!hasNext && !hasPrev) return null;
 
-	const isToday =
-		isPrevValid &&
-		previousMatch?.dateTimeUTC != null &&
-		new Date(previousMatch.dateTimeUTC).toDateString() ===
-			new Date().toDateString();
-
-	return (
-		<section className="mx-auto grid max-w-5xl gap-12 md:grid-cols-2 md:gap-16">
-			{isPrevValid && previousMatch != null && (
-				<Link href={`/matches/${previousMatch.id}`}>
-					<MatchBlock
-						label={isToday ? "Danas" : "Prethodna utakmica"}
-						match={previousMatch}
-						isToday={isToday}
-					/>
-				</Link>
-			)}
-			{isNextValid && nextMatch != null && (
-				<Link href={`/matches/${nextMatch.id}`}>
-					<MatchBlock label="Sljedeća utakmica" match={nextMatch} />
-				</Link>
-			)}
-		</section>
-	);
+  return (
+    <section>
+      {hasNext && nextMatch != null && (
+        <div className="mx-auto w-full max-w-4xl px-4 py-12 md:py-20">
+          <NextMatchHero match={nextMatch} />
+        </div>
+      )}
+      {hasPrev && previousMatch != null && (
+        <div>
+          <div className="mx-auto w-full max-w-4xl px-4 py-12 md:py-20">
+            <PreviousMatchCard match={previousMatch} />
+          </div>
+        </div>
+      )}
+    </section>
+  );
 }

@@ -6,14 +6,16 @@ import {
   hnsFetch,
 } from "./client";
 import { tenantSlug } from "../payload/getTenant";
+import { isFinished } from "../helpers/matchStatus";
 import type {
   HnsCompetition,
   HnsMatch,
+  MatchSlots,
   PaginatedResult,
 } from "@/types/hns";
 
 const COMPETITIONS_TTL = 3600;
-const STANDINGS_TTL = 900;
+const STANDINGS_TTL = 180;
 
 export async function fetchCurrentSeasonCompetitions(): Promise<
   HnsCompetition[]
@@ -92,66 +94,77 @@ export async function fetchCompetitionMatches(params: {
   return [...past, ...future];
 }
 
-async function fetchPastAllMatches(competitionId: number): Promise<HnsMatch[]> {
-  const teamId = await getHnsTeamId();
-  const result = await hnsFetch<PaginatedResult<HnsMatch>>(
-    `/api/live/competition/${competitionId}/matches/paginated/past/2/${teamId}?page=1&pageSize=300`,
-    {
-      revalidate: COMPETITIONS_TTL,
-      tags: [`hns-${tenantSlug}-competition-${competitionId}-all-matches`],
-    },
-  );
-  return result?.result ?? [];
-}
+// HNS rejects large page sizes (pageSize=300 returns an empty result), so we
+// page through with a proven-good size and stop once a short page comes back.
+const MATCHES_PAGE_SIZE = 75;
+const MATCHES_MAX_PAGES = 10;
 
-async function fetchFutureAllMatches(
+async function fetchAllMatchesPaged(
   competitionId: number,
+  direction: "past" | "future",
 ): Promise<HnsMatch[]> {
   const teamId = await getHnsTeamId();
-  const result = await hnsFetch<PaginatedResult<HnsMatch>>(
-    `/api/live/competition/${competitionId}/matches/paginated/future/2/${teamId}?page=1&pageSize=300`,
-    {
-      revalidate: COMPETITIONS_TTL,
-      tags: [`hns-${tenantSlug}-competition-${competitionId}-all-matches`],
-    },
-  );
-  return result?.result ?? [];
+  const all: HnsMatch[] = [];
+
+  for (let page = 1; page <= MATCHES_MAX_PAGES; page++) {
+    const result = await hnsFetch<PaginatedResult<HnsMatch>>(
+      `/api/live/competition/${competitionId}/matches/paginated/${direction}/2/${teamId}?page=${page}&pageSize=${MATCHES_PAGE_SIZE}&teamIdFilter=${teamId}`,
+      {
+        revalidate: COMPETITIONS_TTL,
+        tags: [`hns-${tenantSlug}-competition-${competitionId}-all-matches`],
+      },
+    );
+    const batch = result?.result ?? [];
+    all.push(...batch);
+    if (batch.length < MATCHES_PAGE_SIZE) break;
+  }
+
+  return all;
 }
 
 export async function fetchAllCompetitionMatches(params: {
   competitionId: number;
 }): Promise<HnsMatch[]> {
   const [past, future] = await Promise.all([
-    fetchPastAllMatches(params.competitionId),
-    fetchFutureAllMatches(params.competitionId),
+    fetchAllMatchesPaged(params.competitionId, "past"),
+    fetchAllMatchesPaged(params.competitionId, "future"),
   ]);
   return [...past, ...future];
 }
 
-export async function fetchNextMatch(): Promise<HnsMatch | null> {
-  const senior = await fetchSeniorCompetition();
-  if (!senior?.id) return null;
-  const teamId = await getHnsTeamId();
-  const result = await hnsFetch<PaginatedResult<HnsMatch>>(
-    `/api/live/competition/${senior.id}/matches/paginated/future/2/${teamId}?page=1&pageSize=1&teamIdFilter=${teamId}`,
-    {
-      revalidate: 300,
-      tags: [`hns-${tenantSlug}-next-match`],
-    },
-  );
-  return result?.result?.[0] ?? null;
-}
+const MATCH_SLOT_TTL = 30;
 
-export async function fetchPreviousMatch(): Promise<HnsMatch | null> {
+export async function fetchMatchSlots(): Promise<MatchSlots> {
   const senior = await fetchSeniorCompetition();
-  if (!senior?.id) return null;
+  if (!senior?.id) return { next: null, previous: null };
+
   const teamId = await getHnsTeamId();
-  const result = await hnsFetch<PaginatedResult<HnsMatch>>(
-    `/api/live/competition/${senior.id}/matches/paginated/past/2/${teamId}?page=1&pageSize=1&teamIdFilter=${teamId}`,
-    {
-      revalidate: 300,
-      tags: [`hns-${tenantSlug}-previous-match`],
-    },
-  );
-  return result?.result?.[0] ?? null;
+  const [pastResult, futureResult] = await Promise.all([
+    hnsFetch<PaginatedResult<HnsMatch>>(
+      `/api/live/competition/${senior.id}/matches/paginated/past/2/${teamId}?page=1&pageSize=3&teamIdFilter=${teamId}`,
+      {
+        revalidate: MATCH_SLOT_TTL,
+        tags: [`hns-${tenantSlug}-match-slots`],
+      },
+    ),
+    hnsFetch<PaginatedResult<HnsMatch>>(
+      `/api/live/competition/${senior.id}/matches/paginated/future/2/${teamId}?page=1&pageSize=1&teamIdFilter=${teamId}`,
+      {
+        revalidate: MATCH_SLOT_TTL,
+        tags: [`hns-${tenantSlug}-match-slots`],
+      },
+    ),
+  ]);
+
+  const past = pastResult?.result ?? [];
+  const sortByDateDesc = (a: HnsMatch, b: HnsMatch) =>
+    (b.dateTimeUTC ?? 0) - (a.dateTimeUTC ?? 0);
+
+  const unfinishedPast = past.filter((m) => !isFinished(m)).sort(sortByDateDesc);
+  const finishedPast = past.filter(isFinished).sort(sortByDateDesc);
+
+  const next = unfinishedPast[0] ?? futureResult?.result?.[0] ?? null;
+  const previous = finishedPast[0] ?? null;
+
+  return { next, previous };
 }

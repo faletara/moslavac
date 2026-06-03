@@ -1,4 +1,4 @@
-// Types matching backend DTOs in com.af.moslavac.dtos.hns
+// Types matching the HNS backend DTOs
 // Updated to match actual HNS API responses
 
 export interface PaginatedResult<T> {
@@ -99,6 +99,11 @@ export interface HnsMatch {
   team: string | null;
   showEvents: boolean | null;
   allowDetail: boolean | null;
+}
+
+export interface MatchSlots {
+  next: HnsMatch | null;
+  previous: HnsMatch | null;
 }
 
 export interface HnsMatchEvent {

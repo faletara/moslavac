@@ -3,6 +3,7 @@ import { apiFetch } from "../client";
 import type {
   HnsMatch,
   HnsCompetition,
+  MatchSlots,
   TeamRanking,
   PlayerStats,
 } from "@/types/hns";
@@ -19,16 +20,8 @@ export async function fetchSeniorCompetition(): Promise<HnsCompetition | null> {
   return apiFetch.get<HnsCompetition | null>("/api/competitions/senior");
 }
 
-export async function fetchNextMatch(): Promise<HnsMatch | null> {
-  return apiFetch.get<HnsMatch | null>(
-    "/api/competitions/senior/next-match",
-  );
-}
-
-export async function fetchPreviousMatch(): Promise<HnsMatch | null> {
-  return apiFetch.get<HnsMatch | null>(
-    "/api/competitions/senior/previous-match",
-  );
+export async function fetchMatchSlots(): Promise<MatchSlots> {
+  return apiFetch.get<MatchSlots>("/api/competitions/senior/match-slots");
 }
 
 export async function fetchCompetitionInfo(params: {
@@ -128,13 +121,9 @@ export const competitionsQueries = createQueryKeys("competitions", {
     queryKey: ["senior"],
     queryFn: fetchSeniorCompetition,
   }),
-  nextMatch: () => ({
-    queryKey: ["nextMatch"],
-    queryFn: fetchNextMatch,
-  }),
-  previousMatch: () => ({
-    queryKey: ["previousMatch"],
-    queryFn: fetchPreviousMatch,
+  matchSlots: () => ({
+    queryKey: ["matchSlots"],
+    queryFn: fetchMatchSlots,
   }),
   detail: ({ competitionId }: { competitionId: number }) => ({
     queryKey: [competitionId],

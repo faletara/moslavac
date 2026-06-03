@@ -14,9 +14,9 @@ export default function MatchOfficials({
 }: MatchOfficialsProps) {
   if (isLoading) {
     return (
-      <section className="mt-16 border-t border-border/60 pt-12 sm:mt-20">
+      <section className="mt-20 sm:mt-28">
         <Skeleton className="mx-auto h-4 w-24" />
-        <div className="mt-8 space-y-2">
+        <div className="mx-auto mt-8 max-w-md space-y-2">
           <Skeleton className="h-10" />
           <Skeleton className="h-10" />
         </div>
@@ -31,21 +31,20 @@ export default function MatchOfficials({
   if (officials.length === 0) return null;
 
   return (
-    <section className="mt-16 border-t border-border/60 pt-12 sm:mt-20">
-      <h2 className="text-center text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
-        Suci
-      </h2>
+    <section className="mt-20 sm:mt-28">
+      <div className="flex flex-col items-center gap-6">
+        <p>Sudačka ekipa</p>
+        <h2>Suci</h2>
+      </div>
 
-      <ul className="mx-auto mt-8 max-w-md divide-y divide-border/40">
+      <ul className="mx-auto mt-12 max-w-2xl">
         {officials.map((official, i) => (
           <li
             key={`${official.personId ?? official.name}-${i}`}
-            className="flex items-center justify-between py-3"
+            className="grid grid-cols-[auto_1fr] items-center gap-6 py-4 sm:gap-10"
           >
-            <span className="text-[0.6rem] font-medium uppercase tracking-[0.25em] text-muted-foreground">
-              {official.role ?? ""}
-            </span>
-            <span className="text-sm font-semibold">{official.name}</span>
+            <span>{official.role ?? ""}</span>
+            <span className="text-right">{official.name}</span>
           </li>
         ))}
       </ul>

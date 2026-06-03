@@ -1,34 +1,21 @@
 "use client";
 
 import Link from "next/link";
+import { HnsCrest } from "@/components/HnsCrest";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getCometImageUrl } from "@/lib/api";
 import { formatDateTime } from "@/lib/helpers/date";
+import { buildMatchSlug } from "@/lib/slug";
 import { cn } from "@/lib/utils";
 import type { HnsMatch } from "@/types/hns";
 
-function teamInitials(name: string) {
-	return (
-		name
-			.split(/\s+/)
-			.map((p) => p[0] ?? "")
-			.join("")
-			.slice(0, 3)
-			.toUpperCase() || name.slice(0, 2).toUpperCase()
-	);
-}
-
 function TeamCrest({ name, picture }: { name: string; picture: string }) {
 	return (
-		<Avatar className="size-9 shrink-0 sm:size-11">
-			{picture && (
-				<AvatarImage src={getCometImageUrl(picture)} alt={name} />
-			)}
-			<AvatarFallback className="bg-transparent text-[0.55rem] font-semibold uppercase tracking-wider text-muted-foreground">
-				{teamInitials(name)}
-			</AvatarFallback>
-		</Avatar>
+		<HnsCrest
+			picture={picture}
+			name={name}
+			size={44}
+			className="size-9 shrink-0 sm:size-11"
+		/>
 	);
 }
 
@@ -45,7 +32,7 @@ function TeamSide({
 	const text = (
 		<span
 			className={cn(
-				"line-clamp-2 text-xs font-semibold uppercase leading-tight tracking-[0.12em] sm:text-sm sm:tracking-[0.15em]",
+				"line-clamp-2",
 				isRight ? "text-right" : "text-left",
 			)}
 		>
@@ -87,8 +74,8 @@ function MatchRow({ match }: { match: HnsMatch }) {
 	return (
 		<li>
 			<Link
-				href={`/matches/${match.id}`}
-				className="group grid grid-cols-[1fr_auto_1fr] items-center gap-3 px-1 py-5 transition-colors hover:bg-muted/30 sm:gap-8 sm:py-6"
+				href={`/utakmice/${buildMatchSlug(match)}`}
+				className="group grid grid-cols-[1fr_auto_1fr] items-center gap-3 px-1 py-5 sm:gap-8 sm:py-6"
 			>
 				<TeamSide
 					name={match.homeTeam?.name ?? "N/A"}
@@ -98,17 +85,17 @@ function MatchRow({ match }: { match: HnsMatch }) {
 
 				<div className="flex min-w-20 flex-col items-center gap-1.5 sm:min-w-28">
 					{hasResult ? (
-						<span className="text-2xl font-black uppercase leading-none tracking-tighter tabular-nums sm:text-3xl">
+						<span>
 							{match.homeTeamResult?.current ?? 0}
-							<span className="px-1.5 text-muted-foreground/60">-</span>
+							<span className="px-1.5">-</span>
 							{match.awayTeamResult?.current ?? 0}
 						</span>
 					) : (
-						<span className="text-xl font-black uppercase leading-none tracking-tighter tabular-nums sm:text-2xl">
+						<span>
 							{time}
 						</span>
 					)}
-					<span className="text-[0.6rem] font-medium uppercase tracking-[0.25em] text-muted-foreground">
+					<span>
 						{date}
 					</span>
 				</div>
@@ -133,10 +120,10 @@ function MatchSection({
 	if (matches.length === 0) return null;
 	return (
 		<section>
-			<h2 className="border-b border-border/60 pb-3 text-center text-[0.6rem] font-semibold uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
+			<h2 className="pb-3 text-center">
 				{label}
 			</h2>
-			<ul className="divide-y divide-border/60">
+			<ul>
 				{matches.map((match, i) => (
 					<MatchRow key={match.id ?? `${label}-${i}`} match={match} />
 				))}

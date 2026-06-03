@@ -25,10 +25,8 @@ export default function MatchTopScorersTab({
   );
 
   return (
-    <section className="mt-16 border-t border-border/60 pt-12 sm:mt-20">
-      <h2 className="text-center text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
-        Strijelci
-      </h2>
+    <section className="mt-16 pt-12 sm:mt-20">
+      <h2 className="text-center">Strijelci</h2>
       <div className="mt-8">
         <TopScorersTable
           scorers={scorers}

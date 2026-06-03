@@ -1,10 +1,7 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { HnsCrest } from "@/components/HnsCrest";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useTenant } from "@/components/providers/TenantProvider";
-import { getCometImageUrl } from "@/lib/api";
-import { cn } from "@/lib/utils";
 import type { TeamRanking } from "@/types/hns";
 
 const STAT_COLUMNS = [
@@ -20,9 +17,6 @@ export default function StandingsTable({
 }: {
 	standings: TeamRanking[] | undefined;
 }) {
-	const tenant = useTenant();
-	const shortName = tenant.branding?.shortName ?? tenant.displayName;
-
 	if (!standings || standings.length === 0) {
 		return (
 			<Alert>
@@ -35,97 +29,63 @@ export default function StandingsTable({
 		<div className="overflow-x-auto">
 			<table className="w-full">
 				<thead>
-					<tr className="border-b border-border/60 text-[0.6rem] font-semibold uppercase tracking-[0.25em] text-muted-foreground">
-						<th className="w-8 py-4 pl-1 text-left font-semibold">#</th>
-						<th className="py-4 text-left font-semibold">Klub</th>
+					<tr>
+						<th className="w-8 py-4 pl-1 text-left">#</th>
+						<th className="py-4 text-left">Klub</th>
 						{STAT_COLUMNS.map(({ key, label }) => (
 							<th
 								key={key}
-								className="hidden w-10 py-4 text-center font-semibold sm:table-cell"
+								className="hidden w-10 py-4 text-center sm:table-cell"
 							>
 								{label}
 							</th>
 						))}
-						<th className="w-16 py-4 text-center font-semibold sm:hidden">
+						<th className="w-16 py-4 text-center sm:hidden">
 							G
 						</th>
-						<th className="w-12 py-4 pr-1 text-center font-semibold">B</th>
+						<th className="w-12 py-4 pr-1 text-center">B</th>
 					</tr>
 				</thead>
-				<tbody className="divide-y divide-border/40">
+				<tbody>
 					{standings.map((row, i) => {
 						const teamName = row.team?.name ?? "";
-						const isClub = teamName.includes(shortName);
 						const picture = row.team?.picture ?? "";
-						const initials = teamName
-							.split(/\s+/)
-							.map((p) => p[0] ?? "")
-							.join("")
-							.slice(0, 3)
-							.toUpperCase();
-
 						return (
 							<tr
 								key={`${row.team?.id ?? teamName}-${i}`}
-								className={cn(
-									"text-sm transition-colors",
-									isClub ? "bg-muted/40" : "hover:bg-muted/20",
-								)}
 							>
-								<td
-									className={cn(
-										"py-3 pl-1 text-left tabular-nums",
-										isClub
-											? "font-semibold"
-											: "font-medium text-muted-foreground",
-									)}
-								>
+								<td className="py-3 pl-1 text-left">
 									{row.position ?? i + 1}
 								</td>
 								<td className="py-3 pr-2">
 									<div className="flex items-center gap-3">
-										<Avatar className="size-7 shrink-0">
-											{picture && (
-												<AvatarImage
-													src={getCometImageUrl(picture)}
-													alt={teamName}
-												/>
-											)}
-											<AvatarFallback className="bg-transparent text-[0.55rem] font-semibold uppercase tracking-wider text-muted-foreground">
-												{initials || teamName.slice(0, 2).toUpperCase()}
-											</AvatarFallback>
-										</Avatar>
-										<span
-											className={cn(
-												"line-clamp-1",
-												isClub ? "font-semibold" : "font-medium",
-											)}
-										>
+										<HnsCrest
+											picture={picture}
+											name={teamName}
+											size={28}
+											className="size-7 shrink-0"
+										/>
+										<span className="line-clamp-1">
 											{teamName}
 										</span>
 									</div>
 								</td>
-								<td className="hidden py-3 text-center tabular-nums text-muted-foreground sm:table-cell">
+								<td className="hidden py-3 text-center sm:table-cell">
 									{row.played ?? 0}
 								</td>
-								<td className="hidden py-3 text-center tabular-nums text-muted-foreground sm:table-cell">
+								<td className="hidden py-3 text-center sm:table-cell">
 									{row.wins ?? 0}
 								</td>
-								<td className="hidden py-3 text-center tabular-nums text-muted-foreground sm:table-cell">
+								<td className="hidden py-3 text-center sm:table-cell">
 									{row.draws ?? 0}
 								</td>
-								<td className="hidden py-3 text-center tabular-nums text-muted-foreground sm:table-cell">
+								<td className="hidden py-3 text-center sm:table-cell">
 									{row.losses ?? 0}
 								</td>
-								<td className="py-3 text-center tabular-nums text-muted-foreground">
+								<td className="py-3 text-center">
 									{row.goalsFor ?? 0}:{row.goalsAgainst ?? 0}
 								</td>
-								<td
-									className={cn(
-										"py-3 pr-1 text-center tabular-nums",
-										isClub ? "font-bold" : "font-semibold",
-									)}
-								>
+								<td className="py-3 pr-1 text-center">
 									{row.points ?? 0}
 								</td>
 							</tr>

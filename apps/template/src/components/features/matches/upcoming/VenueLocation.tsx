@@ -24,23 +24,15 @@ export default function VenueLocation({ facility }: VenueLocationProps) {
   const mapUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
 
   return (
-    <section className="mt-16 border-t border-border/60 pt-12 sm:mt-20">
-      <h2 className="text-center text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
-        Lokacija
-      </h2>
+    <section className="mt-16 pt-12 sm:mt-20">
+      <h2>Lokacija</h2>
 
-      <div className="mx-auto mt-8 flex max-w-md flex-col items-center gap-4 text-center">
-        <MapPin className="size-5 text-muted-foreground" aria-hidden />
+      <div className="mx-auto mt-8 flex max-w-md flex-col items-center gap-4">
+        <MapPin className="size-5" aria-hidden />
         <div className="flex flex-col gap-1">
-          {name && <p className="text-sm font-semibold">{name}</p>}
-          {address && (
-            <p className="text-xs text-muted-foreground">{address}</p>
-          )}
-          {place && (
-            <p className="text-[0.65rem] font-medium uppercase tracking-[0.25em] text-muted-foreground">
-              {place}
-            </p>
-          )}
+          {name && <p>{name}</p>}
+          {address && <p>{address}</p>}
+          {place && <p>{place}</p>}
         </div>
 
         <div className="mt-2 flex gap-3">

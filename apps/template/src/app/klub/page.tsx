@@ -10,6 +10,7 @@ import type { HnsFacility } from "@/types/hns";
 export const metadata: Metadata = {
   title: "O klubu",
   description: "Informacije o klubu, kontakt i lokacija stadiona",
+  alternates: { canonical: "/klub" },
 };
 
 export default async function KlubPage() {
@@ -33,7 +34,7 @@ export default async function KlubPage() {
   const logoUrl = resolveLogoUrl(tenant.branding?.logo, team?.picture);
 
   return (
-    <div className="mx-auto w-full max-w-screen-xl space-y-24 px-6 py-16 sm:space-y-32 sm:py-24 lg:px-8">
+    <div className="mx-auto w-full max-w-screen-xl px-6 py-16 sm:py-24 lg:px-8">
       <Hero
         logoUrl={logoUrl}
         displayName={displayName}
@@ -83,25 +84,22 @@ function Hero({
   motto: string | null;
 }) {
   return (
-    <header className="flex flex-col items-center gap-8 text-center">
+    <header className="flex flex-col items-center gap-8">
       <Avatar className="size-32 sm:size-40">
         {logoUrl && <AvatarImage src={logoUrl} alt={displayName} />}
-        <AvatarFallback className="text-xl font-semibold uppercase tracking-[0.2em]">
+        <AvatarFallback>
           {shortName.slice(0, 2).toUpperCase()}
         </AvatarFallback>
       </Avatar>
 
-      <span className="h-px w-12 bg-foreground" />
-      <p className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
+      <p>
         Klub{founded != null ? ` · Osnovan ${founded}.` : ""}
       </p>
 
-      <h1 className="text-balance font-black uppercase leading-[0.85] tracking-tighter text-5xl sm:text-7xl md:text-8xl">
-        {displayName}
-      </h1>
+      <h1>{displayName}</h1>
 
       {motto && (
-        <p className="max-w-md text-balance text-sm leading-relaxed text-muted-foreground md:text-base">
+        <p className="max-w-md">
           &bdquo;{motto}&ldquo;
         </p>
       )}
@@ -116,20 +114,18 @@ function InfoList({
 }) {
   if (rows.length === 0) {
     return (
-      <p className="text-sm text-muted-foreground">Nema podataka.</p>
+      <p>Nema podataka.</p>
     );
   }
   return (
-    <dl className="flex flex-col divide-y divide-border/60 border-y border-border/60">
+    <dl className="flex flex-col">
       {rows.map((row) => (
         <div
           key={row.label}
           className="grid grid-cols-[auto_1fr] items-baseline gap-x-6 py-5 sm:gap-x-10"
         >
-          <dt className="text-[0.55rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.65rem] sm:tracking-[0.4em]">
-            {row.label}
-          </dt>
-          <dd className="wrap-break-word text-right text-sm text-foreground sm:text-base">
+          <dt>{row.label}</dt>
+          <dd className="wrap-break-word text-right">
             {row.value}
           </dd>
         </div>
@@ -182,11 +178,11 @@ function ContactGrid({
   }
 
   if (links.length === 0) {
-    return <p className="text-sm text-muted-foreground">Nema kontakta.</p>;
+    return <p>Nema kontakta.</p>;
   }
 
   return (
-    <dl className="flex flex-col divide-y divide-border/60 border-y border-border/60">
+    <dl className="flex flex-col">
       {links.map((link) => {
         const isExternal = link.href.startsWith("http");
         const Icon =
@@ -200,16 +196,16 @@ function ContactGrid({
             key={link.label}
             className="grid grid-cols-[auto_1fr] items-baseline gap-x-6 py-5 sm:gap-x-10"
           >
-            <dt className="flex items-center gap-2 text-[0.55rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.65rem] sm:tracking-[0.4em]">
+            <dt className="flex items-center gap-2">
               {Icon && <Icon className="size-3" aria-hidden />}
               {link.label}
             </dt>
-            <dd className="text-right text-sm text-foreground sm:text-base">
+            <dd className="text-right">
               <a
                 href={link.href}
                 target={isExternal ? "_blank" : undefined}
                 rel={isExternal ? "noopener noreferrer" : undefined}
-                className="wrap-break-word transition-colors hover:text-muted-foreground"
+                className="wrap-break-word"
               >
                 {link.value}
               </a>
@@ -262,11 +258,11 @@ function StadiumPanel({ facility }: { facility: HnsFacility }) {
       </div>
 
       {hasCoords && (
-        <figure className="relative aspect-square w-full overflow-hidden border border-border/60 bg-muted">
+        <figure className="relative aspect-square w-full overflow-hidden">
           <iframe
             title={`Lokacija: ${name || "stadion"}`}
             src={`https://www.openstreetmap.org/export/embed.html?bbox=${(facility.longitude ?? 0) - 0.005},${(facility.latitude ?? 0) - 0.003},${(facility.longitude ?? 0) + 0.005},${(facility.latitude ?? 0) + 0.003}&layer=mapnik&marker=${facility.latitude},${facility.longitude}`}
-            className="h-full w-full grayscale"
+            className="h-full w-full"
             loading="lazy"
             referrerPolicy="no-referrer"
           />
@@ -290,17 +286,11 @@ function SectionBlock({
   const indexStr = String(index).padStart(2, "0");
   return (
     <section className="space-y-12 sm:space-y-16">
-      <div className="grid grid-cols-[auto_1fr] items-baseline gap-x-5 gap-y-3 border-b border-border/60 pb-6 sm:gap-x-10">
-        <span className="font-black tabular-nums leading-none tracking-tighter text-5xl text-foreground sm:text-7xl">
-          {indexStr}
-        </span>
+      <div className="grid grid-cols-[auto_1fr] items-baseline gap-x-5 gap-y-3 pb-6 sm:gap-x-10">
+        <span>{indexStr}</span>
         <div className="flex flex-col gap-2 sm:gap-3">
-          <span className="text-[0.55rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.65rem] sm:tracking-[0.4em]">
-            {eyebrow}
-          </span>
-          <h2 className="font-black uppercase leading-[0.85] tracking-tighter text-3xl sm:text-5xl md:text-6xl">
-            {title}
-          </h2>
+          <span>{eyebrow}</span>
+          <h2>{title}</h2>
         </div>
       </div>
       {children}
@@ -319,4 +309,3 @@ function resolveLogoUrl(
   if (hnsPicture) return getCometImageUrl(hnsPicture);
   return null;
 }
-

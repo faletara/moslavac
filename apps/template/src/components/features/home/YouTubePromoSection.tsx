@@ -11,41 +11,39 @@ export default function YouTubePromoSection() {
   return (
     <section className="w-full px-4 py-16 sm:py-24">
       <div className="mx-auto flex max-w-4xl flex-col items-center gap-8 text-center sm:gap-10">
-        <p className="flex items-center gap-2 text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
+        <p className="flex items-center gap-2">
           <span className="relative flex size-1.5">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" />
-            <span className="relative inline-flex size-1.5 rounded-full bg-red-500" />
+            <span className="absolute inline-flex h-full w-full" />
+            <span className="relative inline-flex size-1.5" />
           </span>
           Uživo · YouTube
         </p>
 
-        <h2 className="select-none text-balance font-black uppercase leading-[0.9] tracking-tighter text-foreground">
-          <span className="block text-[12vw] sm:text-6xl md:text-7xl lg:text-8xl">
-            Gledajte naše
-          </span>
-          <span className="block text-[12vw] sm:text-6xl md:text-7xl lg:text-8xl">
-            utakmice uživo
-          </span>
-        </h2>
+        <div>
+          <span>Gledajte naše</span>
+          <span>utakmice uživo</span>
+        </div>
 
-        <p className="max-w-xl text-balance text-sm leading-relaxed text-muted-foreground sm:text-base">
+        <p className="max-w-xl">
           Ne propustite nijednu utakmicu. Pretplatite se na naš YouTube kanal za
           prijenose uživo, najbolje trenutke i ekskluzivni sadržaj.
         </p>
 
         <div className="flex flex-col items-center gap-6 pt-2 sm:flex-row sm:gap-10">
-          <Button asChild size="lg" className="rounded-full px-8">
-            <a href={youtube} target="_blank" rel="noopener noreferrer">
-              <FaYoutube className="size-5" />
-              Pretplati se
-            </a>
-          </Button>
+          <div>
+            <Button asChild size="lg">
+              <a href={youtube} target="_blank" rel="noopener noreferrer">
+                <FaYoutube className="size-5" />
+                Pretplati se
+              </a>
+            </Button>
+          </div>
 
           <div className="flex items-center gap-3">
-            <span className="text-2xl font-black tracking-tight tabular-nums">
+            <span>
               150+
             </span>
-            <span className="text-[0.6rem] font-medium uppercase leading-tight tracking-[0.2em] text-muted-foreground sm:text-xs">
+            <span>
               Pretplatnika
               <br />
               na kanalu

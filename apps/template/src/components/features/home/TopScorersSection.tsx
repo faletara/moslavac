@@ -1,10 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { HnsCrest } from "@/components/HnsCrest";
+import {
+	useOurTeamId,
+	useTenant,
+} from "@/components/providers/TenantProvider";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useTenant } from "@/components/providers/TenantProvider";
-import { api, getCometImageUrl } from "@/lib/api";
+import { api } from "@/lib/api";
+import { buildPlayerSlug } from "@/lib/slug";
 import { cn } from "@/lib/utils";
 import type { PlayerStats } from "@/types/hns";
 
@@ -13,21 +17,10 @@ const SKELETON_KEYS = ["s1", "s2", "s3", "s4", "s5"];
 
 function SectionHeader({ subtitle }: { subtitle?: string }) {
 	return (
-		<div className="flex flex-col items-center gap-6 text-center">
-			<span className="h-px w-12 bg-foreground" />
-			<p className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
-				Najbolji
-			</p>
-			<h2 className="select-none text-balance font-black uppercase leading-[0.85] tracking-tighter">
-				<span className="block text-[14vw] sm:text-6xl md:text-7xl lg:text-8xl">
-					Strijelci
-				</span>
-			</h2>
-			{subtitle && (
-				<p className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs">
-					{subtitle}
-				</p>
-			)}
+		<div className="flex flex-col items-center gap-6">
+			<p>Najbolji</p>
+			<h2>Strijelci</h2>
+			{subtitle && <p>{subtitle}</p>}
 		</div>
 	);
 }
@@ -36,11 +29,13 @@ function ScorerRow({
 	row,
 	index,
 	isClub,
+	isOurTeam,
 	competitionId,
 }: {
 	row: PlayerStats;
 	index: number;
 	isClub: boolean;
+	isOurTeam: boolean;
 	competitionId: number;
 }) {
 	const playerName = row.player?.name ?? "";
@@ -50,88 +45,46 @@ function ScorerRow({
 	const goals = row.value ?? 0;
 	const rankStr = String(index + 1).padStart(2, "0");
 
-	const initials = playerName
-		.split(/\s+/)
-		.map((p) => p[0] ?? "")
-		.join("")
-		.slice(0, 2)
-		.toUpperCase();
-
 	const inner = (
 		<div
 			className={cn(
-				"relative grid items-center gap-4 py-5 transition-colors sm:gap-8 sm:py-6",
+				"relative grid items-center gap-4 py-5 sm:gap-8 sm:py-6",
 				"grid-cols-[3rem_1fr_auto] sm:grid-cols-[4rem_1fr_5rem]",
-				isClub && "border-y-2 border-foreground",
 			)}
 		>
 			{isClub && (
 				<span
 					aria-hidden
-					className="pointer-events-none absolute -left-2 top-1/2 hidden h-10 w-[2px] -translate-y-1/2 bg-foreground sm:block"
+					className="pointer-events-none absolute -left-2 top-1/2 hidden h-10 w-[2px] -translate-y-1/2 sm:block"
 				/>
 			)}
 
-			<span
-				className={cn(
-					"font-black tabular-nums leading-none tracking-tighter",
-					isClub
-						? "text-3xl text-foreground sm:text-5xl"
-						: "text-2xl text-muted-foreground sm:text-4xl",
-				)}
-			>
-				{rankStr}
-			</span>
+			<span>{rankStr}</span>
 
 			<div className="flex min-w-0 items-center gap-4">
-				<Avatar className="size-10 shrink-0 sm:size-12">
-					{playerPicture && (
-						<AvatarImage
-							src={getCometImageUrl(playerPicture)}
-							alt={playerName}
-						/>
-					)}
-					<AvatarFallback className="bg-transparent text-[0.6rem] font-semibold uppercase tracking-wider text-muted-foreground">
-						{initials || playerName.slice(0, 2).toUpperCase()}
-					</AvatarFallback>
-				</Avatar>
+				<HnsCrest
+					picture={playerPicture}
+					name={playerName}
+					size={48}
+					className="size-10 shrink-0 sm:size-12"
+				/>
 				<div className="flex min-w-0 flex-col gap-1">
-					<span
-						className={cn(
-							"line-clamp-1 uppercase leading-none tracking-tight",
-							isClub
-								? "text-base font-black sm:text-lg"
-								: "text-sm font-bold sm:text-base",
-						)}
-					>
-						{playerName}
-					</span>
+					<span className="line-clamp-1">{playerName}</span>
 					{teamName && (
-						<span className="line-clamp-1 text-[0.55rem] font-medium uppercase tracking-[0.25em] text-muted-foreground sm:text-[0.65rem]">
-							{teamName}
-						</span>
+						<span className="line-clamp-1">{teamName}</span>
 					)}
 				</div>
 			</div>
 
-			<span
-				className={cn(
-					"text-right tabular-nums sm:text-center",
-					isClub
-						? "text-2xl font-black sm:text-3xl"
-						: "text-lg font-bold sm:text-2xl",
-				)}
-			>
-				{goals}
-			</span>
+			<span className="text-right sm:text-center">{goals}</span>
 		</div>
 	);
 
-	if (personId) {
+	if (personId && isOurTeam) {
 		return (
 			<Link
-				href={`/stats/${personId}/${competitionId}`}
-				className="block hover:opacity-80"
+				href={`/statistika/${buildPlayerSlug({ personId, name: playerName })}/${competitionId}`}
+				className="-mx-3 block px-3"
 			>
 				{inner}
 			</Link>
@@ -143,6 +96,7 @@ function ScorerRow({
 
 export default function TopScorersSection() {
 	const tenant = useTenant();
+	const ourTeamId = useOurTeamId();
 	const shortName = tenant.branding?.shortName ?? tenant.displayName;
 
 	const { data: senior, isLoading: seniorLoading } =
@@ -161,7 +115,7 @@ export default function TopScorersSection() {
 		return (
 			<section className="mx-auto w-full max-w-5xl space-y-16 px-4 py-8 sm:py-12">
 				<SectionHeader />
-				<div className="divide-y divide-border/40">
+				<div>
 					{SKELETON_KEYS.map((k) => (
 						<div
 							key={k}
@@ -169,7 +123,7 @@ export default function TopScorersSection() {
 						>
 							<Skeleton className="h-10 w-12" />
 							<div className="flex items-center gap-4">
-								<Skeleton className="size-10 rounded-full sm:size-12" />
+								<Skeleton className="size-10 sm:size-12" />
 								<div className="flex flex-1 flex-col gap-2">
 									<Skeleton className="h-4 w-40" />
 									<Skeleton className="h-3 w-24" />
@@ -192,21 +146,23 @@ export default function TopScorersSection() {
 			<SectionHeader subtitle={senior.name ?? undefined} />
 
 			<div>
-				<div className="hidden grid-cols-[4rem_1fr_5rem] items-center gap-8 border-b border-border/60 pb-4 text-[0.55rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:grid">
+				<div className="hidden grid-cols-[4rem_1fr_5rem] items-center gap-8 pb-4 sm:grid">
 					<span>#</span>
 					<span>Igrač</span>
 					<span className="text-center">Golovi</span>
 				</div>
 
-				<div className="flex items-center justify-between border-b border-border/60 pb-4 text-[0.55rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:hidden">
+				<div className="flex items-center justify-between pb-4 sm:hidden">
 					<span>Igrač</span>
 					<span>Golovi</span>
 				</div>
 
-				<div className="divide-y divide-border/40">
+				<div>
 					{top.map((row, i) => {
 						const teamName = row.team?.name ?? "";
 						const isClub = !!shortName && teamName.includes(shortName);
+						const isOurTeam =
+							ourTeamId != null && row.team?.id === ourTeamId;
 						const key = `${row.player?.personId ?? row.player?.name ?? i}-${i}`;
 						return (
 							<ScorerRow
@@ -214,6 +170,7 @@ export default function TopScorersSection() {
 								row={row}
 								index={i}
 								isClub={isClub}
+								isOurTeam={isOurTeam}
 								competitionId={senior.id ?? 0}
 							/>
 						);

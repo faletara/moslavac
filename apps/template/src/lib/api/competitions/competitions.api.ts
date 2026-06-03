@@ -6,8 +6,7 @@ import { useGetCompetitionGoalStats } from "./api_hooks/useGetCompetitionGoalSta
 import { useGetCompetitionInfo } from "./api_hooks/useGetCompetitionInfo";
 import { useGetCompetitionMatches } from "./api_hooks/useGetCompetitionMatches";
 import { useGetCurrentSeasonCompetitions } from "./api_hooks/useGetCurrentSeasonCompetitions";
-import { useGetNextMatch } from "./api_hooks/useGetNextMatch";
-import { useGetPreviousMatch } from "./api_hooks/useGetPreviousMatch";
+import { useGetMatchSlots } from "./api_hooks/useGetMatchSlots";
 import { useGetSeniorCompetition } from "./api_hooks/useGetSeniorCompetition";
 import { useGetTeamStandings } from "./api_hooks/useGetTeamStandings";
 
@@ -20,8 +19,7 @@ export const competitionsApi = {
   useGetCompetitionInfo,
   useGetCompetitionMatches,
   useGetCurrentSeasonCompetitions,
-  useGetNextMatch,
-  useGetPreviousMatch,
+  useGetMatchSlots,
   useGetSeniorCompetition,
   useGetTeamStandings,
 };

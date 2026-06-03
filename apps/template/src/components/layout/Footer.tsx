@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { FaFacebook, FaYoutube } from "react-icons/fa";
@@ -22,8 +24,8 @@ export default function Footer({ tenant }: FooterProps) {
       : null;
 
   return (
-    <footer className="mt-32 border-t border-border/60">
-      <div className="mx-auto max-w-screen-xl px-6 lg:px-8">
+    <footer className="mt-32">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8">
         {/* Masthead row */}
         <div className="flex items-center justify-between py-8">
           <Link
@@ -37,23 +39,21 @@ export default function Footer({ tenant }: FooterProps) {
                 alt={logo.alt || tenant.displayName}
                 width={28}
                 height={28}
-                className="rounded-full"
               />
             )}
-            <span className="text-[0.65rem] font-semibold uppercase tracking-[0.35em]">
+            <span>
               {shortName ?? tenant.displayName}
             </span>
           </Link>
 
           {(facebook || youtube) && (
-            <div className="flex items-center gap-5 text-muted-foreground">
+            <div className="flex items-center gap-5">
               {facebook && (
                 <a
                   href={facebook}
                   aria-label="Facebook"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="transition-colors hover:text-foreground"
                 >
                   <FaFacebook className="size-[18px]" />
                 </a>
@@ -64,7 +64,6 @@ export default function Footer({ tenant }: FooterProps) {
                   aria-label="YouTube"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="transition-colors hover:text-foreground"
                 >
                   <FaYoutube className="size-[18px]" />
                 </a>
@@ -74,30 +73,24 @@ export default function Footer({ tenant }: FooterProps) {
         </div>
 
         {/* Editorial columns */}
-        <div className="grid grid-cols-1 border-t border-border/60 md:grid-cols-3">
-          <div className="space-y-5 py-10 md:border-r md:border-border/60 md:pr-10">
-            <div className="flex items-baseline gap-3 text-[0.6rem] font-medium uppercase tracking-[0.4em] text-muted-foreground">
-              <span className="text-foreground">01</span>
+        <div className="grid grid-cols-1 md:grid-cols-3">
+          <div className="space-y-5 py-10 md:pr-10">
+            <div className="flex items-baseline gap-3">
+              <span>01</span>
               <span>Kontakt</span>
             </div>
-            <ul className="space-y-2 text-sm leading-relaxed">
+            <ul className="space-y-2">
               {address && <li>{address}</li>}
               {email && (
                 <li>
-                  <a
-                    href={`mailto:${email}`}
-                    className="transition-colors hover:text-muted-foreground"
-                  >
+                  <a href={`mailto:${email}`}>
                     {email}
                   </a>
                 </li>
               )}
               {phone && (
                 <li>
-                  <a
-                    href={`tel:${phone}`}
-                    className="transition-colors hover:text-muted-foreground"
-                  >
+                  <a href={`tel:${phone}`}>
                     {phone}
                   </a>
                 </li>
@@ -105,60 +98,48 @@ export default function Footer({ tenant }: FooterProps) {
             </ul>
           </div>
 
-          <div className="space-y-5 border-t border-border/60 py-10 md:border-l-0 md:border-r md:border-t-0 md:border-border/60 md:px-10">
-            <div className="flex items-baseline gap-3 text-[0.6rem] font-medium uppercase tracking-[0.4em] text-muted-foreground">
-              <span className="text-foreground">02</span>
+          <div className="space-y-5 py-10 md:px-10">
+            <div className="flex items-baseline gap-3">
+              <span>02</span>
               <span>Klub</span>
             </div>
-            <ul className="space-y-2 text-sm leading-relaxed">
+            <ul className="space-y-2">
               <li>
-                <Link
-                  href="/news"
-                  className="transition-colors hover:text-muted-foreground"
-                >
+                <Link href="/novosti">
                   Vijesti
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/matches"
-                  className="transition-colors hover:text-muted-foreground"
-                >
+                <Link href="/utakmice">
                   Utakmice
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/first-team"
-                  className="transition-colors hover:text-muted-foreground"
-                >
+                <Link href="/prva-momcad">
                   Momčad
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/season-ticket"
-                  className="transition-colors hover:text-muted-foreground"
-                >
+                <Link href="/sezonska-iskaznica">
                   Sezonska ulaznica
                 </Link>
               </li>
             </ul>
           </div>
 
-          <div className="space-y-5 border-t border-border/60 py-10 md:border-t-0 md:pl-10">
-            <div className="flex items-baseline gap-3 text-[0.6rem] font-medium uppercase tracking-[0.4em] text-muted-foreground">
-              <span className="text-foreground">03</span>
+          <div className="space-y-5 py-10 md:pl-10">
+            <div className="flex items-baseline gap-3">
+              <span>03</span>
               <span>Klub od 1933.</span>
             </div>
-            <div className="space-y-3 text-sm leading-relaxed">
+            <div className="space-y-3">
               {motto && (
-                <p className="font-serif italic text-muted-foreground">
+                <p>
                   &ldquo;{motto}&rdquo;
                 </p>
               )}
               {founded && (
-                <p className="text-[0.6rem] font-medium uppercase tracking-[0.4em] text-muted-foreground">
+                <p>
                   {founded} — Popovača
                 </p>
               )}
@@ -167,15 +148,24 @@ export default function Footer({ tenant }: FooterProps) {
         </div>
 
         {/* Bottom strip */}
-        <div className="flex flex-col gap-2 border-t border-border/60 py-6 text-[0.6rem] font-medium uppercase tracking-[0.35em] text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 py-6 sm:flex-row sm:items-center sm:justify-between">
           <p>
             &copy; {new Date().getFullYear()} {tenant.displayName} — Sva prava
             pridržana
           </p>
-          <p>
-            Dizajn{" "}
-            <span className="mx-1 text-foreground/40">/</span> Adriano Faletar
-          </p>
+          <nav className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            <Link href="/politika-privatnosti">
+              Politika privatnosti
+            </Link>
+            <Link href="/pravna-napomena">
+              Pravna napomena
+            </Link>
+            <p>
+              Dizajn{" "}
+              <span className="mx-1">/</span> Adriano
+              Faletar
+            </p>
+          </nav>
         </div>
       </div>
     </footer>

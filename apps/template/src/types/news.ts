@@ -1,5 +1,6 @@
 export interface News {
   id: number;
+  slug: string | null;
   title: string;
   content: string;
   date: string;

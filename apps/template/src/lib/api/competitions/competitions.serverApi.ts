@@ -1,8 +1,7 @@
 import {
   fetchCurrentSeasonCompetitions,
   fetchSeniorCompetition,
-  fetchNextMatch,
-  fetchPreviousMatch,
+  fetchMatchSlots,
   fetchCompetitionInfo,
   fetchCompetitionMatches,
   fetchAllCompetitionMatches,
@@ -19,8 +18,7 @@ import {
 export const competitionsServerApi = {
   fetchCurrentSeasonCompetitions,
   fetchSeniorCompetition,
-  fetchNextMatch,
-  fetchPreviousMatch,
+  fetchMatchSlots,
   fetchCompetitionInfo,
   fetchCompetitionMatches,
   fetchAllCompetitionMatches,

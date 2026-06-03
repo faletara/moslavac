@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
 import Autoplay from "embla-carousel-autoplay";
 import { ArrowUpRight } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 import {
 	Carousel,
 	CarouselContent,
@@ -22,15 +22,10 @@ export default function WebShopCarousel() {
 	if (!isLoading && items.length === 0) return null;
 
 	return (
-		<section className="mx-auto w-full max-w-6xl space-y-14 px-6 sm:px-10">
-			<div className="flex flex-col items-center gap-5 text-center">
-				<span className="h-px w-12 bg-foreground" />
-				<p className="text-xs font-medium uppercase tracking-[0.3em] text-muted-foreground">
-					Službena oprema
-				</p>
-				<h2 className="text-4xl font-black uppercase leading-[0.9] tracking-tighter sm:text-5xl md:text-6xl">
-					Webshop
-				</h2>
+		<section className="mx-auto w-full max-w-6xl px-6 sm:px-10">
+			<div className="flex flex-col items-center gap-5">
+				<p>Službena oprema</p>
+				<h2>Webshop</h2>
 			</div>
 
 			{isLoading ? (
@@ -56,48 +51,45 @@ export default function WebShopCarousel() {
 									target="_blank"
 									rel="noopener noreferrer"
 									aria-label={`Kupi ${item.displayName}`}
-									className="group flex flex-col gap-5"
+									className="flex flex-col gap-5"
 								>
-									<div className="relative aspect-square w-full overflow-hidden bg-muted">
+									<div className="relative aspect-square w-full overflow-hidden">
 										{item.imagePath && (
 											<Image
 												src={item.imagePath}
 												alt={item.imageAlt}
 												fill
 												sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-												className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+												className="object-cover"
 											/>
 										)}
 									</div>
 
 									<div className="flex items-end justify-between gap-4">
 										<div className="flex flex-col gap-3">
-											<span className="h-px w-8 bg-foreground transition-all duration-300 group-hover:w-16" />
-											<span className="text-sm font-semibold uppercase tracking-[0.2em]">
-												{item.displayName}
-											</span>
+											<span>{item.displayName}</span>
 										</div>
-										<span className="flex items-center gap-1.5 text-[0.65rem] font-medium uppercase tracking-[0.3em] text-muted-foreground transition-colors group-hover:text-foreground">
+										<span className="flex items-center gap-1.5">
 											Kupi
-											<ArrowUpRight className="size-3 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+											<ArrowUpRight className="size-3" />
 										</span>
 									</div>
 								</a>
 							</CarouselItem>
 						))}
 					</CarouselContent>
-					<CarouselPrevious className="hidden border-0 bg-transparent shadow-none hover:bg-transparent sm:flex" />
-					<CarouselNext className="hidden border-0 bg-transparent shadow-none hover:bg-transparent sm:flex" />
+					<CarouselPrevious className="hidden sm:flex" />
+					<CarouselNext className="hidden sm:flex" />
 				</Carousel>
 			)}
 
 			<div className="flex justify-center">
 				<Link
 					href="/oprema"
-					className="group inline-flex items-center gap-2 text-[0.65rem] font-medium uppercase tracking-[0.3em] text-muted-foreground transition-colors hover:text-foreground"
+					className="inline-flex items-center gap-2"
 				>
 					Pogledaj svu opremu
-					<ArrowUpRight className="size-3 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+					<ArrowUpRight className="size-3" />
 				</Link>
 			</div>
 		</section>

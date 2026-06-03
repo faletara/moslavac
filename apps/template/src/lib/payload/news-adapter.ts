@@ -31,6 +31,7 @@ export function adaptPayloadNews(
 
   return {
     id: doc.id,
+    slug: doc.slug,
     title: doc.title,
     content: html,
     date: doc.publishedAt ?? doc.createdAt,

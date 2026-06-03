@@ -1,7 +1,4 @@
 import "server-only";
-import { getHnsTeamId, hnsFetch } from "./client";
-import { tenantSlug } from "../payload/getTenant";
-import { fetchSeniorCompetition } from "./competitions";
 import type {
   HnsLineups,
   HnsMatch,
@@ -9,8 +6,11 @@ import type {
   HnsMatchInfo,
   PaginatedResult,
 } from "@/types/hns";
+import { tenantSlug } from "../payload/getTenant";
+import { getHnsTeamId, hnsFetch } from "./client";
 
-const MATCH_TTL = 300;
+const MATCH_TTL = 60;
+const LIVE_MATCH_TTL = 30;
 
 async function fetchPastTeamMatches(): Promise<HnsMatch[]> {
   const teamId = await getHnsTeamId();
@@ -38,23 +38,7 @@ export async function fetchAllMatches(): Promise<HnsMatch[]> {
   return [...past, ...future];
 }
 
-async function fetchUpcomingExcludingSenior(
-  seniorCompetitionId: number,
-): Promise<HnsMatch[]> {
-  const teamId = await getHnsTeamId();
-  const result = await hnsFetch<PaginatedResult<HnsMatch>>(
-    `/api/live/team/${teamId}/matches/paginated/future/2?page=1&pageSize=15&teamIdFilter=${teamId}`,
-    { revalidate: MATCH_TTL, tags: [`hns-${tenantSlug}-upcoming`] },
-  );
-  if (!result?.result) return [];
-  return result.result.filter(
-    (m) => m.competition?.id != null && m.competition.id !== seniorCompetitionId,
-  );
-}
-
-async function fetchTodayMatches(
-  seniorCompetitionId: number,
-): Promise<HnsMatch[]> {
+async function fetchTodayMatches(): Promise<HnsMatch[]> {
   const teamId = await getHnsTeamId();
   const result = await hnsFetch<PaginatedResult<HnsMatch>>(
     `/api/live/team/${teamId}/matches/paginated/past/2?page=1&pageSize=10&teamIdFilter=${teamId}`,
@@ -73,22 +57,33 @@ async function fetchTodayMatches(
     return (
       m.dateTimeUTC >= todayMs &&
       m.dateTimeUTC < tomorrowMs &&
-      m.dateTimeUTC > nowMs &&
-      (seniorCompetitionId == null ||
-        m.competition?.id !== seniorCompetitionId)
+      m.dateTimeUTC > nowMs
     );
   });
 }
 
+async function fetchFutureMatches(): Promise<HnsMatch[]> {
+  const teamId = await getHnsTeamId();
+  const result = await hnsFetch<PaginatedResult<HnsMatch>>(
+    `/api/live/team/${teamId}/matches/paginated/future/2?page=1&pageSize=15&teamIdFilter=${teamId}`,
+    { revalidate: MATCH_TTL, tags: [`hns-${tenantSlug}-upcoming`] },
+  );
+  return result?.result ?? [];
+}
+
 export async function fetchUpcomingMatches(): Promise<HnsMatch[]> {
-  const senior = await fetchSeniorCompetition();
-  if (!senior?.id) return [];
-  const seniorId = senior.id;
-  const [today, upcoming] = await Promise.all([
-    fetchTodayMatches(seniorId),
-    fetchUpcomingExcludingSenior(seniorId),
+  const [today, future] = await Promise.all([
+    fetchTodayMatches(),
+    fetchFutureMatches(),
   ]);
-  return [...today, ...upcoming];
+  const seen = new Set<number>();
+  const merged: HnsMatch[] = [];
+  for (const m of [...today, ...future]) {
+    if (m.id == null || seen.has(m.id)) continue;
+    seen.add(m.id);
+    merged.push(m);
+  }
+  return merged.sort((a, b) => (a.dateTimeUTC ?? 0) - (b.dateTimeUTC ?? 0));
 }
 
 export async function fetchMatchInfo(params: {
@@ -98,7 +93,7 @@ export async function fetchMatchInfo(params: {
   return hnsFetch<HnsMatch>(
     `/api/live/match/${params.matchId}?teamIdFilter=${teamId}`,
     {
-      revalidate: MATCH_TTL,
+      revalidate: LIVE_MATCH_TTL,
       tags: [`hns-${tenantSlug}-match-${params.matchId}`],
     },
   );
@@ -111,7 +106,7 @@ export async function fetchMatchEvents(params: {
   const result = await hnsFetch<HnsMatchEvent[]>(
     `/api/live/match/${params.matchId}/events?teamIdFilter=${teamId}&showComments=true`,
     {
-      revalidate: 60,
+      revalidate: LIVE_MATCH_TTL,
       tags: [`hns-${tenantSlug}-match-${params.matchId}-events`],
     },
   );
