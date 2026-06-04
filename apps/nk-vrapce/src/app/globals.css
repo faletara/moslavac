@@ -1,0 +1,167 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* NK Vrapče brand sustav — boje s dresa (žuta + sky plava) + premium navy. */
+@theme {
+  --color-brand-yellow: #ffcb05;
+  --color-brand-yellow-dark: #e6b500;
+  --color-brand-blue: #1ba0e0;
+  --color-brand-blue-dark: #1685b8;
+  --color-brand-navy: #0a1c33;
+  --color-brand-navy-700: #102844;
+
+  /* Semantičke neutrale */
+  --color-ink: #0a1c33;
+  --color-muted-ink: #5b6b7e;
+  --color-line: #e6eaef;
+  --color-surface: #ffffff;
+  --color-surface-2: #f5f7fa;
+}
+
+/* shadcn/ui semantički tokeni → mapirani na NK Vrapče paletu (samo svijetla tema). */
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-display: var(--font-sora);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --radius: 0.625rem;
+
+  --background: #ffffff;
+  --foreground: #0a1c33;
+  --card: #ffffff;
+  --card-foreground: #0a1c33;
+  --popover: #ffffff;
+  --popover-foreground: #0a1c33;
+
+  /* Primarna akcija = dominantna žuta, navy tekst za kontrast */
+  --primary: #ffcb05;
+  --primary-foreground: #0a1c33;
+
+  --secondary: #f5f7fa;
+  --secondary-foreground: #0a1c33;
+  --muted: #f5f7fa;
+  --muted-foreground: #5b6b7e;
+
+  /* Akcent = blagi plavi ton (sky blue s dresa) */
+  --accent: #eaf6fc;
+  --accent-foreground: #0a1c33;
+
+  --destructive: #e5484d;
+
+  --border: #e6eaef;
+  --input: #e6eaef;
+  /* Fokus prsten = brand plava */
+  --ring: #1ba0e0;
+
+  --chart-1: #ffcb05;
+  --chart-2: #1ba0e0;
+  --chart-3: #0a1c33;
+  --chart-4: #e6b500;
+  --chart-5: #1685b8;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    overflow-x: clip;
+  }
+  body {
+    font-family: var(--font-sans), system-ui, sans-serif;
+    color: var(--color-ink);
+    background-color: var(--color-surface);
+    line-height: 1.6;
+    overflow-x: clip;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display), var(--font-sans), sans-serif;
+    letter-spacing: -0.015em;
+  }
+}
+
+/* Tipografija za rich-text sadržaj iz CMS-a (novosti, povijest, navijači, statut). */
+.news-content {
+  color: var(--color-ink);
+  line-height: 1.75;
+}
+.news-content > * + * {
+  margin-top: 1.15em;
+}
+.news-content h2,
+.news-content h3 {
+  font-family: var(--font-display), var(--font-sans), sans-serif;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  margin-top: 1.8em;
+}
+.news-content h2 {
+  font-size: 1.6rem;
+}
+.news-content h3 {
+  font-size: 1.3rem;
+}
+.news-content a {
+  color: var(--color-brand-blue-dark);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.news-content a:hover {
+  color: var(--color-brand-blue);
+}
+.news-content ul,
+.news-content ol {
+  padding-left: 1.4em;
+}
+.news-content ul {
+  list-style: disc;
+}
+.news-content ol {
+  list-style: decimal;
+}
+.news-content blockquote {
+  border-left: 3px solid var(--color-brand-yellow);
+  padding-left: 1em;
+  color: var(--color-muted-ink);
+  font-style: italic;
+}
+.news-content img {
+  border-radius: var(--radius-lg);
+}

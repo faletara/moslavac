@@ -7,10 +7,15 @@ import { buildConfig } from "payload";
 import { fileURLToPath } from "url";
 import sharp from "sharp";
 
+import { BoardMembers } from "./collections/BoardMembers";
+import { Documents } from "./collections/Documents";
 import { Equipment } from "./collections/Equipment";
+import { GalleryAlbums } from "./collections/GalleryAlbums";
 import { Media } from "./collections/Media";
 import { News } from "./collections/News";
+import { Pages } from "./collections/Pages";
 import { Roster } from "./collections/Roster";
+import { SchoolPrograms } from "./collections/SchoolPrograms";
 import { Tenants } from "./collections/Tenants";
 import { Users } from "./collections/Users";
 import { hnsPlayerSearchEndpoint } from "./endpoints/hnsPlayerSearch";
@@ -30,7 +35,19 @@ export default buildConfig({
 			baseDir: path.resolve(dirname),
 		},
 	},
-	collections: [Users, Tenants, News, Media, Roster, Equipment],
+	collections: [
+		Users,
+		Tenants,
+		News,
+		Media,
+		Roster,
+		Equipment,
+		Pages,
+		Documents,
+		BoardMembers,
+		SchoolPrograms,
+		GalleryAlbums,
+	],
 	endpoints: [hnsPlayerSearchEndpoint],
 	editor: lexicalEditor(),
 	secret: process.env.PAYLOAD_SECRET || "",
@@ -50,6 +67,11 @@ export default buildConfig({
 				media: {},
 				roster: {},
 				equipment: {},
+				pages: {},
+				documents: {},
+				"board-members": {},
+				"school-programs": {},
+				"gallery-albums": {},
 			},
 			tenantsSlug: "tenants",
 			userHasAccessToAllTenants: (user) => isSuperAdmin(user),
@@ -57,6 +79,15 @@ export default buildConfig({
 		s3Storage({
 			collections: {
 				media: {
+					disablePayloadAccessControl: true,
+					generateFileURL: ({ filename, prefix }) => {
+						const base = process.env.R2_PUBLIC_URL ?? "";
+						return prefix
+							? `${base}/${prefix}/${filename}`
+							: `${base}/${filename}`;
+					},
+				},
+				documents: {
 					disablePayloadAccessControl: true,
 					generateFileURL: ({ filename, prefix }) => {
 						const base = process.env.R2_PUBLIC_URL ?? "";

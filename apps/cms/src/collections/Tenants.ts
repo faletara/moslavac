@@ -103,6 +103,14 @@ export const Tenants: CollectionConfig = {
                 { name: 'email', type: 'email' },
                 { name: 'phone', type: 'text' },
                 { name: 'address', type: 'textarea' },
+                {
+                  name: 'mapEmbedUrl',
+                  type: 'text',
+                  admin: {
+                    description:
+                      'Google/OpenStreetMap embed URL (src iz <iframe>) za prikaz lokacije na stranici kontakta.',
+                  },
+                },
               ],
             },
           ],

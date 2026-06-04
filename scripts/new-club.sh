@@ -83,17 +83,19 @@ cat <<EOF
 
 ✅ Gotovo: apps/$SLUG kreiran (port $PORT).
 
+Template je PRAZAN app-shell: minimalni layout + prazna naslovnica.
+Backend (API rute u src/app/api) i HNS data-hookovi (src/lib) su već tu.
+
 Preostali ručni koraci:
   1. Kreiraj Tenant zapis u Payload CMS-u (http://localhost:3002/admin):
        slug = $SLUG
        displayName, hns.apiKey, hns.teamId, branding/contact/payment/legal
   2. Upiši PAYLOAD_API_KEY u apps/$SLUG/.env.local (API-key korisnik iz Payloada).
-  3. Zamijeni placeholder assete u apps/$SLUG/public/:
-       grb.png, naslovna.jpg, dres.png, fans.jpg, game.jpg, uplatnica.png
-     i ikone apps/$SLUG/src/app/{icon.png,apple-icon.png}.
-  4. Instaliraj i pokreni:
+  3. Instaliraj i pokreni:
        pnpm install
        pnpm --filter @moslavac/$SLUG dev
+  4. Počni graditi stranice u apps/$SLUG/src/app/ (frontend je namjerno prazan).
+     Podatke dohvaćaš preko api.* hookova (klijent) ili serverApi.* (server).
   5. Deploy na Vercel: novi projekt, Root Directory = apps/$SLUG,
      postavi env vars (uklj. NEXT_PUBLIC_SITE_URL na pravu domenu).
 EOF
