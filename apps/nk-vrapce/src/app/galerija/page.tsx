@@ -76,11 +76,11 @@ function AlbumCard({ album }: { album: GalleryAlbum }) {
             className="object-cover transition-transform duration-700 group-hover:scale-105"
           />
         ) : (
-          <div className="flex h-full items-center justify-center bg-brand-navy text-brand-yellow">
+          <div className="flex h-full items-center justify-center bg-black text-brand-yellow">
             <ImageIcon className="size-10" />
           </div>
         )}
-        <span className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-brand-navy/85 px-3 py-1 text-[0.6rem] font-bold uppercase tracking-[0.2em] text-white backdrop-blur">
+        <span className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-black/80 px-3 py-1 text-[0.6rem] font-bold uppercase tracking-[0.2em] text-white backdrop-blur">
           <ImageIcon className="size-3" />
           {album.photos.length}
         </span>

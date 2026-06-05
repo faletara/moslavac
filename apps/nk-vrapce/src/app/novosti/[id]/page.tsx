@@ -143,7 +143,7 @@ export default async function NewsDetailPage({ params }: Props) {
       </header>
 
       {news.thumbnailPath && (
-        <figure className="relative mt-12 aspect-video w-full overflow-hidden sm:mt-16">
+        <figure className="relative mt-12 aspect-video w-full overflow-hidden rounded-2xl sm:mt-16">
           <Image
             src={news.thumbnailPath}
             alt={news.title}
@@ -172,7 +172,7 @@ export default async function NewsDetailPage({ params }: Props) {
             {news.imagePaths.map((path) => (
               <figure
                 key={path}
-                className="group relative aspect-square overflow-hidden bg-muted"
+                className="group relative aspect-square overflow-hidden rounded-xl bg-muted"
               >
                 <Image
                   src={path}

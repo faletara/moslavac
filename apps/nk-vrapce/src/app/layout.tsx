@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Sora } from "next/font/google";
+import { Geist, Saira_Condensed } from "next/font/google";
 import "./globals.css";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
@@ -12,10 +12,10 @@ const geistSans = Geist({
   subsets: ["latin", "latin-ext"],
 });
 
-const sora = Sora({
-  variable: "--font-sora",
+const saira = Saira_Condensed({
+  variable: "--font-saira",
   subsets: ["latin", "latin-ext"],
-  weight: ["600", "700", "800"],
+  weight: ["500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
@@ -35,7 +35,7 @@ export default async function RootLayout({
   const tenant = await getTenant();
 
   return (
-    <html lang="hr" className={`${geistSans.variable} ${sora.variable}`}>
+    <html lang="hr" className={`${geistSans.variable} ${saira.variable}`}>
       <body className="flex min-h-screen flex-col">
         <Providers>
           <Header clubName={tenant.displayName} />

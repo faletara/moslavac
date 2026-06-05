@@ -164,7 +164,7 @@ function PlayerCard({
 
   return (
     <FadeInView className="group">
-      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-xl bg-brand-navy ring-1 ring-black/5 transition-all duration-300 group-hover:ring-brand-yellow/50 group-hover:shadow-[0_22px_45px_-20px_rgba(10,28,51,0.5)]">
+      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-xl bg-black ring-1 ring-black/5 transition-all duration-300 group-hover:ring-brand-yellow/50 group-hover:shadow-[0_22px_45px_-20px_rgba(0,0,0,0.55)]">
         {photoUrl ? (
           <Image
             src={photoUrl}
@@ -175,7 +175,7 @@ function PlayerCard({
           />
         ) : (
           // Brandirani fallback — golem ghost broj/inicijal (osjećaj dresa)
-          <div className="absolute inset-0 bg-gradient-to-br from-brand-navy to-brand-navy-700">
+          <div className="absolute inset-0 bg-gradient-to-br from-black to-brand-navy-700">
             <div
               aria-hidden
               className="absolute left-1/2 top-1/2 h-3/4 w-3/4 -translate-x-1/2 -translate-y-1/2 rounded-full"
@@ -193,8 +193,8 @@ function PlayerCard({
           </div>
         )}
 
-        {/* Gradient na dnu — čitljivost imena */}
-        <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-brand-navy via-brand-navy/60 to-transparent" />
+        {/* Gradient na dnu — čitljivost imena (crni, kao Hero) */}
+        <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black via-black/55 to-transparent" />
 
         {!hideNumber && player.jerseyNumber != null && (
           <span className="absolute left-3 top-3 text-3xl font-black leading-none tabular-nums text-brand-yellow drop-shadow-[0_1px_6px_rgba(0,0,0,0.45)]">

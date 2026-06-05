@@ -23,7 +23,7 @@
 /* shadcn/ui semantički tokeni → mapirani na NK Vrapče paletu (samo svijetla tema). */
 @theme inline {
   --font-sans: var(--font-geist-sans);
-  --font-display: var(--font-sora);
+  --font-display: var(--font-saira);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);

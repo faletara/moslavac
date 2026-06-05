@@ -4,7 +4,7 @@ import { Menu } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Sheet,
   SheetContent,
@@ -29,10 +29,43 @@ const NAV_ITEMS = [
 export default function Header({ clubName }: { clubName: string }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const [atTop, setAtTop] = useState(true);
+
+  // Otvoreni mobilni izbornik zaključava body scroll i okida sintetički scroll
+  // event — bez ovog guarda header bi se sakrio baš dok korisnik otvara meni.
+  const menuOpenRef = useRef(false);
+  menuOpenRef.current = open;
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
+    let lastY = window.scrollY;
+    let ticking = false;
+
+    const update = () => {
+      const y = window.scrollY;
+      setAtTop(y <= 80);
+
+      if (!menuOpenRef.current) {
+        if (y <= 80) {
+          setHidden(false);
+        } else if (y > lastY) {
+          setHidden(true); // scroll dolje → sakrij
+        } else if (y < lastY) {
+          setHidden(false); // scroll gore → vrati
+        }
+      }
+
+      lastY = y;
+      ticking = false;
+    };
+
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(update);
+        ticking = true;
+      }
+    };
+
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -41,16 +74,24 @@ export default function Header({ clubName }: { clubName: string }) {
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
+  // Proziran samo na vrhu homepagea (preko crnog Heroa) → čista podloga niže
+  const onHome = pathname === "/";
+  const transparent = onHome && atTop;
+
   return (
-    <header className="sticky top-0 z-50">
+    <header
+      className={`sticky top-0 z-50 h-[5.5rem] transition-transform duration-300 will-change-transform ${
+        hidden ? "-translate-y-full" : "translate-y-0"
+      }`}
+    >
       <div
-        className={`border-b bg-surface/80 backdrop-blur-md transition-all duration-300 ${
-          scrolled
-            ? "border-line shadow-[0_4px_24px_-8px_rgba(10,28,51,0.18)]"
-            : "border-transparent"
+        className={`h-full border-b transition-colors duration-300 ${
+          transparent
+            ? "border-transparent bg-transparent"
+            : "border-line bg-surface/95 shadow-[0_4px_24px_-8px_rgba(10,28,51,0.18)] backdrop-blur-md"
         }`}
       >
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-6 py-3 sm:px-10">
+        <div className="mx-auto flex h-full max-w-6xl items-center justify-between gap-6 px-6 sm:px-10">
           <Link
             href="/"
             className="flex items-center gap-3"
@@ -65,7 +106,11 @@ export default function Header({ clubName }: { clubName: string }) {
               priority
               className="h-16 w-16 object-contain"
             />
-            <span className="font-display text-lg leading-none font-extrabold tracking-tight text-brand-navy uppercase">
+            <span
+              className={`font-display text-lg leading-none font-extrabold tracking-tight uppercase transition-colors ${
+                transparent ? "text-white" : "text-brand-navy"
+              }`}
+            >
               {clubName}
             </span>
           </Link>
@@ -76,8 +121,14 @@ export default function Header({ clubName }: { clubName: string }) {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`relative text-[0.78rem] font-semibold uppercase tracking-wide transition-colors hover:text-brand-blue ${
-                  isActive(item.href) ? "text-brand-navy" : "text-muted-foreground"
+                className={`relative text-[0.78rem] font-semibold uppercase tracking-wide transition-colors ${
+                  transparent
+                    ? isActive(item.href)
+                      ? "text-white"
+                      : "text-white/75 hover:text-brand-yellow"
+                    : isActive(item.href)
+                      ? "text-brand-navy"
+                      : "text-muted-foreground hover:text-brand-blue"
                 }`}
               >
                 {item.label}
@@ -93,7 +144,11 @@ export default function Header({ clubName }: { clubName: string }) {
             <SheetTrigger asChild>
               <button
                 type="button"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-brand-navy transition-colors hover:bg-surface-2 xl:hidden"
+                className={`inline-flex h-10 w-10 items-center justify-center rounded-lg transition-colors xl:hidden ${
+                  transparent
+                    ? "text-white hover:bg-white/10"
+                    : "text-brand-navy hover:bg-surface-2"
+                }`}
                 aria-label="Otvori izbornik"
               >
                 <Menu className="h-6 w-6" />

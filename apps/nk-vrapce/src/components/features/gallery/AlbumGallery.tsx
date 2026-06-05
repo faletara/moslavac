@@ -52,7 +52,7 @@ export function AlbumGallery({ photos }: { photos: AlbumPhoto[] }) {
             key={photo.url}
             type="button"
             onClick={() => setOpenIndex(index)}
-            className="group relative aspect-square overflow-hidden rounded-md bg-surface-2"
+            className="group relative aspect-square overflow-hidden rounded-xl bg-surface-2"
             aria-label={`Otvori fotografiju ${index + 1}`}
           >
             <Image
@@ -76,7 +76,7 @@ export function AlbumGallery({ photos }: { photos: AlbumPhoto[] }) {
           </DialogTitle>
           {active && (
             <figure className="flex flex-col items-center gap-4">
-              <div className="relative aspect-[3/2] w-full overflow-hidden rounded-lg bg-brand-navy">
+              <div className="relative aspect-[3/2] w-full overflow-hidden rounded-xl bg-black">
                 <Image
                   src={active.url}
                   alt={active.alt}
@@ -99,7 +99,7 @@ export function AlbumGallery({ photos }: { photos: AlbumPhoto[] }) {
                 type="button"
                 onClick={prev}
                 aria-label="Prethodna fotografija"
-                className="absolute left-2 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-brand-navy/70 text-white transition-colors hover:bg-brand-yellow hover:text-brand-navy"
+                className="absolute left-2 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 text-white transition-colors hover:bg-brand-yellow hover:text-brand-navy"
               >
                 <ChevronLeft className="size-6" />
               </button>
@@ -107,7 +107,7 @@ export function AlbumGallery({ photos }: { photos: AlbumPhoto[] }) {
                 type="button"
                 onClick={next}
                 aria-label="Sljedeća fotografija"
-                className="absolute right-2 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-brand-navy/70 text-white transition-colors hover:bg-brand-yellow hover:text-brand-navy"
+                className="absolute right-2 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/60 text-white transition-colors hover:bg-brand-yellow hover:text-brand-navy"
               >
                 <ChevronRight className="size-6" />
               </button>

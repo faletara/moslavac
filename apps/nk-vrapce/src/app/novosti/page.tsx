@@ -72,7 +72,7 @@ export default async function NewsPage({ searchParams }: Props) {
                     href={`/novosti/${doc.slug ?? doc.id}`}
                     className="group grid grid-cols-[auto_1fr_auto] items-center gap-4 py-6 sm:gap-8 sm:py-8"
                   >
-                    <div className="relative size-20 shrink-0 overflow-hidden rounded-sm bg-muted sm:size-28">
+                    <div className="relative size-20 shrink-0 overflow-hidden rounded-xl bg-muted sm:size-28">
                       <Image
                         src={thumbnailUrl || fallback}
                         alt={doc.title}
@@ -87,7 +87,7 @@ export default async function NewsPage({ searchParams }: Props) {
                       <p className="text-[0.65rem] font-medium uppercase tracking-[0.3em] text-muted-foreground">
                         {formatDateShort(date)}
                       </p>
-                      <h2 className="line-clamp-2 text-base font-bold uppercase leading-tight tracking-tight transition-colors group-hover:text-brand-blue sm:text-2xl">
+                      <h2 className="line-clamp-2 text-base font-bold leading-snug tracking-tight transition-colors group-hover:text-brand-blue sm:text-xl">
                         {doc.title}
                       </h2>
                     </div>
