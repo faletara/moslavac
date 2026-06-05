@@ -9,7 +9,9 @@
         "NODE_ENV",
         "NEXT_PUBLIC_*",
         "PAYLOAD_*",
+        "DATABASE_URL",
         "DATABASE_URI",
+        "R2_*",
         "S3_*",
         "HNS_*",
         "CORS_ORIGINS"

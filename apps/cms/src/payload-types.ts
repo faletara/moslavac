@@ -73,6 +73,11 @@ export interface Config {
     media: Media;
     roster: Roster;
     equipment: Equipment;
+    pages: Page;
+    documents: Document;
+    'board-members': BoardMember;
+    'school-programs': SchoolProgram;
+    'gallery-albums': GalleryAlbum;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -86,6 +91,11 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     roster: RosterSelect<false> | RosterSelect<true>;
     equipment: EquipmentSelect<false> | EquipmentSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
+    documents: DocumentsSelect<false> | DocumentsSelect<true>;
+    'board-members': BoardMembersSelect<false> | BoardMembersSelect<true>;
+    'school-programs': SchoolProgramsSelect<false> | SchoolProgramsSelect<true>;
+    'gallery-albums': GalleryAlbumsSelect<false> | GalleryAlbumsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -196,6 +206,10 @@ export interface Tenant {
     email?: string | null;
     phone?: string | null;
     address?: string | null;
+    /**
+     * Google/OpenStreetMap embed URL (src iz <iframe>) za prikaz lokacije na stranici kontakta.
+     */
+    mapEmbedUrl?: string | null;
   };
   social?: {
     facebook?: string | null;
@@ -391,6 +405,195 @@ export interface Equipment {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages".
+ */
+export interface Page {
+  id: number;
+  tenant?: (number | null) | Tenant;
+  /**
+   * Odredi kojoj rubrici ovaj sadržaj pripada (jedan zapis po rubrici).
+   */
+  key: 'povijest' | 'navijaci' | 'statut' | 'skola-info' | 'seniori-info';
+  /**
+   * Glavni naslov stranice.
+   */
+  title: string;
+  /**
+   * Mali nadnaslov iznad glavnog naslova (opcionalno).
+   */
+  eyebrow?: string | null;
+  /**
+   * Naslovna slika rubrike (opcionalno).
+   */
+  heroImage?: (number | null) | Media;
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Dodatne fotografije prikazane uz tekst (opcionalno).
+   */
+  gallery?:
+    | {
+        image: number | Media;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Kratki opis za tražilice (meta description).
+   */
+  seoDescription?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "documents".
+ */
+export interface Document {
+  id: number;
+  tenant?: (number | null) | Tenant;
+  /**
+   * Naziv dokumenta prikazan na stranici.
+   */
+  title: string;
+  category: 'statut' | 'pravilnik' | 'obrazac' | 'izvjesce' | 'ostalo';
+  /**
+   * Redoslijed unutar kategorije (manji broj prvi).
+   */
+  displayOrder?: number | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "board-members".
+ */
+export interface BoardMember {
+  id: number;
+  tenant?: (number | null) | Tenant;
+  /**
+   * Ime i prezime člana.
+   */
+  name: string;
+  /**
+   * Funkcija (npr. "Predsjednik", "Tajnik", "Trener vratara").
+   */
+  role: string;
+  /**
+   * Sekcija u kojoj se član prikazuje.
+   */
+  roleGroup: 'predsjednistvo' | 'nadzorni-odbor' | 'strucni-stozer' | 'ostalo';
+  /**
+   * Fotografija člana (opcionalno).
+   */
+  photo?: (number | null) | Media;
+  email?: string | null;
+  phone?: string | null;
+  /**
+   * Kratki opis (opcionalno).
+   */
+  bio?: string | null;
+  /**
+   * Redoslijed unutar sekcije (manji broj prvi).
+   */
+  displayOrder?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "school-programs".
+ */
+export interface SchoolProgram {
+  id: number;
+  tenant?: (number | null) | Tenant;
+  /**
+   * Naziv skupine/programa (npr. "Limači U7–U9").
+   */
+  name: string;
+  /**
+   * Dobni raspon (npr. "U7–U9", "7–9 godina").
+   */
+  ageRange?: string | null;
+  /**
+   * Ime trenera (opcionalno).
+   */
+  coach?: string | null;
+  /**
+   * Termini treninga (npr. "Pon, Sri, Pet — 17:00–18:30").
+   */
+  schedule?: string | null;
+  description?: string | null;
+  photo?: (number | null) | Media;
+  /**
+   * Redoslijed prikaza (manji broj prvi).
+   */
+  displayOrder?: number | null;
+  /**
+   * Sakrij program bez brisanja (ako je isključeno).
+   */
+  active?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "gallery-albums".
+ */
+export interface GalleryAlbum {
+  id: number;
+  tenant?: (number | null) | Tenant;
+  /**
+   * Naziv albuma.
+   */
+  title: string;
+  /**
+   * Auto-generiran iz naziva ako je prazno.
+   */
+  slug?: string | null;
+  date?: string | null;
+  /**
+   * Naslovna slika albuma.
+   */
+  coverImage?: (number | null) | Media;
+  description?: string | null;
+  photos?:
+    | {
+        image: number | Media;
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Redoslijed prikaza albuma (manji broj prvi).
+   */
+  displayOrder?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -436,6 +639,26 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'equipment';
         value: number | Equipment;
+      } | null)
+    | ({
+        relationTo: 'pages';
+        value: number | Page;
+      } | null)
+    | ({
+        relationTo: 'documents';
+        value: number | Document;
+      } | null)
+    | ({
+        relationTo: 'board-members';
+        value: number | BoardMember;
+      } | null)
+    | ({
+        relationTo: 'school-programs';
+        value: number | SchoolProgram;
+      } | null)
+    | ({
+        relationTo: 'gallery-albums';
+        value: number | GalleryAlbum;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -540,6 +763,7 @@ export interface TenantsSelect<T extends boolean = true> {
         email?: T;
         phone?: T;
         address?: T;
+        mapEmbedUrl?: T;
       };
   social?:
     | T
@@ -672,6 +896,104 @@ export interface EquipmentSelect<T extends boolean = true> {
   displayOrder?: T;
   featured?: T;
   active?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages_select".
+ */
+export interface PagesSelect<T extends boolean = true> {
+  tenant?: T;
+  key?: T;
+  title?: T;
+  eyebrow?: T;
+  heroImage?: T;
+  content?: T;
+  gallery?:
+    | T
+    | {
+        image?: T;
+        id?: T;
+      };
+  seoDescription?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "documents_select".
+ */
+export interface DocumentsSelect<T extends boolean = true> {
+  tenant?: T;
+  title?: T;
+  category?: T;
+  displayOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "board-members_select".
+ */
+export interface BoardMembersSelect<T extends boolean = true> {
+  tenant?: T;
+  name?: T;
+  role?: T;
+  roleGroup?: T;
+  photo?: T;
+  email?: T;
+  phone?: T;
+  bio?: T;
+  displayOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "school-programs_select".
+ */
+export interface SchoolProgramsSelect<T extends boolean = true> {
+  tenant?: T;
+  name?: T;
+  ageRange?: T;
+  coach?: T;
+  schedule?: T;
+  description?: T;
+  photo?: T;
+  displayOrder?: T;
+  active?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "gallery-albums_select".
+ */
+export interface GalleryAlbumsSelect<T extends boolean = true> {
+  tenant?: T;
+  title?: T;
+  slug?: T;
+  date?: T;
+  coverImage?: T;
+  description?: T;
+  photos?:
+    | T
+    | {
+        image?: T;
+        caption?: T;
+        id?: T;
+      };
+  displayOrder?: T;
   updatedAt?: T;
   createdAt?: T;
 }
