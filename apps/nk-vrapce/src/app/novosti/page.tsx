@@ -2,12 +2,8 @@ import { ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  AnimatedLine,
-  FadeInView,
-  StaggerContainer,
-  StaggerItem,
-} from "@/components/animations";
+import { StaggerContainer, StaggerItem } from "@/components/animations";
+import { BrandedHero, type HeroStat } from "@/components/features/BrandedHero";
 import { formatDateShort } from "@/lib/helpers/date";
 import { fetchNewsPaginated } from "@/lib/payload/getNews";
 import { getTenant } from "@/lib/payload/getTenant";
@@ -39,25 +35,22 @@ export default async function NewsPage({ searchParams }: Props) {
       ? logo
       : (logo.url ?? "");
 
-  const { docs, totalPages } = result;
+  const { docs, totalPages, totalDocs } = result;
+
+  const stats: HeroStat[] = [
+    ...(totalDocs > 0 ? [{ value: String(totalDocs), label: "Objava" }] : []),
+  ];
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-6 pt-16 pb-24 sm:pt-24 lg:px-8">
-      <header className="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
-        <AnimatedLine className="mx-auto bg-brand-yellow" trigger="load" />
-        <FadeInView delay={0.05}>
-          <p className="text-[0.6rem] font-medium uppercase tracking-[0.4em] text-muted-foreground sm:text-xs">
-            Aktualno · Vijesti i obavijesti
-          </p>
-        </FadeInView>
-        <FadeInView delay={0.1}>
-          <h1 className="select-none text-[15vw] font-black uppercase leading-[0.85] tracking-tighter sm:text-[7rem] md:text-[8rem]">
-            Vijesti
-          </h1>
-        </FadeInView>
-      </header>
+    <>
+      <BrandedHero
+        eyebrow="Aktualno"
+        title="Vijesti"
+        description="Najnovije vijesti, najave i izvještaji s utakmica te sva događanja u klubu."
+        stats={stats}
+      />
 
-      <div className="mx-auto mt-16 max-w-4xl sm:mt-20">
+      <div className="mx-auto mt-16 w-full max-w-4xl px-6 pb-24 sm:mt-20 lg:px-8">
         {docs.length === 0 ? (
           <p className="py-16 text-center text-xs uppercase tracking-[0.3em] text-muted-foreground">
             Nema dostupnih vijesti.
@@ -137,6 +130,6 @@ export default async function NewsPage({ searchParams }: Props) {
           </nav>
         )}
       </div>
-    </div>
+    </>
   );
 }

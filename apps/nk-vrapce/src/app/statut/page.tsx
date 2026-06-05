@@ -1,7 +1,7 @@
 import { Download, FileText } from "lucide-react";
 import type { Metadata } from "next";
 import { FadeInView, StaggerContainer, StaggerItem } from "@/components/animations";
-import { PageHero } from "@/components/features/PageHero";
+import { BrandedHero, type HeroStat } from "@/components/features/BrandedHero";
 import { fetchDocuments } from "@/lib/payload/getDocuments";
 import { fetchPageByKey } from "@/lib/payload/getPages";
 import type { ClubDocument, DocumentCategory } from "@/types/document";
@@ -48,48 +48,61 @@ export default async function StatutPage() {
     }))
     .filter((section) => section.docs.length > 0);
 
+  const stats: HeroStat[] = [
+    { value: String(documents.length), label: "Dokumenata" },
+    ...(grouped.length > 0
+      ? [{ value: String(grouped.length), label: "Kategorija" }]
+      : []),
+  ];
+
   return (
-    <div className="mx-auto w-full max-w-3xl px-6 pt-16 pb-24 sm:pt-24 lg:px-8">
-      <PageHero
+    <>
+      <BrandedHero
         eyebrow="Pravni okvir"
         title={page?.title ?? "Statut kluba"}
         description={
           page?.content
-            ? undefined
-            : "Službeni dokumenti kluba dostupni za preuzimanje."
+            ? null
+            : "Statut, pravilnici i službeni dokumenti kluba — dostupni za preuzimanje."
         }
+        stats={stats}
       />
 
-      {page?.content && (
-        <article
-          className="news-content mx-auto mt-12 max-w-2xl sm:mt-16"
-          dangerouslySetInnerHTML={{ __html: page.content }}
-        />
-      )}
+      <div className="mx-auto w-full max-w-3xl px-6 pb-24 lg:px-8">
+        {page?.content && (
+          <article
+            className="news-content mt-16 sm:mt-20"
+            dangerouslySetInnerHTML={{ __html: page.content }}
+          />
+        )}
 
-      {grouped.length === 0 ? (
-        <p className="mt-16 text-center text-xs uppercase tracking-[0.3em] text-muted-foreground">
-          Dokumenti uskoro.
-        </p>
-      ) : (
-        <div className="mt-16 space-y-12 sm:mt-20">
-          {grouped.map((section) => (
-            <section key={section.category} className="space-y-5">
-              <h2 className="text-sm font-bold uppercase tracking-[0.3em] text-muted-foreground">
-                {categoryLabels[section.category]}
-              </h2>
-              <StaggerContainer className="space-y-3" staggerChildren={0.05}>
-                {section.docs.map((doc) => (
-                  <StaggerItem key={doc.id}>
-                    <DocumentRow doc={doc} />
-                  </StaggerItem>
-                ))}
-              </StaggerContainer>
-            </section>
-          ))}
-        </div>
-      )}
-    </div>
+        {grouped.length === 0 ? (
+          <p className="mt-16 text-center text-xs uppercase tracking-[0.3em] text-muted-foreground">
+            Dokumenti uskoro.
+          </p>
+        ) : (
+          <div className="mt-16 space-y-12 sm:mt-20">
+            {grouped.map((section) => (
+              <section key={section.category} className="space-y-5">
+                <div className="flex items-center gap-3.5 border-b border-line pb-4">
+                  <span className="size-2.5 rounded-full bg-brand-yellow" />
+                  <h2 className="text-xl font-black uppercase tracking-tighter sm:text-2xl">
+                    {categoryLabels[section.category]}
+                  </h2>
+                </div>
+                <StaggerContainer className="space-y-3" staggerChildren={0.05}>
+                  {section.docs.map((doc) => (
+                    <StaggerItem key={doc.id}>
+                      <DocumentRow doc={doc} />
+                    </StaggerItem>
+                  ))}
+                </StaggerContainer>
+              </section>
+            ))}
+          </div>
+        )}
+      </div>
+    </>
   );
 }
 

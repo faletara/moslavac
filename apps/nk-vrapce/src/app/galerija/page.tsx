@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { StaggerContainer, StaggerItem } from "@/components/animations";
-import { PageHero } from "@/components/features/PageHero";
+import { BrandedHero, type HeroStat } from "@/components/features/BrandedHero";
 import { formatDateShort } from "@/lib/helpers/date";
 import { fetchAlbums } from "@/lib/payload/getGallery";
 import type { GalleryAlbum } from "@/types/gallery";
@@ -17,31 +17,42 @@ export const metadata: Metadata = {
 export default async function GalerijaPage() {
   const albums = await fetchAlbums();
 
+  const totalPhotos = albums.reduce((sum, a) => sum + a.photos.length, 0);
+  const stats: HeroStat[] = [
+    { value: String(albums.length), label: "Albuma" },
+    ...(totalPhotos > 0
+      ? [{ value: String(totalPhotos), label: "Fotografija" }]
+      : []),
+  ];
+
   return (
-    <div className="mx-auto w-full max-w-screen-xl px-6 pt-16 pb-24 sm:pt-24 lg:px-8">
-      <PageHero
+    <>
+      <BrandedHero
         eyebrow="Trenuci kluba"
         title="Galerija"
         description="Fotografije s utakmica, treninga i događanja NK Vrapče."
+        stats={stats}
       />
 
-      {albums.length === 0 ? (
-        <p className="mt-16 text-center text-xs uppercase tracking-[0.3em] text-muted-foreground">
-          Albumi uskoro.
-        </p>
-      ) : (
-        <StaggerContainer
-          className="mt-16 grid grid-cols-1 gap-6 sm:mt-24 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8"
-          staggerChildren={0.06}
-        >
-          {albums.map((album) => (
-            <StaggerItem key={album.id}>
-              <AlbumCard album={album} />
-            </StaggerItem>
-          ))}
-        </StaggerContainer>
-      )}
-    </div>
+      <div className="mx-auto w-full max-w-screen-xl px-6 pb-24 lg:px-8">
+        {albums.length === 0 ? (
+          <p className="mt-16 text-center text-xs uppercase tracking-[0.3em] text-muted-foreground">
+            Albumi uskoro.
+          </p>
+        ) : (
+          <StaggerContainer
+            className="mt-20 grid grid-cols-1 gap-6 sm:mt-28 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8"
+            staggerChildren={0.06}
+          >
+            {albums.map((album) => (
+              <StaggerItem key={album.id}>
+                <AlbumCard album={album} />
+              </StaggerItem>
+            ))}
+          </StaggerContainer>
+        )}
+      </div>
+    </>
   );
 }
 

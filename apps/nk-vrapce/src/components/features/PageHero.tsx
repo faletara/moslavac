@@ -1,17 +1,21 @@
+import Image from "next/image";
 import type { ReactNode } from "react";
 import { AnimatedLine, FadeInView } from "@/components/animations";
+import type { PayloadMedia } from "@/lib/payload/types";
 
 interface PageHeroProps {
   eyebrow: string;
   title: string;
   description?: string | null;
+  /** Naslovna slika rubrike (opcionalno) — renderira se ispod naslova. */
+  heroImage?: PayloadMedia | null;
   children?: ReactNode;
 }
 
 /**
  * Dosljedan premium naslovni blok rubrike: žuta linija + nadnaslov + veliki naslov.
  */
-export function PageHero({ eyebrow, title, description, children }: PageHeroProps) {
+export function PageHero({ eyebrow, title, description, heroImage, children }: PageHeroProps) {
   return (
     <header className="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
       <AnimatedLine className="mx-auto bg-brand-yellow" trigger="load" />
@@ -33,6 +37,20 @@ export function PageHero({ eyebrow, title, description, children }: PageHeroProp
         </FadeInView>
       )}
       {children}
+      {heroImage?.url && (
+        <FadeInView delay={0.2} className="w-full">
+          <figure className="relative mt-6 aspect-[16/7] w-full overflow-hidden rounded-lg sm:mt-8">
+            <Image
+              src={heroImage.sizes?.hero?.url ?? heroImage.url}
+              alt={heroImage.alt || title}
+              fill
+              sizes="(min-width: 1024px) 768px, 100vw"
+              priority
+              className="object-cover"
+            />
+          </figure>
+        </FadeInView>
+      )}
     </header>
   );
 }

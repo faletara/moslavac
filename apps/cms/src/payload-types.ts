@@ -544,6 +544,9 @@ export interface SchoolProgram {
    * Termini treninga (npr. "Pon, Sri, Pet — 17:00–18:30").
    */
   schedule?: string | null;
+  /**
+   * Opis programa — prikazuje se na kartici i kao glavni tekst ("O programu") na stranici programa.
+   */
   description?: string | null;
   photo?: (number | null) | Media;
   /**

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import type { IconType } from "react-icons";
 import { FaFacebook, FaYoutube } from "react-icons/fa";
 import { FadeInView } from "@/components/animations";
-import { PageHero } from "@/components/features/PageHero";
+import { BrandedHero, type HeroStat } from "@/components/features/BrandedHero";
 import { getTenant } from "@/lib/payload/getTenant";
 
 export const metadata: Metadata = {
@@ -45,15 +45,21 @@ export default async function KontaktPage() {
       : null,
   ].filter(Boolean) as { label: string; value: string }[];
 
+  const stats: HeroStat[] = founded
+    ? [{ value: String(founded), label: "Osnovan" }]
+    : [];
+
   return (
-    <div className="mx-auto w-full max-w-screen-xl px-6 pt-16 pb-24 sm:pt-24 lg:px-8">
-      <PageHero
+    <>
+      <BrandedHero
         eyebrow="Tu smo za vas"
         title="Lokacija i kontakt"
         description="Posjetite nas ili nam se javite — uvijek nam je drago čuti navijače i partnere."
+        stats={stats}
       />
 
-      <div className="mt-16 grid grid-cols-1 gap-12 sm:mt-24 lg:grid-cols-2 lg:gap-16">
+      <div className="mx-auto w-full max-w-screen-xl px-6 pb-24 lg:px-8">
+        <div className="mt-16 grid grid-cols-1 gap-12 sm:mt-20 lg:grid-cols-2 lg:gap-16">
         <FadeInView className="space-y-8">
           <div className="space-y-5">
             <h2 className="text-sm font-bold uppercase tracking-[0.3em] text-muted-foreground">
@@ -152,8 +158,9 @@ export default async function KontaktPage() {
             </div>
           )}
         </FadeInView>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

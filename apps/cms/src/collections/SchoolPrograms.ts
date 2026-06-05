@@ -40,6 +40,10 @@ export const SchoolPrograms: CollectionConfig = {
     {
       name: 'description',
       type: 'textarea',
+      admin: {
+        description:
+          'Opis programa — prikazuje se na kartici i kao glavni tekst ("O programu") na stranici programa.',
+      },
     },
     {
       name: 'photo',

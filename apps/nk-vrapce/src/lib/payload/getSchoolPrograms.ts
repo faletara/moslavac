@@ -51,3 +51,25 @@ export async function fetchSchoolPrograms(): Promise<SchoolProgram[]> {
     return [];
   }
 }
+
+export async function fetchSchoolProgramById(params: {
+  id: string;
+}): Promise<SchoolProgram | null> {
+  const query = buildQuery({
+    ...tenantWhere(tenantSlug),
+    "where[id][equals]": params.id,
+    "where[active][equals]": "true",
+    limit: 1,
+    depth: 2,
+  });
+  try {
+    const result = await payloadFetch<PayloadPaginated<PayloadSchoolProgram>>(
+      `/school-programs?${query}`,
+      { next: { revalidate: 60, tags: schoolTags() } },
+    );
+    const doc = result.docs[0];
+    return doc ? adaptProgram(doc) : null;
+  } catch {
+    return null;
+  }
+}
