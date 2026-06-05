@@ -133,11 +133,11 @@ export default async function NewsDetailPage({ params }: Props) {
       </Link>
 
       <header className="mt-12 flex flex-col items-center gap-6 text-center sm:mt-16">
-        <span className="h-px w-12 bg-brand-yellow" />
-        <p className="text-[0.6rem] font-medium uppercase tracking-[0.4em] text-muted-foreground sm:text-xs">
+        <span className="h-[3px] w-10 rounded-full bg-brand-yellow" />
+        <p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-brand-blue sm:text-xs">
           {formattedDate} · {formattedTime}
         </p>
-        <h1 className="text-balance text-3xl font-black uppercase leading-[1.08] tracking-tight sm:text-5xl md:text-6xl">
+        <h1 className="text-balance font-display text-3xl font-extrabold uppercase leading-[1.08] tracking-tight text-ink sm:text-5xl md:text-6xl">
           {news.title}
         </h1>
       </header>

@@ -15,10 +15,10 @@ export function ErrorState({
 }: ErrorStateProps) {
   return (
     <section className="mx-auto flex min-h-[60vh] w-full max-w-2xl flex-col items-center justify-center gap-6 px-4 text-center">
-      <span className="text-xs font-bold uppercase tracking-[0.4em] text-muted-foreground">
+      <span className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-blue">
         Greška
       </span>
-      <h1 className="text-3xl font-black uppercase leading-none tracking-tighter sm:text-4xl md:text-5xl">
+      <h1 className="font-display text-3xl font-extrabold uppercase leading-[1.05] tracking-tight text-ink sm:text-4xl md:text-5xl">
         {title}
       </h1>
       <p className="max-w-md text-sm text-muted-foreground sm:text-base">

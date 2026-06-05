@@ -130,8 +130,8 @@ export default async function SchoolProgramPage({ params }: Props) {
           />
 
           <div className="relative z-10 flex flex-col gap-4">
-            <span className="h-px w-12 bg-gradient-to-r from-brand-yellow to-transparent" />
-            <h2 className="text-2xl font-black uppercase tracking-tighter text-white sm:text-3xl">
+            <span className="h-[3px] w-10 rounded-full bg-brand-yellow" />
+            <h2 className="font-display text-2xl font-extrabold uppercase tracking-tight text-white sm:text-3xl">
               Upiši dijete
             </h2>
             <p className="max-w-md text-sm leading-relaxed text-white/70">
@@ -194,7 +194,7 @@ function SectionHeading({
   children: ReactNode;
 }) {
   return (
-    <h2 className="flex items-center gap-3 text-xl font-black uppercase tracking-tight sm:text-2xl">
+    <h2 className="flex items-center gap-3 font-display text-xl font-extrabold uppercase tracking-tight text-ink sm:text-2xl">
       {icon}
       {children}
     </h2>

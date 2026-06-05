@@ -126,11 +126,11 @@ function PlayerSection({
       <div className="flex items-baseline justify-between gap-4 border-b border-line pb-5">
         <div className="flex items-center gap-3.5">
           <span className="size-2.5 rounded-full bg-brand-yellow" />
-          <h2 className="text-2xl font-black uppercase tracking-tighter sm:text-3xl md:text-4xl">
+          <h2 className="font-display text-2xl font-extrabold uppercase tracking-tight text-ink sm:text-3xl md:text-4xl">
             {title}
           </h2>
         </div>
-        <span className="font-black tabular-nums text-sm tracking-[0.2em] text-muted-foreground sm:text-base">
+        <span className="font-bold tabular-nums text-sm tracking-[0.2em] text-muted-foreground sm:text-base">
           {String(players.length).padStart(2, "0")}
         </span>
       </div>

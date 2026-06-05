@@ -51,13 +51,13 @@ export default async function AlbumPage({ params }: Props) {
       </Link>
 
       <header className="mt-10 flex flex-col items-center gap-5 text-center sm:mt-14">
-        <span className="h-px w-12 bg-brand-yellow" />
+        <span className="h-[3px] w-10 rounded-full bg-brand-yellow" />
         {album.date && (
-          <p className="text-[0.6rem] font-medium uppercase tracking-[0.4em] text-muted-foreground sm:text-xs">
+          <p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-brand-blue sm:text-xs">
             {formatDateLong(album.date)}
           </p>
         )}
-        <h1 className="text-balance text-3xl font-black uppercase leading-[1.08] tracking-tight sm:text-5xl md:text-6xl">
+        <h1 className="text-balance font-display text-3xl font-extrabold uppercase leading-[1.08] tracking-tight text-ink sm:text-5xl md:text-6xl">
           {album.title}
         </h1>
         {album.description && (

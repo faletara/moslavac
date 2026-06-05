@@ -86,7 +86,7 @@ export default async function StatutPage() {
               <section key={section.category} className="space-y-5">
                 <div className="flex items-center gap-3.5 border-b border-line pb-4">
                   <span className="size-2.5 rounded-full bg-brand-yellow" />
-                  <h2 className="text-xl font-black uppercase tracking-tighter sm:text-2xl">
+                  <h2 className="font-display text-xl font-extrabold uppercase tracking-tight text-ink sm:text-2xl">
                     {categoryLabels[section.category]}
                   </h2>
                 </div>

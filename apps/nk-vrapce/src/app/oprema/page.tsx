@@ -107,7 +107,7 @@ export default async function OpremaPage() {
 function SectionHeader({ title, count }: { title: string; count: number }) {
   return (
     <div className="flex items-baseline justify-between gap-6 border-b border-line pb-6">
-      <h2 className="font-black uppercase leading-[0.85] tracking-tighter text-3xl sm:text-5xl md:text-6xl">
+      <h2 className="font-display text-3xl font-extrabold uppercase leading-[0.95] tracking-tight text-ink sm:text-5xl md:text-6xl">
         {title}
       </h2>
       <span className="whitespace-nowrap text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs">
@@ -155,7 +155,7 @@ function ProductCard({ item }: { item: Equipment }) {
           <span className="line-clamp-2 text-balance text-sm font-semibold uppercase tracking-[0.15em]">
             {item.displayName}
           </span>
-          <span className="font-black tabular-nums tracking-tight text-lg">
+          <span className="font-bold tabular-nums tracking-tight text-lg">
             {formatPrice(item.price)}
           </span>
         </div>

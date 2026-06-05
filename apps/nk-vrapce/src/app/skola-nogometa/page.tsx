@@ -69,11 +69,11 @@ export default async function SkolaNogometaPage() {
             {/* Bold editorial heading */}
             <div className="mt-20 flex flex-wrap items-end justify-between gap-x-10 gap-y-5 border-b border-line pb-7 sm:mt-28">
               <div className="flex flex-col gap-3">
-                <span className="h-px w-12 bg-brand-yellow" />
-                <p className="text-[0.6rem] font-semibold uppercase tracking-[0.4em] text-muted-foreground sm:text-xs">
+                <span className="h-[3px] w-10 rounded-full bg-brand-yellow" />
+                <p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-brand-blue sm:text-xs">
                   Razvojni put
                 </p>
-                <h2 className="text-balance text-4xl font-black uppercase leading-[0.9] tracking-tighter sm:text-5xl md:text-6xl">
+                <h2 className="text-balance font-display text-4xl font-extrabold uppercase leading-[0.95] tracking-tight text-ink sm:text-5xl md:text-6xl">
                   Programi po uzrastu
                 </h2>
               </div>
@@ -158,7 +158,7 @@ function ProgramCard({
           </span>
         )}
 
-        <h3 className="mt-6 text-balance text-4xl font-black uppercase leading-[0.9] tracking-tighter text-white sm:text-5xl">
+        <h3 className="mt-6 text-balance font-display text-4xl font-extrabold uppercase leading-[0.95] tracking-tight text-white sm:text-5xl">
           {category}
         </h3>
 

@@ -9,7 +9,11 @@ import {
   StaggerItem,
 } from "@/components/animations";
 import Hero from "@/components/features/home/Hero";
+import { StandingsTable } from "@/components/features/home/StandingsTable";
+import { BrandGlow } from "@/components/ui/BrandGlow";
 import { formatDateShort } from "@/lib/helpers/date";
+import { fetchSeniorCompetition } from "@/lib/hns/competitions";
+import { fetchTeamStandings } from "@/lib/hns/standings";
 import { adaptPayloadEquipment } from "@/lib/payload/equipment-adapter";
 import { fetchFeaturedEquipment } from "@/lib/payload/getEquipment";
 import { fetchAlbums } from "@/lib/payload/getGallery";
@@ -34,16 +38,18 @@ const priceFormatter = new Intl.NumberFormat("hr-HR", {
   maximumFractionDigits: 2,
 });
 
-/** Fina filmska grain tekstura — daje dubinu tamnim navy plohama. */
-const GRAIN_URL =
-  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
-
 export default async function HomePage() {
-  const [tenant, news, featuredDocs, albums] = await Promise.all([
+  const [tenant, news, featuredDocs, albums, standings] = await Promise.all([
     getTenant(),
     fetchLatestNews(),
     fetchFeaturedEquipment(),
     fetchAlbums(),
+    (async () => {
+      const competition = await fetchSeniorCompetition();
+      if (!competition?.id) return null;
+      const rows = await fetchTeamStandings({ competitionId: competition.id });
+      return { competition, rows };
+    })(),
   ]);
 
   const featured = featuredDocs.map((d) => adaptPayloadEquipment(d, tenantSlug));
@@ -60,6 +66,13 @@ export default async function HomePage() {
       <div className="space-y-28 py-24 sm:space-y-36 sm:py-32">
         {news.length > 0 && (
           <LatestNews news={news} logoFallback={logoFallback} />
+        )}
+
+        {standings && standings.rows.length > 0 && (
+          <StandingsTable
+            rows={standings.rows}
+            competitionName={standings.competition.name}
+          />
         )}
 
         <TeaserBand
@@ -108,18 +121,18 @@ export default async function HomePage() {
 
 function SectionHeading({ eyebrow, title }: { eyebrow: string; title: string }) {
   return (
-    <div className="flex flex-col items-center gap-5 text-center">
-      <AnimatedLine className="mx-auto bg-brand-yellow" />
+    <div className="flex flex-col items-center gap-4 text-center">
       <FadeInView delay={0.05}>
-        <p className="text-[0.6rem] font-medium uppercase tracking-[0.4em] text-muted-foreground sm:text-xs">
+        <p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-brand-blue sm:text-xs">
           {eyebrow}
         </p>
       </FadeInView>
       <FadeInView delay={0.1}>
-        <h2 className="text-4xl font-black uppercase leading-[0.9] tracking-tighter sm:text-5xl md:text-6xl">
+        <h2 className="font-display text-3xl font-extrabold uppercase leading-[0.95] tracking-tight text-ink sm:text-4xl md:text-5xl">
           {title}
         </h2>
       </FadeInView>
+      <AnimatedLine className="mx-auto h-[3px] w-10 rounded-full bg-brand-yellow" />
     </div>
   );
 }
@@ -145,18 +158,23 @@ function LatestNews({
   const hasList = secondary.length > 0;
 
   return (
-    <section className="mx-auto w-full max-w-6xl px-6 sm:px-10">
+    <section className="relative isolate mx-auto w-full max-w-6xl px-6 sm:px-10">
+      <BrandGlow
+        color="yellow"
+        intensity={0.12}
+        className="-right-[8%] -top-[30%] h-[32vmax] w-[32vmax]"
+      />
       {/* Editorial header: naslov lijevo, link u istom redu desno */}
       <div className="flex flex-wrap items-end justify-between gap-6 border-b border-line pb-6">
         <div className="flex flex-col gap-3">
-          <AnimatedLine className="bg-brand-yellow" />
           <FadeInView delay={0.05}>
-            <p className="text-[0.6rem] font-medium uppercase tracking-[0.4em] text-muted-foreground sm:text-xs">
+            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-brand-blue sm:text-xs">
               Aktualno
             </p>
           </FadeInView>
           <FadeInView delay={0.1}>
-            <h2 className="text-4xl font-black uppercase leading-[0.9] tracking-tighter sm:text-5xl">
+            <h2 className="flex items-center gap-3 font-display text-3xl font-extrabold uppercase leading-[0.95] tracking-tight text-ink sm:text-4xl">
+              <span className="h-7 w-[3px] rounded-full bg-brand-yellow sm:h-9" />
               Vijesti
             </h2>
           </FadeInView>
@@ -198,7 +216,7 @@ function LatestNews({
               <p className="text-[0.65rem] font-medium uppercase tracking-[0.3em] text-muted-foreground">
                 {formatDateShort(lead.publishedAt ?? lead.createdAt)}
               </p>
-              <h3 className="text-balance text-2xl font-black uppercase leading-[1.05] tracking-tight transition-colors group-hover:text-brand-blue sm:text-3xl">
+              <h3 className="text-balance text-2xl font-bold uppercase leading-[1.05] tracking-tight transition-colors group-hover:text-brand-blue sm:text-3xl">
                 {lead.title}
               </h3>
               {lead.excerpt && (
@@ -275,50 +293,42 @@ function TeaserBand({
   image: string;
 }) {
   return (
-    <section className="relative isolate flex min-h-[62vh] w-full items-center overflow-hidden bg-brand-navy sm:min-h-[70vh]">
-      {/* Pozadinska slika */}
-      <Image
-        src={image}
-        alt=""
-        fill
-        sizes="100vw"
-        className="-z-30 object-cover object-center"
+    <section className="relative isolate mx-auto w-full max-w-6xl px-6 sm:px-10">
+      <BrandGlow
+        color="yellow"
+        intensity={0.13}
+        className="-left-[6%] top-[10%] h-[34vmax] w-[34vmax]"
       />
-      {/* Navy gradient slojevi — čitljivost + brand ton */}
-      <div className="absolute inset-0 -z-20 bg-gradient-to-r from-brand-navy via-brand-navy/85 to-brand-navy/30" />
-      <div className="absolute inset-0 -z-20 bg-gradient-to-t from-brand-navy/85 via-transparent to-brand-navy/50" />
-      {/* Žuti glow akcent gore lijevo */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -left-[5%] top-0 -z-10 h-2/3 w-1/2 rounded-full"
-        style={{
-          background:
-            "radial-gradient(closest-side, rgba(255,203,5,0.14), transparent 70%)",
-        }}
-      />
-      {/* Grain tekstura */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 opacity-[0.1] mix-blend-soft-light"
-        style={{ backgroundImage: GRAIN_URL }}
-      />
+      <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+        {/* Uokvirena fotografija — čisto, mekane sjene */}
+        <FadeInView direction="right">
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-surface-2 shadow-[0_30px_80px_-45px_rgba(10,28,51,0.45)] ring-1 ring-line">
+            <Image
+              src={image}
+              alt=""
+              fill
+              sizes="(min-width: 1024px) 45vw, 100vw"
+              className="object-cover object-center"
+            />
+          </div>
+        </FadeInView>
 
-      <div className="mx-auto w-full max-w-6xl px-6 sm:px-10">
-        <FadeInView>
-          <div className="flex max-w-xl flex-col items-start gap-6 text-left">
-            <span className="h-px w-12 bg-gradient-to-r from-brand-yellow to-transparent" />
-            <p className="text-[0.6rem] font-semibold uppercase tracking-[0.4em] text-brand-yellow sm:text-xs">
+        {/* Tekst */}
+        <FadeInView direction="left" delay={0.1}>
+          <div className="flex flex-col items-start gap-5">
+            <span className="h-[3px] w-10 rounded-full bg-brand-yellow" />
+            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-brand-blue sm:text-xs">
               {eyebrow}
             </p>
-            <h2 className="text-balance text-4xl font-black uppercase leading-[0.95] tracking-tighter text-white sm:text-6xl">
+            <h2 className="text-balance font-display text-3xl font-extrabold uppercase leading-[0.95] tracking-tight text-ink sm:text-4xl md:text-5xl">
               {title}
             </h2>
-            <p className="max-w-md text-sm leading-relaxed text-white/75 sm:text-base">
+            <p className="max-w-md text-sm leading-relaxed text-muted-foreground sm:text-base">
               {text}
             </p>
             <Link
               href={href}
-              className="group mt-2 inline-flex items-center gap-2 rounded-full bg-brand-yellow px-7 py-3.5 text-[0.7rem] font-bold uppercase tracking-[0.3em] text-brand-navy shadow-[0_8px_30px_-6px_rgba(255,203,5,0.5)] transition-all hover:scale-[1.03] hover:shadow-[0_10px_40px_-6px_rgba(255,203,5,0.65)]"
+              className="group mt-2 inline-flex items-center gap-2 rounded-full bg-brand-yellow px-7 py-3.5 text-[0.7rem] font-bold uppercase tracking-[0.2em] text-brand-navy shadow-[0_10px_30px_-12px_rgba(255,203,5,0.8)] transition-all hover:-translate-y-0.5 hover:shadow-[0_14px_36px_-12px_rgba(255,203,5,0.9)]"
             >
               {cta}
               <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -348,18 +358,23 @@ function FeaturedShop({
   const cols = visible.length >= 4 ? "lg:grid-cols-4" : "lg:grid-cols-3";
 
   return (
-    <section className="mx-auto w-full max-w-6xl px-6 sm:px-10">
+    <section className="relative isolate mx-auto w-full max-w-6xl px-6 sm:px-10">
+      <BrandGlow
+        color="yellow"
+        intensity={0.12}
+        className="-right-[6%] -top-[28%] h-[32vmax] w-[32vmax]"
+      />
       {/* Editorial header */}
       <div className="flex flex-wrap items-end justify-between gap-6 border-b border-line pb-6">
         <div className="flex flex-col gap-3">
-          <AnimatedLine className="bg-brand-yellow" />
           <FadeInView delay={0.05}>
-            <p className="text-[0.6rem] font-medium uppercase tracking-[0.4em] text-muted-foreground sm:text-xs">
+            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-brand-blue sm:text-xs">
               Službena oprema
             </p>
           </FadeInView>
           <FadeInView delay={0.1}>
-            <h2 className="text-4xl font-black uppercase leading-[0.9] tracking-tighter sm:text-5xl">
+            <h2 className="flex items-center gap-3 font-display text-3xl font-extrabold uppercase leading-[0.95] tracking-tight text-ink sm:text-4xl">
+              <span className="h-7 w-[3px] rounded-full bg-brand-yellow sm:h-9" />
               Webshop
             </h2>
           </FadeInView>
@@ -414,7 +429,7 @@ function FeaturedShop({
                   <span className="line-clamp-1 text-xs font-semibold uppercase tracking-[0.12em] sm:text-sm">
                     {item.displayName}
                   </span>
-                  <span className="font-black tabular-nums tracking-tight text-brand-navy">
+                  <span className="font-bold tabular-nums tracking-tight text-brand-navy">
                     {item.price}
                   </span>
                 </div>
@@ -447,7 +462,12 @@ function GalleryTeaser({
   albums: { id: number; title: string; href: string; cover: string }[];
 }) {
   return (
-    <section className="mx-auto w-full max-w-6xl px-6 sm:px-10">
+    <section className="relative isolate mx-auto w-full max-w-6xl px-6 sm:px-10">
+      <BrandGlow
+        color="yellow"
+        intensity={0.11}
+        className="left-1/2 -top-[18%] h-[36vmax] w-[36vmax] -translate-x-1/2"
+      />
       <SectionHeading eyebrow="Trenuci kluba" title="Galerija" />
       <StaggerContainer
         className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-3 lg:gap-8"
@@ -480,82 +500,58 @@ function GalleryTeaser({
 
 function LunaticsBand() {
   return (
-    <section className="relative isolate w-full overflow-hidden bg-brand-navy py-20 sm:py-28">
-      {/* Tribinska atmosfera — pozadina (krop prema navijačima/zastavama) */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-40">
-        <Image
-          src="/lunatics/lunatics.webp"
-          alt=""
-          fill
-          sizes="100vw"
-          className="object-cover object-[center_30%] brightness-[0.65]"
-        />
-      </div>
-      {/* Jak navy overlay — čitljivost + brand ton, guši tekst transparenata */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 -z-30 bg-gradient-to-b from-brand-navy/92 via-brand-navy/72 to-brand-navy/95"
-      />
-      {/* Dual glow — ultras boje (plava + žuta) */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -left-[8%] -top-[10%] -z-10 h-2/3 w-1/2 rounded-full"
-        style={{
-          background:
-            "radial-gradient(closest-side, rgba(27,160,224,0.20), transparent 70%)",
-        }}
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -bottom-[15%] left-1/3 -z-10 h-2/3 w-1/2 rounded-full"
-        style={{
-          background:
-            "radial-gradient(closest-side, rgba(255,203,5,0.12), transparent 70%)",
-        }}
-      />
-      {/* Grain */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 opacity-[0.1] mix-blend-soft-light"
-        style={{ backgroundImage: GRAIN_URL }}
-      />
+    <section className="mx-auto w-full max-w-6xl px-6 sm:px-10">
+      <FadeInView>
+        <Link
+          href="/navijaci"
+          className="group relative isolate block overflow-hidden rounded-3xl bg-brand-navy shadow-[0_40px_100px_-50px_rgba(10,28,51,0.6)] ring-1 ring-brand-navy/10"
+        >
+          {/* Tribinska atmosfera — suptilna pozadina */}
+          <div aria-hidden className="pointer-events-none absolute inset-0 -z-20">
+            <Image
+              src="/lunatics/lunatics.webp"
+              alt=""
+              fill
+              sizes="(min-width: 1152px) 1088px, 100vw"
+              className="object-cover object-[center_30%] brightness-[0.7] transition-transform duration-700 group-hover:scale-[1.03]"
+            />
+          </div>
+          {/* Jedan čist navy gradijent — čitljivost, bez graina i višestrukih glowova */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-r from-brand-navy via-brand-navy/90 to-brand-navy/55"
+          />
 
-      <div className="mx-auto w-full max-w-6xl px-6 sm:px-10">
-        <FadeInView>
-          <Link
-            href="/navijaci"
-            className="group grid items-center gap-10 text-center md:grid-cols-[auto_1fr] md:gap-14 md:text-left"
-          >
-            {/* Grafiti logo kao patch — ring + glow da iskoči */}
-            <div className="relative mx-auto size-44 shrink-0 overflow-hidden rounded-2xl ring-1 ring-white/15 shadow-[0_20px_50px_-15px_rgba(27,160,224,0.5)] transition-transform duration-500 group-hover:scale-[1.03] sm:size-52">
+          <div className="grid items-center gap-9 p-8 text-center sm:p-12 md:grid-cols-[auto_1fr] md:gap-12 md:text-left lg:p-16">
+            {/* Grafiti logo kao patch */}
+            <div className="relative mx-auto size-40 shrink-0 overflow-hidden rounded-2xl ring-1 ring-white/15 transition-transform duration-500 group-hover:scale-[1.03] sm:size-48">
               <Image
                 src="/lunatics/714443271_26680475911631257_7650010142066840067_n.jpg"
                 alt="Lunatics Vrapče"
                 fill
-                sizes="13rem"
+                sizes="12rem"
                 className="object-cover"
               />
             </div>
-            <div className="flex flex-col items-center gap-5 md:items-start">
-              <span className="h-px w-12 bg-gradient-to-r from-brand-yellow to-transparent" />
-              <p className="text-[0.6rem] font-semibold uppercase tracking-[0.4em] text-brand-yellow sm:text-xs">
+            <div className="flex flex-col items-center gap-4 md:items-start">
+              <p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-brand-yellow sm:text-xs">
                 Bedem uz momčad · 1993
               </p>
-              <h2 className="text-balance text-4xl font-black uppercase leading-[0.95] tracking-tighter text-brand-yellow sm:text-6xl">
+              <h2 className="text-balance font-display text-3xl font-extrabold uppercase leading-[0.95] tracking-tight text-brand-yellow sm:text-4xl md:text-5xl">
                 Lunatics Vrapče
               </h2>
               <p className="max-w-md text-sm leading-relaxed text-white/70 sm:text-base">
                 Naša boja, naš ponos. Upoznaj navijačku skupinu koja diže tribine
                 na svakoj utakmici.
               </p>
-              <span className="mt-1 inline-flex items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.3em] text-brand-yellow">
+              <span className="mt-1 inline-flex items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.2em] text-brand-yellow">
                 Upoznaj navijače
                 <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
               </span>
             </div>
-          </Link>
-        </FadeInView>
-      </div>
+          </div>
+        </Link>
+      </FadeInView>
     </section>
   );
 }

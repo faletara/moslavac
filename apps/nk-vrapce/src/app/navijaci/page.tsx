@@ -60,7 +60,7 @@ export default async function NavijaciPage() {
       : LUNATICS_ART;
 
   return (
-    <div className="bg-brand-navy text-white">
+    <>
       <BrandedHero
         eyebrow={page?.eyebrow ?? "Navijačka skupina · 1993"}
         title={page?.title ?? "Lunatics Vrapče"}
@@ -69,15 +69,13 @@ export default async function NavijaciPage() {
         backgroundImage={heroBg}
       />
 
-      {/* Opcionalni CMS rich-text na svijetloj podlozi radi čitljivosti */}
+      {/* Opcionalni CMS rich-text */}
       {page?.content && (
-        <section className="bg-surface text-foreground">
-          <div className="mx-auto w-full max-w-2xl px-6 py-16 sm:py-20">
-            <article
-              className="news-content"
-              dangerouslySetInnerHTML={{ __html: page.content }}
-            />
-          </div>
+        <section className="mx-auto w-full max-w-2xl px-6 py-16 sm:py-20">
+          <article
+            className="news-content"
+            dangerouslySetInnerHTML={{ __html: page.content }}
+          />
         </section>
       )}
 
@@ -85,8 +83,8 @@ export default async function NavijaciPage() {
       <section className="px-6 py-16 sm:py-24">
         <div className="mx-auto w-full max-w-5xl">
           <div className="mb-12 flex flex-col items-center gap-4 text-center">
-            <span className="h-px w-12 bg-brand-yellow" />
-            <h2 className="text-3xl font-black uppercase tracking-tighter sm:text-4xl">
+            <span className="h-[3px] w-10 rounded-full bg-brand-yellow" />
+            <h2 className="font-display text-3xl font-extrabold uppercase tracking-tight text-ink sm:text-4xl">
               Galerija navijača
             </h2>
           </div>
@@ -110,6 +108,6 @@ export default async function NavijaciPage() {
           </StaggerContainer>
         </div>
       </section>
-    </div>
+    </>
   );
 }

@@ -18,17 +18,20 @@ interface PageHeroProps {
 export function PageHero({ eyebrow, title, description, heroImage, children }: PageHeroProps) {
   return (
     <header className="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
-      <AnimatedLine className="mx-auto bg-brand-yellow" trigger="load" />
       <FadeInView delay={0.05}>
-        <p className="text-[0.6rem] font-medium uppercase tracking-[0.4em] text-muted-foreground sm:text-xs">
+        <p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-brand-blue sm:text-xs">
           {eyebrow}
         </p>
       </FadeInView>
       <FadeInView delay={0.1}>
-        <h1 className="text-balance text-4xl font-black uppercase leading-[1.04] tracking-tighter sm:text-6xl md:text-7xl">
+        <h1 className="text-balance font-display text-4xl font-extrabold uppercase leading-[1.04] tracking-tight text-ink sm:text-6xl md:text-7xl">
           {title}
         </h1>
       </FadeInView>
+      <AnimatedLine
+        className="mx-auto h-[3px] w-10 rounded-full bg-brand-yellow"
+        trigger="load"
+      />
       {description && (
         <FadeInView delay={0.15}>
           <p className="max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">

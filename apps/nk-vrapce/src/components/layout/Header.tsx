@@ -44,11 +44,13 @@ export default function Header({ clubName }: { clubName: string }) {
   return (
     <header className="sticky top-0 z-50">
       <div
-        className={`bg-white/90 backdrop-blur transition-shadow duration-300 ${
-          scrolled ? "shadow-[0_4px_24px_-8px_rgba(10,28,51,0.25)]" : ""
+        className={`border-b bg-surface/80 backdrop-blur-md transition-all duration-300 ${
+          scrolled
+            ? "border-line shadow-[0_4px_24px_-8px_rgba(10,28,51,0.18)]"
+            : "border-transparent"
         }`}
       >
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-3">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-6 py-3 sm:px-10">
           <Link
             href="/"
             className="flex items-center gap-3"

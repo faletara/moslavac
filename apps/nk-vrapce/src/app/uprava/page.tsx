@@ -63,19 +63,14 @@ export default async function UpravaPage() {
           <div className="mt-20 space-y-20 sm:mt-28 sm:space-y-24">
             {grouped.map((section) => (
               <section key={section.group} className="space-y-10">
-                <div className="flex items-baseline justify-between gap-4 border-b border-line pb-5">
-                  <div className="flex items-center gap-3.5">
-                    <span className="size-2.5 rounded-full bg-brand-yellow" />
-                    <h2 className="text-2xl font-black uppercase tracking-tighter sm:text-3xl md:text-4xl">
-                      {groupLabels[section.group]}
-                    </h2>
-                  </div>
-                  <span className="font-black tabular-nums text-sm tracking-[0.2em] text-muted-foreground sm:text-base">
-                    {String(section.members.length).padStart(2, "0")}
-                  </span>
+                <div className="flex items-center gap-3.5 border-b border-line pb-5">
+                  <span className="size-2.5 rounded-full bg-brand-yellow" />
+                  <h2 className="font-display text-2xl font-extrabold uppercase tracking-tight text-ink sm:text-3xl md:text-4xl">
+                    {groupLabels[section.group]}
+                  </h2>
                 </div>
                 <StaggerContainer
-                  className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-8"
+                  className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4"
                   staggerChildren={0.05}
                 >
                   {section.members.map((member) => (
@@ -96,73 +91,70 @@ export default async function UpravaPage() {
 function MemberCard({ member }: { member: BoardMember }) {
   const photoUrl = member.photo?.sizes?.card?.url ?? member.photo?.url ?? null;
   return (
-    <FadeInView className="group flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-surface transition-all duration-300 hover:border-brand-yellow/50 hover:shadow-[0_24px_50px_-22px_rgba(10,28,51,0.4)]">
-      {/* Portret */}
-      <div className="relative aspect-[4/5] w-full overflow-hidden bg-brand-navy">
+    <FadeInView className="group">
+      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-xl bg-brand-navy ring-1 ring-black/5 transition-all duration-300 group-hover:ring-brand-yellow/50 group-hover:shadow-[0_22px_45px_-20px_rgba(10,28,51,0.5)]">
         {photoUrl ? (
           <Image
             src={photoUrl}
             alt={member.photo?.alt || member.name}
             fill
-            sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 100vw"
-            className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.04]"
+            sizes="(min-width: 1024px) 22vw, (min-width: 640px) 30vw, 45vw"
+            className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.05]"
           />
         ) : (
-          // Brandirani fallback — person silueta umjesto slova
+          // Brandirani fallback — person silueta
           <div className="absolute inset-0 bg-gradient-to-br from-brand-navy to-brand-navy-700">
             <div
               aria-hidden
-              className="absolute left-1/2 top-1/2 h-2/3 w-2/3 -translate-x-1/2 -translate-y-1/2 rounded-full"
+              className="absolute left-1/2 top-[38%] h-2/3 w-2/3 -translate-x-1/2 -translate-y-1/2 rounded-full"
               style={{
                 background:
-                  "radial-gradient(closest-side, rgba(255,203,5,0.14), transparent 70%)",
+                  "radial-gradient(closest-side, rgba(255,203,5,0.13), transparent 70%)",
               }}
             />
             <UserRound
-              className="absolute left-1/2 top-1/2 size-16 -translate-x-1/2 -translate-y-1/2 text-brand-yellow/70"
+              className="absolute left-1/2 top-[38%] size-16 -translate-x-1/2 -translate-y-1/2 text-brand-yellow/60"
               strokeWidth={1.25}
             />
           </div>
         )}
-        {/* Gradient za prijelaz u info */}
-        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-brand-navy/40 to-transparent" />
-      </div>
 
-      {/* Info */}
-      <div className="flex flex-1 flex-col gap-2 p-5 sm:p-6">
-        <span className="text-[0.6rem] font-semibold uppercase tracking-[0.3em] text-brand-blue">
-          {member.role}
-        </span>
-        <h3 className="text-balance text-lg font-black uppercase leading-tight tracking-tight sm:text-xl">
-          {member.name}
-        </h3>
-        {member.bio && (
-          <p className="line-clamp-3 text-sm leading-relaxed text-muted-foreground">
-            {member.bio}
-          </p>
-        )}
-        {(member.email || member.phone) && (
-          <div className="mt-auto flex flex-col gap-1.5 border-t border-line pt-4 text-xs text-muted-foreground">
-            {member.email && (
-              <a
-                href={`mailto:${member.email}`}
-                className="inline-flex items-center gap-2 transition-colors hover:text-brand-blue"
-              >
-                <Mail className="size-3.5 shrink-0 text-brand-blue" />
-                <span className="truncate">{member.email}</span>
-              </a>
-            )}
-            {member.phone && (
-              <a
-                href={`tel:${member.phone}`}
-                className="inline-flex items-center gap-2 transition-colors hover:text-brand-blue"
-              >
-                <Phone className="size-3.5 shrink-0 text-brand-blue" />
-                {member.phone}
-              </a>
-            )}
-          </div>
-        )}
+        {/* Gradient za čitljivost */}
+        <div className="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-brand-navy via-brand-navy/85 to-transparent" />
+
+        {/* Ime + funkcija preko slike */}
+        <div className="absolute inset-x-0 bottom-0 flex flex-col gap-2 p-5">
+          <span className="text-[0.58rem] font-semibold uppercase leading-tight tracking-[0.28em] text-brand-yellow">
+            {member.role}
+          </span>
+          <h3 className="text-balance text-base font-bold uppercase leading-[1.1] tracking-tight text-white sm:text-lg">
+            {member.name}
+          </h3>
+          {(member.email || member.phone) && (
+            <div className="flex items-center gap-2.5 pt-1">
+              {member.email && (
+                <a
+                  href={`mailto:${member.email}`}
+                  title={member.email}
+                  aria-label={`Email — ${member.name}`}
+                  className="flex size-8 items-center justify-center rounded-full bg-white/10 text-white/80 backdrop-blur transition-colors hover:bg-brand-yellow hover:text-brand-navy"
+                >
+                  <Mail className="size-3.5" />
+                </a>
+              )}
+              {member.phone && (
+                <a
+                  href={`tel:${member.phone}`}
+                  title={member.phone}
+                  aria-label={`Telefon — ${member.name}`}
+                  className="flex size-8 items-center justify-center rounded-full bg-white/10 text-white/80 backdrop-blur transition-colors hover:bg-brand-yellow hover:text-brand-navy"
+                >
+                  <Phone className="size-3.5" />
+                </a>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </FadeInView>
   );
