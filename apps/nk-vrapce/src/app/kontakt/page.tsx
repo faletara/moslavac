@@ -106,7 +106,7 @@ export default async function KontaktPage() {
                     href={href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-full border border-border/70 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.2em] transition-colors hover:border-brand-yellow hover:bg-accent"
+                    className="inline-flex items-center gap-2 border border-border/70 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.2em] transition-colors hover:border-brand-yellow hover:bg-accent"
                   >
                     <Icon className="size-4 text-brand-blue" />
                     {label}
@@ -142,7 +142,7 @@ export default async function KontaktPage() {
 
         <FadeInView delay={0.1}>
           {contact?.mapEmbedUrl ? (
-            <div className="h-full min-h-80 overflow-hidden rounded-xl border border-border/70">
+            <div className="h-full min-h-80 overflow-hidden border border-border/70">
               <iframe
                 title="Lokacija NK Vrapče"
                 src={contact.mapEmbedUrl}
@@ -153,7 +153,7 @@ export default async function KontaktPage() {
               />
             </div>
           ) : (
-            <div className="flex h-full min-h-80 items-center justify-center rounded-xl bg-surface-2 text-center text-xs uppercase tracking-[0.3em] text-muted-foreground">
+            <div className="flex h-full min-h-80 items-center justify-center bg-surface-2 text-center text-xs uppercase tracking-[0.3em] text-muted-foreground">
               Karta lokacije uskoro.
             </div>
           )}
@@ -173,7 +173,7 @@ function ContactItem({
 }) {
   return (
     <li className="flex items-start gap-3">
-      <Icon className="mt-0.5 size-4 shrink-0 text-brand-yellow" />
+      <Icon className="mt-0.5 size-4 shrink-0 text-brand-blue" />
       <span className="text-foreground">{children}</span>
     </li>
   );

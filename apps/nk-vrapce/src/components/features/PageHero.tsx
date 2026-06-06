@@ -42,7 +42,7 @@ export function PageHero({ eyebrow, title, description, heroImage, children }: P
       {children}
       {heroImage?.url && (
         <FadeInView delay={0.2} className="w-full">
-          <figure className="relative mt-6 aspect-[16/7] w-full overflow-hidden rounded-lg sm:mt-8">
+          <figure className="relative mt-6 aspect-[16/7] w-full overflow-hidden sm:mt-8">
             <Image
               src={heroImage.sizes?.hero?.url ?? heroImage.url}
               alt={heroImage.alt || title}

@@ -66,7 +66,7 @@ function AlbumCard({ album }: { album: GalleryAlbum }) {
   const href = `/galerija/${album.slug ?? album.id}`;
   return (
     <Link href={href} className="group flex flex-col gap-4">
-      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-surface-2">
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-2">
         {cover ? (
           <Image
             src={cover}
@@ -80,7 +80,7 @@ function AlbumCard({ album }: { album: GalleryAlbum }) {
             <ImageIcon className="size-10" />
           </div>
         )}
-        <span className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-black/80 px-3 py-1 text-[0.6rem] font-bold uppercase tracking-[0.2em] text-white backdrop-blur">
+        <span className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 bg-black/80 px-3 py-1 text-[0.6rem] font-bold uppercase tracking-[0.2em] text-white backdrop-blur">
           <ImageIcon className="size-3" />
           {album.photos.length}
         </span>

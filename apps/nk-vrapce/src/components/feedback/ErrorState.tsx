@@ -28,7 +28,7 @@ export function ErrorState({
         <Button
           onClick={reset}
           variant="outline"
-          className="rounded-full px-7 py-3 text-[0.7rem] font-bold uppercase tracking-[0.35em]"
+          className="px-7 py-3 text-[0.7rem] font-bold uppercase tracking-[0.35em]"
         >
           Pokušaj ponovno
         </Button>

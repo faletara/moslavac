@@ -28,7 +28,7 @@ export function NotFoundState({
       <Button
         asChild
         variant="outline"
-        className="rounded-full px-7 py-3 text-[0.7rem] font-bold uppercase tracking-[0.35em]"
+        className="px-7 py-3 text-[0.7rem] font-bold uppercase tracking-[0.35em]"
       >
         <Link href={backHref}>{backLabel}</Link>
       </Button>

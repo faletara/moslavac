@@ -2,12 +2,10 @@ import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { FadeInView } from "@/components/animations";
-import { BrandGlow } from "@/components/ui/BrandGlow";
 import type { TeamRanking } from "@/types/hns";
 
 interface StandingsTableProps {
   rows: TeamRanking[];
-  competitionName?: string | null;
 }
 
 function goalDiff(row: TeamRanking): number {
@@ -20,31 +18,21 @@ function teamLogo(row: TeamRanking): string | null {
 }
 
 /**
- * Tablica seniorske lige (HNS) u svijetlom editorial stilu.
- * Redak našeg kluba je istaknut. Renderira se samo ako ima redaka.
+ * Tablica seniorske lige (HNS). Redak našeg kluba je istaknut.
+ * Renderira se samo ako ima redaka.
  */
-export function StandingsTable({ rows, competitionName }: StandingsTableProps) {
+export function StandingsTable({ rows }: StandingsTableProps) {
   if (rows.length === 0) return null;
 
   return (
     <section className="relative isolate mx-auto w-full max-w-6xl px-6 sm:px-10">
-      <BrandGlow
-        color="yellow"
-        intensity={0.12}
-        className="-left-[6%] -top-[26%] h-[32vmax] w-[32vmax]"
-      />
 
       {/* Editorial header */}
       <div className="flex flex-wrap items-end justify-between gap-6 border-b border-line pb-6">
         <div className="flex flex-col gap-3">
-          <FadeInView delay={0.05}>
-            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-brand-blue sm:text-xs">
-              {competitionName ?? "Seniori"}
-            </p>
-          </FadeInView>
           <FadeInView delay={0.1}>
-            <h2 className="flex items-center gap-3 font-display text-3xl font-extrabold uppercase leading-[0.95] tracking-tight text-ink sm:text-4xl">
-              <span className="h-7 w-[3px] rounded-full bg-brand-yellow sm:h-9" />
+            <h2 className="flex items-center gap-3 font-display text-4xl font-extrabold uppercase leading-[0.9] tracking-tight text-ink sm:text-5xl">
+              <span className="h-9 w-1 rounded-full bg-brand-yellow sm:h-12" />
               Tablica
             </h2>
           </FadeInView>
@@ -52,7 +40,7 @@ export function StandingsTable({ rows, competitionName }: StandingsTableProps) {
         <FadeInView delay={0.15}>
           <Link
             href="/seniori"
-            className="group hidden items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.3em] text-brand-navy transition-colors hover:text-brand-blue sm:inline-flex"
+            className="group hidden items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.3em] text-muted-foreground transition-colors hover:text-brand-blue sm:inline-flex"
           >
             Momčad
             <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -61,7 +49,7 @@ export function StandingsTable({ rows, competitionName }: StandingsTableProps) {
       </div>
 
       <FadeInView delay={0.1} className="mt-8">
-        <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-[0_30px_80px_-50px_rgba(10,28,51,0.35)]">
+        <div className="overflow-hidden border border-line bg-surface shadow-[0_30px_80px_-50px_rgba(10,28,51,0.35)]">
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-sm">
               <thead>
@@ -189,7 +177,7 @@ export function StandingsTable({ rows, competitionName }: StandingsTableProps) {
       <div className="mt-8 flex justify-center sm:hidden">
         <Link
           href="/seniori"
-          className="group inline-flex items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.3em] text-brand-navy transition-colors hover:text-brand-blue"
+          className="group inline-flex items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.3em] text-muted-foreground transition-colors hover:text-brand-blue"
         >
           Momčad
           <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />

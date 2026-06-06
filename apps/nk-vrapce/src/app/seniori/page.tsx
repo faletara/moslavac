@@ -164,7 +164,7 @@ function PlayerCard({
 
   return (
     <FadeInView className="group">
-      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-xl bg-black ring-1 ring-black/5 transition-all duration-300 group-hover:ring-brand-yellow/50 group-hover:shadow-[0_22px_45px_-20px_rgba(0,0,0,0.55)]">
+      <div className="relative aspect-[3/4] w-full overflow-hidden bg-black ring-1 ring-black/5 transition-all duration-300 group-hover:ring-brand-yellow/50 group-hover:shadow-[0_22px_45px_-20px_rgba(0,0,0,0.55)]">
         {photoUrl ? (
           <Image
             src={photoUrl}
@@ -202,7 +202,7 @@ function PlayerCard({
           </span>
         )}
         {player.captain && (
-          <span className="absolute right-3 top-3 rounded-full bg-brand-blue px-2 py-0.5 text-[0.55rem] font-bold uppercase tracking-[0.2em] text-white">
+          <span className="absolute right-3 top-3 bg-brand-blue px-2 py-0.5 text-[0.55rem] font-bold uppercase tracking-[0.2em] text-white">
             Kapetan
           </span>
         )}

@@ -12,12 +12,14 @@
   --color-brand-navy: #0a1c33;
   --color-brand-navy-700: #102844;
 
-  /* Semantičke neutrale */
+  /* Semantičke neutrale — SVIJETLA tema (PSG ritam: bijelo tijelo, navy tekst,
+     žuta akcent). Tamne sekcije (Hero, Rezultati, Footer) nose vlastiti navy. */
   --color-ink: #0a1c33;
-  --color-muted-ink: #5b6b7e;
-  --color-line: #e6eaef;
-  --color-surface: #ffffff;
-  --color-surface-2: #f5f7fa;
+  --color-muted-ink: #5b6b86;
+  --color-line: #e4e9f1;
+  --color-surface: #f6f8fc;
+  --color-surface-2: #eef2f7;
+  --color-canvas: #ffffff;
 }
 
 /* shadcn/ui semantički tokeni → mapirani na NK Vrapče paletu (samo svijetla tema). */
@@ -69,19 +71,19 @@
   --primary: #ffcb05;
   --primary-foreground: #0a1c33;
 
-  --secondary: #f5f7fa;
+  --secondary: #eef2f7;
   --secondary-foreground: #0a1c33;
-  --muted: #f5f7fa;
-  --muted-foreground: #5b6b7e;
+  --muted: #eef2f7;
+  --muted-foreground: #5b6b86;
 
-  /* Akcent = blagi plavi ton (sky blue s dresa) */
-  --accent: #eaf6fc;
+  /* Akcent = suptilna svijetla podloga */
+  --accent: #eef2f7;
   --accent-foreground: #0a1c33;
 
   --destructive: #e5484d;
 
-  --border: #e6eaef;
-  --input: #e6eaef;
+  --border: #e4e9f1;
+  --input: #e4e9f1;
   /* Fokus prsten = brand plava */
   --ring: #1ba0e0;
 
@@ -102,7 +104,7 @@
   body {
     font-family: var(--font-sans), system-ui, sans-serif;
     color: var(--color-ink);
-    background-color: var(--color-surface);
+    background-color: var(--color-canvas);
     line-height: 1.6;
     overflow-x: clip;
     -webkit-font-smoothing: antialiased;

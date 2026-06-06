@@ -126,7 +126,7 @@ function ProductCard({ item }: { item: Equipment }) {
       aria-label={`Kupi ${item.displayName}`}
       className="group flex flex-col gap-5"
     >
-      <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-white">
+      <div className="relative aspect-square w-full overflow-hidden bg-white">
         {item.imagePath ? (
           <Image
             src={item.imagePath}

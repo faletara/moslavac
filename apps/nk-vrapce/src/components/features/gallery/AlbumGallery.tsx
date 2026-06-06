@@ -52,7 +52,7 @@ export function AlbumGallery({ photos }: { photos: AlbumPhoto[] }) {
             key={photo.url}
             type="button"
             onClick={() => setOpenIndex(index)}
-            className="group relative aspect-square overflow-hidden rounded-xl bg-surface-2"
+            className="group relative aspect-square overflow-hidden bg-surface-2"
             aria-label={`Otvori fotografiju ${index + 1}`}
           >
             <Image
@@ -76,7 +76,7 @@ export function AlbumGallery({ photos }: { photos: AlbumPhoto[] }) {
           </DialogTitle>
           {active && (
             <figure className="flex flex-col items-center gap-4">
-              <div className="relative aspect-[3/2] w-full overflow-hidden rounded-xl bg-black">
+              <div className="relative aspect-[3/2] w-full overflow-hidden bg-black">
                 <Image
                   src={active.url}
                   alt={active.alt}

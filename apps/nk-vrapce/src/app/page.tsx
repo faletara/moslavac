@@ -2,17 +2,22 @@ import { ArrowRight, ArrowUpRight } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import type { ReactNode } from "react";
 import {
 	AnimatedLine,
 	FadeInView,
 	StaggerContainer,
 	StaggerItem,
 } from "@/components/animations";
+import { CardSlider } from "@/components/features/CardSlider";
 import Hero from "@/components/features/home/Hero";
+import { ResultsStrip } from "@/components/features/home/ResultsStrip";
 import { StandingsTable } from "@/components/features/home/StandingsTable";
-import { BrandGlow } from "@/components/ui/BrandGlow";
 import { formatDateShort } from "@/lib/helpers/date";
+import { getRecentForm } from "@/lib/helpers/form";
+import { getHnsTeamId } from "@/lib/hns/client";
 import { fetchSeniorCompetition } from "@/lib/hns/competitions";
+import { fetchAllMatches } from "@/lib/hns/matches";
 import { fetchTeamStandings } from "@/lib/hns/standings";
 import { adaptPayloadEquipment } from "@/lib/payload/equipment-adapter";
 import { fetchFeaturedEquipment } from "@/lib/payload/getEquipment";
@@ -39,18 +44,33 @@ const priceFormatter = new Intl.NumberFormat("hr-HR", {
 });
 
 export default async function HomePage() {
-	const [tenant, news, featuredDocs, albums, standings] = await Promise.all([
-		getTenant(),
-		fetchLatestNews(),
-		fetchFeaturedEquipment(),
-		fetchAlbums(),
-		(async () => {
-			const competition = await fetchSeniorCompetition();
-			if (!competition?.id) return null;
-			const rows = await fetchTeamStandings({ competitionId: competition.id });
-			return { competition, rows };
-		})(),
-	]);
+	const [tenant, news, featuredDocs, albums, standings, matchData] =
+		await Promise.all([
+			getTenant(),
+			fetchLatestNews(),
+			fetchFeaturedEquipment(),
+			fetchAlbums(),
+			(async () => {
+				const competition = await fetchSeniorCompetition();
+				if (!competition?.id) return null;
+				const rows = await fetchTeamStandings({
+					competitionId: competition.id,
+				});
+				return { competition, rows };
+			})(),
+			(async () => {
+				try {
+					const [all, teamIdStr] = await Promise.all([
+						fetchAllMatches(),
+						getHnsTeamId(),
+					]);
+					const results = getRecentForm(all, Number(teamIdStr), 3);
+					return { results };
+				} catch {
+					return { results: [] };
+				}
+			})(),
+		]);
 
 	const featured = featuredDocs.map((d) =>
 		adaptPayloadEquipment(d, tenantSlug),
@@ -65,18 +85,21 @@ export default async function HomePage() {
 		<>
 			<Hero tenant={tenant} />
 
-			<div className="space-y-28 py-24 sm:space-y-36 sm:py-32">
-				{news.length > 0 && (
+			<ResultsStrip results={matchData.results} />
+
+			{news.length > 0 && (
+				<Band>
 					<LatestNews news={news} logoFallback={logoFallback} />
-				)}
+				</Band>
+			)}
 
-				{standings && standings.rows.length > 0 && (
-					<StandingsTable
-						rows={standings.rows}
-						competitionName={standings.competition.name}
-					/>
-				)}
+			{standings && standings.rows.length > 0 && (
+				<Band>
+					<StandingsTable rows={standings.rows} />
+				</Band>
+			)}
 
+			<Band>
 				<TeaserBand
 					eyebrow="Generacije koje dolaze"
 					title="Škola nogometa"
@@ -85,8 +108,10 @@ export default async function HomePage() {
 					cta="Upiši dijete"
 					image="/skola-nogometa.jpg"
 				/>
+			</Band>
 
-				{featured.length > 0 && (
+			{featured.length > 0 && (
+				<Band>
 					<FeaturedShop
 						items={featured.map((item) => ({
 							id: item.id,
@@ -98,9 +123,11 @@ export default async function HomePage() {
 						}))}
 						webshopHref="/oprema"
 					/>
-				)}
+				</Band>
+			)}
 
-				{galleryPreview.length > 0 && (
+			{galleryPreview.length > 0 && (
+				<Band>
 					<GalleryTeaser
 						albums={galleryPreview.map((a) => ({
 							id: a.id,
@@ -113,30 +140,41 @@ export default async function HomePage() {
 								"",
 						}))}
 					/>
-				)}
+				</Band>
+			)}
 
+			<div className="py-20 sm:py-28">
 				<LunaticsBand />
 			</div>
 		</>
 	);
 }
 
-function SectionHeading({
-	eyebrow,
-	title,
+/**
+ * Puna-širina traka za ritam homepagea: `plain` = bijela (sa suptilnim grb
+ * motivom), `yellow` = žuti brand-beat. Crno (Hero/Lunatics) je izvan Band-a.
+ */
+function Band({
+	tone = "plain",
+	children,
 }: {
-	eyebrow: string;
-	title: string;
+	tone?: "plain" | "yellow";
+	children: ReactNode;
 }) {
 	return (
+		<div
+			className={`py-20 sm:py-28 ${tone === "yellow" ? "bg-brand-yellow" : ""}`}
+		>
+			{children}
+		</div>
+	);
+}
+
+function SectionHeading({ title }: { title: string }) {
+	return (
 		<div className="flex flex-col items-center gap-4 text-center">
-			<FadeInView delay={0.05}>
-				<p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-brand-blue sm:text-xs">
-					{eyebrow}
-				</p>
-			</FadeInView>
 			<FadeInView delay={0.1}>
-				<h2 className="font-display text-3xl font-extrabold uppercase leading-[0.95] tracking-tight text-ink sm:text-4xl md:text-5xl">
+				<h2 className="font-display text-4xl font-extrabold uppercase leading-[0.9] tracking-tight text-ink sm:text-5xl md:text-6xl">
 					{title}
 				</h2>
 			</FadeInView>
@@ -167,22 +205,12 @@ function LatestNews({
 
 	return (
 		<section className="relative isolate mx-auto w-full max-w-6xl px-6 sm:px-10">
-			<BrandGlow
-				color="yellow"
-				intensity={0.12}
-				className="-right-[8%] -top-[30%] h-[32vmax] w-[32vmax]"
-			/>
 			{/* Editorial header: naslov lijevo, link u istom redu desno */}
 			<div className="flex flex-wrap items-end justify-between gap-6 border-b border-line pb-6">
 				<div className="flex flex-col gap-3">
-					<FadeInView delay={0.05}>
-						<p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-brand-blue sm:text-xs">
-							Aktualno
-						</p>
-					</FadeInView>
 					<FadeInView delay={0.1}>
-						<h2 className="flex items-center gap-3 font-display text-3xl font-extrabold uppercase leading-[0.95] tracking-tight text-ink sm:text-4xl">
-							<span className="h-7 w-[3px] rounded-full bg-brand-yellow sm:h-9" />
+						<h2 className="flex items-center gap-3 font-display text-4xl font-extrabold uppercase leading-[0.9] tracking-tight text-ink sm:text-5xl">
+							<span className="h-9 w-1 rounded-full bg-brand-yellow sm:h-12" />
 							Vijesti
 						</h2>
 					</FadeInView>
@@ -190,7 +218,7 @@ function LatestNews({
 				<FadeInView delay={0.15}>
 					<Link
 						href="/novosti"
-						className="group hidden items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.3em] text-brand-navy transition-colors hover:text-brand-blue sm:inline-flex"
+						className="group hidden items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.3em] text-muted-foreground transition-colors hover:text-brand-blue sm:inline-flex"
 					>
 						Sve vijesti
 						<ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -206,7 +234,7 @@ function LatestNews({
 				<StaggerItem>
 					<Link
 						href={`/novosti/${lead.slug ?? lead.id}`}
-						className="group relative block aspect-[4/3] w-full overflow-hidden rounded-2xl bg-brand-navy sm:aspect-[16/8] lg:aspect-[16/7]"
+						className="group relative block aspect-[4/3] w-full overflow-hidden bg-brand-navy sm:aspect-[16/8] lg:aspect-[16/7]"
 					>
 						<Image
 							src={newsThumb(lead) || logoFallback}
@@ -223,11 +251,10 @@ function LatestNews({
 						{/* Crni gradient — isti sustav kao Hero scrim (žuta/bijela bolje iskaču) */}
 						<div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-transparent" />
 						{/* Žuti "Novo" badge — brand-pop na najnovijoj priči */}
-						<span className="absolute left-6 top-6 inline-flex items-center rounded-full bg-brand-yellow px-3 py-1 text-[0.6rem] font-bold uppercase tracking-[0.2em] text-brand-navy shadow-[0_8px_24px_-10px_rgba(255,203,5,0.9)]">
+						<span className="absolute left-6 top-6 inline-flex items-center bg-brand-yellow px-3 py-1 text-[0.6rem] font-bold uppercase tracking-[0.2em] text-brand-navy shadow-[0_8px_24px_-10px_rgba(255,203,5,0.9)]">
 							Novo
 						</span>
 						<div className="absolute inset-x-0 bottom-0 flex max-w-3xl flex-col gap-3 p-6 sm:p-8 lg:p-10">
-							<span className="h-[3px] w-10 rounded-full bg-brand-yellow" />
 							<p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-white/70">
 								{formatDateShort(lead.publishedAt ?? lead.createdAt)}
 							</p>
@@ -245,38 +272,37 @@ function LatestNews({
 
 				{/* Sporedne priče — 3 male kartice: slika gore, tekst dolje */}
 				{hasList && (
-					<div className="grid gap-6 sm:grid-cols-3 lg:gap-8">
+					<CardSlider itemClassName="basis-[80%] sm:basis-1/3">
 						{secondary.map((doc) => (
-							<StaggerItem key={doc.id}>
-								<Link
-									href={`/novosti/${doc.slug ?? doc.id}`}
-									className="group flex h-full flex-col gap-4"
-								>
-									<div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-surface-2">
-										<Image
-											src={newsThumb(doc) || logoFallback}
-											alt={doc.title}
-											fill
-											sizes="(min-width: 640px) 33vw, 100vw"
-											className={`transition-transform duration-500 group-hover:scale-105 ${
-												newsThumb(doc)
-													? "object-cover"
-													: "object-contain p-6 opacity-40"
-											}`}
-										/>
-									</div>
-									<div className="flex flex-col gap-2.5">
-										<p className="text-[0.6rem] font-medium uppercase tracking-[0.25em] text-muted-foreground">
-											{formatDateShort(doc.publishedAt ?? doc.createdAt)}
-										</p>
-										<h3 className="line-clamp-2 text-balance text-base font-bold leading-snug tracking-tight transition-colors group-hover:text-brand-blue">
-											{doc.title}
-										</h3>
-									</div>
-								</Link>
-							</StaggerItem>
+							<Link
+								key={doc.id}
+								href={`/novosti/${doc.slug ?? doc.id}`}
+								className="group flex h-full flex-col gap-4"
+							>
+								<div className="relative aspect-[16/10] w-full overflow-hidden bg-surface-2">
+									<Image
+										src={newsThumb(doc) || logoFallback}
+										alt={doc.title}
+										fill
+										sizes="(min-width: 640px) 33vw, 100vw"
+										className={`transition-transform duration-500 group-hover:scale-105 ${
+											newsThumb(doc)
+												? "object-cover"
+												: "object-contain p-6 opacity-40"
+										}`}
+									/>
+								</div>
+								<div className="flex flex-col gap-2.5">
+									<p className="text-[0.6rem] font-medium uppercase tracking-[0.25em] text-muted-foreground">
+										{formatDateShort(doc.publishedAt ?? doc.createdAt)}
+									</p>
+									<h3 className="line-clamp-2 text-balance text-base font-bold leading-snug tracking-tight transition-colors group-hover:text-brand-blue">
+										{doc.title}
+									</h3>
+								</div>
+							</Link>
 						))}
-					</div>
+					</CardSlider>
 				)}
 			</StaggerContainer>
 
@@ -284,7 +310,7 @@ function LatestNews({
 			<div className="mt-10 flex justify-center sm:hidden">
 				<Link
 					href="/novosti"
-					className="group inline-flex items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.3em] text-brand-navy transition-colors hover:text-brand-blue"
+					className="group inline-flex items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.3em] text-muted-foreground transition-colors hover:text-brand-blue"
 				>
 					Sve vijesti
 					<ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -310,16 +336,11 @@ function TeaserBand({
 	image: string;
 }) {
 	return (
-		<section className="relative isolate mx-auto w-full max-w-6xl px-6 sm:px-10">
-			<BrandGlow
-				color="yellow"
-				intensity={0.13}
-				className="-left-[6%] top-[10%] h-[34vmax] w-[34vmax]"
-			/>
+		<section className="mx-auto w-full max-w-6xl px-6 sm:px-10">
 			<div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
-				{/* Čista uokvirena fotografija — suptilan donji gradient sakriva watermark */}
+				{/* Fotografija — okvir + suptilni žuti accent uz rub */}
 				<FadeInView direction="right">
-					<div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-surface-2 shadow-[0_30px_80px_-45px_rgba(10,28,51,0.45)] ring-1 ring-line">
+					<div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-2 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.7)] ring-1 ring-line">
 						<Image
 							src={image}
 							alt=""
@@ -349,7 +370,7 @@ function TeaserBand({
 						</p>
 						<Link
 							href={href}
-							className="group mt-2 inline-flex items-center gap-2.5 rounded-full bg-brand-yellow px-8 py-4 text-xs font-bold uppercase tracking-[0.2em] text-brand-navy shadow-[0_14px_36px_-12px_rgba(255,203,5,0.9)] transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_44px_-12px_rgba(255,203,5,1)]"
+							className="group mt-2 inline-flex items-center gap-2.5 bg-brand-yellow px-8 py-4 text-xs font-bold uppercase tracking-[0.2em] text-brand-navy shadow-[0_14px_36px_-12px_rgba(255,203,5,0.5)] transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_44px_-14px_rgba(255,203,5,0.65)]"
 						>
 							{cta}
 							<ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -376,26 +397,16 @@ function FeaturedShop({
 	webshopHref: string;
 }) {
 	const visible = items.slice(0, 4);
-	const cols = visible.length >= 4 ? "lg:grid-cols-4" : "lg:grid-cols-3";
+	const itemBasis = visible.length >= 4 ? "lg:basis-1/4" : "lg:basis-1/3";
 
 	return (
 		<section className="relative isolate mx-auto w-full max-w-6xl px-6 sm:px-10">
-			<BrandGlow
-				color="yellow"
-				intensity={0.12}
-				className="-right-[6%] -top-[28%] h-[32vmax] w-[32vmax]"
-			/>
 			{/* Editorial header */}
 			<div className="flex flex-wrap items-end justify-between gap-6 border-b border-line pb-6">
 				<div className="flex flex-col gap-3">
-					<FadeInView delay={0.05}>
-						<p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-brand-blue sm:text-xs">
-							Službena oprema
-						</p>
-					</FadeInView>
 					<FadeInView delay={0.1}>
-						<h2 className="flex items-center gap-3 font-display text-3xl font-extrabold uppercase leading-[0.95] tracking-tight text-ink sm:text-4xl">
-							<span className="h-7 w-[3px] rounded-full bg-brand-yellow sm:h-9" />
+						<h2 className="flex items-center gap-3 font-display text-4xl font-extrabold uppercase leading-[0.9] tracking-tight text-ink sm:text-5xl">
+							<span className="h-9 w-1 rounded-full bg-brand-yellow sm:h-12" />
 							Webshop
 						</h2>
 					</FadeInView>
@@ -403,7 +414,7 @@ function FeaturedShop({
 				<FadeInView delay={0.15}>
 					<Link
 						href={webshopHref}
-						className="group hidden items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.3em] text-brand-navy transition-colors hover:text-brand-blue sm:inline-flex"
+						className="group hidden items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.3em] text-muted-foreground transition-colors hover:text-brand-blue sm:inline-flex"
 					>
 						Cijela ponuda
 						<ArrowUpRight className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
@@ -411,61 +422,57 @@ function FeaturedShop({
 				</FadeInView>
 			</div>
 
-			<StaggerContainer
-				className={`mt-12 grid grid-cols-2 gap-5 sm:grid-cols-2 lg:gap-6 ${cols}`}
-				staggerChildren={0.06}
-			>
+			<CardSlider itemClassName={`basis-[60%] sm:basis-1/2 ${itemBasis}`}>
 				{visible.map((item) => (
-					<StaggerItem key={item.id}>
-						<a
-							href={item.externalUrl}
-							target="_blank"
-							rel="noopener noreferrer"
-							className="group flex h-full flex-col gap-4"
-						>
-							<div className="relative aspect-square w-full overflow-hidden rounded-xl bg-surface-2">
-								{item.imagePath ? (
+					<a
+						key={item.id}
+						href={item.externalUrl}
+						target="_blank"
+						rel="noopener noreferrer"
+						className="group flex h-full flex-col gap-4"
+					>
+						<div className="relative aspect-square w-full overflow-hidden bg-surface ring-1 ring-line">
+							{item.imagePath ? (
+								<Image
+									src={item.imagePath}
+									alt={item.imageAlt}
+									fill
+									sizes="(min-width: 1024px) 22vw, 45vw"
+									className="object-cover transition-transform duration-500 group-hover:scale-105"
+								/>
+							) : (
+								// Branded fallback dok proizvod nema sliku
+								<div className="absolute inset-0 flex items-center justify-center">
 									<Image
-										src={item.imagePath}
-										alt={item.imageAlt}
-										fill
-										sizes="(min-width: 1024px) 22vw, 45vw"
-										className="object-cover transition-transform duration-500 group-hover:scale-105"
+										src="/grb-vrapce.png"
+										alt=""
+										width={120}
+										height={120}
+										className="h-2/5 w-2/5 object-contain opacity-10"
 									/>
-								) : (
-									// Branded fallback dok proizvod nema sliku
-									<div className="absolute inset-0 flex items-center justify-center">
-										<Image
-											src="/grb-vrapce.png"
-											alt=""
-											width={120}
-											height={120}
-											className="h-2/5 w-2/5 object-contain opacity-10"
-										/>
-									</div>
-								)}
-							</div>
-							<div className="flex items-end justify-between gap-3">
-								<div className="flex flex-col gap-1.5">
-									<span className="line-clamp-1 text-base font-bold leading-snug tracking-tight transition-colors group-hover:text-brand-blue">
-										{item.displayName}
-									</span>
-									<span className="font-bold tabular-nums tracking-tight text-brand-navy">
-										{item.price}
-									</span>
 								</div>
-								<ArrowUpRight className="size-4 shrink-0 text-muted-foreground transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-brand-blue" />
+							)}
+						</div>
+						<div className="flex items-end justify-between gap-3">
+							<div className="flex flex-col gap-1.5">
+								<span className="line-clamp-1 text-base font-bold leading-snug tracking-tight transition-colors group-hover:text-brand-blue">
+									{item.displayName}
+								</span>
+								<span className="font-bold tabular-nums tracking-tight text-brand-navy">
+									{item.price}
+								</span>
 							</div>
-						</a>
-					</StaggerItem>
+							<ArrowUpRight className="size-4 shrink-0 text-muted-foreground transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-brand-blue" />
+						</div>
+					</a>
 				))}
-			</StaggerContainer>
+			</CardSlider>
 
 			{/* Mobilni "Cijela ponuda" */}
 			<div className="mt-10 flex justify-center sm:hidden">
 				<Link
 					href={webshopHref}
-					className="group inline-flex items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.3em] text-brand-navy transition-colors hover:text-brand-blue"
+					className="group inline-flex items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.3em] text-muted-foreground transition-colors hover:text-brand-blue"
 				>
 					Cijela ponuda
 					<ArrowUpRight className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
@@ -482,12 +489,7 @@ function GalleryTeaser({
 }) {
 	return (
 		<section className="relative isolate mx-auto w-full max-w-6xl px-6 sm:px-10">
-			<BrandGlow
-				color="yellow"
-				intensity={0.11}
-				className="left-1/2 -top-[18%] h-[36vmax] w-[36vmax] -translate-x-1/2"
-			/>
-			<SectionHeading eyebrow="Trenuci kluba" title="Galerija" />
+			<SectionHeading title="Galerija" />
 			<StaggerContainer
 				className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-3 lg:gap-8"
 				staggerChildren={0.06}
@@ -495,7 +497,7 @@ function GalleryTeaser({
 				{albums.map((album) => (
 					<StaggerItem key={album.id}>
 						<Link href={album.href} className="group flex flex-col gap-3">
-							<div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-surface-2">
+							<div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-2">
 								{album.cover && (
 									<Image
 										src={album.cover}
@@ -523,7 +525,7 @@ function LunaticsBand() {
 			<FadeInView>
 				<Link
 					href="/navijaci"
-					className="group relative isolate block overflow-hidden rounded-3xl bg-black shadow-[0_40px_100px_-50px_rgba(0,0,0,0.7)] ring-1 ring-white/10"
+					className="group relative isolate block overflow-hidden bg-brand-navy shadow-[0_40px_100px_-50px_rgba(0,0,0,0.7)] ring-1 ring-white/10"
 				>
 					{/* Baklje / ultras atmosfera — dramatična pozadina */}
 					<div
@@ -541,7 +543,7 @@ function LunaticsBand() {
 					{/* Crni scrim drži tekst lijevo čitljivim, a desno pušta da žar baklji zasvijetli */}
 					<div
 						aria-hidden
-						className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-r from-black via-black/75 to-black/10"
+						className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-r from-brand-navy via-brand-navy/80 to-brand-navy/20"
 					/>
 					{/* Suptilno tamnjenje rubova za fokus i premium dubinu */}
 					<div
@@ -556,11 +558,11 @@ function LunaticsBand() {
 						<h2 className="text-balance font-display text-4xl font-extrabold uppercase leading-[0.92] tracking-tight text-brand-yellow drop-shadow-[0_4px_20px_rgba(0,0,0,0.6)] sm:text-5xl md:text-6xl lg:text-7xl">
 							Lunatics Vrapče
 						</h2>
-						<p className="max-w-md text-balance text-sm leading-relaxed text-white/80 sm:text-base">
-							Naša boja, naš ponos. Upoznaj navijačku skupinu koja diže
-							tribine na svakoj utakmici.
+						<p className="max-w-md text-balance text-sm leading-relaxed text-white/90 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] sm:text-base">
+							Naša boja, naš ponos. Upoznaj navijačku skupinu koja diže tribine
+							na svakoj utakmici.
 						</p>
-						<span className="mt-3 inline-flex items-center gap-2.5 rounded-full bg-brand-yellow px-8 py-4 text-xs font-bold uppercase tracking-[0.2em] text-brand-navy shadow-[0_14px_36px_-12px_rgba(255,203,5,0.9)] transition-all group-hover:-translate-y-0.5 group-hover:shadow-[0_18px_44px_-12px_rgba(255,203,5,1)]">
+						<span className="mt-3 inline-flex items-center gap-2.5 bg-brand-yellow px-8 py-4 text-xs font-bold uppercase tracking-[0.2em] text-brand-navy shadow-[0_14px_36px_-12px_rgba(255,203,5,0.9)] transition-all group-hover:-translate-y-0.5 group-hover:shadow-[0_18px_44px_-12px_rgba(255,203,5,1)]">
 							Upoznaj navijače
 							<ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
 						</span>

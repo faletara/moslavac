@@ -92,7 +92,7 @@ function MemberCard({ member }: { member: BoardMember }) {
   const photoUrl = member.photo?.sizes?.card?.url ?? member.photo?.url ?? null;
   return (
     <FadeInView className="group">
-      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-xl bg-brand-navy ring-1 ring-black/5 transition-all duration-300 group-hover:ring-brand-yellow/50 group-hover:shadow-[0_22px_45px_-20px_rgba(10,28,51,0.5)]">
+      <div className="relative aspect-[3/4] w-full overflow-hidden bg-brand-navy ring-1 ring-black/5 transition-all duration-300 group-hover:ring-brand-yellow/50 group-hover:shadow-[0_22px_45px_-20px_rgba(10,28,51,0.5)]">
         {photoUrl ? (
           <Image
             src={photoUrl}

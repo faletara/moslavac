@@ -94,7 +94,7 @@ export default async function NavijaciPage() {
           >
             {galleryItems.map((art) => (
               <StaggerItem key={art.src}>
-                <FadeInView className="group relative aspect-square overflow-hidden rounded-xl bg-black/40 ring-1 ring-white/10 transition-shadow hover:ring-brand-yellow/40">
+                <FadeInView className="group relative aspect-square overflow-hidden bg-black/40 ring-1 ring-white/10 transition-shadow hover:ring-brand-yellow/40">
                   <Image
                     src={art.src}
                     alt={art.alt}

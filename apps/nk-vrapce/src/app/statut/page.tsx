@@ -114,9 +114,9 @@ function DocumentRow({ doc }: { doc: ClubDocument }) {
         href={doc.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="group flex items-center gap-4 rounded-lg border border-border/70 bg-surface px-5 py-4 transition-colors hover:border-brand-yellow hover:bg-accent"
+        className="group flex items-center gap-4 border border-border/70 bg-surface px-5 py-4 transition-colors hover:border-brand-yellow hover:bg-accent"
       >
-        <span className="flex size-11 shrink-0 items-center justify-center rounded-md bg-brand-navy text-brand-yellow">
+        <span className="flex size-11 shrink-0 items-center justify-center bg-brand-navy text-brand-yellow">
           <FileText className="size-5" />
         </span>
         <span className="flex-1 text-sm font-semibold uppercase tracking-tight">

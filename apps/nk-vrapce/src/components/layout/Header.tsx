@@ -1,10 +1,16 @@
 "use client";
 
-import { Menu } from "lucide-react";
+import { ChevronDown, Menu } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import {
   Sheet,
   SheetContent,
@@ -13,18 +19,35 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-const NAV_ITEMS = [
+type NavLeaf = { href: string; label: string };
+type NavEntry = NavLeaf | { label: string; children: NavLeaf[] };
+
+const NAV: NavEntry[] = [
   { href: "/novosti", label: "Vijesti" },
-  { href: "/seniori", label: "Seniori" },
-  { href: "/skola-nogometa", label: "Škola" },
-  { href: "/povijest", label: "Povijest" },
-  { href: "/uprava", label: "Uprava" },
-  { href: "/statut", label: "Statut" },
+  {
+    label: "Klub",
+    children: [
+      { href: "/povijest", label: "Povijest" },
+      { href: "/uprava", label: "Uprava" },
+      { href: "/statut", label: "Statut" },
+      { href: "/navijaci", label: "Lunatics" },
+    ],
+  },
+  {
+    label: "Momčad",
+    children: [
+      { href: "/seniori", label: "Seniori" },
+      { href: "/skola-nogometa", label: "Škola nogometa" },
+    ],
+  },
   { href: "/galerija", label: "Galerija" },
-  { href: "/navijaci", label: "Lunatics" },
   { href: "/kontakt", label: "Kontakt" },
   { href: "/oprema", label: "Webshop" },
 ];
+
+function isLeaf(entry: NavEntry): entry is NavLeaf {
+  return "href" in entry;
+}
 
 export default function Header({ clubName }: { clubName: string }) {
   const pathname = usePathname();
@@ -73,8 +96,10 @@ export default function Header({ clubName }: { clubName: string }) {
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
+  const isGroupActive = (children: NavLeaf[]) =>
+    children.some((c) => isActive(c.href));
 
-  // Proziran samo na vrhu homepagea (preko crnog Heroa) → čista podloga niže
+  // Proziran samo na vrhu homepagea (preko tamnog Heroa) → solid bijeli niže
   const onHome = pathname === "/";
   const transparent = onHome && atTop;
 
@@ -88,7 +113,7 @@ export default function Header({ clubName }: { clubName: string }) {
         className={`h-full border-b transition-colors duration-300 ${
           transparent
             ? "border-transparent bg-transparent"
-            : "border-line bg-surface/95 shadow-[0_4px_24px_-8px_rgba(10,28,51,0.18)] backdrop-blur-md"
+            : "border-line bg-white/95 shadow-[0_4px_24px_-8px_rgba(10,28,51,0.12)] backdrop-blur-md"
         }`}
       >
         <div className="mx-auto flex h-full max-w-6xl items-center justify-between gap-6 px-6 sm:px-10">
@@ -116,27 +141,69 @@ export default function Header({ clubName }: { clubName: string }) {
           </Link>
 
           {/* desktop nav */}
-          <nav className="hidden items-center gap-x-5 xl:flex">
-            {NAV_ITEMS.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`relative text-[0.78rem] font-semibold uppercase tracking-wide transition-colors ${
-                  transparent
-                    ? isActive(item.href)
-                      ? "text-white"
-                      : "text-white/75 hover:text-brand-yellow"
-                    : isActive(item.href)
-                      ? "text-brand-navy"
-                      : "text-muted-foreground hover:text-brand-blue"
-                }`}
-              >
-                {item.label}
-                {isActive(item.href) ? (
-                  <span className="absolute -bottom-1.5 left-0 h-0.5 w-full rounded bg-brand-yellow" />
-                ) : null}
-              </Link>
-            ))}
+          <nav className="hidden items-center gap-x-6 lg:flex">
+            {NAV.map((entry) => {
+              const active = isLeaf(entry)
+                ? isActive(entry.href)
+                : isGroupActive(entry.children);
+              const base =
+                "relative text-[0.78rem] font-semibold uppercase tracking-wide transition-colors";
+              const tone = active
+                ? transparent
+                  ? "text-white"
+                  : "text-brand-navy"
+                : transparent
+                  ? "text-white/70 hover:text-brand-yellow"
+                  : "text-brand-navy/60 hover:text-brand-blue";
+              const underline = active ? (
+                <span className="absolute -bottom-1.5 left-0 h-0.5 w-full bg-brand-yellow" />
+              ) : null;
+
+              if (isLeaf(entry)) {
+                return (
+                  <Link
+                    key={entry.href}
+                    href={entry.href}
+                    className={`${base} ${tone}`}
+                  >
+                    {entry.label}
+                    {underline}
+                  </Link>
+                );
+              }
+
+              return (
+                <div key={entry.label} className="group relative">
+                  <button
+                    type="button"
+                    className={`${base} ${tone} inline-flex items-center gap-1`}
+                    aria-haspopup="menu"
+                  >
+                    {entry.label}
+                    <ChevronDown className="size-3.5 transition-transform duration-200 group-hover:rotate-180" />
+                    {underline}
+                  </button>
+                  {/* pt-3 = hover-most do panela da se ne zatvori između */}
+                  <div className="invisible absolute left-1/2 top-full z-50 -translate-x-1/2 pt-3 opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+                    <div className="flex min-w-[13rem] flex-col border border-line bg-white p-2 shadow-[0_24px_60px_-24px_rgba(10,28,51,0.3)]">
+                      {entry.children.map((child) => (
+                        <Link
+                          key={child.href}
+                          href={child.href}
+                          className={`px-3 py-2.5 text-[0.78rem] font-semibold uppercase tracking-wide transition-colors hover:bg-surface ${
+                            isActive(child.href)
+                              ? "text-brand-blue"
+                              : "text-brand-navy/70 hover:text-brand-navy"
+                          }`}
+                        >
+                          {child.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </nav>
 
           {/* mobile drawer */}
@@ -144,10 +211,10 @@ export default function Header({ clubName }: { clubName: string }) {
             <SheetTrigger asChild>
               <button
                 type="button"
-                className={`inline-flex h-10 w-10 items-center justify-center rounded-lg transition-colors xl:hidden ${
+                className={`inline-flex h-10 w-10 items-center justify-center transition-colors lg:hidden ${
                   transparent
                     ? "text-white hover:bg-white/10"
-                    : "text-brand-navy hover:bg-surface-2"
+                    : "text-brand-navy hover:bg-brand-navy/5"
                 }`}
                 aria-label="Otvori izbornik"
               >
@@ -170,20 +237,57 @@ export default function Header({ clubName }: { clubName: string }) {
                 </SheetTitle>
               </SheetHeader>
               <nav className="flex flex-col px-5 py-2">
-                {NAV_ITEMS.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setOpen(false)}
-                    className={`border-b border-line/70 py-3.5 text-base font-semibold uppercase tracking-tight transition-colors last:border-0 ${
-                      isActive(item.href)
-                        ? "text-brand-blue"
-                        : "text-brand-navy hover:text-brand-blue"
-                    }`}
-                  >
-                    {item.label}
-                  </Link>
-                ))}
+                {NAV.map((entry) => {
+                  if (isLeaf(entry)) {
+                    return (
+                      <Link
+                        key={entry.href}
+                        href={entry.href}
+                        onClick={() => setOpen(false)}
+                        className={`flex items-center border-b border-line/70 py-3.5 text-sm font-semibold uppercase leading-none tracking-tight transition-colors ${
+                          isActive(entry.href)
+                            ? "text-brand-blue"
+                            : "text-brand-navy hover:text-brand-blue"
+                        }`}
+                      >
+                        {entry.label}
+                      </Link>
+                    );
+                  }
+
+                  return (
+                    <Accordion key={entry.label} type="single" collapsible>
+                      <AccordionItem
+                        value={entry.label}
+                        className="border-b border-line/70 last:border-b"
+                      >
+                        <AccordionTrigger className="items-center py-3.5 text-brand-navy hover:text-brand-blue hover:no-underline">
+                          <span className="font-sans text-sm font-semibold uppercase tracking-tight leading-none">
+                            {entry.label}
+                          </span>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <div className="flex flex-col pb-1 pl-3">
+                            {entry.children.map((child) => (
+                              <Link
+                                key={child.href}
+                                href={child.href}
+                                onClick={() => setOpen(false)}
+                                className={`py-2 text-xs font-medium uppercase tracking-tight transition-colors ${
+                                  isActive(child.href)
+                                    ? "text-brand-blue"
+                                    : "text-brand-navy/60 hover:text-brand-blue"
+                                }`}
+                              >
+                                {child.label}
+                              </Link>
+                            ))}
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
+                  );
+                })}
               </nav>
             </SheetContent>
           </Sheet>

@@ -120,7 +120,7 @@ function ProgramCard({
   const idx = String(index + 1).padStart(2, "0");
 
   return (
-    <FadeInView className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-brand-navy to-brand-navy-700 shadow-[0_12px_30px_-18px_rgba(10,28,51,0.5)] transition-all duration-300 group-hover:border-brand-yellow/70 group-hover:shadow-[0_28px_55px_-22px_rgba(255,203,5,0.32)]">
+    <FadeInView className="relative flex h-full flex-col overflow-hidden border border-white/10 bg-gradient-to-br from-brand-navy to-brand-navy-700 shadow-[0_12px_30px_-18px_rgba(10,28,51,0.5)] transition-all duration-300 group-hover:border-brand-yellow/70 group-hover:shadow-[0_28px_55px_-22px_rgba(255,203,5,0.32)]">
       {/* Suptilna fotka u pozadini (ako postoji) */}
       {photoUrl && (
         <div aria-hidden className="absolute inset-0 -z-10">
@@ -153,7 +153,7 @@ function ProgramCard({
 
       <div className="relative flex flex-1 flex-col p-7">
         {program.ageRange && (
-          <span className="inline-flex w-fit rounded-full bg-brand-yellow px-3 py-1 text-[0.6rem] font-bold uppercase tracking-[0.2em] text-brand-navy shadow-[0_4px_14px_-4px_rgba(255,203,5,0.6)]">
+          <span className="inline-flex w-fit bg-brand-yellow px-3 py-1 text-[0.6rem] font-bold uppercase tracking-[0.2em] text-brand-navy shadow-[0_4px_14px_-4px_rgba(255,203,5,0.6)]">
             {program.ageRange}
           </span>
         )}

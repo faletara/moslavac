@@ -83,7 +83,7 @@ export default async function SchoolProgramPage({ params }: Props) {
 
         {/* O programu */}
         <section className="mt-14 sm:mt-16">
-          <SectionHeading icon={<Trophy className="size-5 text-brand-yellow" />}>
+          <SectionHeading icon={<Trophy className="size-5 text-brand-blue" />}>
             O programu
           </SectionHeading>
           <div className="news-content mt-5 max-w-2xl">
@@ -105,7 +105,7 @@ export default async function SchoolProgramPage({ params }: Props) {
         </section>
 
         {/* Upis i kontakt — brandirana CTA kartica */}
-        <section className="relative isolate mt-12 overflow-hidden rounded-2xl bg-gradient-to-br from-brand-navy to-brand-navy-700 p-8 sm:mt-16 sm:p-12">
+        <section className="relative isolate mt-12 overflow-hidden bg-gradient-to-br from-brand-navy to-brand-navy-700 p-8 sm:mt-16 sm:p-12">
           {/* Grb watermark u kutu */}
           <div
             aria-hidden
@@ -141,14 +141,14 @@ export default async function SchoolProgramPage({ params }: Props) {
             <div className="mt-2 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/kontakt"
-                className="group inline-flex items-center justify-center gap-2 rounded-full bg-brand-yellow px-7 py-3.5 text-[0.7rem] font-bold uppercase tracking-[0.3em] text-brand-navy shadow-[0_8px_30px_-6px_rgba(255,203,5,0.5)] transition-all hover:scale-[1.03] hover:shadow-[0_10px_40px_-6px_rgba(255,203,5,0.65)]"
+                className="group inline-flex items-center justify-center gap-2 bg-brand-yellow px-7 py-3.5 text-[0.7rem] font-bold uppercase tracking-[0.3em] text-brand-navy shadow-[0_8px_30px_-6px_rgba(255,203,5,0.5)] transition-all hover:scale-[1.03] hover:shadow-[0_10px_40px_-6px_rgba(255,203,5,0.65)]"
               >
                 Upiši dijete
                 <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
               </Link>
               <Link
                 href="/skola-nogometa"
-                className="inline-flex items-center justify-center rounded-full border border-white/25 px-7 py-3.5 text-[0.7rem] font-bold uppercase tracking-[0.3em] text-white transition-colors hover:border-brand-yellow hover:text-brand-yellow"
+                className="inline-flex items-center justify-center border border-white/25 px-7 py-3.5 text-[0.7rem] font-bold uppercase tracking-[0.3em] text-white transition-colors hover:border-brand-yellow hover:text-brand-yellow"
               >
                 Svi programi
               </Link>
@@ -170,8 +170,8 @@ function InfoTile({
   children: ReactNode;
 }) {
   return (
-    <div className="flex items-center gap-4 rounded-xl border border-line bg-surface-2 p-5 transition-colors hover:border-brand-yellow/50">
-      <span className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-brand-navy text-brand-yellow">
+    <div className="flex items-center gap-4 border border-line bg-surface-2 p-5 transition-colors hover:border-brand-yellow/50">
+      <span className="flex size-12 shrink-0 items-center justify-center bg-brand-navy text-brand-yellow">
         {icon}
       </span>
       <div className="flex min-w-0 flex-col gap-0.5">

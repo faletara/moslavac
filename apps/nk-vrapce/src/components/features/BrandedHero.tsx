@@ -80,12 +80,9 @@ export function BrandedHero({
       <div className="mx-auto w-full max-w-screen-xl px-6 py-20 sm:py-28 lg:px-8">
         <FadeInView>
           <div className="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
-            <div className="flex items-center justify-center gap-4">
-              <span className="h-[3px] w-10 rounded-full bg-brand-yellow" />
-              <p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-brand-blue sm:text-xs">
-                {eyebrow}
-              </p>
-            </div>
+            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-brand-blue sm:text-xs">
+              {eyebrow}
+            </p>
             <h1 className="text-balance font-display text-4xl font-extrabold uppercase leading-[0.95] tracking-tight text-ink sm:text-6xl md:text-7xl">
               {title}
             </h1>
@@ -116,7 +113,7 @@ export function BrandedHero({
                   href={cta.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group mt-2 inline-flex w-fit items-center gap-2 rounded-full bg-brand-yellow px-7 py-3.5 text-[0.7rem] font-bold uppercase tracking-[0.2em] text-brand-navy shadow-[0_10px_30px_-12px_rgba(255,203,5,0.8)] transition-all hover:-translate-y-0.5 hover:shadow-[0_14px_36px_-12px_rgba(255,203,5,0.9)]"
+                  className="group mt-2 inline-flex w-fit items-center gap-2 bg-brand-yellow px-7 py-3.5 text-[0.7rem] font-bold uppercase tracking-[0.2em] text-brand-navy shadow-[0_10px_30px_-12px_rgba(255,203,5,0.8)] transition-all hover:-translate-y-0.5 hover:shadow-[0_14px_36px_-12px_rgba(255,203,5,0.9)]"
                 >
                   {cta.label}
                   <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
@@ -124,7 +121,7 @@ export function BrandedHero({
               ) : (
                 <Link
                   href={cta.href}
-                  className="group mt-2 inline-flex w-fit items-center gap-2 rounded-full bg-brand-yellow px-7 py-3.5 text-[0.7rem] font-bold uppercase tracking-[0.2em] text-brand-navy shadow-[0_10px_30px_-12px_rgba(255,203,5,0.8)] transition-all hover:-translate-y-0.5 hover:shadow-[0_14px_36px_-12px_rgba(255,203,5,0.9)]"
+                  className="group mt-2 inline-flex w-fit items-center gap-2 bg-brand-yellow px-7 py-3.5 text-[0.7rem] font-bold uppercase tracking-[0.2em] text-brand-navy shadow-[0_10px_30px_-12px_rgba(255,203,5,0.8)] transition-all hover:-translate-y-0.5 hover:shadow-[0_14px_36px_-12px_rgba(255,203,5,0.9)]"
                 >
                   {cta.label}
                   <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />

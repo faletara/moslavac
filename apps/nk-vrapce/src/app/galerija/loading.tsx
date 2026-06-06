@@ -11,7 +11,7 @@ export default function GalerijaLoading() {
       <div className="mt-24 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
         {["a1", "a2", "a3", "a4", "a5", "a6"].map((key) => (
           <div key={key} className="space-y-4">
-            <Skeleton className="aspect-[4/3] w-full rounded-xl" />
+            <Skeleton className="aspect-[4/3] w-full " />
             <Skeleton className="h-4 w-2/3" />
           </div>
         ))}

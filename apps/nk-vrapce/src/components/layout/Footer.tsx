@@ -16,7 +16,7 @@ export default function Footer({ tenant }: { tenant: FrontendTenant }) {
 	);
 
 	return (
-		<footer className="relative isolate overflow-hidden bg-black text-white">
+		<footer className="relative isolate overflow-hidden bg-[#060f20] text-white">
 			{/* Žuti accent na vrhu — brand-rub koji odvaja footer od stranice */}
 			<div
 				aria-hidden
@@ -26,7 +26,7 @@ export default function Footer({ tenant }: { tenant: FrontendTenant }) {
 			{/* Landmark — bolnica Vrapče kao suptilni brand watermark koji izranja s dna */}
 			<div
 				aria-hidden
-				className="pointer-events-none absolute inset-0 -z-10 opacity-[0.12]"
+				className="pointer-events-none absolute inset-0 -z-10 opacity-[0.05]"
 			>
 				<Image
 					src="/bolnica-transparent.png"
@@ -38,7 +38,7 @@ export default function Footer({ tenant }: { tenant: FrontendTenant }) {
 			</div>
 			<div
 				aria-hidden
-				className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-t from-transparent via-black/50 to-black"
+				className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-t from-transparent via-[#060f20]/50 to-[#060f20]"
 			/>
 
 			<div className="relative mx-auto max-w-6xl px-4 py-16">

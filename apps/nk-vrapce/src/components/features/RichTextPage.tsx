@@ -31,7 +31,7 @@ export function RichTextPage({
       <div className="mx-auto w-full max-w-4xl px-6 pb-24 lg:px-8">
         {page?.heroImage?.url && (
           <FadeInView delay={0.1}>
-            <figure className="relative mt-12 aspect-[16/7] w-full overflow-hidden rounded-xl sm:mt-16">
+            <figure className="relative mt-12 aspect-[16/7] w-full overflow-hidden sm:mt-16">
               <Image
                 src={page.heroImage.sizes?.hero?.url ?? page.heroImage.url}
                 alt={page.heroImage.alt || page.title}
@@ -61,7 +61,7 @@ export function RichTextPage({
               {page.gallery.map((media) => (
                 <figure
                   key={media.id}
-                  className="group relative aspect-square overflow-hidden rounded-md bg-muted"
+                  className="group relative aspect-square overflow-hidden bg-muted"
                 >
                   <Image
                     src={media.sizes?.card?.url ?? media.url}
