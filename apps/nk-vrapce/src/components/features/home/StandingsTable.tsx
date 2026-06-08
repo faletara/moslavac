@@ -1,6 +1,4 @@
-import { ArrowRight } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { FadeInView } from "@/components/animations";
 import type { TeamRanking } from "@/types/hns";
 
@@ -37,15 +35,6 @@ export function StandingsTable({ rows }: StandingsTableProps) {
             </h2>
           </FadeInView>
         </div>
-        <FadeInView delay={0.15}>
-          <Link
-            href="/seniori"
-            className="group hidden items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.3em] text-muted-foreground transition-colors hover:text-brand-blue sm:inline-flex"
-          >
-            Momčad
-            <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
-          </Link>
-        </FadeInView>
       </div>
 
       <FadeInView delay={0.1} className="mt-8">
@@ -134,7 +123,7 @@ export function StandingsTable({ rows }: StandingsTableProps) {
                         <span
                           className={`min-w-0 truncate font-display text-[0.95rem] uppercase tracking-tight sm:text-base ${
                             mine
-                              ? "font-extrabold text-brand-navy"
+                              ? "font-extrabold text-brand-navy underline decoration-brand-yellow decoration-2 underline-offset-4"
                               : "font-bold text-ink"
                           }`}
                         >
@@ -189,17 +178,6 @@ export function StandingsTable({ rows }: StandingsTableProps) {
           </table>
         </div>
       </FadeInView>
-
-      {/* Mobilni "Momčad" */}
-      <div className="mt-8 flex justify-center sm:hidden">
-        <Link
-          href="/seniori"
-          className="group inline-flex items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.3em] text-muted-foreground transition-colors hover:text-brand-blue"
-        >
-          Momčad
-          <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
-        </Link>
-      </div>
     </section>
   );
 }

@@ -106,7 +106,10 @@ export default function Header({ clubName }: { clubName: string }) {
   const lightTop =
     !!pathname &&
     (pathname.startsWith("/novosti/") || pathname.startsWith("/galerija/"));
-  const transparent = atTop && !lightTop;
+  // Dok je header sakriven (scroll dolje) držimo ga prozirnim — inače bi se
+  // tijekom klizanja prema gore na tren obojao bijelo pa nestao (bljesak).
+  // Bijela podloga se pojavi tek kad se header VRATI (scroll gore, nije na vrhu).
+  const transparent = (atTop || hidden) && !lightTop;
 
   return (
     <header

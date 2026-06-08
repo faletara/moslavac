@@ -13,6 +13,13 @@ const DATE_FMT = new Intl.DateTimeFormat("hr-HR", {
 	month: "long",
 });
 
+// HNS vraća kolo kao goli broj ("30") ili već s tekstom ("30. kolo"). Ako je
+// samo broj, dodamo "kolo" da korisniku bude jasno o čemu se radi.
+function formatRound(round: string): string {
+	const trimmed = round.trim();
+	return /^\d+$/.test(trimmed) ? `${trimmed}. kolo` : trimmed;
+}
+
 // Odrezani donji-desni kut — signature oblik kartice (PSG-style).
 const CLIP =
 	"[clip-path:polygon(0_0,100%_0,100%_calc(100%-1.5rem),calc(100%-1.5rem)_100%,0_100%)]";
@@ -101,13 +108,17 @@ export function ResultsStrip({ results }: { results: PlayedMatchSummary[] }) {
 									className="pointer-events-none absolute -bottom-5 -right-5 size-32 opacity-[0.06]"
 								/>
 								<div className="relative flex flex-col gap-6 p-6">
-									<div className="flex items-center gap-2.5">
+									<div className="flex flex-wrap items-center gap-2.5">
 										<span className="bg-brand-yellow px-2 py-0.5 text-[0.5rem] font-bold uppercase tracking-[0.15em] text-brand-navy">
 											Završeno
 										</span>
+										{m.round && (
+											<span className="border border-brand-navy/15 px-2 py-0.5 text-[0.5rem] font-bold uppercase tracking-[0.15em] text-brand-navy/70">
+												{formatRound(m.round)}
+											</span>
+										)}
 										<span className="text-[0.55rem] font-medium uppercase tracking-[0.2em] text-brand-navy/45">
 											{d ? DATE_FMT.format(d) : ""}
-											{m.round ? ` · ${m.round}` : ""}
 										</span>
 									</div>
 									<div className="flex flex-col gap-3.5">
