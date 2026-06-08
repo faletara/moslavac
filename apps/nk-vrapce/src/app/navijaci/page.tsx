@@ -65,7 +65,6 @@ export default async function NavijaciPage() {
         eyebrow={page?.eyebrow ?? "Navijačka skupina · 1993"}
         title={page?.title ?? "Lunatics Vrapče"}
         description="Naša boja, naš ponos — srce tribina NK Vrapče."
-        stats={[{ value: "1993", label: "Osnovani" }]}
         backgroundImage={heroBg}
       />
 

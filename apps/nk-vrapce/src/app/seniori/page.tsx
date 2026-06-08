@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { FadeInView, StaggerContainer, StaggerItem } from "@/components/animations";
-import { BrandedHero, type HeroStat } from "@/components/features/BrandedHero";
+import { BrandedHero } from "@/components/features/BrandedHero";
 import { fetchPageByKey } from "@/lib/payload/getPages";
 import { fetchRoster } from "@/lib/payload/getRoster";
-import { getTenant } from "@/lib/payload/getTenant";
 import type { RosterEntry, RosterPosition } from "@/types/roster";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -34,10 +33,9 @@ const positionLabels: Record<RosterPosition, string> = {
 };
 
 export default async function SenioriPage() {
-  const [roster, page, tenant] = await Promise.all([
+  const [roster, page] = await Promise.all([
     fetchRoster(),
     fetchPageByKey({ key: "seniori-info" }),
-    getTenant(),
   ]);
 
   const sections = playerOrder
@@ -53,17 +51,6 @@ export default async function SenioriPage() {
     .filter((p) => p.position === "trener")
     .sort((a, b) => a.displayOrder - b.displayOrder);
 
-  const playersCount = roster.filter((p) => p.position !== "trener").length;
-  const founded = tenant.branding?.founded ?? null;
-
-  const stats: HeroStat[] = [
-    { value: String(playersCount), label: "Igrača" },
-    ...(staff.length > 0
-      ? [{ value: String(staff.length), label: "Stručni stožer" }]
-      : []),
-    ...(founded ? [{ value: String(founded), label: "Osnovan" }] : []),
-  ];
-
   return (
     <>
       <BrandedHero
@@ -74,7 +61,6 @@ export default async function SenioriPage() {
             ? null
             : "Naša seniorska momčad — igrači i stručni stožer koji nose boje Vrapča na svakoj utakmici."
         }
-        stats={stats}
       />
 
       <div className="mx-auto w-full max-w-screen-xl px-6 pb-24 lg:px-8">

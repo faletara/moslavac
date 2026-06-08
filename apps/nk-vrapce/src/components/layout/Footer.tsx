@@ -2,49 +2,78 @@ import { Mail, MapPin, Phone, ShoppingBag } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { FaFacebook, FaYoutube } from "react-icons/fa";
+import type { ClubContact } from "@/lib/club/getClubContact";
 import type { FrontendTenant } from "@/lib/payload/types";
 
-export default function Footer({ tenant }: { tenant: FrontendTenant }) {
+// Sitemap kolone — odražavaju Header navigaciju (prave rute)
+const LINK_GROUPS: { title: string; links: { href: string; label: string }[] }[] =
+	[
+		{
+			title: "Klub",
+			links: [
+				{ href: "/novosti", label: "Vijesti" },
+				{ href: "/povijest", label: "Povijest" },
+				{ href: "/uprava", label: "Uprava" },
+				{ href: "/statut", label: "Statut" },
+				{ href: "/navijaci", label: "Lunatics" },
+			],
+		},
+		{
+			title: "Momčad",
+			links: [
+				{ href: "/seniori", label: "Seniori" },
+				{ href: "/skola-nogometa", label: "Škola nogometa" },
+			],
+		},
+		{
+			title: "Više",
+			links: [
+				{ href: "/galerija", label: "Galerija" },
+				{ href: "/oprema", label: "Webshop" },
+				{ href: "/kontakt", label: "Kontakt" },
+			],
+		},
+	];
+
+export default function Footer({
+	tenant,
+	contact,
+}: {
+	tenant: FrontendTenant;
+	contact: ClubContact;
+}) {
 	const year = new Date().getFullYear();
-	const { displayName, branding, contact, social } = tenant;
+	const { displayName, branding, social } = tenant;
 
 	const hasContact = Boolean(
-		contact?.address || contact?.email || contact?.phone,
+		contact.address || contact.email || contact.phone,
 	);
 	const hasSocial = Boolean(
 		social?.facebook || social?.youtube || social?.webshop,
 	);
 
 	return (
-		<footer className="relative isolate overflow-hidden bg-[#060f20] text-white">
+		<footer className="relative isolate overflow-hidden bg-brand-navy text-white">
 			{/* Žuti accent na vrhu — brand-rub koji odvaja footer od stranice */}
 			<div
 				aria-hidden
 				className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-yellow/40 to-transparent"
 			/>
 
-			{/* Landmark — bolnica Vrapče kao suptilni brand watermark koji izranja s dna */}
+			{/* Veliki brand wordmark — izranja s dna, daje footeru karakter */}
 			<div
 				aria-hidden
-				className="pointer-events-none absolute inset-0 -z-10 opacity-[0.05]"
+				className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 flex justify-center overflow-hidden"
 			>
-				<Image
-					src="/bolnica-transparent.png"
-					alt=""
-					fill
-					sizes="100vw"
-					className="object-cover object-[center_75%]"
-				/>
+				<span className="translate-y-[28%] bg-gradient-to-b from-white/[0.07] to-transparent bg-clip-text font-display text-[22vw] leading-none font-extrabold tracking-tighter whitespace-nowrap text-transparent uppercase select-none lg:text-[18vw]">
+					{displayName}
+				</span>
 			</div>
-			<div
-				aria-hidden
-				className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-t from-transparent via-[#060f20]/50 to-[#060f20]"
-			/>
 
-			<div className="relative mx-auto max-w-6xl px-4 py-16">
-				<div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+			<div className="relative mx-auto max-w-6xl px-4 pt-16 pb-40">
+				<div className="flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between">
 					{/* Klub */}
-					<div className="flex flex-col gap-4">
+					<div className="flex max-w-xs flex-col gap-4">
 						<div className="flex items-center gap-3">
 							<Image
 								src="/grb-vrapce.png"
@@ -52,17 +81,18 @@ export default function Footer({ tenant }: { tenant: FrontendTenant }) {
 								width={128}
 								height={128}
 								quality={90}
-								className="h-12 w-12 object-contain"
+								className="h-14 w-14 object-contain"
 							/>
-							<span className="font-display text-lg font-extrabold tracking-tight uppercase">
+							<span className="font-display text-2xl font-extrabold tracking-tight uppercase">
 								{displayName}
 							</span>
 						</div>
-						<p className="max-w-xs text-sm leading-relaxed text-white/60">
+						<p className="text-sm leading-relaxed text-white/60">
 							{branding?.motto ?? "Ponos i tradicija našeg kluba."}
 						</p>
 					</div>
 
+					<div className="flex flex-wrap gap-x-16 gap-y-10">
 					{/* Kontakt */}
 					{hasContact ? (
 						<div>
@@ -102,33 +132,26 @@ export default function Footer({ tenant }: { tenant: FrontendTenant }) {
 						</div>
 					) : null}
 
-					{/* Linkovi */}
-					<div>
-						<h3 className="mb-4 text-xs font-semibold tracking-widest text-brand-yellow uppercase">
-							Linkovi
-						</h3>
-						<ul className="space-y-3 text-sm text-white/80">
-							{[
-								{ href: "/klub", label: "Klub" },
-								{ href: "/novosti", label: "Novosti" },
-								{ href: "/utakmice", label: "Utakmice" },
-								{
-									href: "/politika-privatnosti",
-									label: "Politika privatnosti",
-								},
-								{ href: "/pravna-napomena", label: "Pravna napomena" },
-							].map((link) => (
-								<li key={link.href}>
-									<Link
-										href={link.href}
-										className="transition-colors hover:text-brand-yellow"
-									>
-										{link.label}
-									</Link>
-								</li>
-							))}
-						</ul>
-					</div>
+					{/* Sitemap kolone */}
+					{LINK_GROUPS.map((group) => (
+						<div key={group.title}>
+							<h3 className="mb-4 text-xs font-semibold tracking-widest text-brand-yellow uppercase">
+								{group.title}
+							</h3>
+							<ul className="space-y-3 text-sm text-white/80">
+								{group.links.map((link) => (
+									<li key={link.href}>
+										<Link
+											href={link.href}
+											className="transition-colors hover:text-brand-yellow"
+										>
+											{link.label}
+										</Link>
+									</li>
+								))}
+							</ul>
+						</div>
+					))}
 
 					{/* Pratite nas */}
 					{hasSocial ? (
@@ -173,6 +196,7 @@ export default function Footer({ tenant }: { tenant: FrontendTenant }) {
 							</div>
 						</div>
 					) : null}
+					</div>
 				</div>
 
 				<div className="mt-12 flex flex-col gap-2 border-t border-white/10 pt-6 text-sm text-white/50 sm:flex-row sm:items-center sm:justify-between">

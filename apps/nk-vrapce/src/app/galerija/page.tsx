@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { StaggerContainer, StaggerItem } from "@/components/animations";
-import { BrandedHero, type HeroStat } from "@/components/features/BrandedHero";
+import { BrandedHero } from "@/components/features/BrandedHero";
 import { formatDateShort } from "@/lib/helpers/date";
 import { fetchAlbums } from "@/lib/payload/getGallery";
 import type { GalleryAlbum } from "@/types/gallery";
@@ -17,21 +17,12 @@ export const metadata: Metadata = {
 export default async function GalerijaPage() {
   const albums = await fetchAlbums();
 
-  const totalPhotos = albums.reduce((sum, a) => sum + a.photos.length, 0);
-  const stats: HeroStat[] = [
-    { value: String(albums.length), label: "Albuma" },
-    ...(totalPhotos > 0
-      ? [{ value: String(totalPhotos), label: "Fotografija" }]
-      : []),
-  ];
-
   return (
     <>
       <BrandedHero
         eyebrow="Trenuci kluba"
         title="Galerija"
         description="Fotografije s utakmica, treninga i događanja NK Vrapče."
-        stats={stats}
       />
 
       <div className="mx-auto w-full max-w-screen-xl px-6 pb-24 lg:px-8">

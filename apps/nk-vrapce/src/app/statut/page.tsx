@@ -1,7 +1,7 @@
 import { Download, FileText } from "lucide-react";
 import type { Metadata } from "next";
 import { FadeInView, StaggerContainer, StaggerItem } from "@/components/animations";
-import { BrandedHero, type HeroStat } from "@/components/features/BrandedHero";
+import { BrandedHero } from "@/components/features/BrandedHero";
 import { fetchDocuments } from "@/lib/payload/getDocuments";
 import { fetchPageByKey } from "@/lib/payload/getPages";
 import type { ClubDocument, DocumentCategory } from "@/types/document";
@@ -48,13 +48,6 @@ export default async function StatutPage() {
     }))
     .filter((section) => section.docs.length > 0);
 
-  const stats: HeroStat[] = [
-    { value: String(documents.length), label: "Dokumenata" },
-    ...(grouped.length > 0
-      ? [{ value: String(grouped.length), label: "Kategorija" }]
-      : []),
-  ];
-
   return (
     <>
       <BrandedHero
@@ -65,7 +58,6 @@ export default async function StatutPage() {
             ? null
             : "Statut, pravilnici i službeni dokumenti kluba — dostupni za preuzimanje."
         }
-        stats={stats}
       />
 
       <div className="mx-auto w-full max-w-3xl px-6 pb-24 lg:px-8">

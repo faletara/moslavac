@@ -8,6 +8,8 @@ interface RichTextPageProps {
   /** Nadnaslov i naslov koji se koriste ako CMS zapis još ne postoji. */
   fallbackEyebrow: string;
   fallbackTitle: string;
+  /** Uvodna rečenica heroja kad CMS zapis nema seoDescription. */
+  fallbackDescription?: string;
   emptyMessage?: string;
 }
 
@@ -19,6 +21,7 @@ export function RichTextPage({
   page,
   fallbackEyebrow,
   fallbackTitle,
+  fallbackDescription,
   emptyMessage = "Sadržaj uskoro.",
 }: RichTextPageProps) {
   return (
@@ -26,6 +29,7 @@ export function RichTextPage({
       <BrandedHero
         eyebrow={page?.eyebrow ?? fallbackEyebrow}
         title={page?.title ?? fallbackTitle}
+        description={page?.seoDescription ?? fallbackDescription}
       />
 
       <div className="mx-auto w-full max-w-4xl px-6 pb-24 lg:px-8">

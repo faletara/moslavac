@@ -12,17 +12,21 @@ import {
 import { CardSlider } from "@/components/features/CardSlider";
 import Hero from "@/components/features/home/Hero";
 import { ResultsStrip } from "@/components/features/home/ResultsStrip";
+import { SquadTeaser } from "@/components/features/home/SquadTeaser";
 import { StandingsTable } from "@/components/features/home/StandingsTable";
 import { formatDateShort } from "@/lib/helpers/date";
 import { getRecentForm } from "@/lib/helpers/form";
 import { getHnsTeamId } from "@/lib/hns/client";
-import { fetchSeniorCompetition } from "@/lib/hns/competitions";
-import { fetchAllMatches } from "@/lib/hns/matches";
+import {
+	fetchCompetitionMatches,
+	fetchSeniorCompetition,
+} from "@/lib/hns/competitions";
 import { fetchTeamStandings } from "@/lib/hns/standings";
 import { adaptPayloadEquipment } from "@/lib/payload/equipment-adapter";
 import { fetchFeaturedEquipment } from "@/lib/payload/getEquipment";
 import { fetchAlbums } from "@/lib/payload/getGallery";
 import { fetchLatestNews } from "@/lib/payload/getNews";
+import { fetchRoster } from "@/lib/payload/getRoster";
 import { getTenant, tenantSlug } from "@/lib/payload/getTenant";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -44,12 +48,13 @@ const priceFormatter = new Intl.NumberFormat("hr-HR", {
 });
 
 export default async function HomePage() {
-	const [tenant, news, featuredDocs, albums, standings, matchData] =
+	const [tenant, news, featuredDocs, albums, roster, standings, matchData] =
 		await Promise.all([
 			getTenant(),
 			fetchLatestNews(),
 			fetchFeaturedEquipment(),
 			fetchAlbums(),
+			fetchRoster(),
 			(async () => {
 				const competition = await fetchSeniorCompetition();
 				if (!competition?.id) return null;
@@ -60,11 +65,13 @@ export default async function HomePage() {
 			})(),
 			(async () => {
 				try {
-					const [all, teamIdStr] = await Promise.all([
-						fetchAllMatches(),
+					const competition = await fetchSeniorCompetition();
+					if (!competition?.id) return { results: [] };
+					const [matches, teamIdStr] = await Promise.all([
+						fetchCompetitionMatches({ competitionId: competition.id }),
 						getHnsTeamId(),
 					]);
-					const results = getRecentForm(all, Number(teamIdStr), 3);
+					const results = getRecentForm(matches, Number(teamIdStr), 3);
 					return { results };
 				} catch {
 					return { results: [] };
@@ -76,6 +83,15 @@ export default async function HomePage() {
 		adaptPayloadEquipment(d, tenantSlug),
 	);
 	const galleryPreview = albums.slice(0, 3);
+	// Teaser momčadi — bez stožera, igrači s fotkom prvi, do 8 kartica
+	const squadPreview = roster
+		.filter((p) => p.position !== "trener")
+		.sort((a, b) => {
+			const aHasPhoto = a.photo ? 0 : 1;
+			const bHasPhoto = b.photo ? 0 : 1;
+			return aHasPhoto - bHasPhoto || a.displayOrder - b.displayOrder;
+		})
+		.slice(0, 8);
 	const logoFallback =
 		tenant.branding?.logo && typeof tenant.branding.logo === "object"
 			? (tenant.branding.logo.url ?? "")
@@ -96,6 +112,12 @@ export default async function HomePage() {
 			{standings && standings.rows.length > 0 && (
 				<Band>
 					<StandingsTable rows={standings.rows} />
+				</Band>
+			)}
+
+			{squadPreview.length > 0 && (
+				<Band>
+					<SquadTeaser players={squadPreview} />
 				</Band>
 			)}
 

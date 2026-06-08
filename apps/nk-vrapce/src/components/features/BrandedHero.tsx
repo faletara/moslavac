@@ -2,12 +2,6 @@ import { ArrowRight, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { FadeInView } from "@/components/animations";
-import { BrandGlow } from "@/components/ui/BrandGlow";
-
-export interface HeroStat {
-  value: string;
-  label: string;
-}
 
 export interface HeroCta {
   label: string;
@@ -20,91 +14,65 @@ interface BrandedHeroProps {
   eyebrow: string;
   title: string;
   description?: string | null;
-  stats?: HeroStat[];
   cta?: HeroCta;
-  /** Opcionalna pozadinska slika — renderira se "isprano" ispod bijelog washa. */
+  /** Opcionalna pozadinska slika — renderira se ispod tamnog navy scrima. */
   backgroundImage?: string | null;
 }
 
 /**
- * Svijetli editorial naslovni blok podstranice: bijela podloga, mekani brand
- * glow (žuta dominira, plava akcent), mirna tipografija s jasnom hijerarhijom,
- * opcionalni stat strip i CTA. Dijeli ga više podstranica radi konzistentnosti.
+ * Tamni navy naslovni blok podstranice — prati ritam homepagea (tamni hero →
+ * bijelo tijelo → navy footer). Bijeli Saira naslov, žuti eyebrow akcent,
+ * opcionalna foto isprana navy scrimom. Dijeli ga više podstranica.
  */
 export function BrandedHero({
   eyebrow,
   title,
   description,
-  stats,
   cta,
   backgroundImage,
 }: BrandedHeroProps) {
   return (
-    <section className="relative isolate w-full overflow-hidden bg-surface">
-      {/* Opcionalna pozadinska slika — isprana jakim bijelim washom da
-          ostane suptilna tekstura, a tekst (ink) čitak. */}
+    <section className="relative isolate -mt-[5.5rem] w-full overflow-hidden bg-brand-navy">
       {backgroundImage && (
         <>
+          {/* Pozadinska foto isprana navy scrimom da naslov ostane čitak. */}
           <div aria-hidden className="pointer-events-none absolute inset-0 -z-30">
             <Image
               src={backgroundImage}
               alt=""
               fill
+              priority
               sizes="100vw"
               className="object-cover object-center"
             />
           </div>
+          <div aria-hidden className="absolute inset-0 -z-20 bg-brand-navy/55" />
           <div
             aria-hidden
-            className="absolute inset-0 -z-20 bg-gradient-to-r from-surface via-surface/92 to-surface/70"
+            className="absolute inset-0 -z-20 bg-gradient-to-b from-brand-navy/85 via-brand-navy/40 to-brand-navy/95"
           />
           <div
             aria-hidden
-            className="absolute inset-0 -z-20 bg-gradient-to-t from-surface via-surface/45 to-surface/85"
+            className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(8,24,47,0.6)_100%)]"
           />
         </>
       )}
 
-      {/* Mekani brand glow */}
-      <BrandGlow
-        color="yellow"
-        intensity={0.14}
-        className="-left-[6%] -top-[20%] h-[40vmax] w-[40vmax]"
-      />
-      <BrandGlow
-        color="blue"
-        intensity={0.1}
-        className="-bottom-[30%] left-1/4 h-[36vmax] w-[36vmax]"
-      />
-
-      <div className="mx-auto w-full max-w-screen-xl px-6 py-20 sm:py-28 lg:px-8">
+      {/* Gornji padding uključuje visinu headera (5.5rem) jer hero ulazi pod
+          prozirni header — tako sadržaj ne završi ispod njega. */}
+      <div className="mx-auto w-full max-w-screen-xl px-6 pb-24 pt-[calc(6rem+5.5rem)] sm:pb-32 sm:pt-[calc(8rem+5.5rem)] lg:px-8">
         <FadeInView>
           <div className="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
-            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-brand-blue sm:text-xs">
+            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-brand-yellow sm:text-xs">
               {eyebrow}
             </p>
-            <h1 className="text-balance font-display text-4xl font-extrabold uppercase leading-[0.95] tracking-tight text-ink sm:text-6xl md:text-7xl">
+            <h1 className="text-balance font-display text-4xl font-extrabold uppercase leading-[0.95] tracking-tight text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.5)] sm:text-6xl md:text-7xl">
               {title}
             </h1>
             {description && (
-              <p className="max-w-xl text-base leading-relaxed text-muted-foreground">
+              <p className="max-w-xl text-base leading-relaxed text-white/70">
                 {description}
               </p>
-            )}
-
-            {stats && stats.length > 0 && (
-              <div className="mt-4 flex flex-wrap justify-center gap-x-12 gap-y-5 border-t border-line pt-7">
-                {stats.map((stat) => (
-                  <div key={stat.label} className="flex flex-col gap-1">
-                    <span className="font-display text-3xl font-extrabold uppercase tracking-tight text-ink sm:text-4xl">
-                      {stat.value}
-                    </span>
-                    <span className="text-[0.6rem] font-semibold uppercase tracking-[0.3em] text-muted-foreground">
-                      {stat.label}
-                    </span>
-                  </div>
-                ))}
-              </div>
             )}
 
             {cta &&

@@ -1,9 +1,10 @@
-import { Mail, MapPin, Phone } from "lucide-react";
+import { Building2, Mail, MapPin, Phone } from "lucide-react";
 import type { Metadata } from "next";
 import type { IconType } from "react-icons";
 import { FaFacebook, FaYoutube } from "react-icons/fa";
 import { FadeInView } from "@/components/animations";
-import { BrandedHero, type HeroStat } from "@/components/features/BrandedHero";
+import { BrandedHero } from "@/components/features/BrandedHero";
+import { getClubContact } from "@/lib/club/getClubContact";
 import { getTenant } from "@/lib/payload/getTenant";
 
 export const metadata: Metadata = {
@@ -14,8 +15,7 @@ export const metadata: Metadata = {
 };
 
 export default async function KontaktPage() {
-  const tenant = await getTenant();
-  const contact = tenant.contact;
+  const [tenant, contact] = await Promise.all([getTenant(), getClubContact()]);
   const social = tenant.social;
   const legal = tenant.legal;
   const founded = tenant.branding?.founded;
@@ -45,17 +45,12 @@ export default async function KontaktPage() {
       : null,
   ].filter(Boolean) as { label: string; value: string }[];
 
-  const stats: HeroStat[] = founded
-    ? [{ value: String(founded), label: "Osnovan" }]
-    : [];
-
   return (
     <>
       <BrandedHero
         eyebrow="Tu smo za vas"
         title="Lokacija i kontakt"
         description="Posjetite nas ili nam se javite — uvijek nam je drago čuti navijače i partnere."
-        stats={stats}
       />
 
       <div className="mx-auto w-full max-w-screen-xl px-6 pb-24 lg:px-8">
@@ -93,6 +88,28 @@ export default async function KontaktPage() {
               )}
             </ul>
           </div>
+
+          {contact.stadium && (
+            <div className="space-y-5">
+              <h2 className="text-sm font-bold uppercase tracking-[0.3em] text-muted-foreground">
+                Igralište
+              </h2>
+              <ul className="space-y-4 text-sm">
+                <ContactItem Icon={Building2}>
+                  <span className="font-semibold">{contact.stadium.name}</span>
+                </ContactItem>
+                {(contact.stadium.address || contact.stadium.place) && (
+                  <ContactItem Icon={MapPin}>
+                    <span>
+                      {[contact.stadium.address, contact.stadium.place]
+                        .filter(Boolean)
+                        .join(", ")}
+                    </span>
+                  </ContactItem>
+                )}
+              </ul>
+            </div>
+          )}
 
           {socialLinks.length > 0 && (
             <div className="space-y-5">

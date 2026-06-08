@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { FadeInView, StaggerContainer, StaggerItem } from "@/components/animations";
-import { BrandedHero, type HeroStat } from "@/components/features/BrandedHero";
+import { BrandedHero } from "@/components/features/BrandedHero";
 import { fetchPageByKey } from "@/lib/payload/getPages";
 import { fetchSchoolPrograms } from "@/lib/payload/getSchoolPrograms";
 import type { SchoolProgram } from "@/types/school";
@@ -25,20 +25,6 @@ export default async function SkolaNogometaPage() {
     fetchSchoolPrograms(),
   ]);
 
-  // Raspon uzrasta izveden iz programa (npr. U7–U19)
-  const ages = programs.flatMap((p) =>
-    (p.ageRange?.match(/\d+/g) ?? []).map(Number),
-  );
-  const ageSpan = ages.length
-    ? `U${Math.min(...ages)}–U${Math.max(...ages)}`
-    : null;
-
-  const stats: HeroStat[] = [
-    { value: String(programs.length), label: "Programa" },
-    ...(ageSpan ? [{ value: ageSpan, label: "Uzrasti" }] : []),
-    { value: "Licencirani", label: "Treneri" },
-  ];
-
   return (
     <>
       <BrandedHero
@@ -49,7 +35,6 @@ export default async function SkolaNogometaPage() {
             ? null
             : "Sustavan razvoj mladih nogometaša — od prvih koraka s loptom do juniora spremnih za seniorski nogomet."
         }
-        stats={stats}
       />
 
       <div className="mx-auto w-full max-w-screen-xl px-6 pb-24 lg:px-8">

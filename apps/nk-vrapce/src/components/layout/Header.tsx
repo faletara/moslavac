@@ -99,9 +99,14 @@ export default function Header({ clubName }: { clubName: string }) {
   const isGroupActive = (children: NavLeaf[]) =>
     children.some((c) => isActive(c.href));
 
-  // Proziran samo na vrhu homepagea (preko tamnog Heroa) → solid bijeli niže
-  const onHome = pathname === "/";
-  const transparent = onHome && atTop;
+  // Sve glavne stranice imaju tamni hero na vrhu → header proziran (bijeli tekst)
+  // dok je na vrhu, solid bijeli niže. Iznimka: detalj-stranice (vijest, album)
+  // koje imaju svijetli vrh. Negacija (default = proziran) je namjerna: tako se
+  // prerender i klijent slažu i bez ovisnosti o točnom pathname-u na vrhu.
+  const lightTop =
+    !!pathname &&
+    (pathname.startsWith("/novosti/") || pathname.startsWith("/galerija/"));
+  const transparent = atTop && !lightTop;
 
   return (
     <header
@@ -147,7 +152,7 @@ export default function Header({ clubName }: { clubName: string }) {
                 ? isActive(entry.href)
                 : isGroupActive(entry.children);
               const base =
-                "relative text-[0.78rem] font-semibold uppercase tracking-wide transition-colors";
+                "relative inline-flex items-center text-[0.78rem] font-semibold uppercase leading-none tracking-wide transition-colors";
               const tone = active
                 ? transparent
                   ? "text-white"
@@ -176,7 +181,7 @@ export default function Header({ clubName }: { clubName: string }) {
                 <div key={entry.label} className="group relative">
                   <button
                     type="button"
-                    className={`${base} ${tone} inline-flex items-center gap-1`}
+                    className={`${base} ${tone} gap-1`}
                     aria-haspopup="menu"
                   >
                     {entry.label}

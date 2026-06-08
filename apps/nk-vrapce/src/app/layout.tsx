@@ -5,6 +5,7 @@ import Footer from "@/components/layout/Footer";
 import FooterReveal from "@/components/layout/FooterReveal";
 import Header from "@/components/layout/Header";
 import Providers from "@/components/providers/Providers";
+import { getClubContact } from "@/lib/club/getClubContact";
 import { getTenant } from "@/lib/payload/getTenant";
 import { BASE_URL } from "@/lib/siteUrl";
 
@@ -33,7 +34,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const tenant = await getTenant();
+  const [tenant, clubContact] = await Promise.all([
+    getTenant(),
+    getClubContact(),
+  ]);
 
   return (
     <html lang="hr" className={`${geistSans.variable} ${saira.variable}`}>
@@ -48,7 +52,7 @@ export default async function RootLayout({
 
           {/* Footer fiksiran na dnu viewporta, iza sadržaja (z-0) */}
           <div id="site-footer" className="fixed inset-x-0 bottom-0 z-0">
-            <Footer tenant={tenant} />
+            <Footer tenant={tenant} contact={clubContact} />
           </div>
           <FooterReveal />
         </Providers>

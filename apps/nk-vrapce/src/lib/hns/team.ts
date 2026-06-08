@@ -18,3 +18,9 @@ export async function fetchTeamDetails(params: {
     },
   );
 }
+
+/** Detalji vlastitog kluba (kontakt, adresa, stadion) iz HNS-a. */
+export async function fetchClubDetails(): Promise<HnsTeamDetails | null> {
+  const teamId = await getHnsTeamId();
+  return fetchTeamDetails({ teamId });
+}

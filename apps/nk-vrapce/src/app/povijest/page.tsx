@@ -20,6 +20,7 @@ export default async function PovijestPage() {
       page={page}
       fallbackEyebrow="Naša priča"
       fallbackTitle="Povijest kluba"
+      fallbackDescription="Od osnutka 1932. do danas — priča o nogometnom klubu NK Vrapče."
       emptyMessage="Povijest kluba uskoro će biti objavljena."
     />
   );

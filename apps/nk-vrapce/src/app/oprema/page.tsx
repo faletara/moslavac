@@ -1,7 +1,7 @@
 import { ArrowUpRight } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
-import { BrandedHero, type HeroStat } from "@/components/features/BrandedHero";
+import { BrandedHero } from "@/components/features/BrandedHero";
 import { adaptPayloadEquipment } from "@/lib/payload/equipment-adapter";
 import { fetchEquipment } from "@/lib/payload/getEquipment";
 import { getTenant, tenantSlug } from "@/lib/payload/getTenant";
@@ -55,20 +55,12 @@ export default async function OpremaPage() {
   const populated = categoryOrder.filter((cat) => grouped[cat].length > 0);
   const webshopHref = tenant.social?.webshop ?? null;
 
-  const stats: HeroStat[] = [
-    { value: String(items.length), label: "Proizvoda" },
-    ...(populated.length > 0
-      ? [{ value: String(populated.length), label: "Kategorija" }]
-      : []),
-  ];
-
   return (
     <>
       <BrandedHero
         eyebrow="Službena oprema kluba"
         title="Webshop"
         description="Dresovi, trenirke i navijački artikli s grbom Vrapča. Sva oprema dostupna je za narudžbu kod našeg partnera."
-        stats={stats}
         cta={
           webshopHref
             ? { label: "Posjeti webshop", href: webshopHref, external: true }

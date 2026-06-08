@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { StaggerContainer, StaggerItem } from "@/components/animations";
-import { BrandedHero, type HeroStat } from "@/components/features/BrandedHero";
+import { BrandedHero } from "@/components/features/BrandedHero";
 import { formatDateShort } from "@/lib/helpers/date";
 import { fetchNewsPaginated } from "@/lib/payload/getNews";
 import { getTenant } from "@/lib/payload/getTenant";
@@ -35,11 +35,7 @@ export default async function NewsPage({ searchParams }: Props) {
       ? logo
       : (logo.url ?? "");
 
-  const { docs, totalPages, totalDocs } = result;
-
-  const stats: HeroStat[] = [
-    ...(totalDocs > 0 ? [{ value: String(totalDocs), label: "Objava" }] : []),
-  ];
+  const { docs, totalPages } = result;
 
   return (
     <>
@@ -47,7 +43,6 @@ export default async function NewsPage({ searchParams }: Props) {
         eyebrow="Aktualno"
         title="Vijesti"
         description="Najnovije vijesti, najave i izvještaji s utakmica te sva događanja u klubu."
-        stats={stats}
       />
 
       <div className="mx-auto mt-16 w-full max-w-4xl px-6 pb-24 sm:mt-20 lg:px-8">

@@ -2,7 +2,7 @@ import { Mail, Phone, UserRound } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { FadeInView, StaggerContainer, StaggerItem } from "@/components/animations";
-import { BrandedHero, type HeroStat } from "@/components/features/BrandedHero";
+import { BrandedHero } from "@/components/features/BrandedHero";
 import { fetchBoardMembers } from "@/lib/payload/getBoardMembers";
 import type { BoardMember, BoardRoleGroup } from "@/types/board";
 
@@ -38,20 +38,12 @@ export default async function UpravaPage() {
     }))
     .filter((section) => section.members.length > 0);
 
-  const stats: HeroStat[] = [
-    { value: String(members.length), label: "Članova" },
-    ...(grouped.length > 0
-      ? [{ value: String(grouped.length), label: "Tijela" }]
-      : []),
-  ];
-
   return (
     <>
       <BrandedHero
         eyebrow="Ljudi iza kluba"
         title="Uprava"
         description="Vodstvo i stručni stožer koji svakodnevno vode NK Vrapče."
-        stats={stats}
       />
 
       <div className="mx-auto w-full max-w-screen-xl px-6 pb-24 lg:px-8">

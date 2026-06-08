@@ -49,127 +49,144 @@ export function StandingsTable({ rows }: StandingsTableProps) {
       </div>
 
       <FadeInView delay={0.1} className="mt-8">
-        <div className="overflow-hidden border border-line bg-surface shadow-[0_30px_80px_-50px_rgba(10,28,51,0.35)]">
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-sm">
-              <thead>
-                <tr className="bg-brand-yellow text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-brand-navy/70">
-                  <th className="w-14 py-3.5 pl-5 pr-2 text-center font-semibold sm:pl-6">
-                    #
-                  </th>
-                  <th className="px-2 py-3.5 text-left font-semibold">Klub</th>
-                  <th className="w-10 px-2 py-3.5 text-center font-semibold">
-                    OU
-                  </th>
-                  <th className="hidden w-10 px-2 py-3.5 text-center font-semibold sm:table-cell">
-                    P
-                  </th>
-                  <th className="hidden w-10 px-2 py-3.5 text-center font-semibold sm:table-cell">
-                    N
-                  </th>
-                  <th className="hidden w-10 px-2 py-3.5 text-center font-semibold sm:table-cell">
-                    I
-                  </th>
-                  <th className="hidden w-16 px-2 py-3.5 text-center font-semibold md:table-cell">
-                    Golovi
-                  </th>
-                  <th className="w-12 px-2 py-3.5 text-center font-semibold">
-                    GR
-                  </th>
-                  <th className="w-16 py-3.5 pl-2 pr-5 text-center font-semibold sm:pr-6">
-                    Bod
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((row) => {
-                  const logo = teamLogo(row);
-                  const name = row.team?.name ?? "—";
-                  const gd = goalDiff(row);
-                  const mine = Boolean(row.highlight);
-                  return (
-                    <tr
-                      key={row.team?.id ?? row.position ?? name}
-                      className={`border-t border-line transition-colors ${
-                        mine ? "bg-brand-yellow/15" : "hover:bg-surface-2"
+        <div className="overflow-hidden border border-line bg-canvas shadow-[0_40px_100px_-60px_rgba(10,28,51,0.5)] ring-1 ring-brand-navy/5">
+          <table className="w-full border-collapse text-sm">
+            <thead>
+              <tr className="bg-brand-navy text-[0.62rem] font-bold uppercase tracking-[0.22em] text-white/55">
+                <th className="w-12 py-4 pl-4 pr-1 text-center sm:w-14 sm:pl-6">
+                  #
+                </th>
+                <th className="py-4 pl-1 pr-2 text-left">Klub</th>
+                <th className="hidden w-12 px-2 py-4 text-center sm:table-cell">
+                  OU
+                </th>
+                <th className="hidden w-10 px-2 py-4 text-center md:table-cell">
+                  P
+                </th>
+                <th className="hidden w-10 px-2 py-4 text-center md:table-cell">
+                  N
+                </th>
+                <th className="hidden w-10 px-2 py-4 text-center md:table-cell">
+                  I
+                </th>
+                <th className="hidden w-16 px-2 py-4 text-center md:table-cell">
+                  Golovi
+                </th>
+                <th className="hidden w-12 px-2 py-4 text-center sm:table-cell">
+                  GR
+                </th>
+                <th className="w-16 py-4 pl-2 pr-4 text-center text-brand-yellow sm:pr-6">
+                  Bod
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row) => {
+                const logo = teamLogo(row);
+                const name = row.team?.name ?? "—";
+                const gd = goalDiff(row);
+                const mine = Boolean(row.highlight);
+                return (
+                  <tr
+                    key={row.team?.id ?? row.position ?? name}
+                    className={`group border-t border-line/70 transition-colors ${
+                      mine
+                        ? "bg-brand-yellow/13"
+                        : "odd:bg-surface/40 hover:bg-surface-2"
+                    }`}
+                  >
+                    <td
+                      className={`relative border-l-[3px] py-3.5 pl-4 pr-1 text-center sm:pl-6 ${
+                        mine ? "border-brand-yellow" : "border-transparent"
                       }`}
                     >
-                      <td
-                        className={`border-l-[3px] py-3 pl-5 pr-2 text-center sm:pl-6 ${
-                          mine ? "border-brand-yellow" : "border-transparent"
+                      <span
+                        className={`inline-flex size-6.5 items-center justify-center text-xs font-extrabold tabular-nums ${
+                          mine
+                            ? "bg-brand-yellow text-brand-navy shadow-sm"
+                            : "text-muted-ink"
                         }`}
                       >
+                        {row.position ?? "–"}
+                      </span>
+                    </td>
+                    <td className="py-3.5 pl-1 pr-2">
+                      <div className="flex items-center gap-2.5 sm:gap-3">
                         <span
-                          className={`inline-flex size-6 items-center justify-center rounded-full text-xs font-bold tabular-nums ${
+                          className={`relative flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white ring-1 ${
+                            mine ? "ring-brand-yellow/60" : "ring-line"
+                          }`}
+                        >
+                          {logo ? (
+                            <Image
+                              src={logo}
+                              alt=""
+                              width={32}
+                              height={32}
+                              className="size-8 object-contain p-0.5"
+                            />
+                          ) : (
+                            <span className="text-[0.7rem] font-bold text-muted-ink">
+                              {name.charAt(0)}
+                            </span>
+                          )}
+                        </span>
+                        <span
+                          className={`min-w-0 truncate font-display text-[0.95rem] uppercase tracking-tight sm:text-base ${
                             mine
-                              ? "bg-brand-yellow text-brand-navy"
-                              : "text-muted-foreground"
+                              ? "font-extrabold text-brand-navy"
+                              : "font-bold text-ink"
                           }`}
                         >
-                          {row.position ?? "–"}
+                          {name}
                         </span>
-                      </td>
-                      <td className="px-2 py-3">
-                        <div className="flex items-center gap-3">
-                          <span className="relative flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-full bg-surface-2 ring-1 ring-line">
-                            {logo ? (
-                              <Image
-                                src={logo}
-                                alt=""
-                                width={28}
-                                height={28}
-                                className="size-7 object-contain"
-                              />
-                            ) : (
-                              <span className="text-[0.65rem] font-bold text-muted-foreground">
-                                {name.charAt(0)}
-                              </span>
-                            )}
+                        {mine && (
+                          <span className="ml-auto hidden shrink-0 bg-brand-yellow px-2 py-0.5 text-[0.55rem] font-bold uppercase tracking-[0.15em] text-brand-navy sm:inline-block">
+                            Naš klub
                           </span>
-                          <span
-                            className={`line-clamp-1 uppercase tracking-tight ${
-                              mine
-                                ? "font-extrabold text-brand-navy"
-                                : "font-semibold text-ink"
-                            }`}
-                          >
-                            {name}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-2 py-3 text-center tabular-nums text-muted-foreground">
-                        {row.played ?? "–"}
-                      </td>
-                      <td className="hidden px-2 py-3 text-center tabular-nums text-muted-foreground sm:table-cell">
-                        {row.wins ?? "–"}
-                      </td>
-                      <td className="hidden px-2 py-3 text-center tabular-nums text-muted-foreground sm:table-cell">
-                        {row.draws ?? "–"}
-                      </td>
-                      <td className="hidden px-2 py-3 text-center tabular-nums text-muted-foreground sm:table-cell">
-                        {row.losses ?? "–"}
-                      </td>
-                      <td className="hidden px-2 py-3 text-center tabular-nums text-muted-foreground md:table-cell">
-                        {row.goalsFor ?? 0}:{row.goalsAgainst ?? 0}
-                      </td>
-                      <td className="px-2 py-3 text-center tabular-nums text-muted-foreground">
-                        {gd > 0 ? `+${gd}` : gd}
-                      </td>
-                      <td className="py-3 pl-2 pr-5 text-center sm:pr-6">
-                        <span
-                          className={`font-display font-extrabold tabular-nums ${
-                            mine ? "text-brand-navy" : "text-ink"
-                          }`}
-                        >
-                          {row.points ?? 0}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                        )}
+                      </div>
+                    </td>
+                    <td className="hidden px-2 py-3.5 text-center tabular-nums text-muted-ink sm:table-cell">
+                      {row.played ?? "–"}
+                    </td>
+                    <td className="hidden px-2 py-3.5 text-center tabular-nums text-muted-ink md:table-cell">
+                      {row.wins ?? "–"}
+                    </td>
+                    <td className="hidden px-2 py-3.5 text-center tabular-nums text-muted-ink md:table-cell">
+                      {row.draws ?? "–"}
+                    </td>
+                    <td className="hidden px-2 py-3.5 text-center tabular-nums text-muted-ink md:table-cell">
+                      {row.losses ?? "–"}
+                    </td>
+                    <td className="hidden px-2 py-3.5 text-center tabular-nums text-muted-ink md:table-cell">
+                      {row.goalsFor ?? 0}:{row.goalsAgainst ?? 0}
+                    </td>
+                    <td
+                      className={`hidden px-2 py-3.5 text-center font-semibold tabular-nums sm:table-cell ${
+                        gd > 0
+                          ? "text-emerald-600"
+                          : gd < 0
+                            ? "text-rose-500"
+                            : "text-muted-ink"
+                      }`}
+                    >
+                      {gd > 0 ? `+${gd}` : gd}
+                    </td>
+                    <td className="py-3.5 pl-2 pr-4 text-center sm:pr-6">
+                      <span
+                        className={`inline-flex min-w-9 items-center justify-center font-display text-lg font-extrabold tabular-nums ${
+                          mine ? "text-brand-navy" : "text-ink"
+                        }`}
+                      >
+                        {row.points ?? 0}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       </FadeInView>
 
