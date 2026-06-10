@@ -111,9 +111,7 @@ export default function Hero({ tenant }: { tenant: FrontendTenant }) {
 					{nameParts.map((part, idx) => (
 						<span
 							key={part}
-							className={`block overflow-hidden pb-[0.04em] pt-[0.22em] ${
-								idx > 0 ? "-mt-[0.18em]" : ""
-							}`}
+							className="block overflow-hidden pb-[0.06em] pt-[0.42em]"
 						>
 							<motion.span
 								className="block text-[clamp(3.5rem,15vw,9.5rem)]"

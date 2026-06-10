@@ -73,7 +73,7 @@ export default async function NewsPage({ searchParams }: Props) {
           </p>
         ) : (
           <StaggerContainer
-            className="divide-y divide-line border-y border-line"
+            className="divide-y divide-line border-b border-line"
             staggerChildren={0.05}
           >
             {docs.map((doc) => {
