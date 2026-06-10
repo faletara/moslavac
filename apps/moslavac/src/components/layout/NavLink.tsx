@@ -23,7 +23,7 @@ export default function NavLink({
     !isExternal && (pathname === href || pathname.startsWith(`${href}/`));
 
   const base =
-    "text-xs font-medium uppercase tracking-[0.2em] transition-colors hover:text-foreground";
+    "inline-flex items-center text-xs font-medium uppercase tracking-[0.2em] transition-colors hover:text-foreground";
   const state = isActive ? "text-foreground" : "text-muted-foreground";
 
   if (isExternal) {

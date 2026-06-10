@@ -68,21 +68,33 @@ export default async function SkolaNogometaPage() {
               </p>
             </div>
 
-            <StaggerContainer
-              className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8"
-              staggerChildren={0.07}
-            >
-              {programs.map((program, index) => (
-                <StaggerItem key={program.id}>
-                  <Link
-                    href={`/skola-nogometa/${program.id}`}
-                    className="group block h-full transition-transform duration-300 hover:-translate-y-1.5"
-                  >
-                    <ProgramCard program={program} index={index} />
-                  </Link>
-                </StaggerItem>
-              ))}
-            </StaggerContainer>
+            {/* Razvojna ljestvica — okomiti niz koji prati put od U7 do juniora.
+                Tanka žuta spina lijevo veže korake u jedinstvenu priču. */}
+            <div className="relative mt-12 sm:mt-16">
+              <span
+                aria-hidden
+                className="pointer-events-none absolute bottom-10 left-[1.45rem] top-10 hidden w-px bg-gradient-to-b from-brand-yellow/70 via-line to-transparent sm:block"
+              />
+              <StaggerContainer
+                className="flex flex-col gap-5 sm:gap-6"
+                staggerChildren={0.08}
+              >
+                {programs.map((program, index) => (
+                  <StaggerItem key={program.id}>
+                    <Link
+                      href={`/skola-nogometa/${program.id}`}
+                      className="group block"
+                    >
+                      <ProgramRow
+                        program={program}
+                        index={index}
+                        total={programs.length}
+                      />
+                    </Link>
+                  </StaggerItem>
+                ))}
+              </StaggerContainer>
+            </div>
           </>
         )}
       </div>
@@ -90,12 +102,14 @@ export default async function SkolaNogometaPage() {
   );
 }
 
-function ProgramCard({
+function ProgramRow({
   program,
   index,
+  total,
 }: {
   program: SchoolProgram;
   index: number;
+  total: number;
 }) {
   const photoUrl = program.photo?.sizes?.card?.url ?? program.photo?.url ?? null;
   // Naziv kategorije bez raspona uzrasta (npr. "Limači U7–U9" → "Limači")
@@ -103,76 +117,82 @@ function ProgramCard({
     ? program.name.replace(program.ageRange, "").trim() || program.name
     : program.name;
   const idx = String(index + 1).padStart(2, "0");
+  const isLast = index === total - 1;
 
   return (
-    <FadeInView className="relative flex h-full flex-col overflow-hidden border border-white/10 bg-gradient-to-br from-brand-navy to-brand-navy-700 shadow-[0_12px_30px_-18px_rgba(10,28,51,0.5)] transition-all duration-300 group-hover:border-brand-yellow/70 group-hover:shadow-[0_28px_55px_-22px_rgba(255,203,5,0.32)]">
-      {/* Suptilna fotka u pozadini (ako postoji) */}
-      {photoUrl && (
-        <div aria-hidden className="absolute inset-0 -z-10">
-          <Image
-            src={photoUrl}
-            alt=""
-            fill
-            sizes="(min-width: 1024px) 30vw, 45vw"
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-brand-navy/92 via-brand-navy/85 to-brand-navy-700/92" />
-        </div>
-      )}
-      {/* Ogromni ghost indeks */}
+    <FadeInView className="relative sm:pl-16">
+      {/* Čvor na spini — žuti prsten poravnat s lijevom linijom. */}
       <span
         aria-hidden
-        className="pointer-events-none absolute -right-3 -top-10 select-none text-[8.5rem] font-black leading-none tracking-tighter text-white/[0.04]"
-      >
-        {idx}
-      </span>
-      {/* Topli žuti glow u kutu */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -right-1/4 -top-1/4 h-2/3 w-2/3 rounded-full opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-        style={{
-          background:
-            "radial-gradient(closest-side, rgba(255,203,5,0.12), transparent 70%)",
-        }}
+        className="absolute left-[1.45rem] top-9 z-10 hidden size-3 -translate-x-1/2 rounded-full border-2 border-brand-yellow bg-canvas transition-colors duration-300 group-hover:bg-brand-yellow sm:block"
       />
 
-      <div className="relative flex flex-1 flex-col p-7">
-        {program.ageRange && (
-          <span className="inline-flex w-fit bg-brand-yellow px-3 py-1 text-[0.6rem] font-bold uppercase tracking-[0.2em] text-brand-navy shadow-[0_4px_14px_-4px_rgba(255,203,5,0.6)]">
-            {program.ageRange}
+      <article className="relative flex flex-col overflow-hidden border border-white/10 bg-linear-to-br from-brand-navy to-brand-navy-700 shadow-[0_12px_30px_-18px_rgba(10,28,51,0.5)] transition-all duration-300 group-hover:-translate-y-0.5 group-hover:border-brand-yellow/70 group-hover:shadow-[0_28px_55px_-22px_rgba(255,203,5,0.32)] sm:flex-row">
+        {/* Suptilna fotka u pozadini (ako postoji) */}
+        {photoUrl && (
+          <div aria-hidden className="absolute inset-0 -z-10">
+            <Image
+              src={photoUrl}
+              alt=""
+              fill
+              sizes="(min-width: 640px) 60vw, 100vw"
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-linear-to-br from-brand-navy/92 via-brand-navy/85 to-brand-navy-700/92" />
+          </div>
+        )}
+
+        {/* Lijevi rail — ogroman žuti redni broj + uzrast: ritam ljestvice. */}
+        <div className="relative flex shrink-0 items-center gap-5 border-b border-white/10 bg-black/15 px-7 py-5 sm:w-52 sm:flex-col sm:items-start sm:justify-center sm:border-b-0 sm:border-r sm:py-8">
+          <span className="select-none font-display text-6xl font-black leading-none tracking-tighter text-brand-yellow sm:text-7xl">
+            {idx}
           </span>
-        )}
-
-        <h3 className="mt-6 text-balance font-display text-4xl font-extrabold uppercase leading-[0.95] tracking-tight text-white sm:text-5xl">
-          {category}
-        </h3>
-
-        {program.description && (
-          <p className="mt-4 text-sm leading-relaxed text-white/65">
-            {program.description}
-          </p>
-        )}
-
-        <div className="mt-auto flex flex-col gap-2 border-t border-white/10 pt-5 text-xs text-white/60">
-          {program.coach && (
-            <span className="inline-flex items-center gap-2">
-              <UserRound className="size-3.5 text-brand-blue" />
-              {program.coach}
+          {program.ageRange && (
+            <span className="inline-flex w-fit bg-brand-yellow px-3 py-1 text-[0.6rem] font-bold uppercase tracking-[0.2em] text-brand-navy shadow-[0_4px_14px_-4px_rgba(255,203,5,0.6)] sm:mt-1">
+              {program.ageRange}
             </span>
           )}
-          {program.schedule && (
-            <span className="inline-flex items-center gap-2">
-              <Clock className="size-3.5 text-brand-blue" />
-              {program.schedule}
+          {/* Mikro-oznaka kraja puta na zadnjem koraku. */}
+          {isLast && (
+            <span className="hidden text-[0.55rem] font-semibold uppercase tracking-[0.25em] text-brand-blue sm:mt-3 sm:block">
+              → Seniori
             </span>
           )}
         </div>
 
-        <span className="mt-5 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-brand-yellow">
-          Saznaj više
-          <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
-        </span>
-      </div>
+        {/* Sadržaj */}
+        <div className="relative flex flex-1 flex-col p-7 sm:p-8">
+          <h3 className="text-balance font-display text-4xl font-extrabold uppercase leading-[0.95] tracking-tight text-white sm:text-5xl">
+            {category}
+          </h3>
+
+          {program.description && (
+            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/65">
+              {program.description}
+            </p>
+          )}
+
+          <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 border-t border-white/10 pt-5 text-xs text-white/60">
+            {program.coach && (
+              <span className="inline-flex items-center gap-2">
+                <UserRound className="size-3.5 text-brand-blue" />
+                {program.coach}
+              </span>
+            )}
+            {program.schedule && (
+              <span className="inline-flex items-center gap-2">
+                <Clock className="size-3.5 text-brand-blue" />
+                {program.schedule}
+              </span>
+            )}
+          </div>
+
+          <span className="mt-5 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-brand-yellow">
+            Saznaj više
+            <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+          </span>
+        </div>
+      </article>
     </FadeInView>
   );
 }

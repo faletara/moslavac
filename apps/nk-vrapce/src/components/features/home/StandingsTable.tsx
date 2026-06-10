@@ -16,15 +16,14 @@ function teamLogo(row: TeamRanking): string | null {
 }
 
 /**
- * Tablica seniorske lige (HNS). Redak našeg kluba je istaknut.
- * Renderira se samo ako ima redaka.
+ * Tablica seniorske lige (HNS). Tamna premium kartica — redak našeg kluba je
+ * žuto istaknut. Renderira se samo ako ima redaka.
  */
 export function StandingsTable({ rows }: StandingsTableProps) {
   if (rows.length === 0) return null;
 
   return (
     <section className="relative isolate mx-auto w-full max-w-6xl px-6 sm:px-10">
-
       {/* Editorial header */}
       <div className="flex flex-wrap items-end justify-between gap-6 border-b border-line pb-6">
         <div className="flex flex-col gap-3">
@@ -38,10 +37,10 @@ export function StandingsTable({ rows }: StandingsTableProps) {
       </div>
 
       <FadeInView delay={0.1} className="mt-8">
-        <div className="overflow-hidden border border-line bg-canvas shadow-[0_40px_100px_-60px_rgba(10,28,51,0.5)] ring-1 ring-brand-navy/5">
+        <div className="overflow-hidden border border-white/10 bg-brand-navy shadow-[0_40px_100px_-50px_rgba(10,28,51,0.8)]">
           <table className="w-full border-collapse text-sm">
             <thead>
-              <tr className="bg-brand-navy text-[0.62rem] font-bold uppercase tracking-[0.22em] text-white/55">
+              <tr className="bg-black/30 text-[0.62rem] font-bold uppercase tracking-[0.22em] text-white/50">
                 <th className="w-12 py-4 pl-4 pr-1 text-center sm:w-14 sm:pl-6">
                   #
                 </th>
@@ -78,10 +77,10 @@ export function StandingsTable({ rows }: StandingsTableProps) {
                 return (
                   <tr
                     key={row.team?.id ?? row.position ?? name}
-                    className={`group border-t border-line/70 transition-colors ${
+                    className={`group border-t border-white/5 transition-colors ${
                       mine
-                        ? "bg-brand-yellow/13"
-                        : "odd:bg-surface/40 hover:bg-surface-2"
+                        ? "bg-brand-yellow/15"
+                        : "odd:bg-white/3 hover:bg-white/7"
                     }`}
                   >
                     <td
@@ -93,7 +92,7 @@ export function StandingsTable({ rows }: StandingsTableProps) {
                         className={`inline-flex size-6.5 items-center justify-center text-xs font-extrabold tabular-nums ${
                           mine
                             ? "bg-brand-yellow text-brand-navy shadow-sm"
-                            : "text-muted-ink"
+                            : "text-white/45"
                         }`}
                       >
                         {row.position ?? "–"}
@@ -103,7 +102,7 @@ export function StandingsTable({ rows }: StandingsTableProps) {
                       <div className="flex items-center gap-2.5 sm:gap-3">
                         <span
                           className={`relative flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white ring-1 ${
-                            mine ? "ring-brand-yellow/60" : "ring-line"
+                            mine ? "ring-brand-yellow/60" : "ring-white/15"
                           }`}
                         >
                           {logo ? (
@@ -115,7 +114,7 @@ export function StandingsTable({ rows }: StandingsTableProps) {
                               className="size-8 object-contain p-0.5"
                             />
                           ) : (
-                            <span className="text-[0.7rem] font-bold text-muted-ink">
+                            <span className="text-[0.7rem] font-bold text-brand-navy">
                               {name.charAt(0)}
                             </span>
                           )}
@@ -123,8 +122,8 @@ export function StandingsTable({ rows }: StandingsTableProps) {
                         <span
                           className={`min-w-0 truncate font-display text-[0.95rem] uppercase tracking-tight sm:text-base ${
                             mine
-                              ? "font-extrabold text-brand-navy underline decoration-brand-yellow decoration-2 underline-offset-4"
-                              : "font-bold text-ink"
+                              ? "font-extrabold text-brand-yellow"
+                              : "font-bold text-white"
                           }`}
                         >
                           {name}
@@ -136,28 +135,28 @@ export function StandingsTable({ rows }: StandingsTableProps) {
                         )}
                       </div>
                     </td>
-                    <td className="hidden px-2 py-3.5 text-center tabular-nums text-muted-ink sm:table-cell">
+                    <td className="hidden px-2 py-3.5 text-center tabular-nums text-white/55 sm:table-cell">
                       {row.played ?? "–"}
                     </td>
-                    <td className="hidden px-2 py-3.5 text-center tabular-nums text-muted-ink md:table-cell">
+                    <td className="hidden px-2 py-3.5 text-center tabular-nums text-white/55 md:table-cell">
                       {row.wins ?? "–"}
                     </td>
-                    <td className="hidden px-2 py-3.5 text-center tabular-nums text-muted-ink md:table-cell">
+                    <td className="hidden px-2 py-3.5 text-center tabular-nums text-white/55 md:table-cell">
                       {row.draws ?? "–"}
                     </td>
-                    <td className="hidden px-2 py-3.5 text-center tabular-nums text-muted-ink md:table-cell">
+                    <td className="hidden px-2 py-3.5 text-center tabular-nums text-white/55 md:table-cell">
                       {row.losses ?? "–"}
                     </td>
-                    <td className="hidden px-2 py-3.5 text-center tabular-nums text-muted-ink md:table-cell">
+                    <td className="hidden px-2 py-3.5 text-center tabular-nums text-white/55 md:table-cell">
                       {row.goalsFor ?? 0}:{row.goalsAgainst ?? 0}
                     </td>
                     <td
                       className={`hidden px-2 py-3.5 text-center font-semibold tabular-nums sm:table-cell ${
                         gd > 0
-                          ? "text-emerald-600"
+                          ? "text-emerald-400"
                           : gd < 0
-                            ? "text-rose-500"
-                            : "text-muted-ink"
+                            ? "text-rose-400"
+                            : "text-white/55"
                       }`}
                     >
                       {gd > 0 ? `+${gd}` : gd}
@@ -165,7 +164,7 @@ export function StandingsTable({ rows }: StandingsTableProps) {
                     <td className="py-3.5 pl-2 pr-4 text-center sm:pr-6">
                       <span
                         className={`inline-flex min-w-9 items-center justify-center font-display text-lg font-extrabold tabular-nums ${
-                          mine ? "text-brand-navy" : "text-ink"
+                          mine ? "text-brand-yellow" : "text-white"
                         }`}
                       >
                         {row.points ?? 0}

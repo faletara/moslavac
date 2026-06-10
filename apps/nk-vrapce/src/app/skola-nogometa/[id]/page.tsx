@@ -10,6 +10,7 @@ import {
   fetchSchoolPrograms,
 } from "@/lib/payload/getSchoolPrograms";
 import { BASE_URL } from "@/lib/siteUrl";
+import type { SchoolProgram } from "@/types/school";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -35,7 +36,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function SchoolProgramPage({ params }: Props) {
   const { id } = await params;
-  const program = await fetchSchoolProgramById({ id });
+  const [program, allPrograms] = await Promise.all([
+    fetchSchoolProgramById({ id }),
+    fetchSchoolPrograms(),
+  ]);
   if (!program) notFound();
 
   const photoUrl =
@@ -45,6 +49,15 @@ export default async function SchoolProgramPage({ params }: Props) {
     ? program.name.replace(program.ageRange, "").trim() || program.name
     : program.name;
 
+  // Pozicija ovog koraka unutar razvojnog puta + prethodni/sljedeći program.
+  const currentIndex = allPrograms.findIndex((p) => p.id === program.id);
+  const stepNo = currentIndex >= 0 ? currentIndex + 1 : 1;
+  const prev = currentIndex > 0 ? allPrograms[currentIndex - 1] : null;
+  const next =
+    currentIndex >= 0 && currentIndex < allPrograms.length - 1
+      ? allPrograms[currentIndex + 1]
+      : null;
+
   return (
     <>
       <BrandedHero
@@ -52,11 +65,11 @@ export default async function SchoolProgramPage({ params }: Props) {
           program.ageRange ? `Uzrast ${program.ageRange}` : "Škola nogometa"
         }
         title={category}
-        cta={{ label: "Upiši dijete", href: "/kontakt" }}
+        cta={{ label: "Javi nam se", href: "/kontakt" }}
         backgroundImage={photoUrl}
       />
 
-      <article className="mx-auto w-full max-w-3xl px-6 pt-12 pb-24 sm:pt-16 lg:px-8">
+      <article className="mx-auto w-full max-w-4xl px-6 pt-12 pb-24 sm:pt-16 lg:px-8">
         <Link
           href="/skola-nogometa"
           className="group inline-flex items-center gap-3 text-[0.65rem] font-medium uppercase tracking-[0.3em] text-muted-foreground transition-colors hover:text-brand-blue sm:text-xs"
@@ -64,6 +77,47 @@ export default async function SchoolProgramPage({ params }: Props) {
           <ArrowLeft className="size-4 transition-transform duration-300 group-hover:-translate-x-1" />
           Svi programi
         </Link>
+
+        {/* Razvojni put — mini ljestvica koja smješta ovaj korak u cjelinu. */}
+        {allPrograms.length > 1 && (
+          <div className="mt-10 border-y border-line py-6">
+            <div className="flex items-baseline justify-between">
+              <span className="text-[0.6rem] font-semibold uppercase tracking-[0.3em] text-brand-blue">
+                Razvojni put
+              </span>
+              <span className="font-display text-sm font-bold uppercase tracking-wide text-ink">
+                Korak {String(stepNo).padStart(2, "0")}
+                <span className="text-muted-foreground">
+                  {" "}
+                  / {String(allPrograms.length).padStart(2, "0")}
+                </span>
+              </span>
+            </div>
+            <ol className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-3">
+              {allPrograms.map((p, i) => {
+                const isCurrent = p.id === program.id;
+                return (
+                  <li key={p.id} className="flex items-center gap-2">
+                    <Link
+                      href={`/skola-nogometa/${p.id}`}
+                      aria-current={isCurrent ? "step" : undefined}
+                      className={
+                        isCurrent
+                          ? "inline-flex items-center bg-brand-yellow px-3 py-1.5 text-[0.65rem] font-bold uppercase tracking-[0.15em] text-brand-navy shadow-[0_4px_14px_-4px_rgba(255,203,5,0.6)]"
+                          : "inline-flex items-center border border-line px-3 py-1.5 text-[0.65rem] font-bold uppercase tracking-[0.15em] text-muted-foreground transition-colors hover:border-brand-yellow hover:text-ink"
+                      }
+                    >
+                      {p.ageRange ?? p.name}
+                    </Link>
+                    {i < allPrograms.length - 1 && (
+                      <span aria-hidden className="h-px w-4 bg-line" />
+                    )}
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+        )}
 
         {/* Brze činjenice — trener i termini (uređuju se u CMS-u) */}
         {(program.coach || program.schedule) && (
@@ -105,7 +159,7 @@ export default async function SchoolProgramPage({ params }: Props) {
         </section>
 
         {/* Upis i kontakt — brandirana CTA kartica */}
-        <section className="relative isolate mt-12 overflow-hidden bg-gradient-to-br from-brand-navy to-brand-navy-700 p-8 sm:mt-16 sm:p-12">
+        <section className="relative isolate mt-12 overflow-hidden bg-linear-to-br from-brand-navy to-brand-navy-700 p-8 sm:mt-16 sm:p-12">
           {/* Grb watermark u kutu */}
           <div
             aria-hidden
@@ -132,18 +186,18 @@ export default async function SchoolProgramPage({ params }: Props) {
           <div className="relative z-10 flex flex-col gap-4">
             <span className="h-[3px] w-10 rounded-full bg-brand-yellow" />
             <h2 className="font-display text-2xl font-extrabold uppercase tracking-tight text-white sm:text-3xl">
-              Upiši dijete
+              Pridruži nam se
             </h2>
             <p className="max-w-md text-sm leading-relaxed text-white/70">
-              Za sve informacije o uključivanju djeteta u program javite se na
-              kontakt kluba — rado ćemo odgovoriti na sva pitanja.
+              Želiš da tvoje dijete trenira u NK Vrapče? Javi nam se — dogovorit
+              ćemo termin i odgovoriti na sve što te zanima.
             </p>
             <div className="mt-2 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/kontakt"
                 className="group inline-flex items-center justify-center gap-2 bg-brand-yellow px-7 py-3.5 text-[0.7rem] font-bold uppercase tracking-[0.3em] text-brand-navy shadow-[0_8px_30px_-6px_rgba(255,203,5,0.5)] transition-all hover:scale-[1.03] hover:shadow-[0_10px_40px_-6px_rgba(255,203,5,0.65)]"
               >
-                Upiši dijete
+                Javi nam se
                 <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
               </Link>
               <Link
@@ -155,8 +209,55 @@ export default async function SchoolProgramPage({ params }: Props) {
             </div>
           </div>
         </section>
+
+        {/* Prethodni / sljedeći korak razvojnog puta */}
+        {(prev || next) && (
+          <nav className="mt-12 grid grid-cols-1 gap-4 border-t border-line pt-8 sm:grid-cols-2">
+            {prev ? (
+              <ProgramNavLink program={prev} direction="prev" />
+            ) : (
+              <span aria-hidden />
+            )}
+            {next && <ProgramNavLink program={next} direction="next" />}
+          </nav>
+        )}
       </article>
     </>
+  );
+}
+
+function ProgramNavLink({
+  program,
+  direction,
+}: {
+  program: SchoolProgram;
+  direction: "prev" | "next";
+}) {
+  const isNext = direction === "next";
+  const category = program.ageRange
+    ? program.name.replace(program.ageRange, "").trim() || program.name
+    : program.name;
+  return (
+    <Link
+      href={`/skola-nogometa/${program.id}`}
+      className={`group flex flex-col gap-1 border border-line p-5 transition-colors hover:border-brand-yellow ${isNext ? "items-end text-right" : "items-start"}`}
+    >
+      <span className="inline-flex items-center gap-2 text-[0.6rem] font-semibold uppercase tracking-[0.3em] text-muted-foreground">
+        {!isNext && (
+          <ArrowLeft className="size-3.5 transition-transform duration-300 group-hover:-translate-x-1" />
+        )}
+        {isNext ? "Sljedeći korak" : "Prethodni korak"}
+        {isNext && (
+          <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+        )}
+      </span>
+      <span className="font-display text-lg font-extrabold uppercase tracking-tight text-ink transition-colors group-hover:text-brand-blue-dark">
+        {category}
+      </span>
+      {program.ageRange && (
+        <span className="text-xs text-muted-foreground">{program.ageRange}</span>
+      )}
+    </Link>
   );
 }
 

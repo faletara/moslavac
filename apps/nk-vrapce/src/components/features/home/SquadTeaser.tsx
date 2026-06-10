@@ -51,12 +51,21 @@ export function SquadTeaser({ players }: { players: RosterEntry[] }) {
 	);
 }
 
+const POSITION_LABEL: Record<RosterEntry["position"], string> = {
+	vratar: "Vratar",
+	obrambeni: "Obrana",
+	vezni: "Vezni red",
+	napadac: "Napad",
+	trener: "Trener",
+};
+
 function SquadCard({ player }: { player: RosterEntry }) {
 	const photoUrl = player.photo?.sizes?.card?.url ?? player.photo?.url ?? null;
 	const ghostMark =
 		player.jerseyNumber != null
 			? String(player.jerseyNumber)
 			: player.displayName.charAt(0);
+	const positionLabel = POSITION_LABEL[player.position];
 
 	return (
 		<Link href="/seniori" className="group block">
@@ -70,19 +79,28 @@ function SquadCard({ player }: { player: RosterEntry }) {
 						className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.06]"
 					/>
 				) : (
-					// Brandirani fallback — golem ghost broj/inicijal (osjećaj dresa)
-					<div className="absolute inset-0 bg-gradient-to-br from-black to-brand-navy-700">
+					// Brandirani fallback — chevron motiv s dresa + golem ghost broj
+					<div className="absolute inset-0 bg-linear-to-br from-black to-brand-navy-700">
+						{/* Kosi pruge — heritage motiv preuzet s dresa Vrapča */}
+						<div
+							aria-hidden
+							className="absolute inset-0 opacity-[0.06]"
+							style={{
+								backgroundImage:
+									"repeating-linear-gradient(135deg, #ffcb05 0 2px, transparent 2px 16px)",
+							}}
+						/>
 						<div
 							aria-hidden
 							className="absolute left-1/2 top-1/2 h-3/4 w-3/4 -translate-x-1/2 -translate-y-1/2 rounded-full"
 							style={{
 								background:
-									"radial-gradient(closest-side, rgba(255,203,5,0.14), transparent 70%)",
+									"radial-gradient(closest-side, rgba(255,203,5,0.16), transparent 70%)",
 							}}
 						/>
 						<span
 							aria-hidden
-							className="absolute inset-0 flex select-none items-center justify-center text-[7rem] font-black leading-none tracking-tighter text-white/[0.07]"
+							className="absolute inset-0 flex select-none items-center justify-center text-[7rem] font-black leading-none tracking-tighter text-brand-yellow/10"
 						>
 							{ghostMark}
 						</span>
@@ -103,12 +121,17 @@ function SquadCard({ player }: { player: RosterEntry }) {
 					</span>
 				)}
 
-				{/* Ime preklopljeno preko slike */}
+				{/* Ime + pozicija preklopljeni preko slike */}
 				<div className="absolute inset-x-0 bottom-0 flex flex-col gap-1.5 p-4">
 					<span className="h-px w-6 bg-brand-yellow transition-all duration-300 group-hover:w-12" />
 					<h3 className="text-balance text-sm font-bold uppercase leading-tight tracking-tight text-white sm:text-base">
 						{player.displayName}
 					</h3>
+					{positionLabel && (
+						<span className="text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-brand-yellow/90">
+							{positionLabel}
+						</span>
+					)}
 				</div>
 			</div>
 		</Link>

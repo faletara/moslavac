@@ -1,4 +1,3 @@
-import { ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -7,6 +6,16 @@ import { BrandedHero } from "@/components/features/BrandedHero";
 import { formatDateShort } from "@/lib/helpers/date";
 import { fetchNewsPaginated } from "@/lib/payload/getNews";
 import { getTenant } from "@/lib/payload/getTenant";
+
+type NewsDoc = Awaited<
+  ReturnType<typeof fetchNewsPaginated>
+>["docs"][number];
+
+function newsThumb(doc: NewsDoc): string | null {
+  return doc.thumbnail && typeof doc.thumbnail === "object"
+    ? doc.thumbnail.url
+    : null;
+}
 
 export const metadata: Metadata = {
   title: "Vijesti i obavijesti",
@@ -45,48 +54,61 @@ export default async function NewsPage({ searchParams }: Props) {
         description="Najnovije vijesti, najave i izvještaji s utakmica te sva događanja u klubu."
       />
 
-      <div className="mx-auto mt-16 w-full max-w-4xl px-6 pb-24 sm:mt-20 lg:px-8">
+      <div className="mx-auto mt-16 w-full max-w-5xl px-6 pb-24 sm:mt-20 lg:px-8">
+        {/* Brojač + oznaka stranice — arhivski list, ne homepage hero */}
+        <div className="mb-8 flex items-end justify-between border-b border-line pb-5">
+          <span className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-brand-blue">
+            Sve objave
+          </span>
+          {totalPages > 1 && (
+            <span className="font-display text-sm font-bold uppercase tracking-wide text-muted-foreground tabular-nums">
+              Stranica {String(page).padStart(2, "0")} / {String(totalPages).padStart(2, "0")}
+            </span>
+          )}
+        </div>
+
         {docs.length === 0 ? (
           <p className="py-16 text-center text-xs uppercase tracking-[0.3em] text-muted-foreground">
             Nema dostupnih vijesti.
           </p>
         ) : (
           <StaggerContainer
-            className="divide-y divide-border/60 border-y border-border/60"
-            staggerChildren={0.06}
+            className="divide-y divide-line border-y border-line"
+            staggerChildren={0.05}
           >
             {docs.map((doc) => {
-              const thumbnailUrl =
-                doc.thumbnail && typeof doc.thumbnail === "object"
-                  ? doc.thumbnail.url
-                  : null;
+              const thumbnailUrl = newsThumb(doc);
               const date = doc.publishedAt ?? doc.createdAt;
               return (
                 <StaggerItem key={doc.id}>
                   <Link
                     href={`/novosti/${doc.slug ?? doc.id}`}
-                    className="group grid grid-cols-[auto_1fr_auto] items-center gap-4 py-6 sm:gap-8 sm:py-8"
+                    className="group grid grid-cols-[6rem_1fr] items-stretch gap-5 py-5 sm:grid-cols-[13rem_1fr] sm:gap-7 sm:py-6"
                   >
-                    <div className="relative size-20 shrink-0 overflow-hidden bg-muted sm:size-28">
+                    <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden bg-surface-2 sm:aspect-[16/10]">
                       <Image
                         src={thumbnailUrl || fallback}
                         alt={doc.title}
                         fill
-                        sizes="(min-width: 640px) 7rem, 5rem"
+                        sizes="(min-width: 640px) 13rem, 6rem"
                         className={`transition-transform duration-500 group-hover:scale-105 ${
-                          thumbnailUrl ? "object-cover" : "object-contain p-3"
+                          thumbnailUrl ? "object-cover" : "object-contain p-3 opacity-40"
                         }`}
                       />
                     </div>
-                    <div className="min-w-0 space-y-2">
-                      <p className="text-[0.65rem] font-medium uppercase tracking-[0.3em] text-muted-foreground">
+                    <div className="flex min-w-0 flex-col justify-center gap-2 sm:gap-3">
+                      <p className="text-[0.6rem] font-semibold uppercase tracking-[0.3em] text-brand-blue sm:text-[0.65rem]">
                         {formatDateShort(date)}
                       </p>
-                      <h2 className="line-clamp-2 text-base font-bold leading-snug tracking-tight transition-colors group-hover:text-brand-blue sm:text-xl">
+                      <h2 className="line-clamp-3 text-balance font-display text-lg font-extrabold uppercase leading-[1.05] tracking-tight text-ink transition-colors group-hover:text-brand-blue-dark sm:text-2xl">
                         {doc.title}
                       </h2>
+                      {doc.excerpt && (
+                        <p className="hidden line-clamp-2 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:block">
+                          {doc.excerpt}
+                        </p>
+                      )}
                     </div>
-                    <ArrowRight className="hidden size-5 text-muted-foreground transition-all duration-300 group-hover:translate-x-1 group-hover:text-brand-blue sm:block" />
                   </Link>
                 </StaggerItem>
               );

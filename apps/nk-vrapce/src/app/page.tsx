@@ -4,7 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import {
-	AnimatedLine,
 	FadeInView,
 	StaggerContainer,
 	StaggerItem,
@@ -110,7 +109,7 @@ export default async function HomePage() {
 			)}
 
 			{standings && standings.rows.length > 0 && (
-				<Band>
+				<Band tone="surface">
 					<StandingsTable rows={standings.rows} />
 				</Band>
 			)}
@@ -121,19 +120,20 @@ export default async function HomePage() {
 				</Band>
 			)}
 
-			<Band>
+			<Band tone="yellow">
 				<TeaserBand
+					variant="yellow"
 					eyebrow="Generacije koje dolaze"
 					title="Škola nogometa"
-					text="Dajte svom djetetu dres, ekipu i prve nogometne korake uz iskusne trenere NK Vrapče. Upisi za najmlađe Vrapčiće su otvoreni."
+					text="Želiš da tvoje dijete zaigra nogomet? U školi NK Vrapče vodimo najmlađe od prvih koraka s loptom do juniora. Upisi su otvoreni."
 					href="/skola-nogometa"
-					cta="Upiši dijete"
+					cta="Javi nam se"
 					image="/skola-nogometa.jpg"
 				/>
 			</Band>
 
 			{featured.length > 0 && (
-				<Band>
+				<Band tone="surface">
 					<FeaturedShop
 						items={featured.map((item) => ({
 							id: item.id,
@@ -165,7 +165,7 @@ export default async function HomePage() {
 				</Band>
 			)}
 
-			<div className="py-20 sm:py-28">
+			<div className="py-16 sm:py-24">
 				<LunaticsBand />
 			</div>
 		</>
@@ -173,36 +173,25 @@ export default async function HomePage() {
 }
 
 /**
- * Puna-širina traka za ritam homepagea: `plain` = bijela (sa suptilnim grb
- * motivom), `yellow` = žuti brand-beat. Crno (Hero/Lunatics) je izvan Band-a.
+ * Puna-širina traka za ritam homepagea. Tonovi se izmjenjuju da sekcije ne
+ * plutaju u bijeloj praznini: `plain` = bijela, `surface` = svijetlo-siva
+ * (lagani panel-odmak), `yellow` = žuti brand-beat. Crno (Hero/Lunatics) je
+ * izvan Band-a.
  */
 function Band({
 	tone = "plain",
 	children,
 }: {
-	tone?: "plain" | "yellow";
+	tone?: "plain" | "surface" | "yellow";
 	children: ReactNode;
 }) {
-	return (
-		<div
-			className={`py-20 sm:py-28 ${tone === "yellow" ? "bg-brand-yellow" : ""}`}
-		>
-			{children}
-		</div>
-	);
-}
-
-function SectionHeading({ title }: { title: string }) {
-	return (
-		<div className="flex flex-col items-center gap-4 text-center">
-			<FadeInView delay={0.1}>
-				<h2 className="font-display text-4xl font-extrabold uppercase leading-[0.9] tracking-tight text-ink sm:text-5xl md:text-6xl">
-					{title}
-				</h2>
-			</FadeInView>
-			<AnimatedLine className="mx-auto h-[3px] w-10 rounded-full bg-brand-yellow" />
-		</div>
-	);
+	const toneClass =
+		tone === "yellow"
+			? "bg-brand-yellow"
+			: tone === "surface"
+				? "bg-surface"
+				: "";
+	return <div className={`py-16 sm:py-24 ${toneClass}`}>{children}</div>;
 }
 
 type NewsDoc = Awaited<ReturnType<typeof fetchLatestNews>>[number];
@@ -349,6 +338,7 @@ function TeaserBand({
 	href,
 	cta,
 	image,
+	variant = "plain",
 }: {
 	eyebrow: string;
 	title: string;
@@ -356,13 +346,18 @@ function TeaserBand({
 	href: string;
 	cta: string;
 	image: string;
+	/** `yellow` = sekcija stoji na žutoj traci → akcenti se invertiraju u navy. */
+	variant?: "plain" | "yellow";
 }) {
+	const onYellow = variant === "yellow";
 	return (
 		<section className="mx-auto w-full max-w-6xl px-6 sm:px-10">
 			<div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
-				{/* Fotografija — okvir + suptilni žuti accent uz rub */}
+				{/* Fotografija — okvir + suptilni accent uz rub */}
 				<FadeInView direction="right">
-					<div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-2 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.7)] ring-1 ring-line">
+					<div
+						className={`relative aspect-[4/3] w-full overflow-hidden shadow-[0_30px_80px_-40px_rgba(0,0,0,0.7)] ring-1 ${onYellow ? "bg-brand-navy ring-brand-navy/15" : "bg-surface-2 ring-line"}`}
+					>
 						<Image
 							src={image}
 							alt=""
@@ -372,27 +367,37 @@ function TeaserBand({
 						/>
 						<div
 							aria-hidden
-							className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/55 via-black/15 to-transparent"
+							className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-black/55 via-black/15 to-transparent"
 						/>
 					</div>
 				</FadeInView>
 
-				{/* Tekst */}
+				{/* Tekst — na žutoj traci sve ide u navy (akcent, naslov, dugme) */}
 				<FadeInView direction="left" delay={0.1}>
 					<div className="flex flex-col items-start gap-5">
-						<span className="h-[3px] w-10 rounded-full bg-brand-yellow" />
-						<p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-brand-blue sm:text-xs">
+						<span
+							className={`h-[3px] w-10 rounded-full ${onYellow ? "bg-brand-navy" : "bg-brand-yellow"}`}
+						/>
+						<p
+							className={`text-[0.65rem] font-semibold uppercase tracking-[0.3em] sm:text-xs ${onYellow ? "text-brand-navy/70" : "text-brand-blue"}`}
+						>
 							{eyebrow}
 						</p>
 						<h2 className="text-balance font-display text-3xl font-extrabold uppercase leading-[0.95] tracking-tight text-ink sm:text-4xl md:text-5xl">
 							{title}
 						</h2>
-						<p className="max-w-md text-sm leading-relaxed text-muted-foreground sm:text-base">
+						<p
+							className={`max-w-md text-sm leading-relaxed sm:text-base ${onYellow ? "text-brand-navy/80" : "text-muted-foreground"}`}
+						>
 							{text}
 						</p>
 						<Link
 							href={href}
-							className="group mt-2 inline-flex items-center gap-2.5 bg-brand-yellow px-8 py-4 text-xs font-bold uppercase tracking-[0.2em] text-brand-navy shadow-[0_14px_36px_-12px_rgba(255,203,5,0.5)] transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_44px_-14px_rgba(255,203,5,0.65)]"
+							className={
+								onYellow
+									? "group mt-2 inline-flex items-center gap-2.5 bg-brand-navy px-8 py-4 text-xs font-bold uppercase tracking-[0.2em] text-white shadow-[0_14px_36px_-12px_rgba(10,28,51,0.5)] transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_44px_-14px_rgba(10,28,51,0.65)]"
+									: "group mt-2 inline-flex items-center gap-2.5 bg-brand-yellow px-8 py-4 text-xs font-bold uppercase tracking-[0.2em] text-brand-navy shadow-[0_14px_36px_-12px_rgba(255,203,5,0.5)] transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_44px_-14px_rgba(255,203,5,0.65)]"
+							}
 						>
 							{cta}
 							<ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -511,9 +516,26 @@ function GalleryTeaser({
 }) {
 	return (
 		<section className="relative isolate mx-auto w-full max-w-6xl px-6 sm:px-10">
-			<SectionHeading title="Galerija" />
+			{/* Editorial header — isti sustav kao Vijesti / Momčad / Webshop */}
+			<div className="flex flex-wrap items-end justify-between gap-6 border-b border-line pb-6">
+				<FadeInView delay={0.1}>
+					<h2 className="flex items-center gap-3 font-display text-4xl font-extrabold uppercase leading-[0.9] tracking-tight text-ink sm:text-5xl">
+						<span className="h-9 w-1 rounded-full bg-brand-yellow sm:h-12" />
+						Galerija
+					</h2>
+				</FadeInView>
+				<FadeInView delay={0.15}>
+					<Link
+						href="/galerija"
+						className="group hidden items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.3em] text-muted-foreground transition-colors hover:text-brand-blue sm:inline-flex"
+					>
+						Sve fotografije
+						<ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
+					</Link>
+				</FadeInView>
+			</div>
 			<StaggerContainer
-				className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-3 lg:gap-8"
+				className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3 lg:gap-8"
 				staggerChildren={0.06}
 			>
 				{albums.map((album) => (
