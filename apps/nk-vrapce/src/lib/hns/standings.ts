@@ -16,7 +16,20 @@ export async function fetchTeamStandings(params: {
       tags: [`hns-${tenantSlug}-standings-${params.competitionId}`],
     },
   );
-  return result ?? [];
+  return markOwnTeam(result, teamId);
+}
+
+// HNS ne popunjava `highlight` — označavamo redak našeg kluba usporedbom s teamId.
+function markOwnTeam(
+  rows: TeamRanking[] | null,
+  teamId: string,
+): TeamRanking[] {
+  if (!rows) return [];
+  const ownId = Number(teamId);
+  return rows.map((row) => ({
+    ...row,
+    highlight: row.team?.id === ownId,
+  }));
 }
 
 export async function fetchTeamStandingsUnofficial(params: {
@@ -32,7 +45,7 @@ export async function fetchTeamStandingsUnofficial(params: {
       ],
     },
   );
-  return result ?? [];
+  return markOwnTeam(result, teamId);
 }
 
 export async function fetchCompetitionGoalStats(params: {

@@ -128,12 +128,7 @@ export function StandingsTable({ rows }: StandingsTableProps) {
                         >
                           {name}
                         </span>
-                        {mine && (
-                          <span className="ml-auto hidden shrink-0 bg-brand-yellow px-2 py-0.5 text-[0.55rem] font-bold uppercase tracking-[0.15em] text-brand-navy sm:inline-block">
-                            Naš klub
-                          </span>
-                        )}
-                      </div>
+                        </div>
                     </td>
                     <td className="hidden px-2 py-3.5 text-center tabular-nums text-white/55 sm:table-cell">
                       {row.played ?? "–"}

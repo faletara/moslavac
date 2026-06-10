@@ -113,8 +113,12 @@ export default function Header({ clubName }: { clubName: string }) {
 
   return (
     <header
-      className={`sticky top-0 z-50 h-[5.5rem] transition-transform duration-300 will-change-transform ${
-        hidden ? "-translate-y-full" : "translate-y-0"
+      className={`sticky top-0 z-50 h-[5.5rem] ${
+        atTop
+          ? "translate-y-0"
+          : `transition-transform duration-300 will-change-transform ${
+              hidden ? "-translate-y-full" : "translate-y-0"
+            }`
       }`}
     >
       <div

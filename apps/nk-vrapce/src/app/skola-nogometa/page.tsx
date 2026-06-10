@@ -116,7 +116,6 @@ function ProgramRow({
   const category = program.ageRange
     ? program.name.replace(program.ageRange, "").trim() || program.name
     : program.name;
-  const idx = String(index + 1).padStart(2, "0");
   const isLast = index === total - 1;
 
   return (
@@ -142,13 +141,10 @@ function ProgramRow({
           </div>
         )}
 
-        {/* Lijevi rail — ogroman žuti redni broj + uzrast: ritam ljestvice. */}
+        {/* Lijevi rail — uzrast kao istaknuta oznaka koraka. */}
         <div className="relative flex shrink-0 items-center gap-5 border-b border-white/10 bg-black/15 px-7 py-5 sm:w-52 sm:flex-col sm:items-start sm:justify-center sm:border-b-0 sm:border-r sm:py-8">
-          <span className="select-none font-display text-6xl font-black leading-none tracking-tighter text-brand-yellow sm:text-7xl">
-            {idx}
-          </span>
           {program.ageRange && (
-            <span className="inline-flex w-fit bg-brand-yellow px-3 py-1 text-[0.6rem] font-bold uppercase tracking-[0.2em] text-brand-navy shadow-[0_4px_14px_-4px_rgba(255,203,5,0.6)] sm:mt-1">
+            <span className="inline-flex w-fit bg-brand-yellow px-4 py-1.5 font-display text-lg font-extrabold uppercase tracking-wide text-brand-navy shadow-[0_4px_14px_-4px_rgba(255,203,5,0.6)] sm:text-xl">
               {program.ageRange}
             </span>
           )}
