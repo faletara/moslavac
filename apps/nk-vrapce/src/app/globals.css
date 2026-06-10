@@ -100,9 +100,6 @@
   }
   html {
     overflow-x: clip;
-    /* Bez rubber-band overscroll-a — inače bounce na vrhu otkrije fiksni
-       footer iza sadržaja (footer-reveal trik). */
-    overscroll-behavior-y: none;
   }
   body {
     font-family: var(--font-sans), system-ui, sans-serif;
@@ -110,7 +107,6 @@
     background-color: var(--color-canvas);
     line-height: 1.6;
     overflow-x: clip;
-    overscroll-behavior-y: none;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }

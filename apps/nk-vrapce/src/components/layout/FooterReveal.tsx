@@ -18,15 +18,44 @@ export default function FooterReveal() {
       root.style.setProperty("--footer-h", `${footer.offsetHeight}px`);
     };
 
+    // Footer je vidljiv samo dok je korisnik blizu dna stranice. Inače ga
+    // skrivamo (opacity) da rubber-band overscroll na vrhu ne otkrije fiksni
+    // footer iza sadržaja. Reveal animacija pri dnu ostaje netaknuta.
+    let ticking = false;
+    const updateVisibility = () => {
+      const fromBottom =
+        document.documentElement.scrollHeight -
+        (window.scrollY + window.innerHeight);
+      const near = fromBottom <= footer.offsetHeight + 80;
+      footer.style.opacity = near ? "1" : "0";
+      ticking = false;
+    };
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(updateVisibility);
+        ticking = true;
+      }
+    };
+
+    footer.style.transition = "opacity 0.2s ease";
     apply();
-    const ro = new ResizeObserver(apply);
+    updateVisibility();
+
+    const ro = new ResizeObserver(() => {
+      apply();
+      updateVisibility();
+    });
     ro.observe(footer);
     window.addEventListener("resize", apply);
+    window.addEventListener("scroll", onScroll, { passive: true });
 
     return () => {
       ro.disconnect();
       window.removeEventListener("resize", apply);
+      window.removeEventListener("scroll", onScroll);
       root.style.removeProperty("--footer-h");
+      footer.style.removeProperty("opacity");
+      footer.style.removeProperty("transition");
     };
   }, []);
 
