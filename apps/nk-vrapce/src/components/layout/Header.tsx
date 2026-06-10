@@ -112,17 +112,14 @@ export default function Header({ clubName }: { clubName: string }) {
   const transparent = (atTop || hidden) && !lightTop;
 
   return (
-    <header
-      className={`sticky top-0 z-50 h-[5.5rem] ${
-        atTop
-          ? "translate-y-0"
-          : `transition-transform duration-300 will-change-transform ${
-              hidden ? "-translate-y-full" : "translate-y-0"
-            }`
-      }`}
-    >
+    <header className="sticky top-0 z-50 h-[5.5rem]">
+      {/* Animaciju skrivanja radi unutarnji sloj — sticky element NIKAD nema
+          transform jer kombinacija sticky+transform duplicira header (ghost)
+          na iOS/mobilnim browserima pri overscroll-u na vrhu stranice. */}
       <div
-        className={`h-full border-b transition-colors duration-300 ${
+        className={`h-full border-b transition-[transform,background-color,border-color] duration-300 ${
+          hidden ? "-translate-y-full" : "translate-y-0"
+        } ${
           transparent
             ? "border-transparent bg-transparent"
             : "border-line bg-white/95 shadow-[0_4px_24px_-8px_rgba(10,28,51,0.12)] backdrop-blur-md"
