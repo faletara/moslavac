@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { AnimatedLine, FadeInView } from "@/components/animations";
+import { FadeInView, RevealHeading } from "@/components/animations";
 import { formatDateTime } from "@/lib/helpers/date";
 import { buildMatchSlug } from "@/lib/slug";
 import type { HnsMatch } from "@/types/hns";
@@ -30,31 +30,43 @@ export function NextMatchHero({ match }: NextMatchHeroProps) {
   const subEyebrow = [competition, round].filter(
     (p): p is string => typeof p === "string" && p.length > 0,
   );
-  const venueAndDate = [date, time, venue].filter(
+  const metaChips = [date, time, venue].filter(
     (p): p is string => typeof p === "string" && p.length > 0,
   );
 
   const inner = (
-    <article className="flex flex-col items-center gap-12 md:gap-16">
-      <FadeInView>
-        <div className="flex flex-col items-center gap-3">
-          <AnimatedLine className="mx-auto" />
-          <h2 className="text-center text-3xl font-black uppercase leading-none tracking-tighter md:text-4xl">
-            Sljedeća utakmica
-          </h2>
-          {subEyebrow.length > 0 && (
-            <p className="text-center text-sm font-light text-muted-foreground sm:text-base">
-              {subEyebrow.join(", ")}
+    <article className="flex flex-col items-center gap-10 md:gap-14">
+      <div className="flex flex-col items-center gap-4">
+        <FadeInView>
+          <p className="flex items-center gap-3 text-[0.6rem] font-medium uppercase tracking-[0.35em] text-muted-foreground sm:text-xs">
+            <span aria-hidden className="h-px w-8 bg-primary" />
+            Match centar
+            <span aria-hidden className="h-px w-8 bg-primary" />
+          </p>
+        </FadeInView>
+        <RevealHeading
+          lines={["Sljedeća utakmica"]}
+          delay={0.05}
+          className="select-none text-balance text-center font-display font-black uppercase leading-none"
+          lineClassName="text-[11vw] sm:text-6xl md:text-7xl"
+        />
+        {subEyebrow.length > 0 && (
+          <FadeInView delay={0.15}>
+            <p className="text-center text-xs font-medium uppercase tracking-[0.25em] text-muted-foreground sm:text-sm">
+              {subEyebrow.join(" · ")}
             </p>
-          )}
-        </div>
-      </FadeInView>
+          </FadeInView>
+        )}
+      </div>
 
-      <FadeInView delay={0.1}>
+      <FadeInView delay={0.1} className="w-full">
         <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-6 sm:gap-12 md:gap-16">
           <TeamCrest team={match.homeTeam} size="lg" className="w-full" />
-          <span className="text-3xl font-black uppercase tracking-[0.2em] text-foreground/80 sm:text-4xl md:text-5xl">
-            vs
+          <span
+            aria-hidden
+            className="font-display text-4xl font-black uppercase leading-none text-stroke [--text-stroke-color:color-mix(in_oklab,var(--chalk)_45%,transparent)] sm:text-6xl md:text-7xl"
+          >
+            VS
           </span>
           <TeamCrest team={match.awayTeam} size="lg" className="w-full" />
         </div>
@@ -62,15 +74,24 @@ export function NextMatchHero({ match }: NextMatchHeroProps) {
 
       <CountdownTiles targetUtc={match.dateTimeUTC ?? null} size="hero" />
 
-      <FadeInView delay={0.5}>
-        <p className="text-center text-sm font-light text-muted-foreground sm:text-base">
-          {venueAndDate.join(" · ")}
-        </p>
-      </FadeInView>
+      {metaChips.length > 0 && (
+        <FadeInView delay={0.5}>
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+            {metaChips.map((chip) => (
+              <span
+                key={chip}
+                className="rounded-full border border-foreground/15 px-4 py-1.5 text-[0.6rem] font-bold uppercase tracking-[0.25em] text-foreground/80 sm:text-xs"
+              >
+                {chip}
+              </span>
+            ))}
+          </div>
+        </FadeInView>
+      )}
 
       {match.id != null && (
         <FadeInView delay={0.6}>
-          <span className="group inline-flex items-center gap-3 rounded-full border border-foreground px-7 py-3 text-[0.7rem] font-bold uppercase tracking-[0.35em] transition-colors duration-300 hover:bg-foreground hover:text-background sm:text-xs">
+          <span className="inline-flex items-center gap-3 rounded-full bg-chalk px-8 py-3.5 text-[0.65rem] font-bold uppercase tracking-[0.3em] text-navy-deep transition-colors duration-300 group-hover:bg-club group-hover:text-chalk sm:text-xs">
             <span>Vidi detalje</span>
             <ArrowRight
               className="size-3.5 transition-transform duration-300 group-hover:translate-x-1"
@@ -88,7 +109,7 @@ export function NextMatchHero({ match }: NextMatchHeroProps) {
 
   return (
     <motion.div whileHover={{ y: -2 }} transition={{ duration: 0.2 }}>
-      <Link href={`/utakmice/${buildMatchSlug(match)}`} className="block">
+      <Link href={`/utakmice/${buildMatchSlug(match)}`} className="group block">
         {inner}
       </Link>
     </motion.div>

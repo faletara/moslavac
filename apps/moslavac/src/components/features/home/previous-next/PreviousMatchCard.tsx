@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { AnimatedLine, FadeInView } from "@/components/animations";
+import { FadeInView, RevealHeading } from "@/components/animations";
 import { formatDateTime } from "@/lib/helpers/date";
 import type { FormResult } from "@/lib/helpers/form";
 import { buildMatchSlug } from "@/lib/slug";
@@ -21,9 +21,9 @@ const OUTCOME_LABEL: Record<FormResult, string> = {
 };
 
 const OUTCOME_CHIP: Record<FormResult, string> = {
-  W: "bg-foreground text-background border-foreground",
-  D: "border-foreground/50 text-foreground/70",
-  L: "border-foreground/30 text-foreground/40",
+  W: "bg-chalk text-navy-deep border-chalk",
+  D: "border-foreground/50 text-foreground/80",
+  L: "border-club-red/70 text-foreground/60",
 };
 
 function isMoslavac(name: string | null | undefined): boolean {
@@ -86,55 +86,58 @@ export function PreviousMatchCard({ match }: PreviousMatchCardProps) {
 
   const inner = (
     <article className="flex flex-col items-center gap-8 md:gap-10">
-      <FadeInView>
-        <div className="flex flex-col items-center gap-4">
-          <AnimatedLine className="mx-auto" />
-          <h2 className="text-center text-3xl font-black uppercase leading-none tracking-tighter md:text-4xl">
-            Zadnji rezultat
-          </h2>
-          <div className="flex flex-col items-center gap-2">
-            {outcome && outcomeLabel && (
+      <div className="flex flex-col items-center gap-4">
+        <RevealHeading
+          lines={["Zadnji rezultat"]}
+          className="select-none text-center font-display font-black uppercase leading-none"
+          lineClassName="text-[9vw] sm:text-5xl md:text-6xl"
+        />
+        <div className="flex flex-col items-center gap-2">
+          {outcome && outcomeLabel && (
+            <FadeInView delay={0.1}>
               <span
-                className={`inline-flex items-center rounded-full border px-3 py-1 text-[0.6rem] font-black uppercase tracking-[0.35em] sm:text-xs ${OUTCOME_CHIP[outcome]}`}
+                className={`inline-flex items-center rounded-full border px-4 py-1 text-[0.6rem] font-black uppercase tracking-[0.35em] sm:text-xs ${OUTCOME_CHIP[outcome]}`}
               >
                 {outcomeLabel}
               </span>
-            )}
-            {subInfo.length > 0 && (
-              <p className="text-center text-sm font-light text-muted-foreground sm:text-base">
-                {subInfo.join(", ")}
+            </FadeInView>
+          )}
+          {subInfo.length > 0 && (
+            <FadeInView delay={0.15}>
+              <p className="text-center text-xs font-medium uppercase tracking-[0.25em] text-muted-foreground sm:text-sm">
+                {subInfo.join(" · ")}
               </p>
-            )}
-          </div>
+            </FadeInView>
+          )}
         </div>
-      </FadeInView>
+      </div>
 
-      <FadeInView delay={0.1}>
+      <FadeInView delay={0.1} className="w-full">
         <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-4 sm:gap-8 md:gap-12">
           <TeamCrest team={match.homeTeam} size="md" className="w-full" />
           <div className="flex flex-col items-center gap-3">
             {hasResult ? (
-              <div className="flex items-center gap-3 sm:gap-5 md:gap-6">
-                <span className="text-6xl font-black tabular-nums leading-none sm:text-7xl md:text-8xl">
+              <div className="flex items-center gap-3 font-display sm:gap-5 md:gap-6">
+                <span className="text-7xl font-black tabular-nums leading-none sm:text-8xl md:text-9xl">
                   {home}
                 </span>
                 <span
                   aria-hidden
                   className="text-3xl font-black leading-none text-foreground/25 sm:text-4xl md:text-5xl"
                 >
-                  —
+                  :
                 </span>
-                <span className="text-6xl font-black tabular-nums leading-none sm:text-7xl md:text-8xl">
+                <span className="text-7xl font-black tabular-nums leading-none sm:text-8xl md:text-9xl">
                   {away}
                 </span>
               </div>
             ) : (
-              <span className="text-5xl font-black tabular-nums leading-none text-foreground/40 sm:text-6xl md:text-7xl">
+              <span className="font-display text-6xl font-black tabular-nums leading-none text-foreground/40 sm:text-7xl md:text-8xl">
                 —
               </span>
             )}
             {halfTime && (
-              <span className="text-xs font-light text-muted-foreground sm:text-sm">
+              <span className="text-[0.6rem] font-medium uppercase tracking-[0.25em] text-muted-foreground sm:text-xs">
                 Poluvrijeme {halfTime}
               </span>
             )}
@@ -145,7 +148,7 @@ export function PreviousMatchCard({ match }: PreviousMatchCardProps) {
 
       {metaParts.length > 0 && (
         <FadeInView delay={0.3}>
-          <p className="text-center text-sm font-light text-muted-foreground sm:text-base">
+          <p className="text-center text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground sm:text-sm">
             {metaParts.join(" · ")}
           </p>
         </FadeInView>
@@ -153,7 +156,7 @@ export function PreviousMatchCard({ match }: PreviousMatchCardProps) {
 
       {match.id != null && (
         <FadeInView delay={0.4}>
-          <span className="group inline-flex items-center gap-2 text-[0.65rem] font-bold uppercase tracking-[0.35em] text-muted-foreground transition-colors duration-300 hover:text-foreground sm:text-xs">
+          <span className="inline-flex items-center gap-2 text-[0.65rem] font-bold uppercase tracking-[0.35em] text-muted-foreground transition-colors duration-300 group-hover:text-foreground sm:text-xs">
             <span>Detalji utakmice</span>
             <ArrowRight
               className="size-3 transition-transform duration-300 group-hover:translate-x-1"
@@ -171,7 +174,7 @@ export function PreviousMatchCard({ match }: PreviousMatchCardProps) {
 
   return (
     <motion.div whileHover={{ y: -2 }} transition={{ duration: 0.2 }}>
-      <Link href={`/utakmice/${buildMatchSlug(match)}`} className="block">
+      <Link href={`/utakmice/${buildMatchSlug(match)}`} className="group block">
         {inner}
       </Link>
     </motion.div>

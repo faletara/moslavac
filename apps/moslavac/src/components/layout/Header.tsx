@@ -3,8 +3,8 @@
 import { ChevronDown, Menu } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -50,6 +50,13 @@ export default function Header({ tenant }: HeaderProps) {
 	const [desktopSeasonOpen, setDesktopSeasonOpen] = useState(false);
 	const [mobileSeasonOpen, setMobileSeasonOpen] = useState(false);
 	const [hidden, setHidden] = useState(false);
+	const [atTop, setAtTop] = useState(true);
+	const pathname = usePathname();
+	// Naslovnica ima tamni hero na vrhu → header je proziran (svijetli tekst)
+	// dok je na vrhu ILI dok je sakriven (scroll dolje). Solid podloga se pojavi
+	// tek kad se header VRATI niže (scroll gore, nije na vrhu) — tako nema
+	// bljeska bijele/tamne podloge tijekom klizanja prema gore.
+	const transparent = pathname === "/" && (atTop || hidden) && !sheetOpen;
 
 	// Mirror open-state into a ref so the scroll listener can read it without
 	// being rebound on every open/close. Radix dropdowns lock body scroll when
@@ -60,23 +67,33 @@ export default function Header({ tenant }: HeaderProps) {
 	menuOpenRef.current = sheetOpen || desktopSeasonOpen || mobileSeasonOpen;
 
 	useEffect(() => {
-		let lastY = window.scrollY;
+		// Anchor for direction detection. Only updated once a move clears the
+		// deadzone, so Lenis' sub-pixel jitter can't flip the direction frame to
+		// frame (the cause of the header flicker).
+		let anchorY = window.scrollY;
 		let ticking = false;
+		// Minimum travel before we react to a direction change.
+		const DELTA = 8;
 
 		const update = () => {
 			const currentY = window.scrollY;
+			setAtTop(currentY <= 80);
 
 			if (!menuOpenRef.current) {
 				if (currentY <= 80) {
 					setHidden(false);
-				} else if (currentY > lastY) {
+					anchorY = currentY;
+				} else if (currentY > anchorY + DELTA) {
 					setHidden(true);
-				} else if (currentY < lastY) {
+					anchorY = currentY;
+				} else if (currentY < anchorY - DELTA) {
 					setHidden(false);
+					anchorY = currentY;
 				}
+			} else {
+				anchorY = currentY;
 			}
 
-			lastY = currentY;
 			ticking = false;
 		};
 
@@ -136,12 +153,19 @@ export default function Header({ tenant }: HeaderProps) {
 			: null;
 
 	return (
-		<header
-			className={cn(
-				"sticky top-0 z-50 h-20 border-b border-border/60 bg-background transition-transform duration-300 will-change-transform",
-				hidden && "-translate-y-full",
-			)}
-		>
+		<header className="sticky top-0 z-50 h-20">
+			{/* Animaciju skrivanja radi unutarnji sloj — sticky element NIKAD nema
+			    transform jer kombinacija sticky+transform duplicira header (ghost)
+			    na iOS/mobilnim browserima pri overscroll-u na vrhu stranice. */}
+			<div
+				className={cn(
+					"h-full border-b transition-[transform,background-color,border-color] duration-300 will-change-transform",
+					hidden ? "-translate-y-full" : "translate-y-0",
+					transparent
+						? "dark border-transparent bg-transparent"
+						: "border-border/60 bg-background/90 backdrop-blur-md",
+				)}
+			>
 			<div className="mx-auto flex h-full max-w-7xl items-center justify-between px-6 lg:px-8">
 				{/* Logo */}
 				<Link
@@ -188,10 +212,19 @@ export default function Header({ tenant }: HeaderProps) {
 				{/* Mobile hamburger */}
 				<Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
 					<SheetTrigger asChild>
-						<Button variant="ghost" size="icon" className="lg:hidden">
-							<Menu className="size-5" />
+						<button
+							type="button"
+							aria-label="Otvori navigaciju"
+							className={cn(
+								"inline-flex size-10 items-center justify-center rounded-md transition-colors lg:hidden",
+								transparent
+									? "text-white hover:bg-white/10"
+									: "text-foreground hover:bg-foreground/5",
+							)}
+						>
+							<Menu className="size-6" />
 							<span className="sr-only">Otvori navigaciju</span>
-						</Button>
+						</button>
 					</SheetTrigger>
 					<SheetContent side="right" className="w-full max-w-md bg-background">
 						<SheetHeader className="sr-only">
@@ -251,6 +284,7 @@ export default function Header({ tenant }: HeaderProps) {
 						</nav>
 					</SheetContent>
 				</Sheet>
+			</div>
 			</div>
 		</header>
 	);

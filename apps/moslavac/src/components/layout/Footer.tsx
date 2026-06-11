@@ -25,8 +25,18 @@ export default function Footer({ tenant }: FooterProps) {
       : null;
 
   return (
-    <footer className="mt-32 border-t border-border/60">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+    <footer className="dark relative mt-24 overflow-hidden border-t-2 border-primary bg-navy-deep text-foreground">
+      {/* Hollow wordmark — full-width sign-off */}
+      <FadeInView className="pointer-events-none select-none px-6 pt-14 lg:px-8">
+        <p
+          aria-hidden
+          className="mx-auto max-w-7xl overflow-hidden whitespace-nowrap font-display font-black uppercase leading-[0.8] text-stroke-thin [--text-stroke-color:color-mix(in_oklab,var(--chalk)_20%,transparent)] text-[clamp(3rem,12.5vw,11rem)]"
+        >
+          {(shortName ?? tenant.displayName).toUpperCase()}
+        </p>
+      </FadeInView>
+
+      <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         {/* Masthead row */}
         <FadeInView>
           <div className="flex items-center justify-between py-8">

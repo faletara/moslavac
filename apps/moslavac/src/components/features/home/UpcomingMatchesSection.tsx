@@ -46,11 +46,20 @@ function TeamRow({
 
 function SectionTitle() {
   return (
-    <FadeInView>
-      <h2 className="text-center text-3xl font-black uppercase leading-none tracking-tighter md:text-4xl">
-        Sljedeće utakmice
-      </h2>
-    </FadeInView>
+    <div className="flex flex-col items-center gap-4">
+      <FadeInView>
+        <p className="flex items-center gap-3 text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
+          <span aria-hidden className="h-px w-8 bg-primary" />
+          Raspored
+          <span aria-hidden className="h-px w-8 bg-primary" />
+        </p>
+      </FadeInView>
+      <FadeInView delay={0.05}>
+        <h2 className="text-center font-display text-5xl font-black uppercase leading-none sm:text-6xl md:text-7xl">
+          Sljedeće utakmice
+        </h2>
+      </FadeInView>
+    </div>
   );
 }
 
@@ -131,7 +140,7 @@ export default function UpcomingMatchesSection() {
 
   if (isLoading) {
     return (
-      <section className="mx-auto w-full max-w-7xl space-y-12 px-4">
+      <section className="mx-auto w-full max-w-7xl space-y-12 px-4 pb-20 sm:pb-28">
         <SectionTitle />
         <div className="flex gap-8 overflow-x-auto pb-2">
           {["u1", "u2", "u3", "u4"].map((key) => (
@@ -151,7 +160,7 @@ export default function UpcomingMatchesSection() {
   if (!matches || matches.length === 0) return null;
 
   return (
-    <section className="mx-auto w-full max-w-7xl space-y-12 px-4">
+    <section className="mx-auto w-full max-w-7xl space-y-12 px-4 pb-20 sm:pb-28">
       <SectionTitle />
       <FadeInView delay={0.1}>
         <ScrollableRow>
@@ -188,7 +197,7 @@ export default function UpcomingMatchesSection() {
 
                 <div className="flex items-baseline justify-between gap-3">
                   <div className="flex items-baseline gap-2">
-                    <span className="text-4xl font-black leading-none tracking-tighter tabular-nums">
+                    <span className="font-display text-6xl font-black leading-none tabular-nums">
                       {day}
                     </span>
                     <span className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
@@ -198,12 +207,12 @@ export default function UpcomingMatchesSection() {
                       </span>
                     </span>
                   </div>
-                  <span className="text-sm font-bold uppercase tracking-[0.2em] tabular-nums">
+                  <span className="font-display text-xl font-bold uppercase tabular-nums">
                     {time}
                   </span>
                 </div>
 
-                <div className="space-y-3 border-t border-border/60 pt-4 transition-colors duration-300 group-hover:border-foreground/50">
+                <div className="space-y-3 border-t-2 border-border pt-4 transition-colors duration-300 group-hover:border-primary">
                   <TeamRow
                     name={match.homeTeam?.name ?? "N/A"}
                     picture={match.homeTeam?.picture ?? ""}

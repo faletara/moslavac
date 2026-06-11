@@ -47,13 +47,15 @@ export function TeamCrest({
   const picture = team?.picture ?? "";
 
   return (
-    <div className={cn("flex flex-col items-center gap-2", className)}>
-      <HnsCrest
-        picture={picture}
-        name={name}
-        size={CREST_PX[size]}
-        className={cn(CREST_CLASS[size], "object-contain")}
-      />
+    <div className={cn("flex flex-col items-center gap-3", className)}>
+      <span className="rounded-full bg-chalk p-2.5 shadow-[0_8px_30px_-10px_rgb(0_0_0/0.5)] sm:p-3">
+        <HnsCrest
+          picture={picture}
+          name={name}
+          size={CREST_PX[size]}
+          className={cn(CREST_CLASS[size], "object-contain")}
+        />
+      </span>
       {showName && (
         <span
           className={cn(

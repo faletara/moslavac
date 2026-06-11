@@ -7,6 +7,12 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
+  --font-display: var(--font-display-face), var(--font-geist-sans);
+  --color-club: var(--club);
+  --color-club-red: var(--club-red);
+  --color-navy: var(--navy);
+  --color-navy-deep: var(--navy-deep);
+  --color-chalk: var(--chalk);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -40,28 +46,37 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --animate-marquee: marquee var(--marquee-duration, 36s) linear infinite;
 }
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+
+  /* Club identity — from the crest: cobalt blue, šahovnica red, chalk white */
+  --club: oklch(0.46 0.19 262);
+  --club-red: oklch(0.55 0.21 27);
+  --navy: oklch(0.17 0.045 262);
+  --navy-deep: oklch(0.135 0.04 263);
+  --chalk: oklch(0.975 0.004 250);
+
+  --background: oklch(0.975 0.004 250);
+  --foreground: oklch(0.19 0.035 262);
+  --card: oklch(0.99 0.002 250);
+  --card-foreground: oklch(0.19 0.035 262);
+  --popover: oklch(0.99 0.002 250);
+  --popover-foreground: oklch(0.19 0.035 262);
+  --primary: oklch(0.46 0.19 262);
+  --primary-foreground: oklch(0.985 0.002 250);
+  --secondary: oklch(0.945 0.008 252);
+  --secondary-foreground: oklch(0.22 0.04 262);
+  --muted: oklch(0.945 0.008 252);
+  --muted-foreground: oklch(0.5 0.025 258);
+  --accent: oklch(0.93 0.014 256);
+  --accent-foreground: oklch(0.22 0.04 262);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --border: oklch(0.9 0.012 254);
+  --input: oklch(0.9 0.012 254);
+  --ring: oklch(0.46 0.19 262);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -78,24 +93,24 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --background: oklch(0.17 0.045 262);
+  --foreground: oklch(0.97 0.005 250);
+  --card: oklch(0.215 0.05 262);
+  --card-foreground: oklch(0.97 0.005 250);
+  --popover: oklch(0.215 0.05 262);
+  --popover-foreground: oklch(0.97 0.005 250);
+  --primary: oklch(0.72 0.13 260);
+  --primary-foreground: oklch(0.15 0.04 262);
+  --secondary: oklch(0.24 0.05 262);
+  --secondary-foreground: oklch(0.97 0.005 250);
+  --muted: oklch(0.24 0.05 262);
+  --muted-foreground: oklch(0.72 0.03 256);
+  --accent: oklch(0.27 0.055 262);
+  --accent-foreground: oklch(0.97 0.005 250);
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --border: oklch(0.97 0.01 250 / 12%);
+  --input: oklch(0.97 0.01 250 / 16%);
+  --ring: oklch(0.72 0.13 260);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
@@ -124,5 +139,26 @@
     font-size: 1rem;
     line-height: 1.6;
     overflow-x: clip;
+  }
+  ::selection {
+    background: var(--club);
+    color: var(--chalk);
+  }
+}
+
+/* Hollow display type — the outlined watermark treatment.
+   Set the stroke colour per usage via the --text-stroke-color variable. */
+@utility text-stroke-thin {
+  -webkit-text-stroke: 1px var(--text-stroke-color, var(--foreground));
+  color: transparent;
+}
+@utility text-stroke {
+  -webkit-text-stroke: 1.5px var(--text-stroke-color, var(--foreground));
+  color: transparent;
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
   }
 }
