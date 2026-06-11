@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { isSuperAdmin } from './roles'
 
 /**
  * Vidljivost kolekcije u admin sučelju po tenantu.
@@ -28,9 +29,6 @@ type MaybeUser =
     }
   | null
   | undefined
-
-const isSuperAdmin = (user: MaybeUser): boolean =>
-  Boolean(user?.roles?.includes('super-admin'))
 
 const userTenantSlugs = (user: MaybeUser): string[] => {
   const rows = Array.isArray(user?.tenants) ? user!.tenants! : []

@@ -7,6 +7,7 @@ import { buildConfig } from "payload";
 import { fileURLToPath } from "url";
 import sharp from "sharp";
 
+import { isSuperAdmin, superAdminOnlyField } from "./access/roles";
 import { BoardMembers } from "./collections/BoardMembers";
 import { Documents } from "./collections/Documents";
 import { Equipment } from "./collections/Equipment";
@@ -24,9 +25,9 @@ import type { Config } from "./payload-types";
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
-const isSuperAdmin = (
-	user: { roles?: string[] | null } | null | undefined,
-): boolean => Boolean(user?.roles?.includes("super-admin"));
+if (!process.env.PAYLOAD_SECRET) {
+	throw new Error("PAYLOAD_SECRET env var is required");
+}
 
 export default buildConfig({
 	admin: {
@@ -50,7 +51,15 @@ export default buildConfig({
 	],
 	endpoints: [hnsPlayerSearchEndpoint],
 	editor: lexicalEditor(),
-	secret: process.env.PAYLOAD_SECRET || "",
+	secret: process.env.PAYLOAD_SECRET,
+	graphQL: {
+		disable: true,
+	},
+	upload: {
+		limits: {
+			fileSize: 15_000_000, // 15 MB
+		},
+	},
 	typescript: {
 		outputFile: path.resolve(dirname, "payload-types.ts"),
 	},
@@ -75,6 +84,18 @@ export default buildConfig({
 			},
 			tenantsSlug: "tenants",
 			userHasAccessToAllTenants: (user) => isSuperAdmin(user),
+			tenantsArrayField: {
+				// Samo super-admin smije dodjeljivati korisnike tenantima —
+				// inače bi tenant-admin sam sebi mogao dodati tuđi klub.
+				arrayFieldAccess: {
+					create: superAdminOnlyField,
+					update: superAdminOnlyField,
+				},
+				tenantFieldAccess: {
+					create: superAdminOnlyField,
+					update: superAdminOnlyField,
+				},
+			},
 		}),
 		s3Storage({
 			collections: {

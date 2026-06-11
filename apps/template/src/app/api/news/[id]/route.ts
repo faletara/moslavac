@@ -2,12 +2,16 @@ import type { NextRequest } from "next/server";
 import { fetchNewsById } from "@/lib/payload/getNews";
 import { tenantSlug } from "@/lib/payload/getTenant";
 import { adaptPayloadNews } from "@/lib/payload/news-adapter";
+import { isNumericId } from "@/lib/validate";
 
 export async function GET(
   _req: NextRequest,
   ctx: RouteContext<"/api/news/[id]">,
 ) {
   const { id } = await ctx.params;
+  if (!isNumericId(id)) {
+    return new Response("News not found", { status: 404 });
+  }
   const doc = await fetchNewsById({ id });
   if (!doc) {
     return new Response("News not found", { status: 404 });

@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { superAdminOnly } from '../access/roles'
 
 export const Tenants: CollectionConfig = {
   slug: 'tenants',
@@ -8,9 +9,10 @@ export const Tenants: CollectionConfig = {
   },
   access: {
     read: () => true,
-    create: ({ req: { user } }) => Boolean(user),
+    create: superAdminOnly,
+    // Multi-tenant plugin sužava update na korisnikov vlastiti tenant.
     update: ({ req: { user } }) => Boolean(user),
-    delete: ({ req: { user } }) => Boolean(user),
+    delete: superAdminOnly,
   },
   fields: [
     {
