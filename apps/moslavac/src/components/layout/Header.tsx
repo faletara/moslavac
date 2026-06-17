@@ -1,5 +1,6 @@
 "use client";
 
+import { motion, useReducedMotion } from "framer-motion";
 import { ChevronDown, Menu } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -51,12 +52,16 @@ export default function Header({ tenant }: HeaderProps) {
 	const [mobileSeasonOpen, setMobileSeasonOpen] = useState(false);
 	const [hidden, setHidden] = useState(false);
 	const [atTop, setAtTop] = useState(true);
+	const reduced = useReducedMotion();
 	const pathname = usePathname();
-	// Naslovnica ima tamni hero na vrhu → header je proziran (svijetli tekst)
-	// dok je na vrhu ILI dok je sakriven (scroll dolje). Solid podloga se pojavi
+	// Na vrhu (ili dok je sakriven pri scrollu dolje) header nema podlogu ni
+	// border — stapa se sa stranicom kao na naslovnici. Solid podloga se pojavi
 	// tek kad se header VRATI niže (scroll gore, nije na vrhu) — tako nema
-	// bljeska bijele/tamne podloge tijekom klizanja prema gore.
-	const transparent = pathname === "/" && (atTop || hidden) && !sheetOpen;
+	// bljeska podloge tijekom klizanja prema gore.
+	const bare = (atTop || hidden) && !sheetOpen;
+	// Samo naslovnica ima tamni hero ispod headera → tamo tekst ide svijetli
+	// (dark). Na ostalim stranicama je vrh svijetao pa tekst ostaje taman.
+	const lightText = bare && pathname === "/";
 
 	// Mirror open-state into a ref so the scroll listener can read it without
 	// being rebound on every open/close. Radix dropdowns lock body scroll when
@@ -67,6 +72,13 @@ export default function Header({ tenant }: HeaderProps) {
 	menuOpenRef.current = sheetOpen || desktopSeasonOpen || mobileSeasonOpen;
 
 	useEffect(() => {
+		// Reloads should start at the top, not at the browser's restored scroll
+		// position. Bez ovoga je na produkciji (uz Lenis) header startao u solid
+		// stanju jer je atTop bio izračunat iz vraćene scroll pozicije.
+		if ("scrollRestoration" in window.history) {
+			window.history.scrollRestoration = "manual";
+		}
+
 		// Anchor for direction detection. Only updated once a move clears the
 		// deadzone, so Lenis' sub-pixel jitter can't flip the direction frame to
 		// frame (the cause of the header flicker).
@@ -103,6 +115,10 @@ export default function Header({ tenant }: HeaderProps) {
 				ticking = true;
 			}
 		};
+
+		// Sync state to the real scroll position on mount — the listener alone
+		// won't fire until the user scrolls, leaving the initial state stale.
+		update();
 
 		window.addEventListener("scroll", onScroll, { passive: true });
 		return () => window.removeEventListener("scroll", onScroll);
@@ -157,12 +173,19 @@ export default function Header({ tenant }: HeaderProps) {
 			{/* Animaciju skrivanja radi unutarnji sloj — sticky element NIKAD nema
 			    transform jer kombinacija sticky+transform duplicira header (ghost)
 			    na iOS/mobilnim browserima pri overscroll-u na vrhu stranice. */}
-			<div
+			<motion.div
+				initial={false}
+				animate={{ y: hidden ? "-100%" : "0%" }}
+				transition={
+					reduced
+						? { duration: 0 }
+						: { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }
+				}
 				className={cn(
-					"h-full border-b transition-[transform,background-color,border-color] duration-300 will-change-transform",
-					hidden ? "-translate-y-full" : "translate-y-0",
-					transparent
-						? "dark border-transparent bg-transparent"
+					"h-full border-b transition-colors duration-300 will-change-transform",
+					lightText && "dark",
+					bare
+						? "border-transparent bg-transparent"
 						: "border-border/60 bg-background/90 backdrop-blur-md",
 				)}
 			>
@@ -217,7 +240,7 @@ export default function Header({ tenant }: HeaderProps) {
 							aria-label="Otvori navigaciju"
 							className={cn(
 								"inline-flex size-10 items-center justify-center rounded-md transition-colors lg:hidden",
-								transparent
+								lightText
 									? "text-white hover:bg-white/10"
 									: "text-foreground hover:bg-foreground/5",
 							)}
@@ -285,7 +308,7 @@ export default function Header({ tenant }: HeaderProps) {
 					</SheetContent>
 				</Sheet>
 			</div>
-			</div>
+			</motion.div>
 		</header>
 	);
 }
