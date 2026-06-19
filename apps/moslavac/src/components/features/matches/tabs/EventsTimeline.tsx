@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { AnimatedLine, FadeInView } from "@/components/animations";
 import { useMoslavacTeamId } from "@/components/providers/TenantProvider";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getCometImageUrl } from "@/lib/api";
@@ -15,6 +14,7 @@ import { buildPlayerSlug } from "@/lib/slug";
 import { cn } from "@/lib/utils";
 import type { HnsMatch, HnsMatchEvent } from "@/types/hns";
 import { EventIcon } from "../shared/EventIcon";
+import { MatchSection } from "../shared/MatchSection";
 
 interface EventsTimelineProps {
   match: HnsMatch;
@@ -40,54 +40,44 @@ export default function EventsTimeline({ match, events }: EventsTimelineProps) {
   const homePicture = match.homeTeam?.picture ?? null;
   const awayPicture = match.awayTeam?.picture ?? null;
   const scoreMap = buildScoreProgression(events);
+  const finalScore = `${match.homeTeamResult?.current ?? 0}:${match.awayTeamResult?.current ?? 0}`;
 
   return (
-    <section className="mt-20 sm:mt-28">
-      <FadeInView>
-        <div className="flex flex-col items-center gap-6 text-center">
-          <AnimatedLine className="mx-auto" />
-          <p className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
-            Tijek utakmice
-          </p>
-          <h2 className="select-none font-black uppercase leading-[0.85] tracking-tighter text-[14vw] sm:text-6xl md:text-7xl">
-            Događaji
-          </h2>
-        </div>
-      </FadeInView>
+    <MatchSection
+      eyebrow="Tijek utakmice"
+      title="Događaji"
+      tone="dark"
+      watermark={finalScore}
+    >
+      <TeamsHeader
+        homeName={homeName}
+        homePicture={homePicture}
+        awayName={awayName}
+        awayPicture={awayPicture}
+      />
 
-      <FadeInView delay={0.1}>
-        <div className="mx-auto mt-12 max-w-3xl">
-          <TeamsHeader
-            homeName={homeName}
-            homePicture={homePicture}
-            awayName={awayName}
-            awayPicture={awayPicture}
-          />
-
-          <div className="relative mt-8">
-            <span
-              aria-hidden
-              className="pointer-events-none absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-border/60"
+      <div className="relative mt-8">
+        <span
+          aria-hidden
+          className="pointer-events-none absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-border/60"
+        />
+        <ol className="flex flex-col gap-1 sm:gap-2">
+          {visibleEvents.map((event, i) => (
+            <EventRow
+              key={`${event.eventId ?? i}`}
+              event={event}
+              competitionId={competitionId}
+              homeIsMoslavac={homeIsMoslavac}
+              score={
+                event.eventId != null
+                  ? scoreMap.get(event.eventId) ?? null
+                  : null
+              }
             />
-            <ol className="flex flex-col gap-1 sm:gap-2">
-              {visibleEvents.map((event, i) => (
-                <EventRow
-                  key={`${event.eventId ?? i}`}
-                  event={event}
-                  competitionId={competitionId}
-                  homeIsMoslavac={homeIsMoslavac}
-                  score={
-                    event.eventId != null
-                      ? scoreMap.get(event.eventId) ?? null
-                      : null
-                  }
-                />
-              ))}
-            </ol>
-          </div>
-        </div>
-      </FadeInView>
-    </section>
+          ))}
+        </ol>
+      </div>
+    </MatchSection>
   );
 }
 
@@ -109,7 +99,7 @@ function TeamsHeader({
           <span className="text-[0.55rem] font-medium uppercase tracking-[0.3em] text-muted-foreground">
             Domaći
           </span>
-          <span className="text-[0.7rem] font-black uppercase tracking-tight sm:text-sm">
+          <span className="line-clamp-2 text-[0.7rem] font-black uppercase tracking-tight sm:text-sm">
             {homeName}
           </span>
         </div>
@@ -140,7 +130,7 @@ function TeamsHeader({
           <span className="text-[0.55rem] font-medium uppercase tracking-[0.3em] text-muted-foreground">
             Gosti
           </span>
-          <span className="text-[0.7rem] font-black uppercase tracking-tight sm:text-sm">
+          <span className="line-clamp-2 text-[0.7rem] font-black uppercase tracking-tight sm:text-sm">
             {awayName}
           </span>
         </div>
@@ -182,12 +172,12 @@ function EventRow({
   const NameNode = isLinkable ? (
     <Link
       href={`/statistika/${buildPlayerSlug({ personId, name: playerName })}/${competitionId}`}
-      className="font-black uppercase leading-tight tracking-tight transition-colors hover:underline text-sm sm:text-base"
+      className="line-clamp-2 wrap-break-word text-sm font-black uppercase leading-tight tracking-tight transition-colors hover:text-primary sm:text-base"
     >
       {playerName}
     </Link>
   ) : (
-    <span className="font-black uppercase leading-tight tracking-tight text-sm sm:text-base">
+    <span className="line-clamp-2 wrap-break-word text-sm font-black uppercase leading-tight tracking-tight sm:text-base">
       {playerName}
     </span>
   );

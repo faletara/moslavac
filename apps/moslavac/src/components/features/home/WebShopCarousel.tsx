@@ -36,8 +36,8 @@ export default function WebShopCarousel() {
 					<RevealHeading
 						lines={["Webshop"]}
 						delay={0.1}
-						className="select-none font-display font-black uppercase leading-[0.85]"
-						lineClassName="text-[16vw] sm:text-7xl md:text-8xl lg:text-9xl"
+						className="select-none font-display font-black uppercase leading-[0.85] tracking-[-0.02em]"
+						lineClassName="text-[13vw] sm:text-6xl md:text-7xl lg:text-8xl"
 					/>
 				</div>
 				<FadeInView delay={0.2}>

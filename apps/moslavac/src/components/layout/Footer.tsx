@@ -3,7 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FaFacebook, FaYoutube } from "react-icons/fa";
-import { FadeInView, StaggerContainer, StaggerItem } from "@/components/animations";
+import {
+  FadeInView,
+  StaggerContainer,
+  StaggerItem,
+} from "@/components/animations";
 import type { FrontendTenant, PayloadMedia } from "@/lib/payload/types";
 
 interface FooterProps {
@@ -204,15 +208,10 @@ export default function Footer({ tenant }: FooterProps) {
               >
                 Pravna napomena
               </Link>
-              <p>
-                Dizajn{" "}
-                <span className="mx-1 text-foreground/40">/</span> Adriano
-                Faletar
-              </p>
+              <p>Adriano Faletar</p>
             </nav>
           </div>
         </FadeInView>
-
       </div>
     </footer>
   );

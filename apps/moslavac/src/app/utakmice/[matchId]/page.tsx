@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
-import { HnsCrest } from "@/components/HnsCrest";
 import { TrackEvent } from "@/components/analytics/TrackEvent";
+import MatchHero from "@/components/features/matches/MatchHero";
 import MatchTabs from "@/components/features/matches/tabs/MatchTabs";
 import {
   fetchMatchEvents,
@@ -45,104 +45,45 @@ export default async function MatchInfoPage({ params }: Props) {
   const showHalfTime = hasResult && halfHome != null && halfAway != null;
   const attendance = matchInfo.attendance;
 
+  const eyebrow = [
+    matchInfo.roundOrder != null ? `Kolo ${matchInfo.roundOrder}` : null,
+    matchInfo.competition?.name?.trim() || null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
   return (
-    <div className="container mx-auto mt-16 max-w-4xl px-4 pb-24 sm:px-6 lg:px-8">
+    <div className="pb-24">
       <TrackEvent
         event="Match View"
         props={{ matchId: mid, competition: matchInfo.competition?.name ?? "" }}
       />
 
-      <p className="text-center text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
-        {[
-          matchInfo.roundOrder != null ? `Kolo ${matchInfo.roundOrder}` : null,
-          matchInfo.competition?.name?.trim() || null,
-        ]
-          .filter(Boolean)
-          .join(" · ")}
-      </p>
+      <MatchHero
+        eyebrow={eyebrow}
+        homeName={matchInfo.homeTeam?.name ?? "N/A"}
+        homePicture={matchInfo.homeTeam?.picture ?? null}
+        awayName={matchInfo.awayTeam?.name ?? "N/A"}
+        awayPicture={matchInfo.awayTeam?.picture ?? null}
+        hasResult={hasResult}
+        homeScore={matchInfo.homeTeamResult?.current ?? 0}
+        awayScore={matchInfo.awayTeamResult?.current ?? 0}
+        time={time}
+        date={date}
+        place={matchInfo.facility?.place?.trim() || null}
+        halfTime={showHalfTime ? `${halfHome}:${halfAway}` : null}
+        attendance={attendance ?? null}
+      />
 
-      <div className="mt-12 grid grid-cols-3 items-center gap-4 sm:mt-16 sm:gap-10">
-        <TeamDisplay
-          name={matchInfo.homeTeam?.name ?? "N/A"}
-          picture={matchInfo.homeTeam?.picture ?? null}
-        />
-
-        <div className="flex flex-col items-center gap-4 text-center">
-          {hasResult ? (
-            <div className="flex items-baseline gap-3 font-black uppercase leading-none tracking-tighter sm:gap-6">
-              <span className="text-6xl tabular-nums sm:text-7xl md:text-8xl">
-                {matchInfo.homeTeamResult?.current ?? 0}
-              </span>
-              <span className="text-3xl font-light text-muted-foreground sm:text-5xl">
-                :
-              </span>
-              <span className="text-6xl tabular-nums sm:text-7xl md:text-8xl">
-                {matchInfo.awayTeamResult?.current ?? 0}
-              </span>
-            </div>
-          ) : (
-            <span className="font-black uppercase leading-none tracking-tighter text-5xl tabular-nums sm:text-6xl">
-              {time}
-            </span>
-          )}
-
-          <div className="flex flex-col gap-1.5">
-            {showHalfTime && (
-              <p className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:tracking-[0.35em]">
-                Poluvrijeme {halfHome}:{halfAway}
-              </p>
-            )}
-            <p className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:tracking-[0.35em]">
-              {date}
-            </p>
-            {matchInfo.facility?.place && (
-              <p className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground/80 sm:tracking-[0.35em]">
-                {matchInfo.facility.place}
-              </p>
-            )}
-            {hasResult && attendance != null && attendance > 0 && (
-              <p className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground/80 sm:tracking-[0.35em]">
-                {attendance} gledatelja
-              </p>
-            )}
-          </div>
-        </div>
-
-        <TeamDisplay
-          name={matchInfo.awayTeam?.name ?? "N/A"}
-          picture={matchInfo.awayTeam?.picture ?? null}
+      <div className="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+        <MatchTabs
+          match={matchInfo}
+          events={events ?? undefined}
+          lineups={lineups ?? undefined}
+          refereeData={refereeData ?? undefined}
+          refereesLoading={false}
         />
       </div>
-
-      <MatchTabs
-        match={matchInfo}
-        events={events ?? undefined}
-        lineups={lineups ?? undefined}
-        refereeData={refereeData ?? undefined}
-        refereesLoading={false}
-      />
-    </div>
-  );
-}
-
-function TeamDisplay({
-  name,
-  picture,
-}: {
-  name: string;
-  picture: string | null;
-}) {
-  return (
-    <div className="flex flex-col items-center gap-4 text-center">
-      <HnsCrest
-        picture={picture}
-        name={name}
-        size={96}
-        className="size-16 sm:size-24"
-      />
-      <span className="line-clamp-2 text-[0.65rem] font-semibold uppercase leading-tight tracking-[0.2em] sm:text-xs sm:tracking-[0.25em]">
-        {name}
-      </span>
     </div>
   );
 }

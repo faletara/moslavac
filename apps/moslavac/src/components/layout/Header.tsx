@@ -59,9 +59,16 @@ export default function Header({ tenant }: HeaderProps) {
 	// tek kad se header VRATI niže (scroll gore, nije na vrhu) — tako nema
 	// bljeska podloge tijekom klizanja prema gore.
 	const bare = (atTop || hidden) && !sheetOpen;
-	// Samo naslovnica ima tamni hero ispod headera → tamo tekst ide svijetli
-	// (dark). Na ostalim stranicama je vrh svijetao pa tekst ostaje taman.
-	const lightText = bare && pathname === "/";
+	// Stranice s tamnim hero-om ispod headera traže svijetli tekst (dark).
+	// `/utakmice/...` i `/statistika/...` hvataju samo detaljne rute (ne i
+	// listinge koji koriste svijetli PageHero). Drugdje je vrh svijetao pa tekst
+	// ostaje taman.
+	const lightText =
+		bare &&
+		(pathname === "/" ||
+			pathname.startsWith("/utakmice/") ||
+			pathname.startsWith("/statistika/") ||
+			pathname.startsWith("/novosti/"));
 
 	// Mirror open-state into a ref so the scroll listener can read it without
 	// being rebound on every open/close. Radix dropdowns lock body scroll when

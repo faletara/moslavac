@@ -1,7 +1,7 @@
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
-import { Big_Shoulders, Geist } from "next/font/google";
+import { Geist } from "next/font/google";
 import "./globals.css";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
@@ -11,13 +11,7 @@ import { BASE_URL } from "@/lib/siteUrl";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const bigShoulders = Big_Shoulders({
-  variable: "--font-display-face",
   subsets: ["latin", "latin-ext"],
-  weight: "variable",
   display: "swap",
 });
 
@@ -130,7 +124,7 @@ export default async function RootLayout({
   return (
     <html
       lang="hr"
-      className={`${geistSans.variable} ${bigShoulders.variable} antialiased`}
+      className={`${geistSans.variable} antialiased`}
     >
       <head>
         <link rel="preconnect" href="https://res.cloudinary.com" />

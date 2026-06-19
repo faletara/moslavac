@@ -44,8 +44,8 @@ function ColumnTitle({ children }: { children: string }) {
 	return (
 		<RevealHeading
 			lines={[children]}
-			className="select-none font-display font-black uppercase leading-none"
-			lineClassName="text-4xl sm:text-5xl"
+			className="select-none font-display font-black uppercase leading-none tracking-[-0.02em]"
+			lineClassName="text-3xl sm:text-4xl"
 		/>
 	);
 }
@@ -295,7 +295,7 @@ export default function SeasonDataSection() {
 			{/* Hollow watermark anchors the section */}
 			<span
 				aria-hidden
-				className="pointer-events-none absolute -right-[2vw] -top-[4vw] select-none font-display font-black uppercase leading-none text-stroke-thin [--text-stroke-color:color-mix(in_oklab,var(--chalk)_10%,transparent)] text-[22vw]"
+				className="pointer-events-none absolute -right-[2vw] -top-[4vw] select-none font-display font-black uppercase leading-none text-stroke-thin [--text-stroke-color:color-mix(in_oklab,var(--chalk)_10%,transparent)] tracking-[-0.02em] text-[18vw]"
 			>
 				Sezona
 			</span>
@@ -312,8 +312,8 @@ export default function SeasonDataSection() {
 						<RevealHeading
 							lines={["Sezona"]}
 							delay={0.1}
-							className="select-none font-display font-black uppercase leading-[0.85]"
-							lineClassName="text-[16vw] sm:text-7xl md:text-8xl lg:text-9xl"
+							className="select-none font-display font-black uppercase leading-[0.85] tracking-[-0.02em]"
+							lineClassName="text-[13vw] sm:text-6xl md:text-7xl lg:text-8xl"
 						/>
 					</div>
 					<FadeInView delay={0.2}>

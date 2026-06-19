@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { FadeInView } from "@/components/animations";
 import MatchesCalendar from "@/components/features/matches/MatchesCalendar";
+import { PageHero } from "@/components/layout/PageHero";
 import { fetchAllMatches } from "@/lib/hns/matches";
 
 export const metadata: Metadata = {
@@ -15,12 +16,13 @@ export const revalidate = 120;
 export default async function MatchesPage() {
   const matches = await fetchAllMatches();
   return (
-    <section className="mx-auto w-full max-w-7xl space-y-12 px-4 py-12">
-      <FadeInView>
-        <h1 className="text-center text-3xl font-black uppercase leading-none tracking-tighter md:text-4xl">
-          Raspored utakmica
-        </h1>
-      </FadeInView>
+    <section className="mx-auto w-full max-w-7xl space-y-16 px-4 pt-16 pb-24 sm:space-y-20 sm:pt-24 lg:px-8">
+      <PageHero
+        eyebrow="Raspored · Sezona 2025/26"
+        title="Utakmice"
+        watermark="25/26"
+        lineClassName="text-[15vw] sm:text-6xl md:text-7xl lg:text-8xl"
+      />
       <FadeInView delay={0.1}>
         <MatchesCalendar matches={matches} />
       </FadeInView>

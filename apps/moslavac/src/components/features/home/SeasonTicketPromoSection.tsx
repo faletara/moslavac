@@ -24,7 +24,7 @@ export default function SeasonTicketPromoSection() {
 						{/* Hollow number 12 anchors the "12th player" message */}
 						<span
 							aria-hidden
-							className="pointer-events-none absolute -bottom-8 -right-2 select-none font-display text-9xl font-black leading-none text-stroke [--text-stroke-color:var(--club)] sm:-right-6 sm:text-[12rem]"
+							className="pointer-events-none absolute -bottom-8 -right-2 select-none font-display text-8xl font-black leading-none text-stroke [--text-stroke-color:var(--club)] sm:-right-6 sm:text-[10rem]"
 						>
 							12
 						</span>
@@ -40,8 +40,8 @@ export default function SeasonTicketPromoSection() {
 
 						<RevealHeading
 							lines={["Postani naš", "12. igrač"]}
-							className="select-none text-balance font-display font-black uppercase leading-[0.85]"
-							lineClassName="text-[13vw] sm:text-7xl lg:text-8xl"
+							className="select-none text-balance font-display font-black uppercase leading-[0.85] tracking-[-0.02em]"
+							lineClassName="text-[11vw] sm:text-6xl lg:text-7xl"
 						/>
 
 						<p className="max-w-md text-balance text-sm leading-relaxed text-muted-foreground sm:text-base">

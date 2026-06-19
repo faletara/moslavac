@@ -4,7 +4,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import SmoothScroll from "@/components/providers/SmoothScroll";
 import { TenantProvider } from "@/components/providers/TenantProvider";
 import type { FrontendTenant } from "@/lib/payload/types";
 
@@ -31,7 +30,7 @@ export default function Providers({
     <QueryClientProvider client={queryClient}>
       <TenantProvider tenant={tenant}>
         <TooltipProvider>
-          <SmoothScroll>{children}</SmoothScroll>
+          {children}
           <Toaster position="top-right" richColors />
         </TooltipProvider>
       </TenantProvider>

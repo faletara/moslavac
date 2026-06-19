@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
+import { PageHero } from "@/components/layout/PageHero";
 
 export const metadata: Metadata = {
   title: "Oprema",
@@ -56,7 +57,29 @@ export default async function OpremaPage() {
 
   return (
     <div className="mx-auto w-full max-w-screen-xl space-y-24 px-6 py-16 sm:space-y-32 sm:py-24 lg:px-8">
-      <PageHero webshopHref={webshopHref} totalItems={items.length} />
+      <PageHero
+        eyebrow="Službena oprema kluba"
+        title="Oprema"
+        lineClassName="text-[16vw] sm:text-6xl md:text-7xl lg:text-8xl"
+      >
+        <div className="flex flex-col items-center gap-8">
+          <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
+            {items.length} proizvoda u ponudi. Sva oprema dostupna je za narudžbu
+            kod našeg partnera.
+          </p>
+          {webshopHref && (
+            <a
+              href={webshopHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center gap-2 border border-foreground bg-foreground px-6 py-3 text-[0.65rem] font-medium uppercase tracking-[0.3em] text-background transition-colors hover:bg-background hover:text-foreground"
+            >
+              Posjeti webshop
+              <ArrowUpRight className="size-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            </a>
+          )}
+        </div>
+      </PageHero>
 
       {populated.length === 0 ? (
         <p className="py-16 text-center text-xs uppercase tracking-[0.3em] text-muted-foreground">
@@ -81,50 +104,10 @@ export default async function OpremaPage() {
   );
 }
 
-function PageHero({
-  webshopHref,
-  totalItems,
-}: {
-  webshopHref: string | null;
-  totalItems: number;
-}) {
-  return (
-    <header className="flex flex-col items-center gap-8 text-center">
-      <span className="h-px w-12 bg-foreground" />
-      <p className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
-        Službena oprema kluba
-      </p>
-      <h1
-        aria-label="Oprema"
-        className="select-none text-balance font-black uppercase leading-[0.85] tracking-tighter"
-      >
-        <span className="block text-[20vw] sm:text-7xl md:text-8xl lg:text-9xl">
-          Oprema
-        </span>
-      </h1>
-      <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
-        {totalItems} proizvoda u ponudi. Sva oprema dostupna je za narudžbu kod
-        našeg partnera.
-      </p>
-      {webshopHref && (
-        <a
-          href={webshopHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group inline-flex items-center gap-2 border border-foreground bg-foreground px-6 py-3 text-[0.65rem] font-medium uppercase tracking-[0.3em] text-background transition-colors hover:bg-background hover:text-foreground"
-        >
-          Posjeti webshop
-          <ArrowUpRight className="size-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-        </a>
-      )}
-    </header>
-  );
-}
-
 function SectionHeader({ title, count }: { title: string; count: number }) {
   return (
     <div className="flex items-baseline justify-between gap-6 border-b border-border/60 pb-6">
-      <h2 className="font-black uppercase leading-[0.85] tracking-tighter text-3xl sm:text-5xl md:text-6xl">
+      <h2 className="font-display font-black uppercase leading-[0.85] tracking-[-0.02em] text-3xl sm:text-5xl md:text-6xl">
         {title}
       </h2>
       <span className="whitespace-nowrap text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs">

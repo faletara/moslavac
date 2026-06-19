@@ -1,5 +1,6 @@
 import { Mail, MapPin, Navigation, Phone } from "lucide-react";
 import type { Metadata } from "next";
+import { RevealHeading } from "@/components/animations";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { getCometImageUrl } from "@/lib/api";
@@ -92,14 +93,17 @@ function Hero({
         </AvatarFallback>
       </Avatar>
 
-      <span className="h-px w-12 bg-foreground" />
+      <span className="h-px w-12 bg-primary" />
       <p className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
         Klub{founded != null ? ` · Osnovan ${founded}.` : ""}
       </p>
 
-      <h1 className="text-balance font-black uppercase leading-[0.85] tracking-tighter text-5xl sm:text-7xl md:text-8xl">
-        {displayName}
-      </h1>
+      <RevealHeading
+        as="h1"
+        lines={[displayName]}
+        className="text-balance font-display font-black uppercase leading-[0.85] tracking-[-0.02em]"
+        lineClassName="text-4xl sm:text-6xl md:text-7xl"
+      />
 
       {motto && (
         <p className="max-w-md text-balance text-sm leading-relaxed text-muted-foreground md:text-base">
@@ -292,14 +296,14 @@ function SectionBlock({
   return (
     <section className="space-y-12 sm:space-y-16">
       <div className="grid grid-cols-[auto_1fr] items-baseline gap-x-5 gap-y-3 border-b border-border/60 pb-6 sm:gap-x-10">
-        <span className="font-black tabular-nums leading-none tracking-tighter text-5xl text-foreground sm:text-7xl">
+        <span className="font-display font-black tabular-nums leading-none tracking-tighter text-5xl text-foreground sm:text-7xl">
           {indexStr}
         </span>
         <div className="flex flex-col gap-2 sm:gap-3">
           <span className="text-[0.55rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.65rem] sm:tracking-[0.4em]">
             {eyebrow}
           </span>
-          <h2 className="font-black uppercase leading-[0.85] tracking-tighter text-3xl sm:text-5xl md:text-6xl">
+          <h2 className="font-display font-black uppercase leading-[0.85] tracking-[-0.02em] text-3xl sm:text-5xl md:text-6xl">
             {title}
           </h2>
         </div>

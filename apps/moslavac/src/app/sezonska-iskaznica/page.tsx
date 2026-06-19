@@ -2,6 +2,7 @@ import Image from "next/image";
 import { ArrowDown } from "lucide-react";
 import type { Metadata } from "next";
 import { TrackEvent } from "@/components/analytics/TrackEvent";
+import { PageHero } from "@/components/layout/PageHero";
 import { getTenant } from "@/lib/payload/getTenant";
 
 export const metadata: Metadata = {
@@ -30,7 +31,26 @@ export default async function SeasonTicketPage() {
   return (
     <div className="mx-auto w-full max-w-screen-xl space-y-24 px-6 py-16 sm:space-y-32 sm:py-24 lg:px-8">
       <TrackEvent event="Season Ticket Page" />
-      <PageHero price={price} />
+      <PageHero
+        eyebrow={`Sezonska iskaznica · ${price} EUR`}
+        title={["Postani naš", "12. igrač"]}
+        watermark="12"
+        lineClassName="text-[11vw] sm:text-6xl md:text-7xl lg:text-8xl"
+      >
+        <div className="flex flex-col items-center gap-8">
+          <p className="max-w-md text-balance text-sm leading-relaxed text-muted-foreground md:text-base">
+            Osiguraj svoje mjesto na tribinama i podržavaj klub tijekom cijele
+            sezone. Tvoja iskaznica — tvoj klub.
+          </p>
+          <a
+            href="#podaci-za-uplatu"
+            className="group inline-flex items-center gap-3 text-xs font-medium uppercase tracking-[0.3em] text-foreground transition-colors hover:text-muted-foreground"
+          >
+            Podaci za uplatu
+            <ArrowDown className="size-3 transition-transform duration-300 group-hover:translate-y-1" />
+          </a>
+        </div>
+      </PageHero>
 
       <SectionBlock
         index={1}
@@ -125,49 +145,6 @@ export default async function SeasonTicketPage() {
   );
 }
 
-function PageHero({ price }: { price: number }) {
-  return (
-    <header className="relative isolate flex flex-col items-center gap-8 overflow-hidden text-center">
-      <span
-        aria-hidden
-        className="pointer-events-none absolute -top-6 left-1/2 -z-10 -translate-x-1/2 select-none font-black leading-none tracking-tighter text-foreground/4 text-[42vw] md:-top-12 md:text-[28vw]"
-      >
-        12
-      </span>
-
-      <span className="h-px w-12 bg-foreground" />
-      <p className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
-        Sezonska iskaznica · {price} EUR
-      </p>
-
-      <h1
-        aria-label="Postani naš 12. igrač"
-        className="select-none text-balance font-black uppercase leading-[0.85] tracking-tighter"
-      >
-        <span className="block text-[16vw] sm:text-7xl md:text-8xl lg:text-9xl">
-          Postani naš
-        </span>
-        <span className="block text-[16vw] sm:text-7xl md:text-8xl lg:text-9xl">
-          12. igrač
-        </span>
-      </h1>
-
-      <p className="max-w-md text-balance text-sm leading-relaxed text-muted-foreground md:text-base">
-        Osiguraj svoje mjesto na tribinama i podržavaj klub tijekom cijele
-        sezone. Tvoja iskaznica — tvoj klub.
-      </p>
-
-      <a
-        href="#podaci-za-uplatu"
-        className="group mt-2 inline-flex items-center gap-3 text-xs font-medium uppercase tracking-[0.3em] text-foreground transition-colors hover:text-muted-foreground"
-      >
-        Podaci za uplatu
-        <ArrowDown className="size-3 transition-transform duration-300 group-hover:translate-y-1" />
-      </a>
-    </header>
-  );
-}
-
 function SectionBlock({
   index,
   eyebrow,
@@ -185,14 +162,14 @@ function SectionBlock({
   return (
     <section id={anchor} className="space-y-12 sm:space-y-16">
       <div className="grid grid-cols-[auto_1fr] items-baseline gap-x-5 gap-y-3 border-b border-border/60 pb-6 sm:gap-x-10">
-        <span className="font-black tabular-nums leading-none tracking-tighter text-5xl text-foreground sm:text-7xl">
+        <span className="font-display font-black tabular-nums leading-none tracking-tighter text-5xl text-foreground sm:text-7xl">
           {indexStr}
         </span>
         <div className="flex flex-col gap-2 sm:gap-3">
           <span className="text-[0.55rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.65rem] sm:tracking-[0.4em]">
             {eyebrow}
           </span>
-          <h2 className="font-black uppercase leading-[0.85] tracking-tighter text-3xl sm:text-5xl md:text-6xl">
+          <h2 className="font-display font-black uppercase leading-[0.85] tracking-[-0.02em] text-3xl sm:text-5xl md:text-6xl">
             {title}
           </h2>
         </div>

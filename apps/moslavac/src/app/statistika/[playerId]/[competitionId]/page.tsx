@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
-import { HnsCrest } from "@/components/HnsCrest";
 import { Progress } from "@/components/ui/progress";
 import { TrackEvent } from "@/components/analytics/TrackEvent";
+import PlayerHero from "@/components/features/players/PlayerHero";
 import { fetchPlayerDetails, fetchPlayerStats } from "@/lib/hns/players";
 import { redirectToCanonical } from "@/lib/canonical";
 import {
@@ -73,41 +73,21 @@ export default async function PlayerStatsPage({ params }: Props) {
   ].filter(Boolean) as string[];
 
   return (
-    <section className="mx-auto w-full max-w-5xl space-y-16 px-4 py-16 sm:space-y-20 sm:py-24">
+    <div className="pb-16 sm:pb-24">
       <TrackEvent
         event="Player Profile View"
         props={{ player: playerName, playerId }}
       />
 
-      <header className="flex flex-col items-center gap-8 text-center">
-        <span className="h-px w-12 bg-foreground" />
+      <PlayerHero
+        name={playerName}
+        picture={picture}
+        eyebrowParts={eyebrowParts}
+        subParts={subEyebrowParts}
+        shirtNumber={shirtNumber ?? null}
+      />
 
-        {eyebrowParts.length > 0 && (
-          <p className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
-            {eyebrowParts.join(" · ")}
-          </p>
-        )}
-
-        <HnsCrest
-          picture={picture}
-          name={playerName}
-          size={160}
-          className="size-32 sm:size-40"
-        />
-
-        <h1 className="select-none text-balance font-black uppercase leading-[0.85] tracking-tighter">
-          <span className="block text-[14vw] sm:text-6xl md:text-7xl lg:text-8xl">
-            {playerName}
-          </span>
-        </h1>
-
-        {subEyebrowParts.length > 0 && (
-          <p className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
-            {subEyebrowParts.join(" · ")}
-          </p>
-        )}
-      </header>
-
+      <div className="mx-auto w-full max-w-5xl space-y-16 px-4 pt-16 sm:space-y-20 sm:pt-24">
       {playerStats ? (
         <div className="space-y-px">
           <div className="grid grid-cols-2 divide-x divide-y divide-border/40 border-y border-border/60 md:grid-cols-4 md:divide-y-0">
@@ -134,7 +114,7 @@ export default async function PlayerStatsPage({ params }: Props) {
             <span className="text-[0.55rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.65rem]">
               Odigrane minute
             </span>
-            <span className="font-black tabular-nums leading-none tracking-tighter text-foreground">
+            <span className="font-display font-black tabular-nums leading-none tracking-tighter text-foreground">
               <span className="text-3xl sm:text-5xl">{minutesPlayed}</span>
               <span className="text-base text-muted-foreground sm:text-lg">
                 {" / "}
@@ -148,7 +128,8 @@ export default async function PlayerStatsPage({ params }: Props) {
           />
         </div>
       )}
-    </section>
+      </div>
+    </div>
   );
 }
 
@@ -171,7 +152,7 @@ function StatCell({
     >
       <span
         className={cn(
-          "font-black tabular-nums leading-none tracking-tighter",
+          "font-display font-black tabular-nums leading-none tracking-tighter",
           isPrimary
             ? "text-5xl text-foreground sm:text-7xl"
             : "text-2xl text-muted-foreground sm:text-3xl",

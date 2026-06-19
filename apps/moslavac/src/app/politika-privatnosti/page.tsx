@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageHero } from "@/components/layout/PageHero";
 import { getTenant } from "@/lib/payload/getTenant";
 
 export const metadata: Metadata = {
@@ -20,17 +21,17 @@ export default async function PrivacyPolicyPage() {
 
   return (
     <article className="mx-auto w-full max-w-3xl px-6 py-16 sm:py-24 lg:px-8">
-      <header className="mb-12 space-y-4">
-        <p className="text-[0.6rem] font-medium uppercase tracking-[0.4em] text-muted-foreground">
-          Pravne informacije
-        </p>
-        <h1 className="text-3xl font-black uppercase leading-none tracking-tighter sm:text-4xl">
-          Politika privatnosti
-        </h1>
+      <PageHero
+        eyebrow="Pravne informacije"
+        title="Politika privatnosti"
+        align="left"
+        lineClassName="text-4xl sm:text-5xl md:text-6xl"
+        className="mb-12"
+      >
         <p className="text-sm text-muted-foreground">
           Zadnja izmjena: {lastUpdated}
         </p>
-      </header>
+      </PageHero>
 
       <div className="prose prose-sm sm:prose-base max-w-none space-y-8 text-foreground/90 [&_h2]:mt-10 [&_h2]:text-lg [&_h2]:font-bold [&_h2]:uppercase [&_h2]:tracking-tight [&_h3]:mt-6 [&_h3]:font-semibold [&_p]:leading-relaxed [&_ul]:list-disc [&_ul]:space-y-1 [&_ul]:pl-6">
         <section>

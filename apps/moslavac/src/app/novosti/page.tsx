@@ -2,12 +2,8 @@ import { ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  AnimatedLine,
-  FadeInView,
-  StaggerContainer,
-  StaggerItem,
-} from "@/components/animations";
+import { StaggerContainer, StaggerItem } from "@/components/animations";
+import { PageHero } from "@/components/layout/PageHero";
 import { fetchNewsPaginated } from "@/lib/payload/getNews";
 import { getTenant } from "@/lib/payload/getTenant";
 import { formatDateShort } from "@/lib/helpers/date";
@@ -44,19 +40,7 @@ export default async function NewsPage({ searchParams }: Props) {
 
   return (
     <div className="mx-auto w-full max-w-5xl px-6 pt-16 pb-24 sm:pt-24 lg:px-8">
-      <header className="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
-        <AnimatedLine className="mx-auto" trigger="load" />
-        <FadeInView delay={0.05}>
-          <p className="text-[0.6rem] font-medium uppercase tracking-[0.4em] text-muted-foreground sm:text-xs">
-            Aktualno · Novosti kluba
-          </p>
-        </FadeInView>
-        <FadeInView delay={0.1}>
-          <h1 className="select-none text-[15vw] font-black uppercase leading-[0.85] tracking-tighter sm:text-[7rem] md:text-[8rem]">
-            Vijesti
-          </h1>
-        </FadeInView>
-      </header>
+      <PageHero eyebrow="Aktualno · Novosti kluba" title="Vijesti" />
 
       <div className="mx-auto mt-16 max-w-4xl sm:mt-20">
         {docs.length === 0 ? (

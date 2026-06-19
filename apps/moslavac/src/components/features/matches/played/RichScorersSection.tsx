@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { AnimatedCounter, AnimatedLine, FadeInView } from "@/components/animations";
+import { AnimatedCounter } from "@/components/animations";
 import { HnsCrest } from "@/components/HnsCrest";
 import { useMoslavacTeamId } from "@/components/providers/TenantProvider";
 import { getScorers, type ScorerEntry } from "@/lib/helpers/events";
 import { buildPlayerSlug } from "@/lib/slug";
 import { cn } from "@/lib/utils";
 import type { HnsMatch, HnsMatchEvent } from "@/types/hns";
+import { MatchSection } from "../shared/MatchSection";
 
 interface RichScorersSectionProps {
   match: HnsMatch;
@@ -28,46 +29,34 @@ export default function RichScorersSection({
   const competitionId = match.competition?.id ?? null;
 
   return (
-    <section className="mt-20 sm:mt-28">
-      <FadeInView>
-        <div className="flex flex-col items-center gap-6 text-center">
-          <AnimatedLine className="mx-auto" />
-          <p className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
-            Tko je tresao mreže
-          </p>
-          <h2 className="select-none font-black uppercase leading-[0.85] tracking-tighter text-[14vw] sm:text-6xl md:text-7xl">
-            Strijelci
-          </h2>
-        </div>
-      </FadeInView>
-
-      <FadeInView delay={0.1}>
-        <div className="mx-auto mt-12 grid max-w-5xl grid-cols-2 divide-x divide-border/40">
-          <TeamScorersColumn
-            teamName={match.homeTeam?.name ?? "Domaći"}
-            teamPicture={match.homeTeam?.picture ?? null}
-            scorers={scorers.home}
-            totalGoals={homeGoals}
-            competitionId={competitionId}
-            isMoslavac={
-              moslavacTeamId != null && match.homeTeam?.id === moslavacTeamId
-            }
-            align="right"
-          />
-          <TeamScorersColumn
-            teamName={match.awayTeam?.name ?? "Gosti"}
-            teamPicture={match.awayTeam?.picture ?? null}
-            scorers={scorers.away}
-            totalGoals={awayGoals}
-            competitionId={competitionId}
-            isMoslavac={
-              moslavacTeamId != null && match.awayTeam?.id === moslavacTeamId
-            }
-            align="left"
-          />
-        </div>
-      </FadeInView>
-    </section>
+    <MatchSection
+      eyebrow="Tko je tresao mreže"
+      title="Strijelci"
+      contentClassName="mx-auto mt-12 grid max-w-5xl grid-cols-2 divide-x divide-border/40"
+    >
+      <TeamScorersColumn
+        teamName={match.homeTeam?.name ?? "Domaći"}
+        teamPicture={match.homeTeam?.picture ?? null}
+        scorers={scorers.home}
+        totalGoals={homeGoals}
+        competitionId={competitionId}
+        isMoslavac={
+          moslavacTeamId != null && match.homeTeam?.id === moslavacTeamId
+        }
+        align="right"
+      />
+      <TeamScorersColumn
+        teamName={match.awayTeam?.name ?? "Gosti"}
+        teamPicture={match.awayTeam?.picture ?? null}
+        scorers={scorers.away}
+        totalGoals={awayGoals}
+        competitionId={competitionId}
+        isMoslavac={
+          moslavacTeamId != null && match.awayTeam?.id === moslavacTeamId
+        }
+        align="left"
+      />
+    </MatchSection>
   );
 }
 
@@ -126,18 +115,13 @@ function TeamScorersColumn({
 
       <AnimatedCounter
         value={totalGoals}
-        className="font-black tabular-nums leading-none tracking-tighter text-4xl sm:text-6xl md:text-7xl"
+        className="font-display text-4xl font-black tabular-nums leading-none tracking-tighter sm:text-6xl md:text-7xl"
       />
 
       {scorers.length === 0 ? (
         <p className="text-xs text-muted-foreground/60">Bez strijelaca</p>
       ) : (
-        <ul
-          className={cn(
-            "flex w-full flex-col gap-3",
-            isRight && "items-end",
-          )}
-        >
+        <ul className={cn("flex w-full flex-col gap-3", isRight && "items-end")}>
           {scorers.map((s, idx) => (
             <ScorerRow
               key={`${s.name}-${idx}`}
@@ -171,12 +155,12 @@ function ScorerRow({
   const NameNode = isLinkable ? (
     <Link
       href={`/statistika/${buildPlayerSlug({ personId: scorer.personId, name: scorer.name })}/${competitionId}`}
-      className="line-clamp-2 font-black uppercase leading-tight tracking-tight text-xs sm:text-sm md:text-base transition-colors hover:underline"
+      className="line-clamp-2 text-xs font-black uppercase leading-tight tracking-tight transition-colors hover:text-primary sm:text-sm md:text-base"
     >
       {scorer.name}
     </Link>
   ) : (
-    <span className="line-clamp-2 font-black uppercase leading-tight tracking-tight text-xs sm:text-sm md:text-base">
+    <span className="line-clamp-2 text-xs font-black uppercase leading-tight tracking-tight sm:text-sm md:text-base">
       {scorer.name}
     </span>
   );

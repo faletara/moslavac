@@ -109,7 +109,7 @@ export default function Hero({ tenant }: HeroProps) {
 					{founded && (
 						<motion.span
 							aria-hidden
-							className="pointer-events-none absolute left-1/2 top-1/2 -z-10 block -translate-x-1/2 -translate-y-1/2 select-none font-display font-black leading-none text-stroke [--text-stroke-color:color-mix(in_oklab,var(--chalk)_14%,transparent)] text-[42vw] md:text-[27vw]"
+							className="pointer-events-none absolute left-1/2 top-1/2 -z-10 block -translate-x-1/2 -translate-y-1/2 select-none font-display font-black leading-none text-stroke [--text-stroke-color:color-mix(in_oklab,var(--chalk)_14%,transparent)] text-[34vw] md:text-[22vw]"
 							initial={{ opacity: 0 }}
 							animate={{ opacity: 1 }}
 							transition={{ duration: 2, delay: 0.9, ease: EASE }}
@@ -143,7 +143,7 @@ export default function Hero({ tenant }: HeroProps) {
 						)}
 						<motion.span
 							aria-hidden
-							className="block overflow-hidden leading-[0.84] tracking-[-0.01em] text-[clamp(4rem,21vw,19rem)]"
+							className="block overflow-hidden whitespace-nowrap leading-[0.84] tracking-[-0.02em] text-[clamp(2.75rem,15vw,13rem)]"
 							style={reduced ? undefined : { x: headingX, y: headingPointerY }}
 						>
 							{letters.map(({ char, key }, i) => (
@@ -174,7 +174,7 @@ export default function Hero({ tenant }: HeroProps) {
 				>
 					<Link
 						href="/prva-momcad"
-						className="group inline-flex items-center gap-3 rounded-full border border-foreground/20 bg-foreground/5 px-8 py-3.5 text-[0.65rem] font-bold uppercase tracking-[0.3em] text-foreground backdrop-blur-sm transition-colors duration-300 hover:border-foreground/40 hover:bg-foreground/10 sm:text-xs"
+						className="group inline-flex items-center gap-3 rounded-full border border-foreground/20 bg-foreground/5 px-8 py-3.5 text-[0.65rem] font-bold uppercase tracking-[0.3em] text-foreground backdrop-blur-lg backdrop-saturate-150 transition-colors duration-300 hover:border-foreground/40 hover:bg-foreground/10 sm:text-xs"
 					>
 						Naša momčad
 						<ArrowRight

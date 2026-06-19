@@ -8,6 +8,8 @@ const EXPO_OUT = [0.16, 1, 0.3, 1] as const;
 interface RevealHeadingProps {
   /** Each entry renders as its own clipped line. */
   lines: string[];
+  /** Heading level to render. Defaults to `h2`. */
+  as?: "h1" | "h2";
   /** Classes for the heading element. */
   className?: string;
   /** Classes for each visible line (font size lives here). */
@@ -25,6 +27,7 @@ interface RevealHeadingProps {
  */
 export function RevealHeading({
   lines,
+  as = "h2",
   className,
   lineClassName,
   delay = 0,
@@ -33,21 +36,23 @@ export function RevealHeading({
 }: RevealHeadingProps) {
   const reduced = useReducedMotion();
   const label = ariaLabel ?? lines.join(" ");
+  const Heading = as;
+  const MotionHeading = motion[as];
 
   if (reduced) {
     return (
-      <h2 aria-label={label} className={className}>
+      <Heading aria-label={label} className={className}>
         {lines.map((line) => (
-          <span key={line} className={cn("block", lineClassName)}>
+          <span key={line} className={cn("block whitespace-nowrap", lineClassName)}>
             {line}
           </span>
         ))}
-      </h2>
+      </Heading>
     );
   }
 
   return (
-    <motion.h2
+    <MotionHeading
       aria-label={label}
       className={className}
       initial="hidden"
@@ -61,7 +66,7 @@ export function RevealHeading({
       {lines.map((line) => (
         <span key={line} aria-hidden className="block overflow-hidden">
           <motion.span
-            className={cn("block", lineClassName)}
+            className={cn("block whitespace-nowrap", lineClassName)}
             variants={{
               hidden: { y: "110%" },
               show: { y: 0, transition: { duration: 0.7, ease: EXPO_OUT } },
@@ -71,6 +76,6 @@ export function RevealHeading({
           </motion.span>
         </span>
       ))}
-    </motion.h2>
+    </MotionHeading>
   );
 }
