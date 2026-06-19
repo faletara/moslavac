@@ -3,7 +3,8 @@
     "allow": [
       "Bash(./mvnw compile:*)",
       "Bash(curl -s -H 'X-Tenant-ID: moslavac' 'http://localhost:8082/api/competitions/debug/raw?endpoint=/api/live/match/100446811?teamIdFilter=1337')",
-      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); [print\\(json.dumps\\(json.loads\\(v\\),indent=2\\)[:2000]\\) for k,v in d.items\\(\\)]\")"
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); [print\\(json.dumps\\(json.loads\\(v\\),indent=2\\)[:2000]\\) for k,v in d.items\\(\\)]\")",
+      "Bash(grep -nA40 \"images\")"
     ]
   }
 }
