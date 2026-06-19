@@ -3,7 +3,12 @@ import { HnsCrest } from "@/components/HnsCrest";
 import { Progress } from "@/components/ui/progress";
 import { TrackEvent } from "@/components/analytics/TrackEvent";
 import { fetchPlayerDetails, fetchPlayerStats } from "@/lib/hns/players";
-import { parseTrailingId } from "@/lib/slug";
+import { redirectToCanonical } from "@/lib/canonical";
+import {
+  buildCompetitionSlug,
+  buildPlayerSlug,
+  parseTrailingId,
+} from "@/lib/slug";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -23,6 +28,19 @@ export default async function PlayerStatsPage({ params }: Props) {
   ]);
 
   if (!playerDetails) notFound();
+
+  // Collapse numeric/partial-slug duplicates onto the canonical slug URL.
+  const playerSlug = buildPlayerSlug({
+    personId: Number(personId),
+    name: playerDetails.name,
+  });
+  const competitionSlug = playerStats?.competition
+    ? buildCompetitionSlug(playerStats.competition)
+    : competitionId;
+  redirectToCanonical(
+    `/statistika/${playerId}/${competitionId}`,
+    `/statistika/${playerSlug}/${competitionSlug}`,
+  );
 
   const playerName = playerDetails.name ?? "";
   const position = playerDetails.position ?? "";

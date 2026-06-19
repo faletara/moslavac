@@ -9,7 +9,8 @@ import {
   fetchMatchReferees,
 } from "@/lib/hns/matches";
 import { formatDateTime } from "@/lib/helpers/date";
-import { parseTrailingId } from "@/lib/slug";
+import { redirectToCanonical } from "@/lib/canonical";
+import { buildMatchSlug, parseTrailingId } from "@/lib/slug";
 
 interface Props {
   params: Promise<{ matchId: string }>;
@@ -29,6 +30,12 @@ export default async function MatchInfoPage({ params }: Props) {
   ]);
 
   if (!matchInfo) notFound();
+
+  // Collapse numeric/partial-slug duplicates onto the canonical slug URL.
+  redirectToCanonical(
+    `/utakmice/${matchId}`,
+    `/utakmice/${buildMatchSlug(matchInfo)}`,
+  );
 
   const { date, time } = formatDateTime(matchInfo.dateTimeUTC ?? 0);
   const hasResult =

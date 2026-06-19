@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import StandingsTable from "@/components/features/competition/StandingsTable";
+import { redirectToCanonical } from "@/lib/canonical";
 import { fetchCompetitionInfo } from "@/lib/hns/competitions";
 import { fetchTeamStandings } from "@/lib/hns/standings";
 import { BASE_URL } from "@/lib/siteUrl";
@@ -25,8 +26,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function CompetitionStandingsPage({ params }: Props) {
   const { competitionId } = await params;
-  const standings = await fetchTeamStandings({
-    competitionId: parseTrailingId(competitionId),
-  });
+  const cid = parseTrailingId(competitionId);
+  const [info, standings] = await Promise.all([
+    fetchCompetitionInfo({ competitionId: cid }),
+    fetchTeamStandings({ competitionId: cid }),
+  ]);
+  if (info) {
+    redirectToCanonical(
+      `/sezona/${competitionId}/tablica`,
+      `/sezona/${buildCompetitionSlug(info)}/tablica`,
+    );
+  }
   return <StandingsTable standings={standings} />;
 }

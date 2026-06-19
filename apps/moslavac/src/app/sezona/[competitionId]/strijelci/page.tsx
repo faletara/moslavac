@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import TopScorersTable from "@/components/features/competition/TopScorersTable";
+import { redirectToCanonical } from "@/lib/canonical";
 import { fetchCompetitionInfo } from "@/lib/hns/competitions";
 import { fetchAllCompetitionScorers } from "@/lib/hns/standings";
 import { BASE_URL } from "@/lib/siteUrl";
@@ -26,7 +27,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function CompetitionScorersPage({ params }: Props) {
   const { competitionId } = await params;
   const cid = parseTrailingId(competitionId);
-  const scorers = await fetchAllCompetitionScorers({ competitionId: cid });
+  const [info, scorers] = await Promise.all([
+    fetchCompetitionInfo({ competitionId: cid }),
+    fetchAllCompetitionScorers({ competitionId: cid }),
+  ]);
+  if (info) {
+    redirectToCanonical(
+      `/sezona/${competitionId}/strijelci`,
+      `/sezona/${buildCompetitionSlug(info)}/strijelci`,
+    );
+  }
   return (
     <TopScorersTable
       scorers={scorers}

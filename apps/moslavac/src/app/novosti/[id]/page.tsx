@@ -12,6 +12,7 @@ import {
 } from "@/lib/payload/getNews";
 import { getTenant, tenantSlug } from "@/lib/payload/getTenant";
 import { adaptPayloadNews } from "@/lib/payload/news-adapter";
+import { redirectToCanonical } from "@/lib/canonical";
 import { BASE_URL } from "@/lib/siteUrl";
 
 interface Props {
@@ -73,6 +74,10 @@ export default async function NewsDetailPage({ params }: Props) {
     doc.tenant.slug !== tenantSlug
   ) {
     notFound();
+  }
+  // Redirect legacy numeric ids onto the canonical slug URL.
+  if (doc.slug) {
+    redirectToCanonical(`/novosti/${id}`, `/novosti/${doc.slug}`);
   }
   const news = adaptPayloadNews(doc, tenantSlug);
   const tenant = await getTenant();

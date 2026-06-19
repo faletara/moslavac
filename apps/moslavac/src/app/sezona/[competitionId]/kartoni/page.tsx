@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import CardsTable from "@/components/features/competition/CardsTable";
+import { redirectToCanonical } from "@/lib/canonical";
 import { fetchCompetitionInfo } from "@/lib/hns/competitions";
 import {
   fetchAllCompetitionRedCards,
@@ -29,10 +30,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function CompetitionCardsPage({ params }: Props) {
   const { competitionId } = await params;
   const cid = parseTrailingId(competitionId);
-  const [yellowCards, redCards] = await Promise.all([
+  const [info, yellowCards, redCards] = await Promise.all([
+    fetchCompetitionInfo({ competitionId: cid }),
     fetchAllCompetitionYellowCards({ competitionId: cid }),
     fetchAllCompetitionRedCards({ competitionId: cid }),
   ]);
+  if (info) {
+    redirectToCanonical(
+      `/sezona/${competitionId}/kartoni`,
+      `/sezona/${buildCompetitionSlug(info)}/kartoni`,
+    );
+  }
   return (
     <CardsTable
       yellowCards={yellowCards}
