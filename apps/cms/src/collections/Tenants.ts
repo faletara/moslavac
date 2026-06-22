@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
-import { superAdminOnly } from '../access/roles'
+import { isSuperAdmin, superAdminOnly } from '../access/roles'
+import { CLUB_FEATURES } from '../access/tenantScopedAdmin'
 
 export const Tenants: CollectionConfig = {
   slug: 'tenants',
@@ -34,6 +35,20 @@ export const Tenants: CollectionConfig = {
       name: 'active',
       type: 'checkbox',
       defaultValue: true,
+    },
+    {
+      name: 'features',
+      type: 'select',
+      hasMany: true,
+      options: CLUB_FEATURES,
+      access: {
+        // Samo platforma (super-admin) uključuje rubrike klubu; klub si ih ne dodjeljuje sam.
+        update: ({ req: { user } }) => isSuperAdmin(user),
+      },
+      admin: {
+        description:
+          'Klub-specifične rubrike koje ovaj klub koristi — određuje vidljivost odgovarajućih kolekcija u adminu (Stranice, Dokumenti, Uprava, Škola, Galerija).',
+      },
     },
     {
       type: 'tabs',

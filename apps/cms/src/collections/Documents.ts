@@ -8,7 +8,7 @@ import { tenantScopedAdmin } from '../access/tenantScopedAdmin'
 export const Documents: CollectionConfig = {
   slug: 'documents',
   admin: {
-    ...tenantScopedAdmin(['nk-vrapce']),
+    ...tenantScopedAdmin('documents'),
     useAsTitle: 'title',
     defaultColumns: ['title', 'category', 'tenant'],
   },

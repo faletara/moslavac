@@ -11,7 +11,6 @@ import {
   fetchNewsPaginated,
 } from "@/lib/payload/getNews";
 import { getTenant, tenantSlug } from "@/lib/payload/getTenant";
-import { adaptPayloadNews } from "@/lib/payload/news-adapter";
 import { BASE_URL } from "@/lib/siteUrl";
 
 interface Props {
@@ -27,17 +26,16 @@ function fetchNewsDoc(idOrSlug: string) {
 
 export async function generateStaticParams() {
   const result = await fetchNewsPaginated({ page: 1, size: 200 });
-  return result.docs.map((doc) => ({ id: doc.slug ?? String(doc.id) }));
+  return result.content.map((item) => ({ id: item.slug ?? String(item.id) }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const doc = await fetchNewsDoc(id);
-  if (!doc) return { title: "Vijest nije pronađena" };
-  const news = adaptPayloadNews(doc, tenantSlug);
+  const news = await fetchNewsDoc(id);
+  if (!news) return { title: "Vijest nije pronađena" };
   const text = news.content.replace(/<[^>]+>/g, "").trim();
   const description = text.slice(0, 160);
-  const slug = doc.slug ?? id;
+  const slug = news.slug ?? id;
   return {
     title: news.title,
     description,
@@ -48,7 +46,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: "article",
       title: news.title,
       description,
-      publishedTime: doc.publishedAt ?? doc.createdAt,
+      publishedTime: news.date,
       ...(news.thumbnailPath
         ? { images: [{ url: news.thumbnailPath, alt: news.title }] }
         : {}),
@@ -64,17 +62,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function NewsDetailPage({ params }: Props) {
   const { id } = await params;
-  const doc = await fetchNewsDoc(id);
-  if (!doc) notFound();
-  const slug = doc.slug ?? id;
-  if (
-    doc.tenant &&
-    typeof doc.tenant === "object" &&
-    doc.tenant.slug !== tenantSlug
-  ) {
-    notFound();
-  }
-  const news = adaptPayloadNews(doc, tenantSlug);
+  const news = await fetchNewsDoc(id);
+  if (!news || news.tenantId !== tenantSlug) notFound();
+  const slug = news.slug ?? id;
   const tenant = await getTenant();
 
   const date = new Date(news.date);
@@ -88,8 +78,8 @@ export default async function NewsDetailPage({ params }: Props) {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
     headline: news.title,
-    datePublished: doc.publishedAt ?? doc.createdAt,
-    dateModified: doc.updatedAt ?? doc.publishedAt ?? doc.createdAt,
+    datePublished: news.date,
+    dateModified: news.updatedAt,
     mainEntityOfPage: `${BASE_URL}/novosti/${slug}`,
     publisher: {
       "@type": "Organization",

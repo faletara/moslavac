@@ -9,8 +9,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/oprema" },
 };
 import { fetchEquipment } from "@/lib/payload/getEquipment";
-import { getTenant, tenantSlug } from "@/lib/payload/getTenant";
-import { adaptPayloadEquipment } from "@/lib/payload/equipment-adapter";
+import { getTenant } from "@/lib/payload/getTenant";
 import type { Equipment, EquipmentCategory } from "@/types/equipment";
 
 const categoryOrder: EquipmentCategory[] = [
@@ -39,8 +38,7 @@ function formatPrice(value: number): string {
 }
 
 export default async function OpremaPage() {
-  const [docs, tenant] = await Promise.all([fetchEquipment(), getTenant()]);
-  const items = docs.map((d) => adaptPayloadEquipment(d, tenantSlug));
+  const [items, tenant] = await Promise.all([fetchEquipment(), getTenant()]);
 
   const grouped = categoryOrder.reduce<Record<EquipmentCategory, Equipment[]>>(
     (acc, cat) => {

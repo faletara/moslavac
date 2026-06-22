@@ -1,7 +1,6 @@
 import type { NextRequest } from "next/server";
 import { fetchNewsById } from "@/lib/payload/getNews";
 import { tenantSlug } from "@/lib/payload/getTenant";
-import { adaptPayloadNews } from "@/lib/payload/news-adapter";
 import { isNumericId } from "@/lib/validate";
 
 export async function GET(
@@ -12,16 +11,9 @@ export async function GET(
   if (!isNumericId(id)) {
     return new Response("News not found", { status: 404 });
   }
-  const doc = await fetchNewsById({ id });
-  if (!doc) {
+  const news = await fetchNewsById({ id });
+  if (!news || news.tenantId !== tenantSlug) {
     return new Response("News not found", { status: 404 });
   }
-  if (
-    doc.tenant &&
-    typeof doc.tenant === "object" &&
-    doc.tenant.slug !== tenantSlug
-  ) {
-    return new Response("News not found", { status: 404 });
-  }
-  return Response.json(adaptPayloadNews(doc, tenantSlug));
+  return Response.json(news);
 }

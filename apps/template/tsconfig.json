@@ -19,6 +19,12 @@
       }
     ],
     "paths": {
+      "@/types/*": ["../../packages/types/src/*"],
+      "@/lib/payload/*": ["../../packages/payload/src/*"],
+      "@/lib/hns/*": ["../../packages/hns/src/*"],
+      "@/lib/api": ["../../packages/api/src/index"],
+      "@/lib/api/*": ["../../packages/api/src/*"],
+      "@/components/ui/*": ["../../packages/ui/src/*"],
       "@/*": ["./src/*"]
     }
   },

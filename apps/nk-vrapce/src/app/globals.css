@@ -51,10 +51,13 @@
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
 
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  /* Komponente su oštrih kutova (NK Vrapče dizajn): token-radiusi = 0.
+     Fiksni radiusi (rounded-full, rounded-xs) i var(--radius) drugdje (npr.
+     sonner toast, slike vijesti) ostaju nepromijenjeni. */
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
 }
 
 :root {
@@ -165,5 +168,6 @@
   font-style: italic;
 }
 .news-content img {
-  border-radius: var(--radius-lg);
+  /* Literal jer su token-radiusi sada 0; slike vijesti ostaju blago zaobljene. */
+  border-radius: 0.625rem;
 }

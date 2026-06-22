@@ -6,7 +6,7 @@ import { formatSlug } from '../fields/slug'
 export const GalleryAlbums: CollectionConfig = {
   slug: 'gallery-albums',
   admin: {
-    ...tenantScopedAdmin(['nk-vrapce']),
+    ...tenantScopedAdmin('gallery'),
     useAsTitle: 'title',
     defaultColumns: ['title', 'date', 'displayOrder', 'tenant'],
   },

@@ -34,9 +34,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   const newsEntries: MetadataRoute.Sitemap =
-    news?.docs.map((doc) => ({
+    news?.content.map((doc) => ({
       url: `${BASE_URL}/novosti/${doc.slug ?? doc.id}`,
-      lastModified: doc.updatedAt ?? doc.publishedAt ?? doc.createdAt,
+      lastModified: doc.updatedAt,
       changeFrequency: "monthly",
       priority: 0.6,
     })) ?? [];

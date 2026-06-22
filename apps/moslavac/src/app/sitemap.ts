@@ -31,7 +31,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const newsUrls: MetadataRoute.Sitemap =
     newsResult.status === "fulfilled"
-      ? newsResult.value.docs.map((article) => ({
+      ? newsResult.value.content.map((article) => ({
           url: `${BASE_URL}/novosti/${article.slug ?? article.id}`,
           lastModified: new Date(article.updatedAt),
           changeFrequency: "monthly" as const,

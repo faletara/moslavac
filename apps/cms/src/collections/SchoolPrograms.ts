@@ -5,7 +5,7 @@ import { tenantScopedAdmin } from '../access/tenantScopedAdmin'
 export const SchoolPrograms: CollectionConfig = {
   slug: 'school-programs',
   admin: {
-    ...tenantScopedAdmin(['nk-vrapce']),
+    ...tenantScopedAdmin('school'),
     useAsTitle: 'name',
     defaultColumns: ['name', 'ageRange', 'coach', 'active', 'displayOrder', 'tenant'],
   },

@@ -7,7 +7,10 @@
       "Bash(grep -nA40 \"images\")",
       "Bash(grep -nA25 \"images:\" next.config.ts)",
       "Bash(ls src/lib/imageLoader.ts)",
-      "Bash(cat src/lib/api/images.ts)"
+      "Bash(cat src/lib/api/images.ts)",
+      "Bash(npx tsc *)",
+      "Bash(echo \"moslavac tsc exit: $? \\($\\(wc -l < /tmp/tsc-mos2.log\\) lines\\)\")",
+      "Read(//tmp/**)"
     ]
   }
 }

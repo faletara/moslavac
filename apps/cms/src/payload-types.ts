@@ -182,6 +182,10 @@ export interface Tenant {
   slug: string;
   displayName: string;
   active?: boolean | null;
+  /**
+   * Klub-specifične rubrike koje ovaj klub koristi — određuje vidljivost odgovarajućih kolekcija u adminu (Stranice, Dokumenti, Uprava, Škola, Galerija).
+   */
+  features?: ('pages' | 'documents' | 'board' | 'school' | 'gallery')[] | null;
   hns: {
     /**
      * Sent as API_KEY header to HNS. Hidden from public reads.
@@ -745,6 +749,7 @@ export interface TenantsSelect<T extends boolean = true> {
   slug?: T;
   displayName?: T;
   active?: T;
+  features?: T;
   hns?:
     | T
     | {

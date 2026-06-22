@@ -9,12 +9,10 @@ import { getTenant } from "@/lib/payload/getTenant";
 
 type NewsDoc = Awaited<
   ReturnType<typeof fetchNewsPaginated>
->["docs"][number];
+>["content"][number];
 
 function newsThumb(doc: NewsDoc): string | null {
-  return doc.thumbnail && typeof doc.thumbnail === "object"
-    ? doc.thumbnail.url
-    : null;
+  return doc.thumbnailPath;
 }
 
 export const metadata: Metadata = {
@@ -44,7 +42,7 @@ export default async function NewsPage({ searchParams }: Props) {
       ? logo
       : (logo.url ?? "");
 
-  const { docs, totalPages } = result;
+  const { content, totalPages } = result;
 
   return (
     <>
@@ -67,7 +65,7 @@ export default async function NewsPage({ searchParams }: Props) {
           )}
         </div>
 
-        {docs.length === 0 ? (
+        {content.length === 0 ? (
           <p className="py-16 text-center text-xs uppercase tracking-[0.3em] text-muted-foreground">
             Nema dostupnih vijesti.
           </p>
@@ -76,9 +74,9 @@ export default async function NewsPage({ searchParams }: Props) {
             className="divide-y divide-line border-b border-line"
             staggerChildren={0.05}
           >
-            {docs.map((doc) => {
+            {content.map((doc) => {
               const thumbnailUrl = newsThumb(doc);
-              const date = doc.publishedAt ?? doc.createdAt;
+              const date = doc.date;
               return (
                 <StaggerItem key={doc.id}>
                   <Link

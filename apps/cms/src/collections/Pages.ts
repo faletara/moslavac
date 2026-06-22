@@ -9,7 +9,7 @@ import { tenantScopedAdmin } from '../access/tenantScopedAdmin'
 export const Pages: CollectionConfig = {
   slug: 'pages',
   admin: {
-    ...tenantScopedAdmin(['nk-vrapce']),
+    ...tenantScopedAdmin('pages'),
     useAsTitle: 'title',
     defaultColumns: ['title', 'key', 'tenant'],
   },
@@ -27,7 +27,7 @@ export const Pages: CollectionConfig = {
       index: true,
       options: [
         { label: 'Povijest kluba', value: 'povijest' },
-        { label: 'Navijači (Lunatics Vrapče)', value: 'navijaci' },
+        { label: 'Navijači', value: 'navijaci' },
         { label: 'Statut — uvodni tekst', value: 'statut' },
         { label: 'Škola nogometa — uvodni tekst', value: 'skola-info' },
         { label: 'Seniori — uvodni tekst', value: 'seniori-info' },

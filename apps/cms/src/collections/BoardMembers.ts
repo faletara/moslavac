@@ -5,7 +5,7 @@ import { tenantScopedAdmin } from '../access/tenantScopedAdmin'
 export const BoardMembers: CollectionConfig = {
   slug: 'board-members',
   admin: {
-    ...tenantScopedAdmin(['nk-vrapce']),
+    ...tenantScopedAdmin('board'),
     useAsTitle: 'name',
     defaultColumns: ['name', 'role', 'roleGroup', 'displayOrder', 'tenant'],
   },

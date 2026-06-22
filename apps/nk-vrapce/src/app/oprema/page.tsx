@@ -2,9 +2,8 @@ import { ArrowUpRight } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { BrandedHero } from "@/components/features/BrandedHero";
-import { adaptPayloadEquipment } from "@/lib/payload/equipment-adapter";
 import { fetchEquipment } from "@/lib/payload/getEquipment";
-import { getTenant, tenantSlug } from "@/lib/payload/getTenant";
+import { getTenant } from "@/lib/payload/getTenant";
 import type { Equipment, EquipmentCategory } from "@/types/equipment";
 
 export const metadata: Metadata = {
@@ -39,8 +38,7 @@ function formatPrice(value: number): string {
 }
 
 export default async function OpremaPage() {
-  const [docs, tenant] = await Promise.all([fetchEquipment(), getTenant()]);
-  const items = docs.map((d) => adaptPayloadEquipment(d, tenantSlug));
+  const [items, tenant] = await Promise.all([fetchEquipment(), getTenant()]);
 
   const grouped = categoryOrder.reduce<Record<EquipmentCategory, Equipment[]>>(
     (acc, cat) => {

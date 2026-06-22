@@ -36,14 +36,14 @@ export default async function NewsPage({ searchParams }: Props) {
       ? logo
       : (logo.url ?? "");
 
-  const { docs, totalPages } = result;
+  const { content, totalPages } = result;
 
   return (
     <div className="mx-auto w-full max-w-5xl px-6 pt-16 pb-24 sm:pt-24 lg:px-8">
       <PageHero eyebrow="Aktualno · Novosti kluba" title="Vijesti" />
 
       <div className="mx-auto mt-16 max-w-4xl sm:mt-20">
-        {docs.length === 0 ? (
+        {content.length === 0 ? (
           <p className="py-16 text-center text-xs uppercase tracking-[0.3em] text-muted-foreground">
             Nema dostupnih vijesti.
           </p>
@@ -52,22 +52,18 @@ export default async function NewsPage({ searchParams }: Props) {
             className="divide-y divide-border/60 border-y border-border/60"
             staggerChildren={0.06}
           >
-            {docs.map((doc) => {
-              const thumbnailUrl =
-                doc.thumbnail && typeof doc.thumbnail === "object"
-                  ? doc.thumbnail.url
-                  : null;
-              const date = doc.publishedAt ?? doc.createdAt;
+            {content.map((item) => {
+              const thumbnailUrl = item.thumbnailPath;
               return (
-                <StaggerItem key={doc.id}>
+                <StaggerItem key={item.id}>
                   <Link
-                    href={`/novosti/${doc.slug ?? doc.id}`}
+                    href={`/novosti/${item.slug ?? item.id}`}
                     className="group grid grid-cols-[auto_1fr_auto] items-center gap-4 py-6 sm:gap-8 sm:py-8"
                   >
                     <div className="relative size-20 shrink-0 overflow-hidden rounded-sm bg-muted sm:size-28">
                       <Image
                         src={thumbnailUrl || fallback}
-                        alt={doc.title}
+                        alt={item.title}
                         fill
                         sizes="(min-width: 640px) 7rem, 5rem"
                         className={`transition-transform duration-500 group-hover:scale-105 ${
@@ -77,10 +73,10 @@ export default async function NewsPage({ searchParams }: Props) {
                     </div>
                     <div className="min-w-0 space-y-2">
                       <p className="text-[0.65rem] font-medium uppercase tracking-[0.3em] text-muted-foreground">
-                        {formatDateShort(date)}
+                        {formatDateShort(item.date)}
                       </p>
                       <h2 className="line-clamp-2 text-base font-bold uppercase leading-tight tracking-tight transition-colors group-hover:text-muted-foreground sm:text-2xl">
-                        {doc.title}
+                        {item.title}
                       </h2>
                     </div>
                     <ArrowRight className="hidden size-5 text-muted-foreground transition-all duration-300 group-hover:translate-x-1 group-hover:text-foreground sm:block" />

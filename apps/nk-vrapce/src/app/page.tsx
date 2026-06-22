@@ -21,12 +21,11 @@ import {
 	fetchSeniorCompetition,
 } from "@/lib/hns/competitions";
 import { fetchTeamStandings } from "@/lib/hns/standings";
-import { adaptPayloadEquipment } from "@/lib/payload/equipment-adapter";
 import { fetchFeaturedEquipment } from "@/lib/payload/getEquipment";
 import { fetchAlbums } from "@/lib/payload/getGallery";
 import { fetchLatestNews } from "@/lib/payload/getNews";
 import { fetchRoster } from "@/lib/payload/getRoster";
-import { getTenant, tenantSlug } from "@/lib/payload/getTenant";
+import { getTenant } from "@/lib/payload/getTenant";
 
 export async function generateMetadata(): Promise<Metadata> {
 	const tenant = await getTenant();
@@ -47,7 +46,7 @@ const priceFormatter = new Intl.NumberFormat("hr-HR", {
 });
 
 export default async function HomePage() {
-	const [tenant, news, featuredDocs, albums, roster, standings, matchData] =
+	const [tenant, news, featured, albums, roster, standings, matchData] =
 		await Promise.all([
 			getTenant(),
 			fetchLatestNews(),
@@ -78,9 +77,6 @@ export default async function HomePage() {
 			})(),
 		]);
 
-	const featured = featuredDocs.map((d) =>
-		adaptPayloadEquipment(d, tenantSlug),
-	);
 	const galleryPreview = albums.slice(0, 3);
 	// Teaser momčadi — bez stožera, igrači s fotkom prvi, do 8 kartica
 	const squadPreview = roster
@@ -197,9 +193,7 @@ function Band({
 type NewsDoc = Awaited<ReturnType<typeof fetchLatestNews>>[number];
 
 function newsThumb(doc: NewsDoc): string | null {
-	return doc.thumbnail && typeof doc.thumbnail === "object"
-		? doc.thumbnail.url
-		: null;
+	return doc.thumbnailPath;
 }
 
 function LatestNews({
@@ -267,7 +261,7 @@ function LatestNews({
 						</span>
 						<div className="absolute inset-x-0 bottom-0 flex max-w-3xl flex-col gap-3 p-6 sm:p-8 lg:p-10">
 							<p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-white/70">
-								{formatDateShort(lead.publishedAt ?? lead.createdAt)}
+								{formatDateShort(lead.date)}
 							</p>
 							<h3 className="text-balance font-display text-2xl font-extrabold uppercase leading-[1.05] tracking-tight text-white sm:text-3xl md:text-4xl lg:text-5xl">
 								{lead.title}
@@ -305,7 +299,7 @@ function LatestNews({
 								</div>
 								<div className="flex flex-col gap-2.5">
 									<p className="text-[0.6rem] font-medium uppercase tracking-[0.25em] text-muted-foreground">
-										{formatDateShort(doc.publishedAt ?? doc.createdAt)}
+										{formatDateShort(doc.date)}
 									</p>
 									<h3 className="line-clamp-2 text-balance text-base font-bold leading-snug tracking-tight transition-colors group-hover:text-brand-blue">
 										{doc.title}
