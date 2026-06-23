@@ -25,25 +25,21 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/api/(.*)",
-        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+        headers: [
+          { key: "X-Robots-Tag", value: "noindex, nofollow" },
+        ],
       },
     ];
   },
   images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "res.cloudinary.com",
-      },
-      {
-        protocol: "https",
-        hostname: "pub-35bc4cccae554273b4931967f1b01ba9.r2.dev",
-      },
-      {
-        protocol: "http",
-        hostname: "localhost",
-      },
-    ],
+    // Serve images directly via a passthrough loader instead of Vercel's
+    // metered Image Optimization — R2 variants are already web-sized and crests
+    // proxy through /api/images, so on-the-fly optimization adds little while
+    // exhausting the free transformation quota (which breaks images once hit).
+    loader: "custom",
+    loaderFile: "./src/lib/imageLoader.ts",
+    deviceSizes: [640, 1080, 1920],
+    imageSizes: [256],
   },
 };
 

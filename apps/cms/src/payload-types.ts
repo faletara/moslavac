@@ -211,6 +211,14 @@ export interface Tenant {
     phone?: string | null;
     address?: string | null;
     /**
+     * Mjesto (npr. "Popovača") — schema.org addressLocality.
+     */
+    city?: string | null;
+    /**
+     * Županija (npr. "Sisačko-moslavačka županija") — schema.org addressRegion.
+     */
+    region?: string | null;
+    /**
      * Google/OpenStreetMap embed URL (src iz <iframe>) za prikaz lokacije na stranici kontakta.
      */
     mapEmbedUrl?: string | null;
@@ -771,6 +779,8 @@ export interface TenantsSelect<T extends boolean = true> {
         email?: T;
         phone?: T;
         address?: T;
+        city?: T;
+        region?: T;
         mapEmbedUrl?: T;
       };
   social?:

@@ -2,18 +2,16 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
+import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { TenantProvider } from "@/components/providers/TenantProvider";
+import type { FrontendTenant } from "@/lib/payload/types";
 
-/**
- * App-wide client providers. Holds the React Query client so the `api.*`
- * hooks (HNS data fetching) work in client components.
- *
- * Tenant context is intentionally NOT wired here so the empty template boots
- * without a configured Payload tenant. Wrap subtrees that need it with
- * <TenantProvider tenant={...}> once you build tenant-dependent pages.
- */
 export default function Providers({
+  tenant,
   children,
 }: {
+  tenant: FrontendTenant;
   children: React.ReactNode;
 }) {
   const [queryClient] = useState(
@@ -25,10 +23,17 @@ export default function Providers({
             retry: 1,
           },
         },
-      }),
+      })
   );
 
   return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      <TenantProvider tenant={tenant}>
+        <TooltipProvider>
+          {children}
+          <Toaster position="top-right" richColors />
+        </TooltipProvider>
+      </TenantProvider>
+    </QueryClientProvider>
   );
 }

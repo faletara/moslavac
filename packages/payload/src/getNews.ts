@@ -60,7 +60,6 @@ function adaptNews(doc: PayloadNews): News {
     slug: doc.slug,
     title: doc.title,
     content: html,
-    excerpt: doc.excerpt ?? null,
     date: doc.publishedAt ?? doc.createdAt,
     updatedAt: doc.updatedAt ?? doc.publishedAt ?? doc.createdAt,
     thumbnailPath: mediaUrl(doc.thumbnail),

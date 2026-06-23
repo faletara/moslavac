@@ -1,6 +1,11 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Workspace UI package lives outside the app root — Tailwind's automatic
+   content detection won't scan it, so register it explicitly. Without this,
+   arbitrary variants used only there (e.g. data-[orientation]) aren't generated. */
+@source "../../../../packages/ui/src";
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

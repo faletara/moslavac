@@ -121,6 +121,21 @@ export const Tenants: CollectionConfig = {
                 { name: 'phone', type: 'text' },
                 { name: 'address', type: 'textarea' },
                 {
+                  name: 'city',
+                  type: 'text',
+                  admin: {
+                    description: 'Mjesto (npr. "Popovača") — schema.org addressLocality.',
+                  },
+                },
+                {
+                  name: 'region',
+                  type: 'text',
+                  admin: {
+                    description:
+                      'Županija (npr. "Sisačko-moslavačka županija") — schema.org addressRegion.',
+                  },
+                },
+                {
                   name: 'mapEmbedUrl',
                   type: 'text',
                   admin: {

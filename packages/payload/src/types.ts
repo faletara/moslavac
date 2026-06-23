@@ -32,6 +32,8 @@ export interface FrontendTenant {
     email?: string | null;
     phone?: string | null;
     address?: string | null;
+    city?: string | null;
+    region?: string | null;
     mapEmbedUrl?: string | null;
   } | null;
   social?: {

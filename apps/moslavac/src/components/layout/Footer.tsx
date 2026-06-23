@@ -208,7 +208,14 @@ export default function Footer({ tenant }: FooterProps) {
               >
                 Pravna napomena
               </Link>
-              <p>Adriano Faletar</p>
+              <a
+                href="https://www.linkedin.com/in/adriano-faletar-b58b1a316/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors hover:text-foreground"
+              >
+                Adriano Faletar
+              </a>
             </nav>
           </div>
         </FadeInView>

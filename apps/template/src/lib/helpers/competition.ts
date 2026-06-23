@@ -143,28 +143,27 @@ export function toReadableCompetitionName(
 }
 
 /**
- * Default blue palette (anchored on #026CB6) — override per club via theme. Steps go
- * monotonically dark → light following age hierarchy: oldest (seniors) is the
- * deepest navy, youngest (prstići) the lightest. Brand blue lands on older
- * pioneers, the midpoint of the scale. Every shade stays saturated — no
- * pastels — so the chips read as one tight blue family.
+ * Age-category ramp, theme-driven via CSS tokens (`--cat-*` in globals.css). Steps
+ * go monotonically dark → light by age hierarchy: oldest (seniors) deepest,
+ * youngest (prstići) lightest. Re-skin a club by editing the `--cat-*` values in
+ * its globals.css — no code change here.
  */
 export function getCategoryChipClass(category: CompetitionCategory): string {
   switch (category) {
     case "seniors":
-      return "bg-[#013F6B] text-white";
+      return "bg-cat-seniors text-white";
     case "juniors":
-      return "bg-[#01497D] text-white";
+      return "bg-cat-juniors text-white";
     case "cadets":
-      return "bg-[#015A99] text-white";
+      return "bg-cat-cadets text-white";
     case "older-pioneers":
-      return "bg-[#026CB6] text-white";
+      return "bg-cat-older-pioneers text-white";
     case "younger-pioneers":
-      return "bg-[#1F7BBF] text-white";
+      return "bg-cat-younger-pioneers text-white";
     case "limaci":
-      return "bg-[#3389C7] text-white";
+      return "bg-cat-limaci text-white";
     case "prstici":
-      return "bg-[#4A98CF] text-white";
+      return "bg-cat-prstici text-white";
     case "unknown":
       return "bg-muted text-muted-foreground";
   }
@@ -173,19 +172,19 @@ export function getCategoryChipClass(category: CompetitionCategory): string {
 export function getCategoryBorderClass(category: CompetitionCategory): string {
   switch (category) {
     case "seniors":
-      return "border-[#013F6B]";
+      return "border-cat-seniors";
     case "juniors":
-      return "border-[#01497D]";
+      return "border-cat-juniors";
     case "cadets":
-      return "border-[#015A99]";
+      return "border-cat-cadets";
     case "older-pioneers":
-      return "border-[#026CB6]";
+      return "border-cat-older-pioneers";
     case "younger-pioneers":
-      return "border-[#1F7BBF]";
+      return "border-cat-younger-pioneers";
     case "limaci":
-      return "border-[#3389C7]";
+      return "border-cat-limaci";
     case "prstici":
-      return "border-[#4A98CF]";
+      return "border-cat-prstici";
     case "unknown":
       return "border-border";
   }

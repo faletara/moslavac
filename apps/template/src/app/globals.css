@@ -1,9 +1,191 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
+  --font-display: var(--font-geist-sans);
+  --color-club: var(--club);
+  --color-club-red: var(--club-red);
+  --color-navy: var(--navy);
+  --color-navy-deep: var(--navy-deep);
+  --color-chalk: var(--chalk);
+  --color-cat-seniors: var(--cat-seniors);
+  --color-cat-juniors: var(--cat-juniors);
+  --color-cat-cadets: var(--cat-cadets);
+  --color-cat-older-pioneers: var(--cat-older-pioneers);
+  --color-cat-younger-pioneers: var(--cat-younger-pioneers);
+  --color-cat-limaci: var(--cat-limaci);
+  --color-cat-prstici: var(--cat-prstici);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --animate-marquee: marquee var(--marquee-duration, 36s) linear infinite;
 }
 
-body {
-  font-family: var(--font-sans), system-ui, sans-serif;
+/*
+ * NEUTRAL starting skin. Every token keeps its NAME but ships a brand-neutral
+ * slate value — so the golden-path template looks cohesive but like no club.
+ * Re-skin a club by editing the values in this file (see docs/NEW-CLUB.md):
+ *   - brand: --club, --club-red, --navy, --navy-deep, --chalk
+ *   - semantic: --primary(+foreground), --ring, --accent, --secondary, --muted
+ *   - shape: --radius
+ *   - age-category ramp: --cat-*  (dark → light; chips render white text)
+ *   - optional display font: set --font-display + import it in layout.tsx
+ */
+:root {
+  --radius: 0.625rem;
+
+  /* Brand tokens — neutral slate placeholders; set these to the club's colours. */
+  --club: oklch(0.45 0.03 260);
+  --club-red: oklch(0.55 0.16 27);
+  --navy: oklch(0.24 0.012 262);
+  --navy-deep: oklch(0.17 0.01 262);
+  --chalk: oklch(0.98 0.002 250);
+
+  --background: oklch(0.985 0.002 250);
+  --foreground: oklch(0.21 0.012 262);
+  --card: oklch(0.995 0.001 250);
+  --card-foreground: oklch(0.21 0.012 262);
+  --popover: oklch(0.995 0.001 250);
+  --popover-foreground: oklch(0.21 0.012 262);
+  --primary: oklch(0.45 0.03 260);
+  --primary-foreground: oklch(0.985 0.002 250);
+  --secondary: oklch(0.95 0.004 255);
+  --secondary-foreground: oklch(0.25 0.014 262);
+  --muted: oklch(0.95 0.004 255);
+  --muted-foreground: oklch(0.52 0.012 258);
+  --accent: oklch(0.93 0.006 256);
+  --accent-foreground: oklch(0.25 0.014 262);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.9 0.005 254);
+  --input: oklch(0.9 0.005 254);
+  --ring: oklch(0.45 0.03 260);
+  --chart-1: oklch(0.45 0.02 260);
+  --chart-2: oklch(0.55 0.018 260);
+  --chart-3: oklch(0.65 0.015 260);
+  --chart-4: oklch(0.72 0.012 260);
+  --chart-5: oklch(0.8 0.01 260);
+
+  /* Age-category ramp (oldest → youngest = dark → light). Chips use white text. */
+  --cat-seniors: oklch(0.3 0.012 262);
+  --cat-juniors: oklch(0.355 0.013 262);
+  --cat-cadets: oklch(0.41 0.014 262);
+  --cat-older-pioneers: oklch(0.45 0.015 262);
+  --cat-younger-pioneers: oklch(0.49 0.015 262);
+  --cat-limaci: oklch(0.52 0.015 262);
+  --cat-prstici: oklch(0.55 0.014 262);
+
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.2 0.01 262);
+  --foreground: oklch(0.97 0.004 250);
+  --card: oklch(0.24 0.012 262);
+  --card-foreground: oklch(0.97 0.004 250);
+  --popover: oklch(0.24 0.012 262);
+  --popover-foreground: oklch(0.97 0.004 250);
+  --primary: oklch(0.7 0.03 260);
+  --primary-foreground: oklch(0.17 0.012 262);
+  --secondary: oklch(0.26 0.012 262);
+  --secondary-foreground: oklch(0.97 0.004 250);
+  --muted: oklch(0.26 0.012 262);
+  --muted-foreground: oklch(0.72 0.012 256);
+  --accent: oklch(0.29 0.014 262);
+  --accent-foreground: oklch(0.97 0.004 250);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(0.97 0.01 250 / 12%);
+  --input: oklch(0.97 0.01 250 / 16%);
+  --ring: oklch(0.7 0.03 260);
+  --chart-1: oklch(0.55 0.02 260);
+  --chart-2: oklch(0.63 0.018 260);
+  --chart-3: oklch(0.7 0.015 260);
+  --chart-4: oklch(0.77 0.012 260);
+  --chart-5: oklch(0.84 0.01 260);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    font-size: 16px;
+    overflow-x: clip;
+  }
+  body {
+    color: var(--foreground);
+    font-size: 1rem;
+    line-height: 1.6;
+    overflow-x: clip;
+  }
+  ::selection {
+    background: var(--club);
+    color: var(--chalk);
+  }
+}
+
+/* Hollow display type — the outlined watermark treatment.
+   Set the stroke colour per usage via the --text-stroke-color variable. */
+@utility text-stroke-thin {
+  -webkit-text-stroke: 1px var(--text-stroke-color, var(--foreground));
+  color: transparent;
+}
+@utility text-stroke {
+  -webkit-text-stroke: 1.5px var(--text-stroke-color, var(--foreground));
+  color: transparent;
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
 }

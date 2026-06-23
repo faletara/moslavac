@@ -1,5 +1,6 @@
 "use client";
 
+import { useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
 
 export interface CountdownState {
@@ -26,6 +27,7 @@ function compute(targetUtc: number): CountdownState {
 }
 
 export function useCountdown(targetUtc: number | null): CountdownState | null {
+  const reduced = useReducedMotion();
   const [state, setState] = useState<CountdownState | null>(null);
 
   useEffect(() => {
@@ -35,9 +37,9 @@ export function useCountdown(targetUtc: number | null): CountdownState | null {
     }
     const update = () => setState(compute(targetUtc));
     update();
-    const id = setInterval(update, 1000);
+    const id = setInterval(update, reduced ? 60_000 : 1000);
     return () => clearInterval(id);
-  }, [targetUtc]);
+  }, [targetUtc, reduced]);
 
   return state;
 }
