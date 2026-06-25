@@ -85,6 +85,11 @@ export default async function NewsDetailPage({ params }: Props) {
     datePublished: news.date,
     dateModified: news.updatedAt,
     mainEntityOfPage: `${BASE_URL}/novosti/${slug}`,
+    author: {
+      "@type": "Organization",
+      name: tenant.displayName,
+      url: BASE_URL,
+    },
     publisher: {
       "@type": "Organization",
       name: tenant.displayName,

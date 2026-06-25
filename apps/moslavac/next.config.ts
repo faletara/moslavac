@@ -4,9 +4,36 @@ import { fileURLToPath } from "node:url";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
+// Baseline Content-Security-Policy. Permissive on script/style ('unsafe-inline'
+// is required for the inline JSON-LD blocks and framer-motion inline styles;
+// 'unsafe-eval' keeps Next's dev HMR working). Tighten to nonce-based later via
+// proxy/middleware if stricter guarantees are needed. frame-src covers the
+// OpenStreetMap stadium embed and YouTube promo.
+const csp = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https:",
+  "font-src 'self' data:",
+  "connect-src 'self' https://*.vercel-insights.com https://va.vercel-scripts.com",
+  "frame-src 'self' https://www.openstreetmap.org https://www.youtube.com https://www.youtube-nocookie.com",
+  "media-src 'self' https:",
+  "frame-ancestors 'self'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "object-src 'none'",
+  "upgrade-insecure-requests",
+].join("; ");
+
 const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(dirname, "../.."),
+  },
+  async redirects() {
+    return [
+      // Legacy/expected contact path — the club's contact lives on /klub.
+      { source: "/kontakt", destination: "/klub", permanent: true },
+    ];
   },
   async headers() {
     return [
@@ -17,6 +44,11 @@ const nextConfig: NextConfig = {
           { key: "X-Frame-Options", value: "SAMEORIGIN" },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains; preload",
+          },
+          { key: "Content-Security-Policy", value: csp },
           {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=()",

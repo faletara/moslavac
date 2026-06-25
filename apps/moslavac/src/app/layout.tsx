@@ -98,12 +98,13 @@ export default async function RootLayout({
   const orgJsonLd = {
     "@context": "https://schema.org",
     "@type": "SportsOrganization",
+    "@id": `${baseUrl}/#organization`,
     name: tenant.displayName,
     ...(altNames.length > 0 ? { alternateName: altNames } : {}),
     ...(motto ? { slogan: motto } : {}),
     sport: "Football",
     url: baseUrl,
-    ...(logoUrl ? { logo: logoUrl } : {}),
+    ...(logoUrl ? { logo: logoUrl, image: logoUrl } : {}),
     ...(founded ? { foundingDate: String(founded) } : {}),
     ...(address
       ? {
@@ -119,6 +120,16 @@ export default async function RootLayout({
     ...(email ? { email } : {}),
     ...(phone ? { telephone: phone } : {}),
     ...(sameAs.length > 0 ? { sameAs } : {}),
+  };
+
+  const websiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${baseUrl}/#website`,
+    name: tenant.displayName,
+    url: baseUrl,
+    inLanguage: "hr-HR",
+    publisher: { "@id": `${baseUrl}/#organization` },
   };
 
   return (
@@ -137,6 +148,10 @@ export default async function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
         <Providers tenant={tenant}>
           <Header tenant={tenant} />

@@ -17,6 +17,23 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: "CCBot",
         disallow: "/",
       },
+      // Explicitly welcome AI search crawlers (they read robots.txt
+      // conservatively and a missing rule can be treated as a soft block).
+      // These power citations in ChatGPT, Perplexity, Claude and Google AI.
+      {
+        userAgent: [
+          "GPTBot",
+          "OAI-SearchBot",
+          "ChatGPT-User",
+          "PerplexityBot",
+          "Perplexity-User",
+          "ClaudeBot",
+          "Claude-User",
+          "Google-Extended",
+        ],
+        allow: "/",
+        disallow: "/api/",
+      },
     ],
     sitemap: `${BASE_URL}/sitemap.xml`,
   };

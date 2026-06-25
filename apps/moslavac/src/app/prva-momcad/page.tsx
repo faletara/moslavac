@@ -2,11 +2,14 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 
-export const metadata: Metadata = {
-	title: "Prva momčad",
-	description: "Igrači i stručni stožer prve momčadi NK Moslavac.",
-	alternates: { canonical: "/prva-momcad" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+	const tenant = await getTenant();
+	return {
+		title: "Prva momčad",
+		description: `Igrači i stručni stožer prve momčadi ${tenant.displayName}.`,
+		alternates: { canonical: "/prva-momcad" },
+	};
+}
 import { FirstTeamHero } from "@/components/features/first-team/FirstTeamHero";
 import {
 	PlayerGrid,
