@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { getRecentForm, type FormResult } from "@/lib/helpers/form";
 import { cn } from "@/lib/utils";
 import type { HnsMatch, TeamRanking } from "@/types/hns";
+import { MatchTabHeading } from "../shared/MatchTabHeading";
 
 interface FormAndStandingProps {
   homeTeamId: number | null;
@@ -31,9 +32,9 @@ export default function FormAndStanding({
 }: FormAndStandingProps) {
   if (isLoading) {
     return (
-      <section className="mt-16 border-t border-border/60 pt-12 sm:mt-20">
-        <Skeleton className="mx-auto h-4 w-32" />
-        <div className="mt-10 space-y-3">
+      <section className="mt-12 sm:mt-16">
+        <MatchTabHeading eyebrow="Usporedba" title="Forma" />
+        <div className="mx-auto mt-12 max-w-2xl space-y-3">
           <Skeleton className="h-10" />
           <Skeleton className="h-10" />
           <Skeleton className="h-10" />
@@ -87,12 +88,10 @@ export default function FormAndStanding({
   }
 
   return (
-    <section className="mt-16 border-t border-border/60 pt-12 sm:mt-20">
-      <h2 className="text-center text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
-        Forma i tablica
-      </h2>
+    <section className="mt-12 sm:mt-16">
+      <MatchTabHeading eyebrow="Usporedba" title="Forma" />
 
-      <div className="mx-auto mt-10 max-w-2xl">
+      <div className="mx-auto mt-12 max-w-2xl">
         <TeamHeaders
           homeName={homeTeamName}
           homePicture={homeTeamPicture}
@@ -139,12 +138,12 @@ function TeamHeaders({
   awayPicture: string | null;
 }) {
   return (
-    <div className="grid grid-cols-3 items-center gap-3">
-      <TeamHeader name={homeName} picture={homePicture} align="left" />
-      <span className="text-center text-[0.55rem] font-medium uppercase tracking-[0.3em] text-muted-foreground/70 sm:text-[0.6rem]">
+    <div className="grid grid-cols-[1fr_auto_1fr] items-start gap-2 sm:gap-4">
+      <TeamHeader name={homeName} picture={homePicture} />
+      <span className="self-center text-center text-[0.55rem] font-medium uppercase tracking-[0.3em] text-muted-foreground/70 sm:text-[0.6rem]">
         vs
       </span>
-      <TeamHeader name={awayName} picture={awayPicture} align="right" />
+      <TeamHeader name={awayName} picture={awayPicture} />
     </div>
   );
 }
@@ -152,27 +151,19 @@ function TeamHeaders({
 function TeamHeader({
   name,
   picture,
-  align,
 }: {
   name: string;
   picture: string | null;
-  align: "left" | "right";
 }) {
-  const isRight = align === "right";
   return (
-    <div
-      className={cn(
-        "flex items-center gap-3",
-        isRight ? "flex-row-reverse text-right" : "text-left",
-      )}
-    >
+    <div className="flex flex-col items-center gap-2.5 text-center">
       <HnsCrest
         picture={picture}
         name={name}
-        size={48}
-        className="size-10 shrink-0 sm:size-12"
+        size={56}
+        className="size-11 shrink-0 sm:size-14"
       />
-      <span className="line-clamp-2 text-[0.65rem] font-semibold uppercase leading-tight tracking-[0.15em] sm:text-xs sm:tracking-[0.2em]">
+      <span className="line-clamp-2 text-balance text-[0.6rem] font-bold uppercase leading-tight tracking-[0.1em] sm:text-xs sm:tracking-[0.15em]">
         {name}
       </span>
     </div>

@@ -73,9 +73,10 @@ export default async function MatchInfoPage({ params }: Props) {
         place={matchInfo.facility?.place?.trim() || null}
         halfTime={showHalfTime ? `${halfHome}:${halfAway}` : null}
         attendance={attendance ?? null}
+        events={events ?? undefined}
       />
 
-      <div className="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <MatchTabs
           match={matchInfo}
           events={events ?? undefined}

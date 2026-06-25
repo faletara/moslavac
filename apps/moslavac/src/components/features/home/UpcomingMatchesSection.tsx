@@ -55,7 +55,7 @@ function SectionTitle() {
         </p>
       </FadeInView>
       <FadeInView delay={0.05}>
-        <h2 className="text-center font-display text-5xl font-black uppercase leading-none sm:text-6xl md:text-7xl">
+        <h2 className="text-center font-display text-[13vw] font-black uppercase leading-[0.85] sm:text-6xl md:text-7xl lg:text-8xl">
           Sljedeće utakmice
         </h2>
       </FadeInView>

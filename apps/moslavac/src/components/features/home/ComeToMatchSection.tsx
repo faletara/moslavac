@@ -35,7 +35,7 @@ export default function ComeToMatchSection() {
 					lines={["Dođi na", "utakmicu"]}
 					delay={0.1}
 					className="select-none text-balance font-display font-black uppercase leading-[0.85] tracking-[-0.02em]"
-					lineClassName="text-[14vw] sm:text-7xl md:text-8xl lg:text-9xl"
+					lineClassName="text-[13vw] sm:text-6xl md:text-7xl lg:text-8xl"
 				/>
 
 				<FadeInView direction="up" delay={0.2}>

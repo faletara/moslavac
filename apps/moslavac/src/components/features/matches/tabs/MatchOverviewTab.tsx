@@ -1,14 +1,21 @@
 "use client";
 
-import type { HnsMatch, HnsMatchEvent, HnsMatchInfo } from "@/types/hns";
-import RichScorersSection from "../played/RichScorersSection";
+import type {
+  HnsLineups,
+  HnsMatch,
+  HnsMatchEvent,
+  HnsMatchInfo,
+} from "@/types/hns";
+import MatchLineupSummary from "../MatchLineupSummary";
 import MatchInfoCard from "../shared/MatchInfoCard";
 import MatchCountdown from "../upcoming/MatchCountdown";
+import MatchFormTab from "./MatchFormTab";
 import EventsTimeline from "./EventsTimeline";
 
 interface MatchOverviewTabProps {
   match: HnsMatch;
   events: HnsMatchEvent[] | undefined;
+  lineups: HnsLineups | undefined;
   refereeData: HnsMatchInfo | undefined;
   refereesLoading: boolean;
 }
@@ -16,24 +23,45 @@ interface MatchOverviewTabProps {
 export default function MatchOverviewTab({
   match,
   events,
+  lineups,
   refereeData,
 }: MatchOverviewTabProps) {
   const hasResult =
     match.homeTeamResult != null && match.awayTeamResult != null;
 
-  return (
-    <div className="mt-16 flex flex-col gap-20 sm:mt-20 sm:gap-28">
-      {hasResult ? (
-        <>
-          <RichScorersSection match={match} events={events} />
-          <EventsTimeline match={match} events={events} />
-        </>
-      ) : (
-        match.dateTimeUTC != null && (
+  if (!hasResult) {
+    // Pre-match Match Room — countdown, form/standing/H2H, then facts.
+    return (
+      <div className="mx-auto mt-12 flex max-w-4xl flex-col gap-20 sm:mt-16 sm:gap-28">
+        {match.dateTimeUTC != null && (
           <MatchCountdown dateTimeUTC={match.dateTimeUTC} />
-        )
-      )}
-      <MatchInfoCard match={match} refereeData={refereeData} />
+        )}
+        <MatchFormTab match={match} />
+        <MatchInfoCard match={match} refereeData={refereeData} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-12 sm:mt-16">
+      <div className="grid gap-12 lg:grid-cols-[20rem_1fr] lg:gap-16 xl:gap-20">
+        {/* Lineups companion — desktop only; full lineups live in Postave tab */}
+        <aside className="hidden lg:block">
+          <div className="lg:sticky lg:top-24">
+            <MatchLineupSummary
+              match={match}
+              home={lineups?.home ?? null}
+              away={lineups?.away ?? null}
+            />
+          </div>
+        </aside>
+
+        <EventsTimeline match={match} events={events} />
+      </div>
+
+      <div className="mt-20 sm:mt-28">
+        <MatchInfoCard match={match} refereeData={refereeData} />
+      </div>
     </div>
   );
 }

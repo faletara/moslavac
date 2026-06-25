@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { AnimatedLine, FadeInView } from "@/components/animations";
+import { FadeInView } from "@/components/animations";
 import { HnsCrest } from "@/components/HnsCrest";
 import { useMoslavacTeamId } from "@/components/providers/TenantProvider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { buildPlayerSlug } from "@/lib/slug";
 import type { HnsLineups, HnsMatch, HnsTeamPlayer } from "@/types/hns";
+import { MatchTabHeading } from "../shared/MatchTabHeading";
 
 interface MatchLineupsTabProps {
   match: HnsMatch;
@@ -61,18 +62,8 @@ export default function MatchLineupsTab({
   );
 
   return (
-    <section className="mt-20 sm:mt-28">
-      <FadeInView>
-        <div className="flex flex-col items-center gap-6 text-center">
-          <AnimatedLine className="mx-auto" />
-          <p className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
-            Tko je u igri
-          </p>
-          <h2 className="select-none font-black uppercase leading-[0.85] tracking-tighter text-[14vw] sm:text-6xl md:text-7xl">
-            Postave
-          </h2>
-        </div>
-      </FadeInView>
+    <section className="mt-12 sm:mt-16">
+      <MatchTabHeading eyebrow="Tko je u igri" title="Postave" />
 
       <FadeInView delay={0.1}>
         <Tabs

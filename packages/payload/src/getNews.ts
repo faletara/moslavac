@@ -59,6 +59,7 @@ function adaptNews(doc: PayloadNews): News {
     id: doc.id,
     slug: doc.slug,
     title: doc.title,
+    excerpt: doc.excerpt,
     content: html,
     date: doc.publishedAt ?? doc.createdAt,
     updatedAt: doc.updatedAt ?? doc.publishedAt ?? doc.createdAt,

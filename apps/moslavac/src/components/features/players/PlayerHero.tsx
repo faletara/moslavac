@@ -1,8 +1,9 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
+import Image from "next/image";
 import { RevealHeading } from "@/components/animations";
-import { HnsCrest } from "@/components/HnsCrest";
+import { getCometImageUrl } from "@/lib/api";
 
 const EASE = [0.25, 0.1, 0.25, 1] as const;
 const EXPO_OUT = [0.16, 1, 0.3, 1] as const;
@@ -84,12 +85,7 @@ export default function PlayerHero({
             aria-hidden
             className="absolute inset-0 -z-10 rounded-full bg-club/25 blur-3xl"
           />
-          <HnsCrest
-            picture={picture}
-            name={name}
-            size={176}
-            className="size-32 sm:size-40 md:size-44"
-          />
+          <PlayerPortrait picture={picture} name={name} />
         </motion.div>
 
         <RevealHeading
@@ -112,5 +108,38 @@ export default function PlayerHero({
         )}
       </div>
     </section>
+  );
+}
+
+function PlayerPortrait({
+  picture,
+  name,
+}: {
+  picture: string | null;
+  name: string;
+}) {
+  const initials = name
+    .split(/\s+/)
+    .map((p) => p[0] ?? "")
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
+  return (
+    <div className="relative size-32 overflow-hidden rounded-full bg-club/20 ring-2 ring-foreground/15 sm:size-40 md:size-44">
+      {picture ? (
+        <Image
+          src={getCometImageUrl(picture)}
+          alt={name}
+          fill
+          sizes="176px"
+          className="object-cover object-top"
+        />
+      ) : (
+        <span className="flex size-full items-center justify-center font-display text-4xl font-black uppercase text-foreground/40">
+          {initials}
+        </span>
+      )}
+    </div>
   );
 }

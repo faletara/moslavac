@@ -3,6 +3,8 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { HnsCrest } from "@/components/HnsCrest";
 import { cn } from "@/lib/utils";
+import type { HnsMatchEvent } from "@/types/hns";
+import MatchEventBar from "./MatchEventBar";
 
 const EASE = [0.25, 0.1, 0.25, 1] as const;
 const EXPO_OUT = [0.16, 1, 0.3, 1] as const;
@@ -23,13 +25,15 @@ interface MatchHeroProps {
   halfTime: string | null;
   /** Attendance count, shown only for played matches with a positive value. */
   attendance: number | null;
+  /** Match events — render the broadcast event bar when present. */
+  events?: HnsMatchEvent[];
 }
 
 /**
- * Cinematic scoreboard hero — carries the homepage's dark floodlit canvas onto
- * the match page: club-blue glows, a hollow venue watermark, oversized crests
- * and a display-font score. Replaces the flat white header so the page opens
- * with the same brand punch as the home Hero.
+ * Broadcast scoreboard hero — the team names ARE the hero, set in oversized
+ * display type flanking the score with crests inline (à la club match centres).
+ * Dark floodlit canvas with club-blue glows and a broadcast accent line carries
+ * the brand; all the small match facts are intentionally dropped for impact.
  */
 export default function MatchHero({
   eyebrow,
@@ -43,23 +47,27 @@ export default function MatchHero({
   time,
   date,
   place,
-  halfTime,
-  attendance,
+  events,
 }: MatchHeroProps) {
   const reduced = useReducedMotion();
 
-  const meta = [
-    halfTime ? `Poluvrijeme ${halfTime}` : null,
-    date,
-    place,
-    hasResult && attendance != null && attendance > 0
-      ? `${attendance} gledatelja`
-      : null,
-  ].filter(Boolean) as string[];
+  const subline = [date, place].filter(
+    (p): p is string => typeof p === "string" && p.trim().length > 0,
+  );
+
+  const score = (
+    <Scoreline
+      hasResult={hasResult}
+      homeScore={homeScore}
+      awayScore={awayScore}
+      time={time}
+      reduced={!!reduced}
+    />
+  );
 
   return (
     <section className="dark relative isolate -mt-20 flex min-h-[70svh] w-full items-center overflow-hidden bg-navy-deep pt-20 text-foreground">
-      {/* Floodlight glows — same club-blue bloom as the home Hero */}
+      {/* Floodlight glows */}
       <div
         aria-hidden
         className="absolute -top-[18vw] left-[12%] -z-20 size-[52vw] rounded-full bg-club/25 blur-[120px]"
@@ -73,112 +81,177 @@ export default function MatchHero({
         className="absolute inset-0 -z-10 bg-linear-to-b from-navy-deep/40 via-transparent to-navy-deep"
       />
 
-      <div className="mx-auto w-full max-w-5xl px-4 py-20 sm:px-6 sm:py-28">
-        <motion.p
-          className="flex items-center justify-center gap-3 text-center text-[0.6rem] font-medium uppercase tracking-[0.3em] text-foreground/60 sm:text-xs sm:tracking-[0.4em]"
-          initial={{ opacity: 0, y: reduced ? 0 : 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: EASE }}
-        >
-          {eyebrow}
-        </motion.p>
-
-        <div className="mt-12 grid grid-cols-3 items-center gap-3 sm:mt-16 sm:gap-10">
-          <TeamSide
-            name={homeName}
-            picture={homePicture}
-            side="home"
-            reduced={!!reduced}
-          />
-
-          <motion.div
-            className="flex flex-col items-center gap-5 text-center"
-            initial={{ opacity: 0, scale: reduced ? 1 : 0.92 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.15, ease: EXPO_OUT }}
+      <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 sm:py-24">
+        {/* Eyebrow cluster */}
+        <div className="flex flex-col items-center gap-3 text-center">
+          <motion.p
+            className="flex items-center justify-center gap-3 text-[0.6rem] font-bold uppercase tracking-[0.3em] text-foreground/70 sm:text-xs sm:tracking-[0.4em]"
+            initial={{ opacity: 0, y: reduced ? 0 : 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: EASE }}
           >
-            {hasResult ? (
-              <div className="flex items-baseline gap-3 font-display font-black uppercase leading-none tracking-tighter sm:gap-6">
-                <span className="text-7xl tabular-nums sm:text-8xl md:text-9xl">
-                  {homeScore}
-                </span>
-                <span className="text-3xl font-light text-foreground/40 sm:text-5xl">
-                  :
-                </span>
-                <span className="text-7xl tabular-nums sm:text-8xl md:text-9xl">
-                  {awayScore}
-                </span>
-              </div>
-            ) : (
-              <span className="font-display text-6xl font-black uppercase leading-none tracking-tighter tabular-nums sm:text-7xl md:text-8xl">
-                {time}
-              </span>
-            )}
-
-            {meta.length > 0 && (
-              <div className="flex flex-col gap-1.5">
-                {meta.map((line, i) => (
-                  <p
-                    key={line}
-                    className={cn(
-                      "text-[0.6rem] font-medium uppercase tracking-[0.3em] sm:tracking-[0.35em]",
-                      i === 0 ? "text-foreground/70" : "text-foreground/45",
-                    )}
-                  >
-                    {line}
-                  </p>
-                ))}
-              </div>
-            )}
-          </motion.div>
-
-          <TeamSide
-            name={awayName}
-            picture={awayPicture}
-            side="away"
-            reduced={!!reduced}
-          />
+            <span aria-hidden className="h-px w-8 bg-primary" />
+            {eyebrow}
+            <span aria-hidden className="h-px w-8 bg-primary" />
+          </motion.p>
+          {subline.length > 0 && (
+            <motion.p
+              className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-foreground/45 sm:text-xs"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
+            >
+              {subline.join(" · ")}
+            </motion.p>
+          )}
         </div>
+
+        {/* Desktop — horizontal broadcast line: NAME · crest · score · crest · NAME */}
+        <div className="mt-16 hidden items-center gap-6 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:gap-10">
+          <div className="flex items-center justify-end gap-6">
+            <TeamName name={homeName} align="right" reduced={!!reduced} side="home" />
+            <Crest picture={homePicture} name={homeName} reduced={!!reduced} side="home" />
+          </div>
+          {score}
+          <div className="flex items-center gap-6">
+            <Crest picture={awayPicture} name={awayName} reduced={!!reduced} side="away" />
+            <TeamName name={awayName} align="left" reduced={!!reduced} side="away" />
+          </div>
+        </div>
+
+        {/* Mobile / tablet — compact scoreboard: crests + score aligned on one
+            row, names directly below in the same grid so they stay aligned. */}
+        <div className="mt-12 grid grid-cols-[1fr_auto_1fr] items-center gap-x-3 gap-y-5 sm:mt-14 sm:gap-x-6 lg:hidden">
+          <div className="col-start-1 row-start-1 flex justify-center">
+            <Crest picture={homePicture} name={homeName} reduced={!!reduced} side="home" />
+          </div>
+          <div className="col-start-2 row-start-1">{score}</div>
+          <div className="col-start-3 row-start-1 flex justify-center">
+            <Crest picture={awayPicture} name={awayName} reduced={!!reduced} side="away" />
+          </div>
+          <h2 className="col-start-1 row-start-2 text-balance text-center font-display text-xl font-black uppercase leading-[0.95] tracking-tighter text-foreground sm:text-2xl">
+            {homeName}
+          </h2>
+          <h2 className="col-start-3 row-start-2 text-balance text-center font-display text-xl font-black uppercase leading-[0.95] tracking-tighter text-foreground sm:text-2xl">
+            {awayName}
+          </h2>
+        </div>
+
+        {/* Broadcast event bar */}
+        {hasResult && events && events.length > 0 && (
+          <div className="mt-14 sm:mt-20">
+            <MatchEventBar
+              events={events}
+              homeName={homeName}
+              homePicture={homePicture}
+              awayName={awayName}
+              awayPicture={awayPicture}
+            />
+          </div>
+        )}
       </div>
     </section>
   );
 }
 
-function TeamSide({
-  name,
-  picture,
-  side,
+function Scoreline({
+  hasResult,
+  homeScore,
+  awayScore,
+  time,
   reduced,
 }: {
-  name: string;
-  picture: string | null;
-  side: "home" | "away";
+  hasResult: boolean;
+  homeScore: number;
+  awayScore: number;
+  time: string;
   reduced: boolean;
 }) {
-  const fromX = side === "home" ? -28 : 28;
-
   return (
     <motion.div
-      className="flex flex-col items-center gap-4 text-center"
+      className="flex shrink-0 items-center justify-center"
+      initial={{ opacity: 0, scale: reduced ? 1 : 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.8, delay: 0.15, ease: EXPO_OUT }}
+    >
+      {hasResult ? (
+        <div className="flex items-center gap-3 font-display font-black uppercase leading-none tracking-tighter sm:gap-5">
+          <span className="text-7xl tabular-nums sm:text-8xl lg:text-9xl">
+            {homeScore}
+          </span>
+          <span className="text-3xl font-light text-foreground/30 sm:text-5xl lg:text-6xl">
+            :
+          </span>
+          <span className="text-7xl tabular-nums sm:text-8xl lg:text-9xl">
+            {awayScore}
+          </span>
+        </div>
+      ) : (
+        <span className="font-display text-6xl font-black uppercase leading-none tracking-tighter tabular-nums sm:text-7xl lg:text-8xl">
+          {time}
+        </span>
+      )}
+    </motion.div>
+  );
+}
+
+function Crest({
+  picture,
+  name,
+  reduced,
+  side,
+}: {
+  picture: string | null;
+  name: string;
+  reduced: boolean;
+  side: "home" | "away";
+}) {
+  const fromX = side === "home" ? -24 : 24;
+  return (
+    <motion.div
+      className="relative shrink-0"
       initial={{ opacity: 0, x: reduced ? 0 : fromX }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.7, delay: 0.05, ease: EXPO_OUT }}
     >
-      <div className="relative">
-        <span
-          aria-hidden
-          className="absolute inset-0 -z-10 rounded-full bg-club/20 blur-2xl"
-        />
-        <HnsCrest
-          picture={picture}
-          name={name}
-          size={128}
-          className="size-20 sm:size-28 md:size-32"
-        />
-      </div>
-      <span className="line-clamp-2 text-[0.65rem] font-semibold uppercase leading-tight tracking-[0.2em] text-foreground/90 sm:text-sm sm:tracking-[0.25em]">
-        {name}
-      </span>
+      <span
+        aria-hidden
+        className="absolute inset-0 -z-10 rounded-full bg-club/25 blur-2xl"
+      />
+      <HnsCrest
+        picture={picture}
+        name={name}
+        size={128}
+        className="size-24 sm:size-28 lg:size-24 xl:size-28"
+      />
     </motion.div>
   );
 }
+
+function TeamName({
+  name,
+  align,
+  reduced,
+  side,
+}: {
+  name: string;
+  align: "left" | "right";
+  reduced: boolean;
+  side: "home" | "away";
+}) {
+  const fromX = side === "home" ? -24 : 24;
+  return (
+    <motion.h2
+      className={cn(
+        "text-balance font-display font-black uppercase leading-[0.9] tracking-tighter text-foreground text-4xl xl:text-5xl",
+        align === "right" ? "text-right" : "text-left",
+      )}
+      initial={{ opacity: 0, x: reduced ? 0 : fromX }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.7, delay: 0.1, ease: EXPO_OUT }}
+    >
+      {name}
+    </motion.h2>
+  );
+}
+

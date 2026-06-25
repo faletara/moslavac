@@ -15,6 +15,7 @@ import { api } from "@/lib/api";
 import { getStandingsForm, type FormResult } from "@/lib/helpers/form";
 import { cn } from "@/lib/utils";
 import type { TeamRanking } from "@/types/hns";
+import { MatchTabHeading } from "../shared/MatchTabHeading";
 
 interface MatchStandingsTabProps {
   competitionId: number | null;
@@ -34,9 +35,9 @@ export default function MatchStandingsTab({
 
   if (isLoading) {
     return (
-      <section className="mt-16 border-t border-border/60 pt-12 sm:mt-20">
-        <Skeleton className="mx-auto h-4 w-32" />
-        <div className="mt-8 space-y-2">
+      <section className="mt-12 sm:mt-16">
+        <MatchTabHeading eyebrow="Poredak" title="Tablica" />
+        <div className="mx-auto mt-12 max-w-3xl space-y-2">
           {["a", "b", "c", "d", "e", "f", "g", "h"].map((k) => (
             <Skeleton key={k} className="h-10" />
           ))}
@@ -47,8 +48,9 @@ export default function MatchStandingsTab({
 
   if (!standings || standings.length === 0) {
     return (
-      <section className="mt-16 border-t border-border/60 pt-12 sm:mt-20">
-        <p className="text-center text-sm text-muted-foreground">
+      <section className="mt-12 sm:mt-16">
+        <MatchTabHeading eyebrow="Poredak" title="Tablica" />
+        <p className="mt-12 text-center text-sm text-muted-foreground">
           Tablica nije dostupna.
         </p>
       </section>
@@ -56,12 +58,10 @@ export default function MatchStandingsTab({
   }
 
   return (
-    <section className="mt-16 border-t border-border/60 pt-12 sm:mt-20">
-      <h2 className="text-center text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
-        Tablica
-      </h2>
+    <section className="mt-12 sm:mt-16">
+      <MatchTabHeading eyebrow="Poredak" title="Tablica" />
 
-      <div className="mx-auto mt-8 max-w-3xl">
+      <div className="mx-auto mt-12 max-w-3xl">
         <Table>
           <TableHeader>
             <TableRow>

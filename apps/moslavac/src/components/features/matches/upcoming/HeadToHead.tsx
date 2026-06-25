@@ -7,6 +7,7 @@ import { formatDateShort } from "@/lib/helpers/date";
 import { buildMatchSlug } from "@/lib/slug";
 import { cn } from "@/lib/utils";
 import type { HnsMatch } from "@/types/hns";
+import { MatchTabHeading } from "../shared/MatchTabHeading";
 
 interface HeadToHeadProps {
   homeTeamId: number | null;
@@ -29,9 +30,9 @@ export default function HeadToHead({
 }: HeadToHeadProps) {
   if (isLoading) {
     return (
-      <section className="mt-16 border-t border-border/60 pt-12 sm:mt-20">
-        <Skeleton className="mx-auto h-4 w-40" />
-        <div className="mt-8 space-y-2">
+      <section className="mt-12 sm:mt-16">
+        <MatchTabHeading eyebrow="Ranije" title="Susreti" />
+        <div className="mx-auto mt-12 max-w-2xl space-y-2">
           <Skeleton className="h-12" />
           <Skeleton className="h-12" />
         </div>
@@ -48,12 +49,10 @@ export default function HeadToHead({
   if (h2h.length === 0) return null;
 
   return (
-    <section className="mt-16 border-t border-border/60 pt-12 sm:mt-20">
-      <h2 className="text-center text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
-        Međusobni susreti
-      </h2>
+    <section className="mt-12 sm:mt-16">
+      <MatchTabHeading eyebrow="Ranije" title="Susreti" />
 
-      <ul className="mx-auto mt-8 max-w-2xl divide-y divide-border/40">
+      <ul className="mx-auto mt-12 max-w-2xl divide-y divide-border/40">
         {h2h.slice(0, 5).map((match) => (
           <H2HRow
             key={match.id ?? `${match.dateTimeUTC}`}

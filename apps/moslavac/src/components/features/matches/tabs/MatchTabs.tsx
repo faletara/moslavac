@@ -71,8 +71,11 @@ export default function MatchTabs({
       onValueChange={handleTabChange}
       className="mt-12 sm:mt-16"
     >
-      <div className="flex justify-center">
-        <TabsList variant="line">
+      <div className="flex justify-start overflow-x-auto border-b border-border [scrollbar-width:none] sm:justify-center [&::-webkit-scrollbar]:hidden">
+        <TabsList
+          variant="line"
+          className="w-max shrink-0 gap-0 [&>button]:px-3 [&>button]:text-xs [&>button]:font-black [&>button]:uppercase [&>button]:tracking-[0.15em] [&>button]:after:bottom-[-1px] [&>button]:after:h-0.5 [&>button]:after:bg-primary [&>button]:data-[state=active]:text-foreground sm:[&>button]:px-5 sm:[&>button]:text-sm sm:[&>button]:tracking-[0.18em]"
+        >
           <TabsTrigger value="pregled">Pregled</TabsTrigger>
           <TabsTrigger value="postave">Postave</TabsTrigger>
           <TabsTrigger value="tablica">Tablica</TabsTrigger>
@@ -85,6 +88,7 @@ export default function MatchTabs({
         <MatchOverviewTab
           match={match}
           events={events}
+          lineups={lineups}
           refereeData={refereeData}
           refereesLoading={refereesLoading}
         />
@@ -95,11 +99,13 @@ export default function MatchTabs({
       </TabsContent>
 
       <TabsContent value="tablica">
-        <MatchStandingsTab
-          competitionId={competitionId}
-          homeTeamId={homeTeamId}
-          awayTeamId={awayTeamId}
-        />
+        <div className="mx-auto max-w-4xl">
+          <MatchStandingsTab
+            competitionId={competitionId}
+            homeTeamId={homeTeamId}
+            awayTeamId={awayTeamId}
+          />
+        </div>
       </TabsContent>
 
       <TabsContent value="forma">
@@ -107,11 +113,13 @@ export default function MatchTabs({
       </TabsContent>
 
       <TabsContent value="strijelci">
-        <MatchTopScorersTab
-          competitionId={competitionId}
-          homeTeamId={homeTeamId}
-          awayTeamId={awayTeamId}
-        />
+        <div className="mx-auto max-w-4xl">
+          <MatchTopScorersTab
+            competitionId={competitionId}
+            homeTeamId={homeTeamId}
+            awayTeamId={awayTeamId}
+          />
+        </div>
       </TabsContent>
     </Tabs>
   );

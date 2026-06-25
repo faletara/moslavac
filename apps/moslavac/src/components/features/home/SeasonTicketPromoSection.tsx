@@ -41,7 +41,7 @@ export default function SeasonTicketPromoSection() {
 						<RevealHeading
 							lines={["Postani naš", "12. igrač"]}
 							className="select-none text-balance font-display font-black uppercase leading-[0.85] tracking-[-0.02em]"
-							lineClassName="text-[11vw] sm:text-6xl lg:text-7xl"
+							lineClassName="text-[13vw] sm:text-6xl md:text-7xl lg:text-8xl"
 						/>
 
 						<p className="max-w-md text-balance text-sm leading-relaxed text-muted-foreground sm:text-base">

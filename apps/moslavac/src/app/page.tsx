@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import ComeToMatchSection from "@/components/features/home/ComeToMatchSection";
+import FirstTeamSection from "@/components/features/home/FirstTeamSection";
 import Hero from "@/components/features/home/Hero";
 import LatestNewsSection from "@/components/features/home/LatestNewsSection";
 import PreviousAndNextMatchSection from "@/components/features/home/PreviousAndNextMatchSection";
@@ -26,19 +27,20 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-	const tenant = await getTenant();
+  const tenant = await getTenant();
 
-	return (
-		<div>
-			<Hero tenant={tenant} />
-			<PreviousAndNextMatchSection />
-			<LatestNewsSection />
-			<UpcomingMatchesSection />
-			<SeasonDataSection />
-			<ComeToMatchSection />
-			<YouTubePromoSection />
-			<WebShopCarousel />
-			<SeasonTicketPromoSection />
-		</div>
-	);
+  return (
+    <div>
+      <Hero tenant={tenant} />
+      <PreviousAndNextMatchSection />
+      <LatestNewsSection />
+      <FirstTeamSection />
+      <UpcomingMatchesSection />
+      <SeasonDataSection />
+      <WebShopCarousel />
+      <ComeToMatchSection />
+      <SeasonTicketPromoSection />
+      <YouTubePromoSection />
+    </div>
+  );
 }
