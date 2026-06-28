@@ -1,5 +1,6 @@
 import { getPayload } from 'payload'
 import config from '@payload-config'
+import { paragraphsToLexical } from '@/lib/ai/lexical'
 
 const TENANT_SLUG = process.env.SEED_TENANT_SLUG ?? 'moslavac'
 
@@ -69,36 +70,6 @@ const news: NewsSeed[] = [
   },
 ]
 
-const richTextFromParagraphs = (paragraphs: Paragraph[]) => ({
-  root: {
-    type: 'root',
-    format: '' as const,
-    indent: 0,
-    version: 1,
-    direction: 'ltr' as const,
-    children: paragraphs.map((text) => ({
-      type: 'paragraph',
-      format: '' as const,
-      indent: 0,
-      version: 1,
-      direction: 'ltr' as const,
-      textFormat: 0,
-      textStyle: '',
-      children: [
-        {
-          type: 'text',
-          detail: 0,
-          format: 0,
-          mode: 'normal' as const,
-          style: '',
-          text,
-          version: 1,
-        },
-      ],
-    })),
-  },
-})
-
 // Top-level await is required: `payload run` calls process.exit(0) immediately
 // after the module's synchronous evaluation finishes, so we must block module
 // evaluation until the seeding work completes.
@@ -145,7 +116,7 @@ for (const item of news) {
       title: item.title,
       excerpt: item.excerpt,
       publishedAt: item.publishedAt,
-      content: richTextFromParagraphs(item.paragraphs),
+      content: paragraphsToLexical(item.paragraphs),
       tenant: tenant.id,
     },
   })

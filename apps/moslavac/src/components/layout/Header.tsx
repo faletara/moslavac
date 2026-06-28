@@ -29,6 +29,7 @@ import {
 import { buildCompetitionSlug } from "@/lib/slug";
 import type { FrontendTenant, PayloadMedia } from "@/lib/payload/types";
 import { cn } from "@/lib/utils";
+import { PushBell } from "@/components/ui/push-bell";
 import NavLink from "./NavLink";
 
 interface HeaderProps {
@@ -237,9 +238,12 @@ export default function Header({ tenant }: HeaderProps) {
 					<NavLink href="/prva-momcad">Momčad</NavLink>
 					<NavLink href="/klub">Klub</NavLink>
 					<NavLink href="/oprema">Oprema</NavLink>
+					<PushBell />
 				</nav>
 
-				{/* Mobile hamburger */}
+				{/* Mobile: obavijesti + hamburger */}
+				<div className="flex items-center gap-1 lg:hidden">
+				<PushBell />
 				<Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
 					<SheetTrigger asChild>
 						<button
@@ -314,6 +318,7 @@ export default function Header({ tenant }: HeaderProps) {
 						</nav>
 					</SheetContent>
 				</Sheet>
+				</div>
 			</div>
 			</motion.div>
 		</header>

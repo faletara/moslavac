@@ -1,11 +1,10 @@
 import "server-only";
 
-const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL;
+// Resolved lazily rather than thrown at module load: the CMS imports this
+// shared data layer (transitively, via the HNS client) but never calls
+// payloadFetch — it talks to Payload through the local API instead.
+const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL ?? "";
 const PAYLOAD_API_KEY = process.env.PAYLOAD_API_KEY;
-
-if (!PAYLOAD_API_URL) {
-  throw new Error("PAYLOAD_API_URL env var is required");
-}
 
 interface PayloadFetchOptions {
   authenticated?: boolean;
@@ -16,6 +15,10 @@ export async function payloadFetch<T>(
   path: string,
   { authenticated = false, next }: PayloadFetchOptions = {},
 ): Promise<T> {
+  if (!PAYLOAD_API_URL) {
+    throw new Error("PAYLOAD_API_URL env var is required");
+  }
+
   const headers: Record<string, string> = {
     Accept: "application/json",
   };

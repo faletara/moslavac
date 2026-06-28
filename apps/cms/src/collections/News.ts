@@ -1,37 +1,26 @@
-import type { CollectionConfig, FieldHook } from 'payload'
-
-const slugify = (value: string): string =>
-  value
-    .toString()
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-
-const formatSlug: FieldHook = ({ value, originalDoc, data }) => {
-  if (typeof value === 'string' && value.length > 0) {
-    return slugify(value)
-  }
-  const fallback = data?.title ?? originalDoc?.title
-  if (typeof fallback === 'string' && fallback.length > 0) {
-    return slugify(fallback)
-  }
-  return value
-}
+import type { CollectionConfig } from 'payload'
+import { formatSlug } from '../fields/slug'
+import { sendNewsPublishedPush } from '../hooks/newsPush'
 
 export const News: CollectionConfig = {
   slug: 'news',
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'publishedAt', 'tenant'],
+    defaultColumns: ['title', '_status', 'publishedAt', 'tenant'],
+  },
+  // Drafts: AI piše neobjavljen nацrt (_status: draft); admin ga objavi ručno.
+  // Frontend čita samo published (vidi packages/payload publishedWhere()).
+  versions: {
+    drafts: true,
   },
   access: {
     read: () => true,
     create: ({ req: { user } }) => Boolean(user),
     update: ({ req: { user } }) => Boolean(user),
     delete: ({ req: { user } }) => Boolean(user),
+  },
+  hooks: {
+    afterChange: [sendNewsPublishedPush],
   },
   fields: [
     {

@@ -1,5 +1,6 @@
 import "server-only";
 import { getTenant } from "@/lib/payload/getTenant";
+import { getActiveHnsContext } from "./context";
 
 const HNS_API_BASE =
 	process.env.HNS_API_BASE ?? "https://api-hns.analyticom.de";
@@ -13,17 +14,28 @@ export async function hnsFetch<T>(
 	endpoint: string,
 	{ revalidate, tags }: HnsFetchOptions = {},
 ): Promise<T | null> {
-	const tenant = await getTenant();
+	const ctx = getActiveHnsContext();
+	const apiKey = ctx ? ctx.apiKey : (await getTenant()).hns.apiKey;
 	const url = `${HNS_API_BASE}${endpoint}`;
 
-	const response = await fetch(url, {
+	const init: RequestInit & { dispatcher?: unknown; next?: unknown } = {
 		headers: {
-			API_KEY: tenant.hns.apiKey,
+			API_KEY: apiKey,
 			"Accept-Language": "hr",
 			Accept: "application/json",
 		},
-		next: { revalidate, tags },
-	});
+	};
+
+	if (ctx) {
+		// Explicit-context callers (the CMS cron) want fresh data, have no
+		// per-request Next cache to tag, and may need a custom DNS dispatcher.
+		init.cache = "no-store";
+		if (ctx.dispatcher) init.dispatcher = ctx.dispatcher;
+	} else {
+		init.next = { revalidate, tags };
+	}
+
+	const response = await fetch(url, init);
 
 	if (!response.ok) {
 		console.error(
@@ -36,13 +48,15 @@ export async function hnsFetch<T>(
 }
 
 export async function getHnsTeamId(): Promise<string> {
-	const tenant = await getTenant();
-	return tenant.hns.teamId;
+	const ctx = getActiveHnsContext();
+	if (ctx) return ctx.teamId;
+	return (await getTenant()).hns.teamId;
 }
 
 export async function getSeniorCompetitionFilter(): Promise<string | null> {
-	const tenant = await getTenant();
-	return tenant.hns.seniorCompetitionFilter ?? null;
+	const ctx = getActiveHnsContext();
+	if (ctx) return ctx.seniorCompetitionFilter ?? null;
+	return (await getTenant()).hns.seniorCompetitionFilter ?? null;
 }
 
 export function currentSeasonTag(): string {

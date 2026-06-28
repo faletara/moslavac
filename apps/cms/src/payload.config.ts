@@ -14,12 +14,16 @@ import { Equipment } from "./collections/Equipment";
 import { GalleryAlbums } from "./collections/GalleryAlbums";
 import { Media } from "./collections/Media";
 import { News } from "./collections/News";
+import { NotifiedMatches } from "./collections/NotifiedMatches";
 import { Pages } from "./collections/Pages";
+import { PushSubscriptions } from "./collections/PushSubscriptions";
 import { Roster } from "./collections/Roster";
 import { SchoolPrograms } from "./collections/SchoolPrograms";
 import { Tenants } from "./collections/Tenants";
 import { Users } from "./collections/Users";
+import { cronEndpoint } from "./endpoints/cron";
 import { hnsPlayerSearchEndpoint } from "./endpoints/hnsPlayerSearch";
+import { pushSubscribeEndpoint } from "./endpoints/pushSubscribe";
 import type { Config } from "./payload-types";
 
 const filename = fileURLToPath(import.meta.url);
@@ -48,8 +52,14 @@ export default buildConfig({
 		BoardMembers,
 		SchoolPrograms,
 		GalleryAlbums,
+		PushSubscriptions,
+		NotifiedMatches,
 	],
-	endpoints: [hnsPlayerSearchEndpoint],
+	endpoints: [hnsPlayerSearchEndpoint, cronEndpoint, pushSubscribeEndpoint],
+	// Browser posts push subscriptions cross-origin from each club frontend.
+	cors: process.env.CORS_ORIGINS
+		? process.env.CORS_ORIGINS.split(",").map((o) => o.trim())
+		: "*",
 	editor: lexicalEditor(),
 	secret: process.env.PAYLOAD_SECRET,
 	graphQL: {
@@ -81,6 +91,8 @@ export default buildConfig({
 				"board-members": {},
 				"school-programs": {},
 				"gallery-albums": {},
+				"push-subscriptions": {},
+				"notified-matches": {},
 			},
 			tenantsSlug: "tenants",
 			userHasAccessToAllTenants: (user) => isSuperAdmin(user),
