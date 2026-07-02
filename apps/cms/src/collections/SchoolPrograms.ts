@@ -1,19 +1,16 @@
-import type { CollectionConfig } from 'payload'
 import { tenantScopedAdmin } from '../access/tenantScopedAdmin'
+import { createCollection } from '../factories/createCollection'
+import { activeField } from '../fields/active'
+import { displayOrderField } from '../fields/displayOrder'
+import { mediaField } from '../fields/media'
 
 /** Škola nogometa — programi po dobnim skupinama (Limači, Zagici, Pioniri…). */
-export const SchoolPrograms: CollectionConfig = {
+export const SchoolPrograms = createCollection({
   slug: 'school-programs',
   admin: {
     ...tenantScopedAdmin('school'),
     useAsTitle: 'name',
     defaultColumns: ['name', 'ageRange', 'coach', 'active', 'displayOrder', 'tenant'],
-  },
-  access: {
-    read: () => true,
-    create: ({ req: { user } }) => Boolean(user),
-    update: ({ req: { user } }) => Boolean(user),
-    delete: ({ req: { user } }) => Boolean(user),
   },
   fields: [
     {
@@ -45,28 +42,8 @@ export const SchoolPrograms: CollectionConfig = {
           'Opis programa — prikazuje se na kartici i kao glavni tekst ("O programu") na stranici programa.',
       },
     },
-    {
-      name: 'photo',
-      type: 'upload',
-      relationTo: 'media',
-    },
-    {
-      name: 'displayOrder',
-      type: 'number',
-      defaultValue: 0,
-      admin: {
-        position: 'sidebar',
-        description: 'Redoslijed prikaza (manji broj prvi).',
-      },
-    },
-    {
-      name: 'active',
-      type: 'checkbox',
-      defaultValue: true,
-      admin: {
-        position: 'sidebar',
-        description: 'Sakrij program bez brisanja (ako je isključeno).',
-      },
-    },
+    mediaField('photo'),
+    displayOrderField({ description: 'Redoslijed prikaza (manji broj prvi).' }),
+    activeField('Sakrij program bez brisanja (ako je isključeno).'),
   ],
-}
+})

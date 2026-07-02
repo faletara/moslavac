@@ -3,7 +3,7 @@ import { convertLexicalToHTML } from "@payloadcms/richtext-lexical/html";
 import type { News, PaginatedNews } from "@/types/news";
 import { payloadFetch } from "./client";
 import { tenantSlug } from "./getTenant";
-import { publishedWhere } from "./query";
+import { buildQuery, publishedWhere, tenantWhere } from "./query";
 import type { PayloadMedia, PayloadPaginated } from "./types";
 
 interface PayloadNews {
@@ -26,18 +26,6 @@ interface PayloadNews {
 }
 
 const newsTags = () => [`news-${tenantSlug}`];
-
-const tenantWhere = (slug: string) => ({
-  "where[tenant.slug][equals]": slug,
-});
-
-function buildQuery(params: Record<string, string | number>): string {
-  const search = new URLSearchParams();
-  for (const [key, value] of Object.entries(params)) {
-    search.append(key, String(value));
-  }
-  return search.toString();
-}
 
 function mediaUrl(value: PayloadMedia | number | null | undefined): string | null {
   if (!value || typeof value !== "object") return null;

@@ -1,13 +1,7 @@
-import type { CollectionConfig } from 'payload'
+import { createCollection } from '../factories/createCollection'
 
-export const Media: CollectionConfig = {
+export const Media = createCollection({
   slug: 'media',
-  access: {
-    read: () => true,
-    create: ({ req: { user } }) => Boolean(user),
-    update: ({ req: { user } }) => Boolean(user),
-    delete: ({ req: { user } }) => Boolean(user),
-  },
   fields: [
     {
       name: 'alt',
@@ -27,4 +21,4 @@ export const Media: CollectionConfig = {
     ],
     mimeTypes: ['image/*'],
   },
-}
+})

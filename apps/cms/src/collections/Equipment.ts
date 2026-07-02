@@ -1,16 +1,13 @@
-import type { CollectionConfig } from 'payload'
+import { activeField } from '../fields/active'
+import { createCollection } from '../factories/createCollection'
+import { displayOrderField } from '../fields/displayOrder'
+import { mediaField } from '../fields/media'
 
-export const Equipment: CollectionConfig = {
+export const Equipment = createCollection({
   slug: 'equipment',
   admin: {
     useAsTitle: 'displayName',
     defaultColumns: ['displayName', 'category', 'price', 'featured', 'active', 'displayOrder'],
-  },
-  access: {
-    read: () => true,
-    create: ({ req: { user } }) => Boolean(user),
-    update: ({ req: { user } }) => Boolean(user),
-    delete: ({ req: { user } }) => Boolean(user),
   },
   fields: [
     {
@@ -51,14 +48,9 @@ export const Equipment: CollectionConfig = {
         step: 0.01,
       },
     },
-    {
-      name: 'image',
-      type: 'upload',
-      relationTo: 'media',
-      admin: {
-        description: 'Slika proizvoda (uploadaj u admin UI nakon kreiranja zapisa)',
-      },
-    },
+    mediaField('image', {
+      description: 'Slika proizvoda (uploadaj u admin UI nakon kreiranja zapisa)',
+    }),
     {
       name: 'externalUrl',
       type: 'text',
@@ -79,15 +71,7 @@ export const Equipment: CollectionConfig = {
         description: 'Opcionalni kratki opis proizvoda',
       },
     },
-    {
-      name: 'displayOrder',
-      type: 'number',
-      defaultValue: 0,
-      admin: {
-        position: 'sidebar',
-        description: 'Redoslijed unutar kategorije (manji broj se prikazuje prvi)',
-      },
-    },
+    displayOrderField({ description: 'Redoslijed unutar kategorije (manji broj se prikazuje prvi)' }),
     {
       name: 'featured',
       type: 'checkbox',
@@ -97,14 +81,6 @@ export const Equipment: CollectionConfig = {
         description: 'Prikaži u carouselu na naslovnici',
       },
     },
-    {
-      name: 'active',
-      type: 'checkbox',
-      defaultValue: true,
-      admin: {
-        position: 'sidebar',
-        description: 'Sakrij proizvod bez brisanja (ako je isključeno)',
-      },
-    },
+    activeField('Sakrij proizvod bez brisanja (ako je isključeno)'),
   ],
-}
+})

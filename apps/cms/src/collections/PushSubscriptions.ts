@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { authenticatedUserAccess } from '../access/authenticatedUser'
 
 /**
  * Web Push pretplate, tenant-scoped (multiTenantPlugin). Zapise kreira isključivo
@@ -13,10 +14,10 @@ export const PushSubscriptions: CollectionConfig = {
     description: 'Web Push pretplatnici (popunjava frontend automatski).',
   },
   access: {
-    read: ({ req: { user } }) => Boolean(user),
+    read: authenticatedUserAccess,
     create: () => false,
     update: () => false,
-    delete: ({ req: { user } }) => Boolean(user),
+    delete: authenticatedUserAccess,
   },
   fields: [
     {

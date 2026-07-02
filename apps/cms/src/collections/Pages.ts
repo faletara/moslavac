@@ -1,23 +1,18 @@
-import type { CollectionConfig } from 'payload'
 import { tenantScopedAdmin } from '../access/tenantScopedAdmin'
+import { createCollection } from '../factories/createCollection'
+import { mediaArrayField, mediaField } from '../fields/media'
 
 /**
  * Generička rich-text stranica za statične rubrike koje klub sam uređuje.
  * Jedan zapis po `key` slotu (Povijest, Navijači, Statut-uvod, Škola-uvod, Seniori-uvod).
  * Frontend dohvaća deterministički po `key` (vidi getPages.ts).
  */
-export const Pages: CollectionConfig = {
+export const Pages = createCollection({
   slug: 'pages',
   admin: {
     ...tenantScopedAdmin('pages'),
     useAsTitle: 'title',
     defaultColumns: ['title', 'key', 'tenant'],
-  },
-  access: {
-    read: () => true,
-    create: ({ req: { user } }) => Boolean(user),
-    update: ({ req: { user } }) => Boolean(user),
-    delete: ({ req: { user } }) => Boolean(user),
   },
   fields: [
     {
@@ -47,29 +42,14 @@ export const Pages: CollectionConfig = {
       type: 'text',
       admin: { description: 'Mali nadnaslov iznad glavnog naslova (opcionalno).' },
     },
-    {
-      name: 'heroImage',
-      type: 'upload',
-      relationTo: 'media',
-      admin: { description: 'Naslovna slika rubrike (opcionalno).' },
-    },
+    mediaField('heroImage', { description: 'Naslovna slika rubrike (opcionalno).' }),
     {
       name: 'content',
       type: 'richText',
     },
-    {
-      name: 'gallery',
-      type: 'array',
-      admin: { description: 'Dodatne fotografije prikazane uz tekst (opcionalno).' },
-      fields: [
-        {
-          name: 'image',
-          type: 'upload',
-          relationTo: 'media',
-          required: true,
-        },
-      ],
-    },
+    mediaArrayField('gallery', {
+      description: 'Dodatne fotografije prikazane uz tekst (opcionalno).',
+    }),
     {
       name: 'seoDescription',
       type: 'textarea',
@@ -79,4 +59,4 @@ export const Pages: CollectionConfig = {
       },
     },
   ],
-}
+})

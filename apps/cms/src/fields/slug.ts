@@ -1,4 +1,4 @@
-import type { FieldHook } from 'payload'
+import type { Field, FieldHook } from 'payload'
 
 /** Pretvara proizvoljan string u URL-safe slug (bez dijakritike). */
 export const slugify = (value: string): string =>
@@ -25,3 +25,20 @@ export const formatSlug: FieldHook = ({ value, originalDoc, data }) => {
   }
   return value
 }
+
+/**
+ * Cijelo `slug` text polje (indexed, sidebar, auto-generira iz `title` preko
+ * formatSlug). Koriste News i GalleryAlbums.
+ */
+export const slugField = (opts: { description?: string } = {}): Field => ({
+  name: 'slug',
+  type: 'text',
+  index: true,
+  admin: {
+    position: 'sidebar',
+    description: opts.description ?? 'Auto-generiran iz naziva ako je prazno.',
+  },
+  hooks: {
+    beforeValidate: [formatSlug],
+  },
+})

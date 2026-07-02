@@ -1,22 +1,11 @@
 import "server-only";
 import { payloadFetch } from "./client";
 import { tenantSlug } from "./getTenant";
+import { buildQuery, tenantWhere } from "./query";
 import type { PayloadPaginated } from "./types";
 import type { RosterEntry } from "@/types/roster";
 
 const rosterTags = () => [`roster-${tenantSlug}`];
-
-const tenantWhere = (slug: string) => ({
-  "where[tenant.slug][equals]": slug,
-});
-
-function buildQuery(params: Record<string, string | number>): string {
-  const search = new URLSearchParams();
-  for (const [key, value] of Object.entries(params)) {
-    search.append(key, String(value));
-  }
-  return search.toString();
-}
 
 export async function fetchRoster(): Promise<RosterEntry[]> {
   const query = buildQuery({

@@ -1,19 +1,15 @@
-import type { CollectionConfig } from 'payload'
 import { tenantScopedAdmin } from '../access/tenantScopedAdmin'
+import { createCollection } from '../factories/createCollection'
+import { displayOrderField } from '../fields/displayOrder'
+import { mediaField } from '../fields/media'
 
 /** Uprava kluba — predsjedništvo, nadzorni odbor, stručni stožer. */
-export const BoardMembers: CollectionConfig = {
+export const BoardMembers = createCollection({
   slug: 'board-members',
   admin: {
     ...tenantScopedAdmin('board'),
     useAsTitle: 'name',
     defaultColumns: ['name', 'role', 'roleGroup', 'displayOrder', 'tenant'],
-  },
-  access: {
-    read: () => true,
-    create: ({ req: { user } }) => Boolean(user),
-    update: ({ req: { user } }) => Boolean(user),
-    delete: ({ req: { user } }) => Boolean(user),
   },
   fields: [
     {
@@ -41,12 +37,7 @@ export const BoardMembers: CollectionConfig = {
       ],
       admin: { description: 'Sekcija u kojoj se član prikazuje.' },
     },
-    {
-      name: 'photo',
-      type: 'upload',
-      relationTo: 'media',
-      admin: { description: 'Fotografija člana (opcionalno).' },
-    },
+    mediaField('photo', { description: 'Fotografija člana (opcionalno).' }),
     {
       name: 'email',
       type: 'email',
@@ -60,14 +51,6 @@ export const BoardMembers: CollectionConfig = {
       type: 'textarea',
       admin: { description: 'Kratki opis (opcionalno).' },
     },
-    {
-      name: 'displayOrder',
-      type: 'number',
-      defaultValue: 0,
-      admin: {
-        position: 'sidebar',
-        description: 'Redoslijed unutar sekcije (manji broj prvi).',
-      },
-    },
+    displayOrderField({ description: 'Redoslijed unutar sekcije (manji broj prvi).' }),
   ],
-}
+})

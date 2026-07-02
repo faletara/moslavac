@@ -1,16 +1,12 @@
-import type { CollectionConfig } from 'payload'
+import { createCollection } from '../factories/createCollection'
+import { displayOrderField } from '../fields/displayOrder'
+import { mediaField } from '../fields/media'
 
-export const Roster: CollectionConfig = {
+export const Roster = createCollection({
   slug: 'roster',
   admin: {
     useAsTitle: 'displayName',
     defaultColumns: ['displayName', 'position', 'jerseyNumber', 'captain', 'displayOrder'],
-  },
-  access: {
-    read: () => true,
-    create: ({ req: { user } }) => Boolean(user),
-    update: ({ req: { user } }) => Boolean(user),
-    delete: ({ req: { user } }) => Boolean(user),
   },
   fields: [
     {
@@ -46,14 +42,10 @@ export const Roster: CollectionConfig = {
         { label: 'Trener', value: 'trener' },
       ],
     },
-    {
-      name: 'displayOrder',
-      type: 'number',
-      defaultValue: 0,
-      admin: {
-        description: 'Redoslijed unutar pozicije (manji broj se prikazuje prvi)',
-      },
-    },
+    displayOrderField({
+      sidebar: false,
+      description: 'Redoslijed unutar pozicije (manji broj se prikazuje prvi)',
+    }),
     {
       name: 'jerseyNumber',
       type: 'number',
@@ -63,13 +55,6 @@ export const Roster: CollectionConfig = {
       type: 'checkbox',
       defaultValue: false,
     },
-    {
-      name: 'photo',
-      type: 'upload',
-      relationTo: 'media',
-      admin: {
-        description: 'Fotografija igrača',
-      },
-    },
+    mediaField('photo', { description: 'Fotografija igrača' }),
   ],
-}
+})

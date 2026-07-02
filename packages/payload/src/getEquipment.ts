@@ -2,6 +2,7 @@ import "server-only";
 import type { Equipment } from "@/types/equipment";
 import { payloadFetch } from "./client";
 import { tenantSlug } from "./getTenant";
+import { buildQuery, tenantWhere } from "./query";
 import type { PayloadMedia, PayloadPaginated } from "./types";
 
 type PayloadEquipmentCategory =
@@ -29,18 +30,6 @@ interface PayloadEquipment {
 }
 
 const equipmentTags = () => [`equipment-${tenantSlug}`];
-
-const tenantWhere = (slug: string) => ({
-  "where[tenant.slug][equals]": slug,
-});
-
-function buildQuery(params: Record<string, string | number>): string {
-  const search = new URLSearchParams();
-  for (const [key, value] of Object.entries(params)) {
-    search.append(key, String(value));
-  }
-  return search.toString();
-}
 
 function pickImageUrl(value: PayloadMedia | number | null | undefined): {
   url: string;

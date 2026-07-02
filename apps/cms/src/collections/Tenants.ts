@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { isSuperAdmin, superAdminOnly } from '../access/roles'
 import { CLUB_FEATURES } from '../access/tenantScopedAdmin'
+import { mediaField } from '../fields/media'
 
 export const Tenants: CollectionConfig = {
   slug: 'tenants',
@@ -101,11 +102,7 @@ export const Tenants: CollectionConfig = {
                 { name: 'shortName', type: 'text' },
                 { name: 'motto', type: 'text' },
                 { name: 'founded', type: 'number' },
-                {
-                  name: 'logo',
-                  type: 'upload',
-                  relationTo: 'media',
-                },
+                mediaField('logo'),
               ],
             },
           ],

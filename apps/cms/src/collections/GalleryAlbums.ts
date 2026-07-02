@@ -1,20 +1,16 @@
-import type { CollectionConfig } from 'payload'
 import { tenantScopedAdmin } from '../access/tenantScopedAdmin'
-import { formatSlug } from '../fields/slug'
+import { createCollection } from '../factories/createCollection'
+import { displayOrderField } from '../fields/displayOrder'
+import { mediaArrayField, mediaField } from '../fields/media'
+import { slugField } from '../fields/slug'
 
 /** Galerija — albumi fotografija (događaj → više slika). */
-export const GalleryAlbums: CollectionConfig = {
+export const GalleryAlbums = createCollection({
   slug: 'gallery-albums',
   admin: {
     ...tenantScopedAdmin('gallery'),
     useAsTitle: 'title',
     defaultColumns: ['title', 'date', 'displayOrder', 'tenant'],
-  },
-  access: {
-    read: () => true,
-    create: ({ req: { user } }) => Boolean(user),
-    update: ({ req: { user } }) => Boolean(user),
-    delete: ({ req: { user } }) => Boolean(user),
   },
   fields: [
     {
@@ -23,18 +19,7 @@ export const GalleryAlbums: CollectionConfig = {
       required: true,
       admin: { description: 'Naziv albuma.' },
     },
-    {
-      name: 'slug',
-      type: 'text',
-      index: true,
-      admin: {
-        position: 'sidebar',
-        description: 'Auto-generiran iz naziva ako je prazno.',
-      },
-      hooks: {
-        beforeValidate: [formatSlug],
-      },
-    },
+    slugField(),
     {
       name: 'date',
       type: 'date',
@@ -43,40 +28,12 @@ export const GalleryAlbums: CollectionConfig = {
         date: { pickerAppearance: 'dayOnly' },
       },
     },
-    {
-      name: 'coverImage',
-      type: 'upload',
-      relationTo: 'media',
-      admin: { description: 'Naslovna slika albuma.' },
-    },
+    mediaField('coverImage', { description: 'Naslovna slika albuma.' }),
     {
       name: 'description',
       type: 'textarea',
     },
-    {
-      name: 'photos',
-      type: 'array',
-      fields: [
-        {
-          name: 'image',
-          type: 'upload',
-          relationTo: 'media',
-          required: true,
-        },
-        {
-          name: 'caption',
-          type: 'text',
-        },
-      ],
-    },
-    {
-      name: 'displayOrder',
-      type: 'number',
-      defaultValue: 0,
-      admin: {
-        position: 'sidebar',
-        description: 'Redoslijed prikaza albuma (manji broj prvi).',
-      },
-    },
+    mediaArrayField('photos', { withCaption: true }),
+    displayOrderField({ description: 'Redoslijed prikaza albuma (manji broj prvi).' }),
   ],
-}
+})

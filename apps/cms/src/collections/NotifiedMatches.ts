@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { authenticatedUserAccess } from '../access/authenticatedUser'
 
 /**
  * Dedup stanje push obavijesti po HNS utakmici (tenant-scoped). Tri nezavisna
@@ -20,10 +21,10 @@ export const NotifiedMatches: CollectionConfig = {
     description: 'Stanje poslanih obavijesti po utakmici (dedup). Popunjava cron.',
   },
   access: {
-    read: ({ req: { user } }) => Boolean(user),
+    read: authenticatedUserAccess,
     create: () => false,
     update: () => false,
-    delete: ({ req: { user } }) => Boolean(user),
+    delete: authenticatedUserAccess,
   },
   fields: [
     {

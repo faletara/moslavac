@@ -1,22 +1,17 @@
-import type { CollectionConfig } from 'payload'
 import { tenantScopedAdmin } from '../access/tenantScopedAdmin'
+import { createCollection } from '../factories/createCollection'
+import { displayOrderField } from '../fields/displayOrder'
 
 /**
  * Dokumenti kluba za preuzimanje (PDF): statut, pravilnici, obrasci, izvješća.
  * Zasebna upload kolekcija jer Media prima samo slike (`image/*`).
  */
-export const Documents: CollectionConfig = {
+export const Documents = createCollection({
   slug: 'documents',
   admin: {
     ...tenantScopedAdmin('documents'),
     useAsTitle: 'title',
     defaultColumns: ['title', 'category', 'tenant'],
-  },
-  access: {
-    read: () => true,
-    create: ({ req: { user } }) => Boolean(user),
-    update: ({ req: { user } }) => Boolean(user),
-    delete: ({ req: { user } }) => Boolean(user),
   },
   upload: {
     mimeTypes: ['application/pdf'],
@@ -41,14 +36,6 @@ export const Documents: CollectionConfig = {
         { label: 'Ostalo', value: 'ostalo' },
       ],
     },
-    {
-      name: 'displayOrder',
-      type: 'number',
-      defaultValue: 0,
-      admin: {
-        position: 'sidebar',
-        description: 'Redoslijed unutar kategorije (manji broj prvi).',
-      },
-    },
+    displayOrderField({ description: 'Redoslijed unutar kategorije (manji broj prvi).' }),
   ],
-}
+})
