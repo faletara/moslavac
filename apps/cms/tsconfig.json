@@ -32,9 +32,6 @@
       "@/lib/hns/*": [
         "../../packages/hns/src/*"
       ],
-      "@/lib/push/*": [
-        "../../packages/push/src/*"
-      ],
       "@/lib/ai/*": [
         "../../packages/ai/src/*"
       ],

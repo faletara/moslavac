@@ -1,7 +1,6 @@
 import { createCollection } from '../factories/createCollection'
 import { mediaArrayField, mediaField } from '../fields/media'
 import { slugField } from '../fields/slug'
-import { sendNewsPublishedPush } from '../hooks/newsPush'
 
 export const News = createCollection({
   slug: 'news',
@@ -9,13 +8,10 @@ export const News = createCollection({
     useAsTitle: 'title',
     defaultColumns: ['title', '_status', 'publishedAt', 'tenant'],
   },
-  // Drafts: AI piše neobjavljen nацrt (_status: draft); admin ga objavi ručno.
+  // Drafts: nацrt se sprema neobjavljen (_status: draft); admin ga objavi ručno.
   // Frontend čita samo published (vidi packages/payload publishedWhere()).
   versions: {
     drafts: true,
-  },
-  hooks: {
-    afterChange: [sendNewsPublishedPush],
   },
   fields: [
     {
