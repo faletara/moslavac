@@ -1,15 +1,22 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { TrackEvent } from "@/components/analytics/TrackEvent";
 import MatchHero from "@/components/features/matches/MatchHero";
 import MatchTabs from "@/components/features/matches/tabs/MatchTabs";
+import { fetchAllCompetitionMatches } from "@/lib/hns/competitions";
 import {
   fetchMatchEvents,
   fetchMatchInfo,
   fetchMatchLineups,
   fetchMatchReferees,
 } from "@/lib/hns/matches";
+import {
+  fetchAllCompetitionScorers,
+  fetchTeamStandings,
+} from "@/lib/hns/standings";
 import { formatDateTime } from "@/lib/helpers/date";
 import { redirectToCanonical } from "@/lib/canonical";
+import { BASE_URL } from "@/lib/siteUrl";
 import { buildMatchSlug, parseTrailingId } from "@/lib/slug";
 
 interface Props {
@@ -17,6 +24,45 @@ interface Props {
 }
 
 export const revalidate = 30;
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { matchId } = await params;
+  const mid = parseTrailingId(matchId);
+  const matchInfo = await fetchMatchInfo({ matchId: mid });
+  if (!matchInfo) return {};
+
+  const home = matchInfo.homeTeam?.name ?? "N/A";
+  const away = matchInfo.awayTeam?.name ?? "N/A";
+  const title = `${home} - ${away}`;
+  const hasResult =
+    matchInfo.homeTeamResult != null && matchInfo.awayTeamResult != null;
+  const score = hasResult
+    ? ` ${matchInfo.homeTeamResult?.current ?? 0}:${matchInfo.awayTeamResult?.current ?? 0}`
+    : "";
+  const competition = matchInfo.competition?.name?.trim();
+  const description = `${home} protiv ${away}${score}${
+    competition ? ` — ${competition}` : ""
+  }. Rezultat, tijek utakmice, postave i statistika.`;
+  const canonical = `${BASE_URL}/utakmice/${buildMatchSlug(matchInfo)}`;
+
+  return {
+    title,
+    description,
+    alternates: { canonical },
+    openGraph: {
+      type: "website",
+      title,
+      description,
+      images: [{ url: "/naslovna.jpg", alt: title, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: ["/naslovna.jpg"],
+    },
+  };
+}
 
 export default async function MatchInfoPage({ params }: Props) {
   const { matchId } = await params;
@@ -36,6 +82,19 @@ export default async function MatchInfoPage({ params }: Props) {
     `/utakmice/${matchId}`,
     `/utakmice/${buildMatchSlug(matchInfo)}`,
   );
+
+  // Competition-level data the tabs (standings / form / scorers) render.
+  // Keyed off the match's competition, so it can only start once matchInfo
+  // resolves — the three requests then run in parallel.
+  const competitionId = matchInfo.competition?.id ?? null;
+  const [standings, competitionMatches, scorers] =
+    competitionId != null
+      ? await Promise.all([
+          fetchTeamStandings({ competitionId }),
+          fetchAllCompetitionMatches({ competitionId }),
+          fetchAllCompetitionScorers({ competitionId }),
+        ])
+      : [[], [], []];
 
   const { date, time } = formatDateTime(matchInfo.dateTimeUTC ?? 0);
   const hasResult =
@@ -83,6 +142,9 @@ export default async function MatchInfoPage({ params }: Props) {
           lineups={lineups ?? undefined}
           refereeData={refereeData ?? undefined}
           refereesLoading={false}
+          standings={standings}
+          competitionMatches={competitionMatches}
+          scorers={scorers}
         />
       </div>
     </div>

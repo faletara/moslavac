@@ -1,9 +1,11 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Progress } from "@/components/ui/progress";
 import { TrackEvent } from "@/components/analytics/TrackEvent";
 import PlayerHero from "@/components/features/players/PlayerHero";
 import { fetchPlayerDetails, fetchPlayerStats } from "@/lib/hns/players";
 import { redirectToCanonical } from "@/lib/canonical";
+import { BASE_URL } from "@/lib/siteUrl";
 import {
   buildCompetitionSlug,
   buildPlayerSlug,
@@ -16,6 +18,48 @@ interface Props {
 }
 
 export const revalidate = 600;
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { playerId, competitionId } = await params;
+  const personId = String(parseTrailingId(playerId));
+  const cid = parseTrailingId(competitionId);
+
+  const [details, stats] = await Promise.all([
+    fetchPlayerDetails({ personId }),
+    fetchPlayerStats({ personId, competitionId: cid }),
+  ]);
+  if (!details) return {};
+
+  const name = details.name ?? "Igrač";
+  const competitionName = stats?.competition?.name;
+  const description = competitionName
+    ? `Statistika igrača ${name} u natjecanju ${competitionName}: nastupi, golovi, kartoni i minute.`
+    : `Profil i statistika igrača ${name}.`;
+
+  const playerSlug = buildPlayerSlug({ personId: Number(personId), name });
+  const competitionSlug = stats?.competition
+    ? buildCompetitionSlug(stats.competition)
+    : competitionId;
+  const canonical = `${BASE_URL}/statistika/${playerSlug}/${competitionSlug}`;
+
+  return {
+    title: name,
+    description,
+    alternates: { canonical },
+    openGraph: {
+      type: "profile",
+      title: name,
+      description,
+      images: [{ url: "/naslovna.jpg", alt: name, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: name,
+      description,
+      images: ["/naslovna.jpg"],
+    },
+  };
+}
 
 export default async function PlayerStatsPage({ params }: Props) {
   const { playerId, competitionId } = await params;

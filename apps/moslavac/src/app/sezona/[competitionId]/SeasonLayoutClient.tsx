@@ -1,30 +1,24 @@
-"use client";
-
 import SeasonTabsNav from "@/components/features/competition/SeasonTabsNav";
 import { PageHero } from "@/components/layout/PageHero";
-import { api } from "@/lib/api";
 import { buildCompetitionSlug } from "@/lib/slug";
 
 export default function SeasonLayoutClient({
   competitionId,
+  competitionName,
   children,
 }: {
   competitionId: number;
+  competitionName: string | null;
   children: React.ReactNode;
 }) {
-  const { data: info } = api.competitions.useGetCompetitionInfo({
-    competitionId,
-    enabled: !!competitionId,
-  });
-
-  const competitionSlug = info?.name
-    ? buildCompetitionSlug({ id: competitionId, name: info.name })
+  const competitionSlug = competitionName
+    ? buildCompetitionSlug({ id: competitionId, name: competitionName })
     : String(competitionId);
 
   return (
     <div className="container mx-auto max-w-5xl px-4 pt-16 pb-24 sm:px-6 sm:pt-24 lg:px-8">
       <PageHero
-        eyebrow={info?.name?.trim() || "Prvenstvo"}
+        eyebrow={competitionName?.trim() || "Prvenstvo"}
         title="Sezona"
         watermark="25/26"
         lineClassName="text-[15vw] sm:text-6xl md:text-7xl lg:text-8xl"

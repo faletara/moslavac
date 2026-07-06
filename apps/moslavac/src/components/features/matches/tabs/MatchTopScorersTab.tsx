@@ -1,6 +1,6 @@
 "use client";
 
-import { api } from "@/lib/api";
+import type { PlayerStats } from "@/types/hns";
 import TopScorersTable from "../../competition/TopScorersTable";
 import { MatchTabHeading } from "../shared/MatchTabHeading";
 
@@ -8,19 +8,15 @@ interface MatchTopScorersTabProps {
   competitionId: number | null;
   homeTeamId: number | null;
   awayTeamId: number | null;
+  scorers: PlayerStats[];
 }
 
 export default function MatchTopScorersTab({
   competitionId,
   homeTeamId,
   awayTeamId,
+  scorers,
 }: MatchTopScorersTabProps) {
-  const { data: scorers, isLoading } =
-    api.competitions.useGetAllCompetitionScorers({
-      competitionId: competitionId ?? 0,
-      enabled: competitionId != null,
-    });
-
   const highlightTeamIds = [homeTeamId, awayTeamId].filter(
     (id): id is number => id != null,
   );
@@ -31,7 +27,7 @@ export default function MatchTopScorersTab({
       <div className="mt-12">
         <TopScorersTable
           scorers={scorers}
-          isLoading={isLoading}
+          isLoading={false}
           competitionId={competitionId}
           highlightTeamIds={highlightTeamIds}
         />

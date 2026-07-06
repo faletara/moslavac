@@ -1,5 +1,3 @@
-"use client";
-
 import { FadeInView, RevealHeading } from "@/components/animations";
 import { cn } from "@/lib/utils";
 

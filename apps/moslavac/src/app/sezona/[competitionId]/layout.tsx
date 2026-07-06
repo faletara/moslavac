@@ -52,8 +52,10 @@ export default async function SeasonLayout({
   params: Promise<Params>;
 }) {
   const { competitionId } = await params;
+  const id = parseTrailingId(competitionId);
+  const info = await fetchCompetitionInfo({ competitionId: id });
   return (
-    <SeasonLayoutClient competitionId={parseTrailingId(competitionId)}>
+    <SeasonLayoutClient competitionId={id} competitionName={info?.name ?? null}>
       {children}
     </SeasonLayoutClient>
   );

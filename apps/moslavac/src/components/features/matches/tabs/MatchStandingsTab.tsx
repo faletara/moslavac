@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { HnsCrest } from "@/components/HnsCrest";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -11,41 +10,22 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { api } from "@/lib/api";
 import { getStandingsForm, type FormResult } from "@/lib/helpers/form";
 import { cn } from "@/lib/utils";
 import type { TeamRanking } from "@/types/hns";
 import { MatchTabHeading } from "../shared/MatchTabHeading";
 
 interface MatchStandingsTabProps {
-  competitionId: number | null;
+  standings: TeamRanking[];
   homeTeamId: number | null;
   awayTeamId: number | null;
 }
 
 export default function MatchStandingsTab({
-  competitionId,
+  standings,
   homeTeamId,
   awayTeamId,
 }: MatchStandingsTabProps) {
-  const { data: standings, isLoading } = api.competitions.useGetTeamStandings({
-    competitionId: competitionId ?? 0,
-    enabled: competitionId != null,
-  });
-
-  if (isLoading) {
-    return (
-      <section className="mt-12 sm:mt-16">
-        <MatchTabHeading eyebrow="Poredak" title="Tablica" />
-        <div className="mx-auto mt-12 max-w-3xl space-y-2">
-          {["a", "b", "c", "d", "e", "f", "g", "h"].map((k) => (
-            <Skeleton key={k} className="h-10" />
-          ))}
-        </div>
-      </section>
-    );
-  }
-
   if (!standings || standings.length === 0) {
     return (
       <section className="mt-12 sm:mt-16">

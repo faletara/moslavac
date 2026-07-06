@@ -20,7 +20,6 @@ import {
 	SheetTitle,
 	SheetTrigger,
 } from "@/components/ui/sheet";
-import { api } from "@/lib/api";
 import {
 	getCategoryChipClass,
 	groupByCompetitionCategory,
@@ -28,11 +27,13 @@ import {
 } from "@/lib/helpers/competition";
 import { buildCompetitionSlug } from "@/lib/slug";
 import type { FrontendTenant, PayloadMedia } from "@/lib/payload/types";
+import type { HnsCompetition } from "@/types/hns";
 import { cn } from "@/lib/utils";
 import NavLink from "./NavLink";
 
 interface HeaderProps {
 	tenant: FrontendTenant;
+	competitions: HnsCompetition[];
 }
 
 const dropdownContentClass =
@@ -46,7 +47,7 @@ const dropdownChipClass =
 const dropdownItemClass =
 	"rounded-sm px-2 py-1.5 text-sm font-medium leading-snug tracking-tight text-foreground/80 transition-colors hover:text-foreground focus:bg-muted focus:text-foreground";
 
-export default function Header({ tenant }: HeaderProps) {
+export default function Header({ tenant, competitions }: HeaderProps) {
 	const [sheetOpen, setSheetOpen] = useState(false);
 	const [desktopSeasonOpen, setDesktopSeasonOpen] = useState(false);
 	const [mobileSeasonOpen, setMobileSeasonOpen] = useState(false);
@@ -130,9 +131,6 @@ export default function Header({ tenant }: HeaderProps) {
 		window.addEventListener("scroll", onScroll, { passive: true });
 		return () => window.removeEventListener("scroll", onScroll);
 	}, []);
-
-	const { data: competitions = [] } =
-		api.competitions.useGetCurrentSeasonCompetitions();
 
 	const competitionGroups = groupByCompetitionCategory(
 		competitions,

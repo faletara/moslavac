@@ -1,5 +1,3 @@
-"use client";
-
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import {
@@ -9,13 +7,10 @@ import {
 	StaggerContainer,
 	StaggerItem,
 } from "@/components/animations";
-import { useTenantLogo } from "@/components/providers/TenantProvider";
-import { Skeleton } from "@/components/ui/skeleton";
-import { api } from "@/lib/api";
 import { formatDateLong } from "@/lib/helpers/date";
+import { fetchLatestNews } from "@/lib/payload/getNews";
+import { getTenant } from "@/lib/payload/getTenant";
 import type { News } from "@/types/news";
-
-const SKELETON_KEYS = ["n1", "n2", "n3"];
 
 function SectionHeader() {
 	return (
@@ -101,28 +96,15 @@ function NewsCard({
 	);
 }
 
-export default function LatestNewsSection() {
-	const { data: news, isLoading } = api.news.useGetLatestNews();
-	const logo = useTenantLogo();
+export default async function LatestNewsSection() {
+	const [news, tenant] = await Promise.all([fetchLatestNews(), getTenant()]);
+	const logo =
+		tenant.branding?.logo &&
+		typeof tenant.branding.logo === "object" &&
+		"url" in tenant.branding.logo
+			? tenant.branding.logo
+			: null;
 	const fallback = logo?.url ?? "";
-
-	if (isLoading) {
-		return (
-			<section className="mx-auto w-full max-w-7xl space-y-14 px-4 py-20 sm:py-28">
-				<SectionHeader />
-				<div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
-					{SKELETON_KEYS.map((key) => (
-						<div key={key} className="flex flex-col gap-5">
-							<Skeleton className="aspect-4/3 w-full" />
-							<Skeleton className="h-3 w-28" />
-							<Skeleton className="h-6 w-full" />
-							<Skeleton className="h-6 w-2/3" />
-						</div>
-					))}
-				</div>
-			</section>
-		);
-	}
 
 	if (!news || news.length === 0) return null;
 

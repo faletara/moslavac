@@ -8,7 +8,14 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
-import type { HnsLineups, HnsMatch, HnsMatchEvent, HnsMatchInfo } from "@/types/hns";
+import type {
+  HnsLineups,
+  HnsMatch,
+  HnsMatchEvent,
+  HnsMatchInfo,
+  PlayerStats,
+  TeamRanking,
+} from "@/types/hns";
 import MatchFormTab from "./MatchFormTab";
 import MatchLineupsTab from "./MatchLineupsTab";
 import MatchOverviewTab from "./MatchOverviewTab";
@@ -31,6 +38,9 @@ interface MatchTabsProps {
   lineups: HnsLineups | undefined;
   refereeData: HnsMatchInfo | undefined;
   refereesLoading: boolean;
+  standings: TeamRanking[];
+  competitionMatches: HnsMatch[];
+  scorers: PlayerStats[];
 }
 
 export default function MatchTabs({
@@ -39,6 +49,9 @@ export default function MatchTabs({
   lineups,
   refereeData,
   refereesLoading,
+  standings,
+  competitionMatches,
+  scorers,
 }: MatchTabsProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -91,6 +104,8 @@ export default function MatchTabs({
           lineups={lineups}
           refereeData={refereeData}
           refereesLoading={refereesLoading}
+          competitionMatches={competitionMatches}
+          standings={standings}
         />
       </TabsContent>
 
@@ -101,7 +116,7 @@ export default function MatchTabs({
       <TabsContent value="tablica">
         <div className="mx-auto max-w-4xl">
           <MatchStandingsTab
-            competitionId={competitionId}
+            standings={standings}
             homeTeamId={homeTeamId}
             awayTeamId={awayTeamId}
           />
@@ -109,7 +124,11 @@ export default function MatchTabs({
       </TabsContent>
 
       <TabsContent value="forma">
-        <MatchFormTab match={match} />
+        <MatchFormTab
+          match={match}
+          competitionMatches={competitionMatches}
+          standings={standings}
+        />
       </TabsContent>
 
       <TabsContent value="strijelci">
@@ -118,6 +137,7 @@ export default function MatchTabs({
             competitionId={competitionId}
             homeTeamId={homeTeamId}
             awayTeamId={awayTeamId}
+            scorers={scorers}
           />
         </div>
       </TabsContent>

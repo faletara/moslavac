@@ -5,6 +5,7 @@ import type {
   HnsMatch,
   HnsMatchEvent,
   HnsMatchInfo,
+  TeamRanking,
 } from "@/types/hns";
 import MatchLineupSummary from "../MatchLineupSummary";
 import MatchInfoCard from "../shared/MatchInfoCard";
@@ -18,6 +19,8 @@ interface MatchOverviewTabProps {
   lineups: HnsLineups | undefined;
   refereeData: HnsMatchInfo | undefined;
   refereesLoading: boolean;
+  competitionMatches: HnsMatch[];
+  standings: TeamRanking[];
 }
 
 export default function MatchOverviewTab({
@@ -25,6 +28,8 @@ export default function MatchOverviewTab({
   events,
   lineups,
   refereeData,
+  competitionMatches,
+  standings,
 }: MatchOverviewTabProps) {
   const hasResult =
     match.homeTeamResult != null && match.awayTeamResult != null;
@@ -36,7 +41,11 @@ export default function MatchOverviewTab({
         {match.dateTimeUTC != null && (
           <MatchCountdown dateTimeUTC={match.dateTimeUTC} />
         )}
-        <MatchFormTab match={match} />
+        <MatchFormTab
+          match={match}
+          competitionMatches={competitionMatches}
+          standings={standings}
+        />
         <MatchInfoCard match={match} refereeData={refereeData} />
       </div>
     );

@@ -6,6 +6,7 @@ import "./globals.css";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import Providers from "@/components/providers/Providers";
+import { fetchCurrentSeasonCompetitions } from "@/lib/hns/competitions";
 import { getTenant } from "@/lib/payload/getTenant";
 import { BASE_URL } from "@/lib/siteUrl";
 
@@ -79,7 +80,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const tenant = await getTenant();
+  const [tenant, competitions] = await Promise.all([
+    getTenant(),
+    fetchCurrentSeasonCompetitions(),
+  ]);
 
   const logo = tenant.branding?.logo;
   const logoUrl = !logo ? null : typeof logo === "string" ? logo : logo.url;
@@ -154,7 +158,7 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
         <Providers tenant={tenant}>
-          <Header tenant={tenant} />
+          <Header tenant={tenant} competitions={competitions} />
           <main className="flex-1">{children}</main>
           <Footer tenant={tenant} />
         </Providers>
