@@ -21,10 +21,22 @@ export interface ShopProduct {
   icon: ShopIcon;
 }
 
-const ACCENT_BG: Record<ShopProduct["accent"], string> = {
-  red: "bg-[linear-gradient(140deg,#ef3a40_0%,#c11a20_55%,#8f1216_100%)]",
-  blue: "bg-[linear-gradient(140deg,#2b98e0_0%,#0d6bad_55%,#0a4f80_100%)]",
-  gold: "bg-[linear-gradient(140deg,#d3c19c_0%,#b79f7e_55%,#8f7a58_100%)]",
+const ACCENT_RAIL: Record<ShopProduct["accent"], string> = {
+  red: "bg-club-red",
+  blue: "bg-club-blue",
+  gold: "bg-club-gold",
+};
+
+const ACCENT_TEXT: Record<ShopProduct["accent"], string> = {
+  red: "text-club-red",
+  blue: "text-club-blue",
+  gold: "text-club-gold",
+};
+
+const ACCENT_BADGE_TEXT: Record<ShopProduct["accent"], string> = {
+  red: "text-white",
+  blue: "text-white",
+  gold: "text-ink-deep",
 };
 
 // Prepoznatljiva silueta po tipu proizvoda (placeholder dok nema fotografija).
@@ -47,57 +59,59 @@ function formatPrice(price: number): string {
   return `${price.toFixed(2).replace(".", ",")} €`;
 }
 
+/** Ink kartica proizvoda — ghost silueta, rezani kut, potpis u boji varijante. */
 function ProductCard({ product }: { product: ShopProduct }) {
   return (
-    <article className="group w-56 shrink-0 snap-start sm:w-64">
-      {/* Slika proizvoda (placeholder dok nema pravih fotografija) */}
-      <div
-        className={`relative aspect-square w-full overflow-hidden rounded-2xl ring-1 ring-black/5 transition-transform duration-300 ease-out group-hover:-translate-y-1 ${ACCENT_BG[product.accent]}`}
-      >
-        {/* Dijagonalni raster + sjaj za dubinu */}
-        <div className="absolute inset-0 bg-[repeating-linear-gradient(115deg,transparent,transparent_38px,rgba(255,255,255,0.05)_38px,rgba(255,255,255,0.05)_76px)]" />
-        <div className="absolute -right-14 -top-14 h-44 w-44 rounded-full bg-white/15 blur-2xl" />
-        <div className="absolute -bottom-16 -left-10 h-40 w-40 rounded-full bg-black/15 blur-3xl" />
+    <article className="group relative h-80 w-56 shrink-0 snap-start overflow-hidden bg-ink-deep clip-corner sm:h-88 sm:w-64">
+      {/* Rubni potpis boje varijante */}
+      <span
+        aria-hidden
+        className={`absolute inset-y-0 left-0 w-1 transition-[width] duration-300 group-hover:w-1.5 ${ACCENT_RAIL[product.accent]}`}
+      />
 
-        {/* Silueta proizvoda */}
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <svg
-            viewBox="0 0 24 24"
-            className="h-[48%] w-auto text-white drop-shadow-[0_10px_20px_rgba(0,0,0,0.28)] transition-transform duration-500 ease-out group-hover:scale-110"
-            fill="currentColor"
-            aria-hidden
-          >
-            <path d={ICON_PATHS[product.icon]} />
-          </svg>
-        </div>
+      {/* Ghost silueta proizvoda */}
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+        <svg
+          viewBox="0 0 24 24"
+          className="h-[54%] w-auto text-white/[0.07] transition-transform duration-500 ease-out group-hover:scale-110"
+          fill="currentColor"
+          aria-hidden
+        >
+          <path d={ICON_PATHS[product.icon]} />
+        </svg>
+      </div>
 
+      {/* Eyebrow + oznaka */}
+      <div className="absolute left-6 top-6 right-6 flex items-start justify-between gap-3">
+        <p className="text-[0.58rem] font-bold uppercase tracking-[0.3em] text-white/40">
+          {product.category}
+        </p>
         {product.badge && (
-          <span className="absolute left-3 top-3 rounded-full bg-white px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-wide text-club-red shadow-sm">
+          <span
+            className={`shrink-0 px-2 py-0.5 text-[0.58rem] font-black uppercase tracking-[0.2em] ${ACCENT_RAIL[product.accent]} ${ACCENT_BADGE_TEXT[product.accent]}`}
+          >
             {product.badge}
           </span>
         )}
-
-        {/* Dodaj u košaricu (hover) */}
-        <button
-          type="button"
-          aria-label={`Dodaj ${product.name} u košaricu`}
-          className="absolute bottom-3 right-3 flex h-10 w-10 translate-y-2 items-center justify-center rounded-full bg-white text-club-red opacity-0 shadow-lg transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 hover:scale-110"
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
-            <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-          </svg>
-        </button>
       </div>
 
-      {/* Info */}
-      <div className="mt-3.5">
-        <p className="text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-          {product.category}
-        </p>
-        <h3 className="mt-1 truncate text-base font-bold uppercase tracking-tight text-foreground transition-colors group-hover:text-club-red">
+      {/* Dodaj u košaricu (hover) */}
+      <button
+        type="button"
+        aria-label={`Dodaj ${product.name} u košaricu`}
+        className="absolute bottom-20 right-6 flex h-10 w-10 translate-y-2 items-center justify-center border border-white/30 text-white opacity-0 backdrop-blur-sm transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 hover:bg-white hover:text-ink-deep sm:bottom-24"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+          <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+        </svg>
+      </button>
+
+      {/* Naziv + cijena */}
+      <div className="absolute inset-x-6 bottom-6">
+        <h3 className="truncate font-display text-xl uppercase leading-[0.95] tracking-wide text-white transition-colors group-hover:text-white/80 sm:text-2xl">
           {product.name}
         </h3>
-        <p className="mt-1.5 font-display text-lg font-black tabular-nums text-club-red">
+        <p className={`mt-2 font-display text-lg tabular-nums ${ACCENT_TEXT[product.accent]}`}>
           {formatPrice(product.price)}
         </p>
       </div>
@@ -145,9 +159,9 @@ export default function ShopCarousel({
       {/* Kontrole + CTA */}
       <div className="mt-8 flex items-center justify-between gap-6">
         <div className="flex items-center gap-4">
-          <div className="h-1 w-40 overflow-hidden rounded-full bg-black/10 sm:w-56">
+          <div className="h-1 w-40 overflow-hidden bg-black/10 sm:w-56">
             <div
-              className="h-full rounded-full bg-club-red transition-[width] duration-150"
+              className="h-full bg-club-red transition-[width] duration-150"
               style={{ width: `${Math.max(12, progress * 100)}%` }}
             />
           </div>
@@ -155,7 +169,7 @@ export default function ShopCarousel({
             type="button"
             onClick={scrollNext}
             aria-label="Sljedeći proizvodi"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-black/15 text-foreground transition-colors hover:border-club-red hover:text-club-red"
+            className="flex h-10 w-10 items-center justify-center border border-black/15 text-foreground transition-colors hover:border-club-red hover:text-club-red"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
               <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -165,9 +179,15 @@ export default function ShopCarousel({
 
         <Link
           href="/oprema"
-          className="inline-flex shrink-0 items-center rounded-full bg-club-red px-7 py-3 text-sm font-bold uppercase tracking-wide text-white transition-transform hover:scale-105"
+          className="group inline-flex shrink-0 items-center gap-3 bg-club-red px-7 py-3.5 text-xs font-black uppercase tracking-[0.18em] text-white transition-colors duration-300 hover:bg-ink-deep"
         >
           Cijela ponuda
+          <span
+            aria-hidden
+            className="transition-transform duration-300 group-hover:translate-x-1"
+          >
+            →
+          </span>
         </Link>
       </div>
     </div>
