@@ -45,10 +45,11 @@ export function NextMatchHero({ match }: NextMatchHeroProps) {
           </p>
         </FadeInView>
         <RevealHeading
-          lines={["Sljedeća utakmica"]}
+          lines={["Sljedeća", "utakmica"]}
+          ariaLabel="Sljedeća utakmica"
           delay={0.05}
-          className="select-none text-balance text-center font-display font-black uppercase leading-none"
-          lineClassName="text-[11vw] sm:text-6xl md:text-7xl"
+          className="select-none text-center font-display font-black uppercase leading-none"
+          lineClassName="text-[15vw] sm:text-6xl md:text-7xl"
         />
         {subEyebrow.length > 0 && (
           <FadeInView delay={0.15}>

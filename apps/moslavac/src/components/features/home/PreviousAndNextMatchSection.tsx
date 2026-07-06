@@ -23,22 +23,21 @@ export default async function PreviousAndNextMatchSection() {
   if (!hasNext && !hasPrev) return null;
 
   return (
-    <section
-      id="utakmice"
-      className="dark relative scroll-mt-20 overflow-hidden bg-navy-deep text-foreground"
-    >
-      {/* Faint centre glow keeps the scoreboard lit */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute left-1/2 top-0 -z-10 h-[40rem] w-[60rem] -translate-x-1/2 rounded-full bg-club/10 blur-[140px]"
-      />
+    <section id="utakmice" className="scroll-mt-20">
       {hasNext && nextMatch != null && (
-        <div className="mx-auto w-full max-w-5xl px-4 py-16 md:py-24">
-          <NextMatchHero match={nextMatch} />
+        <div className="dark relative overflow-hidden bg-navy-deep text-foreground">
+          {/* Faint centre glow keeps the scoreboard lit */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute left-1/2 top-0 -z-10 h-160 w-240 -translate-x-1/2 rounded-full bg-club/10 blur-[140px]"
+          />
+          <div className="mx-auto w-full max-w-5xl px-4 py-16 md:py-24">
+            <NextMatchHero match={nextMatch} />
+          </div>
         </div>
       )}
       {hasPrev && previousMatch != null && (
-        <div className="border-t border-foreground/10 bg-foreground/[0.03]">
+        <div className="border-t border-border bg-background text-foreground">
           <div className="mx-auto w-full max-w-5xl px-4 py-16 md:py-20">
             <PreviousMatchCard match={previousMatch} />
           </div>

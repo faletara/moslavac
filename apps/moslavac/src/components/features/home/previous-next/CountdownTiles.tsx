@@ -24,12 +24,12 @@ interface TileProps {
 const TILE_BOX: Record<CountdownSize, string> = {
   compact:
     "min-w-[3.25rem] px-3 py-3 sm:min-w-[4.5rem] sm:px-5 sm:py-4 md:min-w-[3.75rem] md:px-3 md:py-3 lg:min-w-[5rem] lg:px-5 lg:py-4 border border-foreground/15 bg-foreground/[0.03] text-foreground",
-  hero: "min-w-[4.75rem] px-4 py-5 sm:min-w-[6.25rem] sm:px-6 sm:py-6 md:min-w-[7.5rem] md:px-7 md:py-7 border border-foreground/15 bg-foreground/[0.05] text-foreground backdrop-blur-sm shadow-[0_0_50px_-18px_var(--club)]",
+  hero: "min-w-[4.75rem] px-4 py-5 sm:min-w-[6.25rem] sm:px-6 sm:py-6 md:min-w-[7.5rem] md:px-7 md:py-7 border border-foreground/15 bg-foreground/[0.05] text-foreground",
 };
 
 const TILE_DIGIT: Record<CountdownSize, string> = {
   compact: "text-2xl sm:text-4xl md:text-3xl lg:text-5xl",
-  hero: "text-5xl sm:text-6xl md:text-8xl",
+  hero: "text-4xl sm:text-6xl md:text-8xl",
 };
 
 const TILE_LABEL: Record<CountdownSize, string> = {
@@ -75,7 +75,7 @@ function Tile({ value, label, delay, size }: TileProps) {
     >
       <span
         className={cn(
-          "block font-display font-black leading-none",
+          "block whitespace-nowrap font-display font-black leading-none",
           TILE_DIGIT[size],
         )}
       >

@@ -187,7 +187,7 @@ function Scoreline({
           </span>
         </div>
       ) : (
-        <span className="font-display text-6xl font-black uppercase leading-none tracking-tighter tabular-nums sm:text-7xl lg:text-8xl">
+        <span className="font-display text-4xl font-black uppercase leading-none tracking-tighter tabular-nums sm:text-6xl lg:text-8xl">
           {time}
         </span>
       )}
@@ -222,7 +222,7 @@ function Crest({
         picture={picture}
         name={name}
         size={128}
-        className="size-24 sm:size-28 lg:size-24 xl:size-28"
+        className="size-20 sm:size-28 lg:size-24 xl:size-28"
       />
     </motion.div>
   );

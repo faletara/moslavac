@@ -7,6 +7,7 @@ import {
 } from "./client";
 import { tenantSlug } from "@/lib/payload/getTenant";
 import { isFinished } from "./matchStatus";
+import { fetchUpcomingMatches } from "./matches";
 import type {
   HnsCompetition,
   HnsMatch,
@@ -163,7 +164,21 @@ export async function fetchMatchSlots(): Promise<MatchSlots> {
   const unfinishedPast = past.filter((m) => !isFinished(m)).sort(sortByDateDesc);
   const finishedPast = past.filter(isFinished).sort(sortByDateDesc);
 
-  const next = unfinishedPast[0] ?? futureResult?.result?.[0] ?? null;
+  // The senior competition is season-scoped, so between seasons (old season
+  // finished, new one not yet tagged as current) it has no future matches.
+  // Fall back to the team-wide upcoming query, but keep only senior matches
+  // (that query returns every age group) by matching the senior filter.
+  const competitionNext =
+    unfinishedPast[0] ?? futureResult?.result?.[0] ?? null;
+  let next: HnsMatch | null = competitionNext;
+  if (!next) {
+    const filter = await getSeniorCompetitionFilter();
+    const upcoming = await fetchUpcomingMatches();
+    next =
+      upcoming.find((m) =>
+        filter ? m.competition?.name?.includes(filter) : false,
+      ) ?? null;
+  }
   const previous = finishedPast[0] ?? null;
 
   return { next, previous };
