@@ -1,17 +1,14 @@
 import "server-only";
 import { cache } from "react";
 import { payloadFetch } from "./client";
+import { tenantSlug } from "./tenant";
 import type { FrontendTenant, PayloadPaginated } from "./types";
 
-// Empty when unset rather than throwing at module load: the CMS (which serves
-// many tenants) imports the shared data layer without a single tenant slug.
-// getTenant() still throws if actually called without the env var.
-const TENANT_SLUG = process.env.PAYLOAD_TENANT_SLUG ?? "";
-
-export const tenantSlug = TENANT_SLUG;
+// Re-exported so external callers keep importing `tenantSlug` from here.
+export { tenantSlug } from "./tenant";
 
 export const getTenant = cache(async (): Promise<FrontendTenant> => {
-  const slug = TENANT_SLUG;
+  const slug = tenantSlug;
   if (!slug) {
     throw new Error("PAYLOAD_TENANT_SLUG env var is required");
   }

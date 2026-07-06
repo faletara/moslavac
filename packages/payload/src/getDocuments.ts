@@ -1,9 +1,6 @@
 import "server-only";
 import type { ClubDocument, DocumentCategory } from "@/types/document";
-import { payloadFetch } from "./client";
-import { tenantSlug } from "./getTenant";
-import { buildQuery, tenantWhere } from "./query";
-import type { PayloadPaginated } from "./types";
+import { fetchList } from "./fetchCollection";
 
 interface PayloadDocument {
   id: number;
@@ -14,9 +11,7 @@ interface PayloadDocument {
   displayOrder: number;
 }
 
-const documentsTags = () => [`documents-${tenantSlug}`];
-
-function adaptDocument(doc: PayloadDocument): ClubDocument {
+export function adaptDocument(doc: PayloadDocument): ClubDocument {
   return {
     id: doc.id,
     title: doc.title,
@@ -27,25 +22,16 @@ function adaptDocument(doc: PayloadDocument): ClubDocument {
   };
 }
 
-export async function fetchDocuments(params?: {
+export const fetchDocuments = (params?: {
   category?: DocumentCategory;
-}): Promise<ClubDocument[]> {
-  const query = buildQuery({
-    ...tenantWhere(tenantSlug),
-    ...(params?.category
+}): Promise<ClubDocument[]> =>
+  fetchList<PayloadDocument, ClubDocument>({
+    collection: "documents",
+    where: params?.category
       ? { "where[category][equals]": params.category }
-      : {}),
-    limit: 100,
+      : undefined,
     sort: "displayOrder",
     depth: 0,
+    limit: 100,
+    adapt: adaptDocument,
   });
-  try {
-    const result = await payloadFetch<PayloadPaginated<PayloadDocument>>(
-      `/documents?${query}`,
-      { next: { revalidate: 60, tags: documentsTags() } },
-    );
-    return result.docs.map(adaptDocument);
-  } catch {
-    return [];
-  }
-}

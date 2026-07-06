@@ -1,10 +1,10 @@
 import "server-only";
 import { convertLexicalToHTML } from "@payloadcms/richtext-lexical/html";
 import type { News, PaginatedNews } from "@/types/news";
-import { payloadFetch } from "./client";
-import { tenantSlug } from "./getTenant";
-import { buildQuery, tenantWhere } from "./query";
-import type { PayloadMedia, PayloadPaginated } from "./types";
+import { fetchList, fetchOne, fetchPage } from "./fetchCollection";
+import { mediaUrl } from "./media";
+import { resolveTenantSlug } from "./tenant";
+import type { PayloadMedia } from "./types";
 
 interface PayloadNews {
   id: number;
@@ -25,19 +25,12 @@ interface PayloadNews {
   updatedAt: string;
 }
 
-const newsTags = () => [`news-${tenantSlug}`];
-
-function mediaUrl(value: PayloadMedia | number | null | undefined): string | null {
-  if (!value || typeof value !== "object") return null;
-  return value.url ?? null;
-}
-
 function tenantSlugOf(tenant: PayloadNews["tenant"]): string {
   if (tenant && typeof tenant === "object") return tenant.slug;
-  return tenantSlug;
+  return resolveTenantSlug();
 }
 
-function adaptNews(doc: PayloadNews): News {
+export function adaptNews(doc: PayloadNews): News {
   const html = doc.content
     ? convertLexicalToHTML({
         data: doc.content as Parameters<typeof convertLexicalToHTML>[0]["data"],
@@ -61,78 +54,38 @@ function adaptNews(doc: PayloadNews): News {
   };
 }
 
-function adaptNewsPaginated(page: PayloadPaginated<PayloadNews>): PaginatedNews {
-  return {
-    content: page.docs.map(adaptNews),
-    totalElements: page.totalDocs,
-    totalPages: page.totalPages,
-    number: page.page - 1,
-    size: page.limit,
-  };
-}
-
-export async function fetchLatestNews(): Promise<News[]> {
-  const query = buildQuery({
-    ...tenantWhere(tenantSlug),
-    limit: 6,
+export const fetchLatestNews = (): Promise<News[]> =>
+  fetchList<PayloadNews, News>({
+    collection: "news",
     sort: "-publishedAt",
-    depth: 2,
+    limit: 6,
+    adapt: adaptNews,
   });
-  const result = await payloadFetch<PayloadPaginated<PayloadNews>>(
-    `/news?${query}`,
-    { next: { revalidate: 60, tags: newsTags() } },
-  );
-  return result.docs.map(adaptNews);
-}
 
-export async function fetchNewsPaginated(params: {
+export const fetchNewsPaginated = (params: {
   page: number;
   size: number;
-}): Promise<PaginatedNews> {
-  const query = buildQuery({
-    ...tenantWhere(tenantSlug),
-    page: params.page,
-    limit: params.size,
+}): Promise<PaginatedNews> =>
+  fetchPage<PayloadNews, News>({
+    collection: "news",
     sort: "-publishedAt",
-    depth: 2,
+    page: params.page,
+    size: params.size,
+    adapt: adaptNews,
   });
-  const result = await payloadFetch<PayloadPaginated<PayloadNews>>(
-    `/news?${query}`,
-    { next: { revalidate: 60, tags: newsTags() } },
-  );
-  return adaptNewsPaginated(result);
-}
 
-export async function fetchNewsBySlug(params: {
+export const fetchNewsBySlug = (params: {
   slug: string;
-}): Promise<News | null> {
-  const query = buildQuery({
-    ...tenantWhere(tenantSlug),
-    "where[slug][equals]": params.slug,
-    limit: 1,
-    depth: 2,
+}): Promise<News | null> =>
+  fetchOne<PayloadNews, News>({
+    collection: "news",
+    where: { "where[slug][equals]": params.slug },
+    adapt: adaptNews,
   });
-  const result = await payloadFetch<PayloadPaginated<PayloadNews>>(
-    `/news?${query}`,
-    { next: { revalidate: 60, tags: newsTags() } },
-  );
-  const doc = result.docs[0];
-  return doc ? adaptNews(doc) : null;
-}
 
-export async function fetchNewsById(params: {
-  id: string;
-}): Promise<News | null> {
-  const query = buildQuery({
-    ...tenantWhere(tenantSlug),
-    "where[id][equals]": params.id,
-    limit: 1,
-    depth: 2,
+export const fetchNewsById = (params: { id: string }): Promise<News | null> =>
+  fetchOne<PayloadNews, News>({
+    collection: "news",
+    where: { "where[id][equals]": params.id },
+    adapt: adaptNews,
   });
-  const result = await payloadFetch<PayloadPaginated<PayloadNews>>(
-    `/news?${query}`,
-    { next: { revalidate: 60, tags: newsTags() } },
-  );
-  const doc = result.docs[0];
-  return doc ? adaptNews(doc) : null;
-}

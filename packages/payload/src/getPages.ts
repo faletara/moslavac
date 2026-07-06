@@ -1,11 +1,9 @@
 import "server-only";
 import { convertLexicalToHTML } from "@payloadcms/richtext-lexical/html";
 import type { ClubPage, PageKey } from "@/types/page";
-import { payloadFetch } from "./client";
-import { tenantSlug } from "./getTenant";
+import { fetchOne } from "./fetchCollection";
 import { mediaObject } from "./media";
-import { buildQuery, tenantWhere } from "./query";
-import type { PayloadMedia, PayloadPaginated } from "./types";
+import type { PayloadMedia } from "./types";
 
 interface PayloadPage {
   id: number;
@@ -18,9 +16,7 @@ interface PayloadPage {
   seoDescription: string | null;
 }
 
-const pagesTags = () => [`pages-${tenantSlug}`];
-
-function adaptPage(doc: PayloadPage): ClubPage {
+export function adaptPage(doc: PayloadPage): ClubPage {
   return {
     id: doc.id,
     key: doc.key,
@@ -42,24 +38,11 @@ function adaptPage(doc: PayloadPage): ClubPage {
   };
 }
 
-export async function fetchPageByKey(params: {
+export const fetchPageByKey = (params: {
   key: PageKey;
-}): Promise<ClubPage | null> {
-  const query = buildQuery({
-    ...tenantWhere(tenantSlug),
-    "where[key][equals]": params.key,
-    limit: 1,
-    depth: 2,
+}): Promise<ClubPage | null> =>
+  fetchOne<PayloadPage, ClubPage>({
+    collection: "pages",
+    where: { "where[key][equals]": params.key },
+    adapt: adaptPage,
   });
-  try {
-    const result = await payloadFetch<PayloadPaginated<PayloadPage>>(
-      `/pages?${query}`,
-      { next: { revalidate: 60, tags: pagesTags() } },
-    );
-    const doc = result.docs[0];
-    return doc ? adaptPage(doc) : null;
-  } catch {
-    // Kolekcija još nije deployana ili zapis ne postoji → graciozno null.
-    return null;
-  }
-}

@@ -13,3 +13,12 @@ export function mediaObject(value: MediaRef): PayloadMedia | null {
   if (!value || typeof value !== "object") return null;
   return value;
 }
+
+/**
+ * Card-sized image URL (fallback na originalni URL) + alt. Prazan string kad
+ * relacija nije populirana. Jedinstvena zamjena za per-fetcher `pickImageUrl`.
+ */
+export function mediaCardImage(value: MediaRef): { url: string; alt: string } {
+  if (!value || typeof value !== "object") return { url: "", alt: "" };
+  return { url: value.sizes?.card?.url ?? value.url ?? "", alt: value.alt ?? "" };
+}

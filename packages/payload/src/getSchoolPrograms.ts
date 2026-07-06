@@ -1,10 +1,8 @@
 import "server-only";
 import type { SchoolProgram } from "@/types/school";
-import { payloadFetch } from "./client";
-import { tenantSlug } from "./getTenant";
+import { fetchList, fetchOne } from "./fetchCollection";
 import { mediaObject } from "./media";
-import { buildQuery, tenantWhere } from "./query";
-import type { PayloadMedia, PayloadPaginated } from "./types";
+import type { PayloadMedia } from "./types";
 
 interface PayloadSchoolProgram {
   id: number;
@@ -18,9 +16,7 @@ interface PayloadSchoolProgram {
   active: boolean;
 }
 
-const schoolTags = () => [`school-${tenantSlug}`];
-
-function adaptProgram(doc: PayloadSchoolProgram): SchoolProgram {
+export function adaptProgram(doc: PayloadSchoolProgram): SchoolProgram {
   return {
     id: doc.id,
     name: doc.name,
@@ -33,43 +29,25 @@ function adaptProgram(doc: PayloadSchoolProgram): SchoolProgram {
   };
 }
 
-export async function fetchSchoolPrograms(): Promise<SchoolProgram[]> {
-  const query = buildQuery({
-    ...tenantWhere(tenantSlug),
-    "where[active][equals]": "true",
-    limit: 100,
+export const fetchSchoolPrograms = (): Promise<SchoolProgram[]> =>
+  fetchList<PayloadSchoolProgram, SchoolProgram>({
+    collection: "school-programs",
+    tagPrefix: "school",
+    where: { "where[active][equals]": "true" },
     sort: "displayOrder",
-    depth: 2,
+    limit: 100,
+    adapt: adaptProgram,
   });
-  try {
-    const result = await payloadFetch<PayloadPaginated<PayloadSchoolProgram>>(
-      `/school-programs?${query}`,
-      { next: { revalidate: 60, tags: schoolTags() } },
-    );
-    return result.docs.map(adaptProgram);
-  } catch {
-    return [];
-  }
-}
 
-export async function fetchSchoolProgramById(params: {
+export const fetchSchoolProgramById = (params: {
   id: string;
-}): Promise<SchoolProgram | null> {
-  const query = buildQuery({
-    ...tenantWhere(tenantSlug),
-    "where[id][equals]": params.id,
-    "where[active][equals]": "true",
-    limit: 1,
-    depth: 2,
+}): Promise<SchoolProgram | null> =>
+  fetchOne<PayloadSchoolProgram, SchoolProgram>({
+    collection: "school-programs",
+    tagPrefix: "school",
+    where: {
+      "where[id][equals]": params.id,
+      "where[active][equals]": "true",
+    },
+    adapt: adaptProgram,
   });
-  try {
-    const result = await payloadFetch<PayloadPaginated<PayloadSchoolProgram>>(
-      `/school-programs?${query}`,
-      { next: { revalidate: 60, tags: schoolTags() } },
-    );
-    const doc = result.docs[0];
-    return doc ? adaptProgram(doc) : null;
-  } catch {
-    return null;
-  }
-}

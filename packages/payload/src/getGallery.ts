@@ -1,10 +1,8 @@
 import "server-only";
 import type { GalleryAlbum } from "@/types/gallery";
-import { payloadFetch } from "./client";
-import { tenantSlug } from "./getTenant";
+import { fetchList, fetchOne } from "./fetchCollection";
 import { mediaObject } from "./media";
-import { buildQuery, tenantWhere } from "./query";
-import type { PayloadMedia, PayloadPaginated } from "./types";
+import type { PayloadMedia } from "./types";
 
 interface PayloadAlbum {
   id: number;
@@ -18,9 +16,7 @@ interface PayloadAlbum {
     | null;
 }
 
-const galleryTags = () => [`gallery-${tenantSlug}`];
-
-function adaptAlbum(doc: PayloadAlbum): GalleryAlbum {
+export function adaptAlbum(doc: PayloadAlbum): GalleryAlbum {
   return {
     id: doc.id,
     title: doc.title,
@@ -40,42 +36,21 @@ function adaptAlbum(doc: PayloadAlbum): GalleryAlbum {
   };
 }
 
-export async function fetchAlbums(): Promise<GalleryAlbum[]> {
-  const query = buildQuery({
-    ...tenantWhere(tenantSlug),
-    limit: 100,
+export const fetchAlbums = (): Promise<GalleryAlbum[]> =>
+  fetchList<PayloadAlbum, GalleryAlbum>({
+    collection: "gallery-albums",
+    tagPrefix: "gallery",
     sort: "displayOrder",
-    depth: 2,
+    limit: 100,
+    adapt: adaptAlbum,
   });
-  try {
-    const result = await payloadFetch<PayloadPaginated<PayloadAlbum>>(
-      `/gallery-albums?${query}`,
-      { next: { revalidate: 60, tags: galleryTags() } },
-    );
-    return result.docs.map(adaptAlbum);
-  } catch {
-    // Kolekcija još nije deployana ili je prazna → graciozno prazno.
-    return [];
-  }
-}
 
-export async function fetchAlbumBySlug(params: {
+export const fetchAlbumBySlug = (params: {
   slug: string;
-}): Promise<GalleryAlbum | null> {
-  const query = buildQuery({
-    ...tenantWhere(tenantSlug),
-    "where[slug][equals]": params.slug,
-    limit: 1,
-    depth: 2,
+}): Promise<GalleryAlbum | null> =>
+  fetchOne<PayloadAlbum, GalleryAlbum>({
+    collection: "gallery-albums",
+    tagPrefix: "gallery",
+    where: { "where[slug][equals]": params.slug },
+    adapt: adaptAlbum,
   });
-  try {
-    const result = await payloadFetch<PayloadPaginated<PayloadAlbum>>(
-      `/gallery-albums?${query}`,
-      { next: { revalidate: 60, tags: galleryTags() } },
-    );
-    const doc = result.docs[0];
-    return doc ? adaptAlbum(doc) : null;
-  } catch {
-    return null;
-  }
-}

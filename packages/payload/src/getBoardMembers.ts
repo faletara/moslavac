@@ -1,10 +1,8 @@
 import "server-only";
 import type { BoardMember, BoardRoleGroup } from "@/types/board";
-import { payloadFetch } from "./client";
-import { tenantSlug } from "./getTenant";
+import { fetchList } from "./fetchCollection";
 import { mediaObject } from "./media";
-import { buildQuery, tenantWhere } from "./query";
-import type { PayloadMedia, PayloadPaginated } from "./types";
+import type { PayloadMedia } from "./types";
 
 interface PayloadBoardMember {
   id: number;
@@ -18,9 +16,7 @@ interface PayloadBoardMember {
   displayOrder: number;
 }
 
-const boardTags = () => [`board-${tenantSlug}`];
-
-function adaptBoardMember(doc: PayloadBoardMember): BoardMember {
+export function adaptBoardMember(doc: PayloadBoardMember): BoardMember {
   return {
     id: doc.id,
     name: doc.name,
@@ -34,20 +30,11 @@ function adaptBoardMember(doc: PayloadBoardMember): BoardMember {
   };
 }
 
-export async function fetchBoardMembers(): Promise<BoardMember[]> {
-  const query = buildQuery({
-    ...tenantWhere(tenantSlug),
-    limit: 100,
+export const fetchBoardMembers = (): Promise<BoardMember[]> =>
+  fetchList<PayloadBoardMember, BoardMember>({
+    collection: "board-members",
+    tagPrefix: "board",
     sort: "displayOrder",
-    depth: 2,
+    limit: 100,
+    adapt: adaptBoardMember,
   });
-  try {
-    const result = await payloadFetch<PayloadPaginated<PayloadBoardMember>>(
-      `/board-members?${query}`,
-      { next: { revalidate: 60, tags: boardTags() } },
-    );
-    return result.docs.map(adaptBoardMember);
-  } catch {
-    return [];
-  }
-}

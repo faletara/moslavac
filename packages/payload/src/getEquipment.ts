@@ -1,9 +1,9 @@
 import "server-only";
 import type { Equipment } from "@/types/equipment";
-import { payloadFetch } from "./client";
-import { tenantSlug } from "./getTenant";
-import { buildQuery, tenantWhere } from "./query";
-import type { PayloadMedia, PayloadPaginated } from "./types";
+import { fetchList } from "./fetchCollection";
+import { mediaCardImage } from "./media";
+import { resolveTenantSlug } from "./tenant";
+import type { PayloadMedia } from "./types";
 
 type PayloadEquipmentCategory =
   | "paketi"
@@ -29,26 +29,13 @@ interface PayloadEquipment {
   updatedAt: string;
 }
 
-const equipmentTags = () => [`equipment-${tenantSlug}`];
-
-function pickImageUrl(value: PayloadMedia | number | null | undefined): {
-  url: string;
-  alt: string;
-} {
-  if (!value || typeof value !== "object") {
-    return { url: "", alt: "" };
-  }
-  const url = value.sizes?.card?.url ?? value.url ?? "";
-  return { url, alt: value.alt ?? "" };
-}
-
 function tenantSlugOf(tenant: PayloadEquipment["tenant"]): string {
   if (tenant && typeof tenant === "object") return tenant.slug;
-  return tenantSlug;
+  return resolveTenantSlug();
 }
 
-function adaptEquipment(doc: PayloadEquipment): Equipment {
-  const { url, alt } = pickImageUrl(doc.image);
+export function adaptEquipment(doc: PayloadEquipment): Equipment {
+  const { url, alt } = mediaCardImage(doc.image);
   return {
     id: doc.id,
     displayName: doc.displayName,
@@ -65,33 +52,23 @@ function adaptEquipment(doc: PayloadEquipment): Equipment {
   };
 }
 
-export async function fetchEquipment(): Promise<Equipment[]> {
-  const query = buildQuery({
-    ...tenantWhere(tenantSlug),
-    "where[active][equals]": "true",
+export const fetchEquipment = (): Promise<Equipment[]> =>
+  fetchList<PayloadEquipment, Equipment>({
+    collection: "equipment",
+    where: { "where[active][equals]": "true" },
+    sort: "displayOrder",
     limit: 100,
-    sort: "displayOrder",
-    depth: 2,
+    adapt: adaptEquipment,
   });
-  const result = await payloadFetch<PayloadPaginated<PayloadEquipment>>(
-    `/equipment?${query}`,
-    { next: { revalidate: 60, tags: equipmentTags() } },
-  );
-  return result.docs.map(adaptEquipment);
-}
 
-export async function fetchFeaturedEquipment(): Promise<Equipment[]> {
-  const query = buildQuery({
-    ...tenantWhere(tenantSlug),
-    "where[active][equals]": "true",
-    "where[featured][equals]": "true",
-    limit: 12,
+export const fetchFeaturedEquipment = (): Promise<Equipment[]> =>
+  fetchList<PayloadEquipment, Equipment>({
+    collection: "equipment",
+    where: {
+      "where[active][equals]": "true",
+      "where[featured][equals]": "true",
+    },
     sort: "displayOrder",
-    depth: 2,
+    limit: 12,
+    adapt: adaptEquipment,
   });
-  const result = await payloadFetch<PayloadPaginated<PayloadEquipment>>(
-    `/equipment?${query}`,
-    { next: { revalidate: 60, tags: equipmentTags() } },
-  );
-  return result.docs.map(adaptEquipment);
-}
