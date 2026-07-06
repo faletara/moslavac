@@ -3,7 +3,7 @@ import { convertLexicalToHTML } from "@payloadcms/richtext-lexical/html";
 import type { News, PaginatedNews } from "@/types/news";
 import { payloadFetch } from "./client";
 import { tenantSlug } from "./getTenant";
-import { buildQuery, publishedWhere, tenantWhere } from "./query";
+import { buildQuery, tenantWhere } from "./query";
 import type { PayloadMedia, PayloadPaginated } from "./types";
 
 interface PayloadNews {
@@ -74,7 +74,6 @@ function adaptNewsPaginated(page: PayloadPaginated<PayloadNews>): PaginatedNews 
 export async function fetchLatestNews(): Promise<News[]> {
   const query = buildQuery({
     ...tenantWhere(tenantSlug),
-    ...publishedWhere(),
     limit: 6,
     sort: "-publishedAt",
     depth: 2,
@@ -92,7 +91,6 @@ export async function fetchNewsPaginated(params: {
 }): Promise<PaginatedNews> {
   const query = buildQuery({
     ...tenantWhere(tenantSlug),
-    ...publishedWhere(),
     page: params.page,
     limit: params.size,
     sort: "-publishedAt",
@@ -110,7 +108,6 @@ export async function fetchNewsBySlug(params: {
 }): Promise<News | null> {
   const query = buildQuery({
     ...tenantWhere(tenantSlug),
-    ...publishedWhere(),
     "where[slug][equals]": params.slug,
     limit: 1,
     depth: 2,
@@ -126,11 +123,8 @@ export async function fetchNewsBySlug(params: {
 export async function fetchNewsById(params: {
   id: string;
 }): Promise<News | null> {
-  // Query by id rather than findByID so the published-only filter applies —
-  // unpublished drafts must not be reachable by id either.
   const query = buildQuery({
     ...tenantWhere(tenantSlug),
-    ...publishedWhere(),
     "where[id][equals]": params.id,
     limit: 1,
     depth: 2,

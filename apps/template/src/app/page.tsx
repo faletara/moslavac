@@ -1,11 +1,4 @@
 import type { Metadata } from "next";
-import Hero from "@/components/features/home/Hero";
-import LatestNewsSection from "@/components/features/home/LatestNewsSection";
-import PreviousAndNextMatchSection from "@/components/features/home/PreviousAndNextMatchSection";
-import SeasonDataSection from "@/components/features/home/SeasonDataSection";
-import UpcomingMatchesSection from "@/components/features/home/UpcomingMatchesSection";
-import WebShopCarousel from "@/components/features/home/WebShopCarousel";
-import YouTubePromoSection from "@/components/features/home/YouTubePromoSection";
 import { getTenant } from "@/lib/payload/getTenant";
 
 export const revalidate = 60;
@@ -24,17 +17,20 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-	const tenant = await getTenant();
+  const tenant = await getTenant();
 
-	return (
-		<div>
-			<Hero tenant={tenant} />
-			<PreviousAndNextMatchSection />
-			<LatestNewsSection />
-			<UpcomingMatchesSection />
-			<SeasonDataSection />
-			<YouTubePromoSection />
-			<WebShopCarousel />
-		</div>
-	);
+  return (
+    <div className="mx-auto flex min-h-[60vh] max-w-7xl flex-col items-center justify-center px-6 py-24 text-center">
+      <p className="text-[0.6rem] font-medium uppercase tracking-[0.4em] text-muted-foreground">
+        {tenant.displayName}
+      </p>
+      <h1 className="mt-4 text-4xl font-black uppercase tracking-tighter">
+        Naslovnica
+      </h1>
+      <p className="mt-4 max-w-md text-sm text-muted-foreground">
+        Prazan predložak. Podatkovni sloj (Payload + HNS) i API rute su spremni —
+        gradi stranice od nule.
+      </p>
+    </div>
+  );
 }

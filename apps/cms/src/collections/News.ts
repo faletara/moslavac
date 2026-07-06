@@ -8,10 +8,18 @@ export const News = createCollection({
     useAsTitle: 'title',
     defaultColumns: ['title', '_status', 'publishedAt', 'tenant'],
   },
-  // Drafts: nацrt se sprema neobjavljen (_status: draft); admin ga objavi ručno.
-  // Frontend čita samo published (vidi packages/payload publishedWhere()).
   versions: {
     drafts: true,
+  },
+  // Auto-publish: svaki spremljeni članak je odmah objavljen (bez ručnog
+  // "Publish" koraka). Draft sustav ostaje radi povijesti verzija.
+  hooks: {
+    beforeChange: [
+      ({ data }) => {
+        ;(data as { _status?: string })._status = 'published'
+        return data
+      },
+    ],
   },
   fields: [
     {

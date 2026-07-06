@@ -2,10 +2,12 @@
 
 Vodič za pokretanje nove klupske stranice na platformi. Novi klub = tanki
 `apps/<slug>` (rute + komponente + skin) nad dijeljenim slojem u `packages/`
-(podaci, UI, tipovi). `apps/template` je potpun, generički "golden-path" klub —
-sve standardne stranice rade odmah; treba samo postaviti podatke i boje.
+(podaci, UI, tipovi). `apps/template` je PRAZAN skeleton — naslovna je
+placeholder, Header/Footer minimalni, bez gotovih stranica (gradiš ih od nule).
+Ali sve "ispod haube" radi odmah: API rute, podatkovni sloj (Payload + HNS),
+provideri, metadata i UI toolkit.
 
-> Sažetak: scaffold → Tenant u CMS-u → env → install/dev → re-skin → deploy.
+> Sažetak: scaffold → Tenant u CMS-u → env → install/dev → gradnja stranica → deploy.
 
 ---
 
@@ -87,8 +89,9 @@ Sve klupske ručice su na malo mjesta:
   vuče iz CMS `branding.logo`; favicon/OG se generiraju iz tenanta —
   `app/icon.tsx`, `app/opengraph-image.tsx` — ili ih nadjačaj stvarnim datotekama).
 
-Stranice/komponente su generičke i tenant-driven — sadržaj (vijesti, oprema,
-roster, utakmice) dolazi iz CMS-a i HNS-a po tenantu, bez diranja koda.
+Stranice gradiš sam od nule, ali podaci su spremni: server komponente zovu
+`@/lib/payload/*` i `@/lib/hns/*` izravno, klijent koristi `api.*` hookove —
+sadržaj (vijesti, oprema, roster, utakmice) dolazi iz CMS-a i HNS-a po tenantu.
 
 ## 7. Deploy (Vercel)
 

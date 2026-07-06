@@ -4,7 +4,9 @@ import type { Field, FieldHook } from 'payload'
 export const slugify = (value: string): string =>
   value
     .toString()
-    .normalize('NFD')
+    // NFKD (ne NFD) da se i Unicode "fancy"/bold slova (npr. 𝗞, 𝐌) i ligature
+    // dekompoziraju u obični ASCII prije uklanjanja dijakritike.
+    .normalize('NFKD')
     .replace(/[̀-ͯ]/g, '')
     .toLowerCase()
     .trim()

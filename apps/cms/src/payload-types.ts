@@ -78,8 +78,6 @@ export interface Config {
     'board-members': BoardMember;
     'school-programs': SchoolProgram;
     'gallery-albums': GalleryAlbum;
-    'push-subscriptions': PushSubscription;
-    'notified-matches': NotifiedMatch;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -98,8 +96,6 @@ export interface Config {
     'board-members': BoardMembersSelect<false> | BoardMembersSelect<true>;
     'school-programs': SchoolProgramsSelect<false> | SchoolProgramsSelect<true>;
     'gallery-albums': GalleryAlbumsSelect<false> | GalleryAlbumsSelect<true>;
-    'push-subscriptions': PushSubscriptionsSelect<false> | PushSubscriptionsSelect<true>;
-    'notified-matches': NotifiedMatchesSelect<false> | NotifiedMatchesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -613,47 +609,6 @@ export interface GalleryAlbum {
   createdAt: string;
 }
 /**
- * Web Push pretplatnici (popunjava frontend automatski).
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "push-subscriptions".
- */
-export interface PushSubscription {
-  id: number;
-  tenant?: (number | null) | Tenant;
-  /**
-   * Push service endpoint URL (jedinstven po pretplati).
-   */
-  endpoint: string;
-  keys: {
-    p256dh: string;
-    auth: string;
-  };
-  userAgent?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Stanje poslanih obavijesti po utakmici (dedup). Popunjava cron.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "notified-matches".
- */
-export interface NotifiedMatch {
-  id: number;
-  tenant?: (number | null) | Tenant;
-  hnsMatchId: number;
-  /**
-   * Čitljiv opis utakmice (npr. "Moslavac – Kutina").
-   */
-  matchLabel?: string | null;
-  reminderSent?: boolean | null;
-  resultPushSent?: boolean | null;
-  aiDraftCreated?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -720,14 +675,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'gallery-albums';
         value: number | GalleryAlbum;
-      } | null)
-    | ({
-        relationTo: 'push-subscriptions';
-        value: number | PushSubscription;
-      } | null)
-    | ({
-        relationTo: 'notified-matches';
-        value: number | NotifiedMatch;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1067,37 +1014,6 @@ export interface GalleryAlbumsSelect<T extends boolean = true> {
         id?: T;
       };
   displayOrder?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "push-subscriptions_select".
- */
-export interface PushSubscriptionsSelect<T extends boolean = true> {
-  tenant?: T;
-  endpoint?: T;
-  keys?:
-    | T
-    | {
-        p256dh?: T;
-        auth?: T;
-      };
-  userAgent?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "notified-matches_select".
- */
-export interface NotifiedMatchesSelect<T extends boolean = true> {
-  tenant?: T;
-  hnsMatchId?: T;
-  matchLabel?: T;
-  reminderSent?: T;
-  resultPushSent?: T;
-  aiDraftCreated?: T;
   updatedAt?: T;
   createdAt?: T;
 }

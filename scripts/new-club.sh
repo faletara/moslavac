@@ -83,10 +83,10 @@ cat <<EOF
 
 ✅ Gotovo: apps/$SLUG kreiran (port $PORT).
 
-Template je POTPUN "golden-path" klub: sve standardne stranice (naslovna,
-novosti, utakmice, sezona, klub, prva-momčad, oprema, statistika) i komponente
-su već tu — generičke i tenant-driven, s neutralnim skinom. Dijeljeni sloj
-(podaci/UI) je u /packages.
+Template je PRAZAN skeleton: naslovna je placeholder, Header/Footer su minimalni,
+nema gotovih stranica — gradiš ih od nule. Ali "ispod haube" sve radi odmah:
+API rute, podatkovni sloj (Payload + HNS), provideri, metadata i UI toolkit.
+Dijeljeni sloj (podaci/UI) je u /packages.
 
 📖 Detaljan vodič: docs/NEW-CLUB.md
 
