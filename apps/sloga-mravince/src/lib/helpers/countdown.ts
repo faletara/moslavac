@@ -12,8 +12,7 @@ export interface CountdownState {
   isPast: boolean;
 }
 
-function compute(targetUtc: number): CountdownState {
-  const now = Date.now();
+function compute(targetUtc: number, now: number): CountdownState {
   const totalMs = Math.max(0, targetUtc - now);
   const isPast = targetUtc <= now;
 
@@ -26,20 +25,23 @@ function compute(targetUtc: number): CountdownState {
   return { days, hours, minutes, seconds, totalMs, isPast };
 }
 
+/**
+ * Odbrojavanje do targeta (epoch ms). Hydration-safe: do prvog (asinkronog)
+ * ticka vraća null, zatim otkucava svake sekunde (uz reduced-motion jednom u
+ * minuti). Stanje drži samo "now", a dijelovi se izvode tijekom rendera.
+ */
 export function useCountdown(targetUtc: number | null): CountdownState | null {
   const reduced = useReducedMotion();
-  const [state, setState] = useState<CountdownState | null>(null);
+  const [now, setNow] = useState<number | null>(null);
 
   useEffect(() => {
-    if (targetUtc == null) {
-      setState(null);
-      return;
-    }
-    const update = () => setState(compute(targetUtc));
-    update();
-    const id = setInterval(update, reduced ? 60_000 : 1000);
-    return () => clearInterval(id);
-  }, [targetUtc, reduced]);
+    const first = setTimeout(() => setNow(Date.now()), 0);
+    const id = setInterval(() => setNow(Date.now()), reduced ? 60_000 : 1000);
+    return () => {
+      clearTimeout(first);
+      clearInterval(id);
+    };
+  }, [reduced]);
 
-  return state;
+  return targetUtc != null && now != null ? compute(targetUtc, now) : null;
 }

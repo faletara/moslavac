@@ -5,8 +5,8 @@ import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 /**
- * Mobilni izbornik (< md) u stilu glavne aplikacije: hamburger otvara slide-in
- * drawer zdesna s velikim uppercase itemima. Zatvara se na Escape, klik na
+ * Mobilni izbornik (< md): hamburger otvara slide-in ink drawer zdesna s
+ * velikim Anton itemima i rednim brojevima. Zatvara se na Escape, klik na
  * pozadinu ili odabir itema; dok je otvoren zaključava scroll pozadine.
  */
 export default function MobileNav({ items }: { items: readonly string[] }) {
@@ -31,7 +31,7 @@ export default function MobileNav({ items }: { items: readonly string[] }) {
         type="button"
         onClick={() => setOpen(true)}
         aria-label="Otvori navigaciju"
-        className="ml-auto inline-flex size-10 items-center justify-center rounded-md text-foreground transition-colors hover:bg-foreground/5 md:hidden"
+        className="ml-auto inline-flex size-10 items-center justify-center rounded-md text-chalk transition-colors hover:bg-chalk/10 md:hidden"
       >
         <Menu className="size-6" />
       </button>
@@ -46,7 +46,7 @@ export default function MobileNav({ items }: { items: readonly string[] }) {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
               onClick={() => setOpen(false)}
-              className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm md:hidden"
+              className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm md:hidden"
             />
             <motion.div
               key="panel"
@@ -54,14 +54,14 @@ export default function MobileNav({ items }: { items: readonly string[] }) {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-              className="fixed inset-y-0 right-0 z-50 flex w-full max-w-sm flex-col bg-background shadow-2xl md:hidden"
+              className="fixed inset-y-0 right-0 z-50 flex w-full max-w-sm flex-col bg-ink-deep text-chalk shadow-2xl md:hidden"
             >
-              <div className="flex h-20 shrink-0 items-center justify-end border-b border-border px-6">
+              <div className="flex h-20 shrink-0 items-center justify-end border-b border-chalk/10 px-6">
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
                   aria-label="Zatvori navigaciju"
-                  className="inline-flex size-10 items-center justify-center rounded-md text-foreground transition-colors hover:bg-foreground/5"
+                  className="inline-flex size-10 items-center justify-center rounded-md text-chalk transition-colors hover:bg-chalk/10"
                 >
                   <X className="size-6" />
                 </button>
@@ -69,18 +69,27 @@ export default function MobileNav({ items }: { items: readonly string[] }) {
 
               <nav
                 aria-label="Glavna navigacija"
-                className="flex flex-col gap-6 px-8 pt-10"
+                className="flex flex-col gap-7 px-8 pt-12"
               >
-                {items.map((item) => (
+                {items.map((item, i) => (
                   <span
                     key={item}
                     onClick={() => setOpen(false)}
-                    className="cursor-default text-3xl font-black uppercase leading-none tracking-tighter text-foreground transition-colors hover:text-club-red"
+                    className="flex cursor-default items-baseline gap-4"
                   >
-                    {item}
+                    <span className="text-[0.6rem] font-bold tabular-nums tracking-[0.3em] text-club-red">
+                      0{i + 1}
+                    </span>
+                    <span className="font-display text-4xl uppercase leading-none tracking-wide transition-colors hover:text-club-red">
+                      {item}
+                    </span>
                   </span>
                 ))}
               </nav>
+
+              <p className="mt-auto px-8 pb-8 text-[0.6rem] font-semibold uppercase tracking-[0.3em] text-chalk/40">
+                HNK Sloga Mravince · od 1925.
+              </p>
             </motion.div>
           </>
         )}

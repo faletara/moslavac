@@ -1,17 +1,24 @@
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
-import { Ubuntu } from "next/font/google";
+import { Anton, Archivo } from "next/font/google";
 import "./globals.css";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import Providers from "@/components/providers/Providers";
+import SmoothScroll from "@/components/providers/SmoothScroll";
 import { getTenant } from "@/lib/payload/getTenant";
 import { BASE_URL } from "@/lib/siteUrl";
 
-const ubuntu = Ubuntu({
-  variable: "--font-ubuntu",
-  weight: ["300", "400", "500", "700"],
+const archivo = Archivo({
+  variable: "--font-archivo",
+  subsets: ["latin", "latin-ext"],
+  display: "swap",
+});
+
+const anton = Anton({
+  variable: "--font-anton",
+  weight: "400",
   subsets: ["latin", "latin-ext"],
   display: "swap",
 });
@@ -130,7 +137,7 @@ export default async function RootLayout({
   return (
     <html
       lang="hr"
-      className={`${ubuntu.variable} antialiased`}
+      className={`${archivo.variable} ${anton.variable} antialiased`}
     >
       <head>
         <link rel="preconnect" href="https://res.cloudinary.com" />
@@ -145,6 +152,7 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
         />
         <Providers tenant={tenant}>
+          <SmoothScroll />
           <Header tenant={tenant} />
           <main className="flex-1 overflow-x-clip">{children}</main>
           <Footer tenant={tenant} />

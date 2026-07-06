@@ -2,7 +2,14 @@
 
 import Link from "next/link";
 import { useCallback, useRef, useState } from "react";
-import type { RosterEntry } from "@/types/roster";
+import type { RosterEntry, RosterPosition } from "@/types/roster";
+
+const POSITION_LABEL: Record<Exclude<RosterPosition, "trener">, string> = {
+  vratar: "Vratar",
+  obrambeni: "Obrana",
+  vezni: "Vezni red",
+  napadac: "Napad",
+};
 
 function splitName(name: string): { first: string; last: string } {
   const parts = name.trim().split(/\s+/);
@@ -11,62 +18,57 @@ function splitName(name: string): { first: string; last: string } {
   return { first: parts.join(" "), last };
 }
 
-function PlayerCard({
-  player,
-  featured,
-}: {
-  player: RosterEntry;
-  featured: boolean;
-}) {
+/** Ink kartica igrača — ogroman ghost broj, Anton prezime, crveni detalji. */
+function PlayerCard({ player }: { player: RosterEntry }) {
   const { first, last } = splitName(player.displayName);
+  const position =
+    player.position !== "trener" ? POSITION_LABEL[player.position] : null;
+
   return (
-    <article
-      className={`relative h-75 shrink-0 snap-start overflow-hidden rounded-xl bg-[linear-gradient(135deg,#e5292f_0%,#a51419_100%)] ${
-        featured ? "w-75 sm:w-90" : "w-52.5 sm:w-60"
-      }`}
-    >
-      {/* Dijagonalni pattern + sjaj za dubinu */}
-      <div className="absolute inset-0 bg-[repeating-linear-gradient(115deg,transparent,transparent_38px,rgba(255,255,255,0.045)_38px,rgba(255,255,255,0.045)_76px)]" />
-      <div className="absolute -right-12 -top-12 h-44 w-44 rounded-full bg-white/10 blur-2xl" />
-
-      {/* Placeholder silueta igrača (dok nema pravih fotografija) */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center">
-        <svg
-          viewBox="0 0 200 220"
-          className="h-[80%] w-auto text-white/[0.14]"
-          fill="currentColor"
-          aria-hidden
-        >
-          <circle cx="100" cy="72" r="44" />
-          <path d="M18 220C18 158 54 126 100 126s82 32 82 94Z" />
-        </svg>
-      </div>
-
-      {/* Scrim pri dnu za čitljivost imena */}
-      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-black/30 to-transparent" />
-
-      {/* Broj dresa */}
+    <article className="group relative h-80 w-60 shrink-0 snap-start overflow-hidden bg-ink-deep clip-corner sm:h-88 sm:w-68">
+      {/* Ghost broj — dominantni element, na hover se lagano pomakne */}
       {player.jerseyNumber != null && (
-        <span className="absolute left-5 top-4 text-6xl font-black leading-none tracking-tight text-white/95 tabular-nums">
+        <span
+          aria-hidden
+          className="[--text-stroke-color:rgba(255,255,255,0.14)] absolute -right-3 -top-4 select-none font-display text-[11rem] leading-none tabular-nums text-stroke transition-transform duration-500 ease-out group-hover:-translate-y-2 sm:text-[13rem]"
+        >
           {player.jerseyNumber}
         </span>
       )}
 
-      {/* Kapetanska oznaka */}
-      {player.captain && (
-        <span className="absolute right-4 top-4 flex h-7 w-7 items-center justify-center rounded-full border border-white/50 text-xs font-bold text-white">
-          C
-        </span>
-      )}
+      {/* Crveni potpis uz lijevi rub */}
+      <span
+        aria-hidden
+        className="absolute inset-y-0 left-0 w-1 bg-club-red transition-[width] duration-300 group-hover:w-1.5"
+      />
 
-      {/* Ime */}
-      <div className="absolute inset-x-5 bottom-5">
+      {/* Broj + kapetanska oznaka */}
+      <div className="absolute left-6 top-6 flex items-center gap-3">
+        {player.jerseyNumber != null && (
+          <span className="font-display text-4xl leading-none tabular-nums text-club-red">
+            {player.jerseyNumber}
+          </span>
+        )}
+        {player.captain && (
+          <span className="flex h-6 w-6 items-center justify-center border border-club-gold text-[0.62rem] font-black text-club-gold">
+            C
+          </span>
+        )}
+      </div>
+
+      {/* Ime + pozicija */}
+      <div className="absolute inset-x-6 bottom-6">
+        {position && (
+          <p className="mb-2 text-[0.58rem] font-bold uppercase tracking-[0.3em] text-white/40">
+            {position}
+          </p>
+        )}
         {first && (
-          <p className="text-sm font-medium uppercase tracking-wide text-white/80">
+          <p className="text-sm font-medium uppercase tracking-[0.14em] text-white/65">
             {first}
           </p>
         )}
-        <p className="text-2xl font-extrabold uppercase leading-none tracking-tight text-white">
+        <p className="font-display text-3xl uppercase leading-[0.95] tracking-wide text-white sm:text-4xl">
           {last}
         </p>
       </div>
@@ -93,7 +95,10 @@ export default function PlayersCarousel({
     const el = scrollerRef.current;
     if (!el) return;
     const atEnd = el.scrollLeft >= el.scrollWidth - el.clientWidth - 8;
-    el.scrollBy({ left: atEnd ? -el.scrollWidth : el.clientWidth * 0.8, behavior: "smooth" });
+    el.scrollBy({
+      left: atEnd ? -el.scrollWidth : el.clientWidth * 0.8,
+      behavior: "smooth",
+    });
   }, []);
 
   return (
@@ -103,17 +108,17 @@ export default function PlayersCarousel({
         onScroll={onScroll}
         className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
-        {players.map((player, i) => (
-          <PlayerCard key={player.id} player={player} featured={i === 0} />
+        {players.map((player) => (
+          <PlayerCard key={player.id} player={player} />
         ))}
       </div>
 
       {/* Kontrole + CTA */}
-      <div className="mt-8 flex items-center justify-between gap-6">
+      <div className="mt-10 flex items-center justify-between gap-6">
         <div className="flex items-center gap-4">
-          <div className="h-1 w-40 overflow-hidden rounded-full bg-black/10 sm:w-56">
+          <div className="h-1 w-40 overflow-hidden bg-black/25 sm:w-56">
             <div
-              className="h-full rounded-full bg-club-red transition-[width] duration-150"
+              className="h-full bg-white transition-[width] duration-150"
               style={{ width: `${Math.max(12, progress * 100)}%` }}
             />
           </div>
@@ -121,19 +126,31 @@ export default function PlayersCarousel({
             type="button"
             onClick={scrollNext}
             aria-label="Sljedeći igrači"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-black/15 text-foreground transition-colors hover:border-club-red hover:text-club-red"
+            className="flex h-10 w-10 items-center justify-center border border-white/40 text-white transition-colors hover:border-white hover:bg-white/10"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
-              <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <path
+                d="M5 12h14M13 6l6 6-6 6"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </button>
         </div>
 
         <Link
           href="/momcad"
-          className="inline-flex shrink-0 items-center rounded-full bg-club-red px-7 py-3 text-sm font-bold uppercase tracking-wide text-white transition-transform hover:scale-105"
+          className="group inline-flex shrink-0 items-center gap-3 bg-white px-7 py-3.5 text-xs font-black uppercase tracking-[0.18em] text-ink-deep transition-colors duration-300 hover:bg-ink-deep hover:text-white"
         >
           Svi igrači
+          <span
+            aria-hidden
+            className="transition-transform duration-300 group-hover:translate-x-1"
+          >
+            →
+          </span>
         </Link>
       </div>
     </div>

@@ -6,12 +6,14 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-ubuntu);
-  --font-display: var(--font-ubuntu);
+  --font-sans: var(--font-archivo);
+  --font-display: var(--font-anton);
   --color-club: var(--club);
   --color-club-red: var(--club-red);
   --color-club-blue: var(--club-blue);
   --color-club-gold: var(--club-gold);
+  --color-ink: var(--ink);
+  --color-ink-deep: var(--ink-deep);
   --color-navy: var(--navy);
   --color-navy-deep: var(--navy-deep);
   --color-chalk: var(--chalk);
@@ -59,14 +61,9 @@
 }
 
 /*
- * NEUTRAL starting skin. Every token keeps its NAME but ships a brand-neutral
- * slate value — so the golden-path template looks cohesive but like no club.
- * Re-skin a club by editing the values in this file (see docs/NEW-CLUB.md):
- *   - brand: --club, --club-red, --navy, --navy-deep, --chalk
- *   - semantic: --primary(+foreground), --ring, --accent, --secondary, --muted
- *   - shape: --radius
- *   - age-category ramp: --cat-*  (dark → light; chips render white text)
- *   - optional display font: set --font-display + import it in layout.tsx
+ * HNK Sloga Mravince — "matchday poster" skin.
+ * Warm chalk paper base, near-black ink, dominant club red, gold hairlines.
+ * Display type: Anton (poster condensed) · body: Archivo.
  */
 :root {
   --radius: 0.625rem;
@@ -76,28 +73,32 @@
   --club-red: #de2025; /* crvena — primarna (alias) */
   --club-blue: #0d74bc; /* plava — sekundarni akcent */
   --club-gold: #b79f7e; /* zlatna — suptilni premium akcent */
-  --navy: oklch(0.24 0.012 262);
-  --navy-deep: oklch(0.17 0.01 262);
-  --chalk: oklch(0.98 0.002 250);
 
-  --background: oklch(0.985 0.002 250);
-  --foreground: oklch(0.21 0.012 262);
-  --card: oklch(0.995 0.001 250);
-  --card-foreground: oklch(0.21 0.012 262);
-  --popover: oklch(0.995 0.001 250);
-  --popover-foreground: oklch(0.21 0.012 262);
-  --primary: oklch(0.45 0.03 260);
+  /* Ink — near-black cinematic sections. `navy*` su naslijeđeni aliasi. */
+  --ink: oklch(0.19 0.008 275);
+  --ink-deep: oklch(0.145 0.007 275);
+  --navy: var(--ink);
+  --navy-deep: var(--ink-deep);
+  --chalk: oklch(0.972 0.005 85);
+
+  --background: oklch(0.972 0.005 85);
+  --foreground: oklch(0.2 0.01 275);
+  --card: oklch(0.985 0.004 85);
+  --card-foreground: oklch(0.2 0.01 275);
+  --popover: oklch(0.985 0.004 85);
+  --popover-foreground: oklch(0.2 0.01 275);
+  --primary: #de2025;
   --primary-foreground: oklch(0.985 0.002 250);
-  --secondary: oklch(0.95 0.004 255);
-  --secondary-foreground: oklch(0.25 0.014 262);
-  --muted: oklch(0.95 0.004 255);
-  --muted-foreground: oklch(0.52 0.012 258);
-  --accent: oklch(0.93 0.006 256);
-  --accent-foreground: oklch(0.25 0.014 262);
+  --secondary: oklch(0.94 0.006 85);
+  --secondary-foreground: oklch(0.24 0.012 275);
+  --muted: oklch(0.94 0.006 85);
+  --muted-foreground: oklch(0.5 0.012 275);
+  --accent: oklch(0.92 0.008 85);
+  --accent-foreground: oklch(0.24 0.012 275);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.9 0.005 254);
-  --input: oklch(0.9 0.005 254);
-  --ring: oklch(0.45 0.03 260);
+  --border: oklch(0.87 0.008 85);
+  --input: oklch(0.87 0.008 85);
+  --ring: #de2025;
   --chart-1: oklch(0.45 0.02 260);
   --chart-2: oklch(0.55 0.018 260);
   --chart-3: oklch(0.65 0.015 260);
@@ -124,24 +125,24 @@
 }
 
 .dark {
-  --background: oklch(0.2 0.01 262);
-  --foreground: oklch(0.97 0.004 250);
-  --card: oklch(0.24 0.012 262);
-  --card-foreground: oklch(0.97 0.004 250);
-  --popover: oklch(0.24 0.012 262);
-  --popover-foreground: oklch(0.97 0.004 250);
-  --primary: oklch(0.7 0.03 260);
-  --primary-foreground: oklch(0.17 0.012 262);
-  --secondary: oklch(0.26 0.012 262);
-  --secondary-foreground: oklch(0.97 0.004 250);
-  --muted: oklch(0.26 0.012 262);
-  --muted-foreground: oklch(0.72 0.012 256);
-  --accent: oklch(0.29 0.014 262);
-  --accent-foreground: oklch(0.97 0.004 250);
+  --background: oklch(0.19 0.008 275);
+  --foreground: oklch(0.97 0.004 85);
+  --card: oklch(0.23 0.01 275);
+  --card-foreground: oklch(0.97 0.004 85);
+  --popover: oklch(0.23 0.01 275);
+  --popover-foreground: oklch(0.97 0.004 85);
+  --primary: #de2025;
+  --primary-foreground: oklch(0.985 0.002 250);
+  --secondary: oklch(0.25 0.01 275);
+  --secondary-foreground: oklch(0.97 0.004 85);
+  --muted: oklch(0.25 0.01 275);
+  --muted-foreground: oklch(0.72 0.012 275);
+  --accent: oklch(0.28 0.012 275);
+  --accent-foreground: oklch(0.97 0.004 85);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(0.97 0.01 250 / 12%);
   --input: oklch(0.97 0.01 250 / 16%);
-  --ring: oklch(0.7 0.03 260);
+  --ring: #de2025;
   --chart-1: oklch(0.55 0.02 260);
   --chart-2: oklch(0.63 0.018 260);
   --chart-3: oklch(0.7 0.015 260);
@@ -167,6 +168,7 @@
   }
   body {
     color: var(--foreground);
+    background: var(--background);
     font-size: 1rem;
     line-height: 1.6;
     overflow-x: clip;
@@ -186,6 +188,21 @@
 @utility text-stroke {
   -webkit-text-stroke: 1.5px var(--text-stroke-color, var(--foreground));
   color: transparent;
+}
+@utility text-stroke-thick {
+  -webkit-text-stroke: 2.5px var(--text-stroke-color, var(--foreground));
+  color: transparent;
+}
+
+/* Filmsko zrno — položi kao apsolutni sloj preko sekcije (uz nisku opacity). */
+@utility bg-grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+/* Odrezani kut — potpis kartica (matchday poster jezik). */
+@utility clip-corner {
+  clip-path: polygon(0 0, calc(100% - 1.25rem) 0, 100% 1.25rem, 100% 100%, 0 100%);
 }
 
 @keyframes marquee {

@@ -1,15 +1,19 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { FadeInView } from "@/components/animations";
 import { HnsCrest } from "@/components/HnsCrest";
 import { formatDateParts } from "@/lib/helpers/date";
 import { cn } from "@/lib/utils";
 import type { HnsMatch, MatchSlots } from "@/types/hns";
+import Countdown from "./Countdown";
 
 function isRealMatch(match: HnsMatch | null | undefined): match is HnsMatch {
-  return match != null && Object.keys(match).length > 0 && match.dateTimeUTC != null;
+  return (
+    match != null && Object.keys(match).length > 0 && match.dateTimeUTC != null
+  );
 }
 
-/** Jedan tim: grb na bijeloj pločici + naziv. Pobjednik ima puni bijeli naziv. */
+/** Jedan tim: veliki grb na bijeloj pločici + Anton naziv. */
 function TeamBlock({
   picture,
   name,
@@ -20,17 +24,19 @@ function TeamBlock({
   winner: boolean;
 }) {
   return (
-    <div className="flex flex-col items-center gap-4 text-center">
-      <HnsCrest
-        picture={picture}
-        name={name}
-        size={88}
-        className="size-16! bg-white p-2 shadow-[0_12px_28px_-10px_rgba(0,0,0,0.5)] ring-1 ring-white/50 sm:size-20!"
-      />
+    <div className="flex flex-col items-center gap-5 text-center">
+      <div className="bg-white p-3 shadow-[0_18px_40px_-14px_rgba(0,0,0,0.7)] clip-corner sm:p-4">
+        <HnsCrest
+          picture={picture}
+          name={name}
+          size={96}
+          className="size-16! sm:size-24!"
+        />
+      </div>
       <span
         className={cn(
-          "max-w-36 font-display text-sm font-bold uppercase leading-tight tracking-wide sm:max-w-48 sm:text-base",
-          winner ? "text-white" : "text-white/70",
+          "max-w-36 font-display text-lg uppercase leading-[1.05] tracking-wide sm:max-w-52 sm:text-2xl",
+          winner ? "text-white" : "text-white/60",
         )}
       >
         {name ?? "—"}
@@ -40,20 +46,21 @@ function TeamBlock({
 }
 
 /**
- * Matchday rezultat u jeziku sekcije igrača: lijevo-poravnat heading + crvena
- * gradient kartica s dijagonalnom teksturom i mekim krugovima. Sljedeća
- * utakmica, a van sezone — posljednji rezultat. Ne renderira se bez utakmice.
+ * Matchday sekcija — fullwidth ink pozornica sa živim odbrojavanjem do
+ * sljedeće utakmice (van sezone: posljednji rezultat). Ogroman outlined "VS"
+ * watermark, veliki grbovi, meta linija s datumom i stadionom.
+ * Ne renderira se bez utakmice.
  */
 export default function NextMatchBar({ slots }: { slots: MatchSlots }) {
   const isNext = isRealMatch(slots.next);
   const match = isNext ? slots.next : slots.previous;
   if (!isRealMatch(match)) return null;
 
-  const { weekdayShort, day, monthShort, time } = formatDateParts(
-    match.dateTimeUTC as number,
-  );
-  const heading = isNext ? "Sljedeća utakmica" : "Posljednji rezultat";
-  const meta = [match.competition?.name, match.round].filter(Boolean).join(" · ");
+  const kickoff = match.dateTimeUTC as number;
+  const { weekdayShort, day, monthShort, time } = formatDateParts(kickoff);
+  const meta = [match.competition?.name, match.round]
+    .filter(Boolean)
+    .join(" · ");
   const venue = match.facility?.name ?? match.facility?.place ?? null;
 
   const home = match.homeTeamResult?.current;
@@ -63,74 +70,66 @@ export default function NextMatchBar({ slots }: { slots: MatchSlots }) {
   const detailsHref = match.id != null ? `/utakmice/${match.id}` : null;
 
   return (
-    <section className="mx-auto max-w-6xl px-6 py-16 md:py-20">
-      <h2 className="text-3xl font-bold uppercase tracking-tight md:text-4xl">
-        {heading}
-      </h2>
+    <section
+      id="utakmice"
+      className="relative isolate overflow-hidden bg-ink-deep py-20 text-white md:py-28"
+    >
+      {/* Atmosfera: crveni sjaj + dijagonalni raster + zrno */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -left-40 top-1/2 -z-10 size-[42rem] -translate-y-1/2 rounded-full bg-club-red/20 blur-3xl"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10 bg-[repeating-linear-gradient(115deg,transparent,transparent_44px,rgba(255,255,255,0.025)_44px,rgba(255,255,255,0.025)_88px)]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10 bg-grain opacity-[0.06] mix-blend-overlay"
+      />
+      {/* Ogroman outlined VS watermark */}
+      <span
+        aria-hidden
+        className="[--text-stroke-color:rgba(255,255,255,0.07)] pointer-events-none absolute left-1/2 top-1/2 -z-10 -translate-x-1/2 -translate-y-1/2 select-none font-display text-[38vw] uppercase leading-none text-stroke-thick md:text-[24rem]"
+      >
+        VS
+      </span>
 
-      <div className="mt-8 md:mt-10">
-        {/* Crvena gradient kartica (jezik player-kartica) */}
-        <div className="relative overflow-hidden rounded-2xl bg-[linear-gradient(135deg,#e5292f_0%,#a51419_100%)] px-6 py-10 text-white shadow-[0_30px_70px_-32px_rgba(165,20,25,0.7)] sm:px-12 sm:py-14">
-          {/* Dijagonalni raster */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 bg-[repeating-linear-gradient(115deg,transparent,transparent_38px,rgba(255,255,255,0.045)_38px,rgba(255,255,255,0.045)_76px)]"
-          />
-          {/* Meki krugovi */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-white/10 blur-2xl"
-          />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -bottom-24 -left-12 h-64 w-64 rounded-full bg-black/10 blur-3xl"
-          />
-          {/* Zlatni hairline gore */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-club-gold/70 to-transparent"
-          />
+      <div className="mx-auto max-w-6xl px-6">
+        <SectionRow
+          index="02"
+          eyebrow={isNext ? "Matchday" : "Posljednji rezultat"}
+          meta={meta}
+        />
 
-          {/* Meta: natjecanje */}
-          {meta && (
-            <div className="relative mb-8 flex items-center gap-2.5 sm:mb-10">
-              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-club-gold" />
-              <span className="text-[0.7rem] font-bold uppercase tracking-[0.2em] text-white/80 sm:text-xs">
-                {meta}
-              </span>
-            </div>
-          )}
-
+        <FadeInView className="mt-14 md:mt-20">
           {/* Scoreboard */}
-          <div className="relative grid grid-cols-[1fr_auto_1fr] items-center gap-3 sm:gap-8">
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4 sm:gap-10">
             <TeamBlock
               picture={match.homeTeam?.picture}
               name={match.homeTeam?.name}
-              winner={hasScore && home! > away!}
+              winner={!hasScore || home! >= away!}
             />
 
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center gap-5">
               {hasScore ? (
-                <div className="flex items-baseline gap-2.5 font-display text-6xl font-black leading-none tabular-nums sm:gap-4 sm:text-7xl">
-                  <span className={home! > away! ? "text-white" : "text-white/40"}>
+                <div className="flex items-baseline gap-3 font-display text-7xl leading-none tabular-nums sm:gap-5 sm:text-9xl">
+                  <span
+                    className={home! > away! ? "text-white" : "text-white/35"}
+                  >
                     {home}
                   </span>
-                  <span className="text-4xl font-light text-white/25 sm:text-5xl">:</span>
-                  <span className={away! > home! ? "text-white" : "text-white/40"}>
+                  <span className="text-4xl text-club-red sm:text-6xl">:</span>
+                  <span
+                    className={away! > home! ? "text-white" : "text-white/35"}
+                  >
                     {away}
                   </span>
                 </div>
               ) : isNext ? (
-                <div className="flex flex-col items-center gap-2.5">
-                  <span className="font-display text-4xl font-black uppercase tracking-tight text-white/90 sm:text-5xl">
-                    vs
-                  </span>
-                  <span className="rounded-md bg-white px-2.5 py-1 text-sm font-black tabular-nums text-club-red shadow-sm">
-                    {time}
-                  </span>
-                </div>
+                <Countdown target={kickoff} />
               ) : (
-                <span className="font-display text-4xl font-black sm:text-5xl">
+                <span className="font-display text-6xl sm:text-8xl">
                   {match.result ?? "–"}
                 </span>
               )}
@@ -139,20 +138,23 @@ export default function NextMatchBar({ slots }: { slots: MatchSlots }) {
             <TeamBlock
               picture={match.awayTeam?.picture}
               name={match.awayTeam?.name}
-              winner={hasScore && away! > home!}
+              winner={!hasScore || away! >= home!}
             />
           </div>
 
-          {/* Footer: datum + lokacija + CTA */}
-          <div className="relative mt-10 flex flex-col items-center gap-5 border-t border-white/15 pt-6">
-            <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-white/70">
-              <span className="tabular-nums text-white/90">
-                {weekdayShort} {day} {monthShort}
+          {/* Meta + CTA */}
+          <div className="mt-14 flex flex-col items-center gap-6 border-t border-white/10 pt-8 md:mt-16">
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-[0.68rem] font-bold uppercase tracking-[0.24em] text-white/55">
+              <span className="tabular-nums text-white">
+                {weekdayShort} {day}. {monthShort}
                 {isNext ? ` · ${time}` : ""}
               </span>
               {venue && (
                 <>
-                  <span className="h-1 w-1 rounded-full bg-club-gold" />
+                  <span
+                    aria-hidden
+                    className="size-1.5 rotate-45 bg-club-red"
+                  />
                   <span>{venue}</span>
                 </>
               )}
@@ -161,15 +163,43 @@ export default function NextMatchBar({ slots }: { slots: MatchSlots }) {
             {detailsHref && (
               <Link
                 href={detailsHref}
-                className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-2.5 text-xs font-bold uppercase tracking-wide text-club-red transition-transform hover:scale-105"
+                className="group inline-flex items-center gap-3 bg-club-red px-8 py-4 text-xs font-black uppercase tracking-[0.18em] text-white transition-colors duration-300 hover:bg-white hover:text-ink-deep"
               >
-                Vidi detalje
-                <ArrowRight className="size-4" />
+                Detalji utakmice
+                <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
               </Link>
             )}
           </div>
-        </div>
+        </FadeInView>
       </div>
     </section>
+  );
+}
+
+/** Gornji editorial red sekcije na tamnoj podlozi (broj + linija + meta). */
+function SectionRow({
+  index,
+  eyebrow,
+  meta,
+}: {
+  index: string;
+  eyebrow: string;
+  meta: string;
+}) {
+  return (
+    <div className="flex items-center gap-4">
+      <span className="font-display text-sm tabular-nums tracking-[0.2em] text-club-red">
+        N°{index}
+      </span>
+      <span aria-hidden className="h-px flex-1 bg-white/15" />
+      <span className="text-[0.62rem] font-bold uppercase tracking-[0.3em] text-white">
+        {eyebrow}
+      </span>
+      {meta && (
+        <span className="hidden text-[0.62rem] font-semibold uppercase tracking-[0.3em] text-white/40 sm:inline">
+          · {meta}
+        </span>
+      )}
+    </div>
   );
 }

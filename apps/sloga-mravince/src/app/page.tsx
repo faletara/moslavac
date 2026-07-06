@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
 import CtaSection from "@/components/features/home/CtaSection";
+import HeritageSection from "@/components/features/home/HeritageSection";
 import Hero from "@/components/features/home/Hero";
+import MarqueeStrip from "@/components/features/home/MarqueeStrip";
 import NewsSection from "@/components/features/home/NewsSection";
 import NextMatchBar from "@/components/features/home/NextMatchBar";
+import PartnersSection from "@/components/features/home/PartnersSection";
 import PlayersSection from "@/components/features/home/PlayersSection";
 import ShopSection from "@/components/features/home/ShopSection";
+import StadiumSection from "@/components/features/home/StadiumSection";
 import StandingsSection from "@/components/features/home/StandingsSection";
 import { fetchMatchSlots, fetchSeniorCompetition } from "@/lib/hns/competitions";
 import { fetchTeamStandings } from "@/lib/hns/standings";
@@ -50,18 +54,30 @@ export default async function HomePage() {
       ? logo
       : logo.url;
 
+  const marqueeItems = [
+    tenant.displayName,
+    "Od 1925.",
+    "Stadion Glavica",
+    "Mravince · Dalmacija",
+    "Jedan klub · Jedna Sloga",
+  ];
+
   return (
     <div>
-      {/* Hero puni ekran (viewport minus 5rem header); scoreboard je zasebna sekcija ispod */}
+      {/* Hero puni ekran (viewport minus 5rem header) */}
       <div className="flex h-[calc(100svh-5rem)] flex-col">
         <Hero tenant={tenant} news={heroNews} crestSrc={crestSrc} />
       </div>
-      <NextMatchBar slots={matchSlots} />
+      <MarqueeStrip items={marqueeItems} />
       <NewsSection news={allNews} crestSrc={crestSrc} />
+      <NextMatchBar slots={matchSlots} />
       <StandingsSection rows={standings} />
       <PlayersSection players={roster} />
+      <StadiumSection />
+      <HeritageSection />
       <ShopSection />
       <CtaSection tenant={tenant} />
+      <PartnersSection />
     </div>
   );
 }
