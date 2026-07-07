@@ -35,7 +35,7 @@ export default function StadiumSection() {
 
       {/* Meta uz donji rub */}
       <div className="absolute inset-x-0 bottom-0">
-        <div className="mx-auto flex w-full max-w-6xl flex-wrap items-end justify-between gap-6 px-6 pb-10 md:pb-14">
+        <div className="mx-auto flex w-full max-w-6xl flex-wrap items-end px-6 pb-10 md:pb-14">
           <div>
             <p className="text-[0.62rem] font-bold uppercase tracking-[0.3em] text-club-gold">
               Naš dom
@@ -45,14 +45,6 @@ export default function StadiumSection() {
             </h2>
             <p className="mt-2 text-xs font-semibold uppercase tracking-[0.28em] text-white/50">
               Mravince · Dalmacija
-            </p>
-          </div>
-          <div className="hidden text-right sm:block">
-            <p className="font-display text-4xl leading-none tabular-nums text-white md:text-5xl">
-              1500
-            </p>
-            <p className="mt-2 text-[0.62rem] font-bold uppercase tracking-[0.3em] text-white/50">
-              Kapacitet
             </p>
           </div>
         </div>

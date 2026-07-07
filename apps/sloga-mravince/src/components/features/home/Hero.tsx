@@ -130,16 +130,16 @@ function HeroSlider({
       />
 
       {/* Vertikalna heritage traka — lijevi rub */}
-      <div
+      {/* <div
         aria-hidden
         className="pointer-events-none absolute inset-y-0 left-0 hidden w-14 items-center justify-center border-r border-white/10 lg:flex"
       >
         <span className="rotate-180 whitespace-nowrap text-[0.6rem] font-bold uppercase tracking-[0.5em] text-white/45 [writing-mode:vertical-rl]">
           {clubName} · Od 1925 · Stadion Glavica
         </span>
-      </div>
+      </div> */}
 
-      {/* Veliki redni broj slajda — gore desno */}
+      {/* Veliki redni broj slajda — gore desno
       {count > 1 && (
         <div
           aria-hidden
@@ -161,7 +161,7 @@ function HeroSlider({
             / {String(count).padStart(2, "0")}
           </span>
         </div>
-      )}
+      )} */}
 
       {/* Sadržaj dolje-lijevo */}
       <div className="absolute inset-x-0 bottom-0 px-6 pb-24 md:px-14 md:pb-24 lg:pl-24">
@@ -199,8 +199,8 @@ function HeroSlider({
               </motion.p>
 
               {/* Naslov — clip reveal */}
-              <h1 className="mt-5 font-display uppercase leading-[0.95] tracking-normal text-white">
-                <span className="block overflow-hidden pb-1">
+              <h1 className="mt-5 font-display uppercase leading-[1.14] tracking-normal text-white">
+                <span className="block overflow-hidden pt-[0.18em] pb-[0.06em]">
                   <motion.span
                     variants={{
                       hidden: reduced ? {} : { y: "110%" },
@@ -209,7 +209,7 @@ function HeroSlider({
                         transition: { duration: 0.75, ease: EXPO_OUT },
                       },
                     }}
-                    className="block text-balance text-4xl sm:text-5xl md:text-7xl"
+                    className="block pt-[0.02em] text-balance text-4xl sm:text-5xl md:text-7xl"
                   >
                     {active.title}
                   </motion.span>

@@ -48,11 +48,11 @@ export default function CtaSection({ tenant }: { tenant: FrontendTenant }) {
             {founded ? `${clubName} · od ${founded}.` : clubName}
           </p>
 
-          <h2 className="mt-7 font-display uppercase leading-[0.9] tracking-normal drop-shadow-[0_4px_30px_rgba(0,0,0,0.6)]">
-            <span className="block text-6xl sm:text-7xl md:text-8xl">
+          <h2 className="mt-7 flex flex-col gap-3 font-display uppercase leading-[1.12] tracking-normal drop-shadow-[0_4px_30px_rgba(0,0,0,0.6)] sm:gap-4">
+            <span className="block pt-[0.12em] text-6xl sm:text-7xl md:text-8xl">
               Postani dio
             </span>
-            <span className="[--text-stroke-color:#ffffff] block text-6xl text-stroke-thick sm:text-7xl md:text-8xl">
+            <span className="[--text-stroke-color:#ffffff] block pt-[0.18em] text-6xl text-stroke-thick sm:text-7xl md:text-8xl">
               naše priče
             </span>
           </h2>

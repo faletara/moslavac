@@ -6,7 +6,6 @@ import { AnimatedCounter, FadeInView } from "@/components/animations";
 const STATS = [
   { value: 1925, label: "Godina osnivanja" },
   { value: 101, label: "Godina tradicije" },
-  { value: 1500, label: "Kapacitet stadiona" },
 ] as const;
 
 /**
@@ -34,11 +33,7 @@ export default function HeritageSection() {
       </span>
 
       <div className="mx-auto max-w-6xl px-6">
-        <div className="flex items-center gap-4">
-          <span className="font-display text-sm tabular-nums tracking-[0.2em] text-club-gold">
-            N°05
-          </span>
-          <span aria-hidden className="h-px flex-1 bg-white/15" />
+        <div className="flex items-center">
           <span className="text-[0.62rem] font-bold uppercase tracking-[0.3em] text-white/45">
             Naša povijest
           </span>
@@ -46,11 +41,11 @@ export default function HeritageSection() {
 
         <div className="mt-12 grid gap-16 md:grid-cols-2 md:items-center md:gap-20">
           <div>
-            <h2 className="font-display uppercase leading-[0.9] tracking-normal">
-              <span className="block text-5xl text-white sm:text-6xl md:text-7xl">
+            <h2 className="flex flex-col gap-1 font-display uppercase leading-[1.14] tracking-normal sm:gap-2">
+              <span className="block pt-[0.12em] text-5xl text-white sm:text-6xl md:text-7xl">
                 Jedno stoljeće
               </span>
-              <span className="block text-5xl text-club-red sm:text-6xl md:text-7xl">
+              <span className="block pt-[0.12em] text-5xl text-club-red sm:text-6xl md:text-7xl">
                 Sloge
               </span>
             </h2>
@@ -60,7 +55,7 @@ export default function HeritageSection() {
               ljudi koji čine Slogu onim što jest.
             </p>
 
-            <div className="mt-12 grid grid-cols-3 gap-6">
+            <div className="mt-12 grid grid-cols-2 gap-6">
               {STATS.map(({ value, label }) => (
                 <div key={label} className="border-l border-white/12 pl-4">
                   <AnimatedCounter

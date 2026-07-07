@@ -17,7 +17,6 @@ export default function ShopSection() {
   return (
     <section className="mx-auto max-w-6xl px-6 py-20 md:py-28">
       <SectionHead
-        index="06"
         eyebrow="Nosi boje kluba"
         title="Klupski webshop"
       />

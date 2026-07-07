@@ -1,8 +1,9 @@
-import { Fragment } from "react";
+import { Fragment, type CSSProperties } from "react";
 import { cn } from "@/lib/utils";
 
 interface MarqueeStripProps {
   items: string[];
+  ariaLabel?: string;
   className?: string;
   /** Seconds for one full loop. */
   duration?: number;
@@ -37,21 +38,27 @@ function StripHalf({ items }: { items: string[] }) {
  */
 export default function MarqueeStrip({
   items,
+  ariaLabel,
   className,
   duration = 28,
 }: MarqueeStripProps) {
   if (items.length === 0) return null;
 
+  const accessibleText = ariaLabel ?? items.join(" · ");
+
   return (
     <div
-      aria-hidden
       className={cn(
         "flex overflow-hidden border-y border-black/25 bg-club-red py-3.5 text-white sm:py-4",
         className,
       )}
-      style={{ "--marquee-duration": `${duration}s` } as React.CSSProperties}
+      style={{ "--marquee-duration": `${duration}s` } as CSSProperties}
     >
-      <div className="flex w-max animate-marquee items-center motion-reduce:[animation:none]">
+      <span className="sr-only">{accessibleText}</span>
+      <div
+        aria-hidden
+        className="flex w-max animate-marquee items-center motion-reduce:[animation:none]"
+      >
         <StripHalf items={items} />
         <StripHalf items={items} />
       </div>

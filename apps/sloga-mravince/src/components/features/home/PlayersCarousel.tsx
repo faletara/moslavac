@@ -68,7 +68,7 @@ function PlayerCard({ player }: { player: RosterEntry }) {
             {first}
           </p>
         )}
-        <p className="font-display text-3xl uppercase leading-[0.95] tracking-wide text-white sm:text-4xl">
+        <p className="mt-1.5 pt-[0.16em] font-display text-3xl uppercase leading-[1.12] tracking-wide text-white sm:text-4xl">
           {last}
         </p>
       </div>

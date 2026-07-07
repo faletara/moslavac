@@ -33,7 +33,6 @@ export default function PlayersSection({
       <div className="mx-auto max-w-6xl px-6">
         <SectionHead
           dark
-          index="04"
           eyebrow="Prva momčad"
           title="Naši igrači"
           link={{ href: "/momcad", label: "Svi igrači" }}

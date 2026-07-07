@@ -1,6 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
-import { FadeInView, StaggerContainer, StaggerItem } from "@/components/animations";
+import {
+  FadeInView,
+  StaggerContainer,
+  StaggerItem,
+} from "@/components/animations";
 import { formatDateLong } from "@/lib/helpers/date";
 import { cn } from "@/lib/utils";
 import type { News } from "@/types/news";
@@ -66,7 +70,7 @@ function FeatureCard({ item, crestSrc }: { item: News; crestSrc: string }) {
             {formatDateLong(item.date)}
           </span>
         </p>
-        <h3 className="mt-4 max-w-xl font-display text-3xl uppercase leading-[0.98] text-white sm:text-4xl md:text-5xl">
+        <h3 className="mt-4 max-w-xl pt-[0.14em] font-display text-3xl uppercase leading-[1.14] text-white sm:text-4xl md:text-5xl">
           {item.title}
         </h3>
       </div>
@@ -89,9 +93,6 @@ function ListRow({
       href={`/novosti/${item.slug}`}
       className="group flex items-center gap-5 border-b border-foreground/10 py-5 first:pt-0 last:border-b-0"
     >
-      <span className="hidden w-8 shrink-0 font-display text-sm tabular-nums text-foreground/30 transition-colors group-hover:text-club-red sm:block">
-        {String(index).padStart(2, "0")}
-      </span>
       <Thumb
         item={item}
         crestSrc={crestSrc}
@@ -131,7 +132,6 @@ export default function NewsSection({
   return (
     <section className="mx-auto max-w-6xl px-6 py-20 md:py-28">
       <SectionHead
-        index="01"
         eyebrow="Aktualno iz kluba"
         title="Novosti"
         link={{ href: "/novosti", label: "Sve vijesti" }}
@@ -156,7 +156,7 @@ export default function NewsSection({
           )}
         </div>
       </FadeInView>
-
+      {/*
       {bottom.length > 0 && (
         <StaggerContainer className="mt-12 grid grid-cols-2 gap-x-5 gap-y-10 md:mt-16 lg:grid-cols-4">
           {bottom.map((item) => (
@@ -178,7 +178,7 @@ export default function NewsSection({
             </StaggerItem>
           ))}
         </StaggerContainer>
-      )}
+      )} */}
 
       <div className="mt-12 sm:hidden">
         <Link

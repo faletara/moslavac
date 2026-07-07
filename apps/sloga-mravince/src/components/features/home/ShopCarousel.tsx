@@ -108,7 +108,7 @@ function ProductCard({ product }: { product: ShopProduct }) {
 
       {/* Naziv + cijena */}
       <div className="absolute inset-x-6 bottom-6">
-        <h3 className="truncate font-display text-xl uppercase leading-[0.95] tracking-wide text-white transition-colors group-hover:text-white/80 sm:text-2xl">
+        <h3 className="truncate pt-[0.14em] font-display text-xl uppercase leading-[1.12] tracking-wide text-white transition-colors group-hover:text-white/80 sm:text-2xl">
           {product.name}
         </h3>
         <p className={`mt-2 font-display text-lg tabular-nums ${ACCENT_TEXT[product.accent]}`}>

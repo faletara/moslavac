@@ -6,7 +6,6 @@ import "./globals.css";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import Providers from "@/components/providers/Providers";
-import SmoothScroll from "@/components/providers/SmoothScroll";
 import { getTenant } from "@/lib/payload/getTenant";
 import { BASE_URL } from "@/lib/siteUrl";
 
@@ -152,7 +151,6 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
         />
         <Providers tenant={tenant}>
-          <SmoothScroll />
           <Header tenant={tenant} />
           <main className="flex-1 overflow-x-clip">{children}</main>
           <Footer tenant={tenant} />

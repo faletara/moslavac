@@ -10,13 +10,55 @@ import PlayersSection from "@/components/features/home/PlayersSection";
 import ShopSection from "@/components/features/home/ShopSection";
 import StadiumSection from "@/components/features/home/StadiumSection";
 import StandingsSection from "@/components/features/home/StandingsSection";
+import { formatDateParts } from "@/lib/helpers/date";
 import { fetchMatchSlots, fetchSeniorCompetition } from "@/lib/hns/competitions";
 import { fetchTeamStandings } from "@/lib/hns/standings";
 import { fetchNewsPaginated } from "@/lib/payload/getNews";
 import { fetchRoster } from "@/lib/payload/getRoster";
 import { getTenant } from "@/lib/payload/getTenant";
+import type { HnsMatch, MatchSlots } from "@/types/hns";
 
 export const revalidate = 60;
+
+function isRealMatch(
+  match: HnsMatch | null | undefined,
+): match is HnsMatch & { dateTimeUTC: number } {
+  return (
+    match != null && Object.keys(match).length > 0 && match.dateTimeUTC != null
+  );
+}
+
+function getNextMatchMarquee(
+  slots: MatchSlots,
+  clubName: string,
+): { items: string[]; ariaLabel: string } {
+  if (!isRealMatch(slots.next)) {
+    const items = ["Sljedeća utakmica", "Raspored uskoro", clubName];
+    return { items, ariaLabel: items.join(" · ") };
+  }
+
+  const match = slots.next;
+  const { weekdayShort, day, monthShort, time } = formatDateParts(
+    match.dateTimeUTC,
+  );
+  const teams =
+    [match.homeTeam?.name, match.awayTeam?.name].filter(Boolean).join(" - ") ||
+    clubName;
+  const kickoff = `${weekdayShort} ${day}. ${monthShort} · ${time}`;
+  const venue = match.facility?.name ?? match.facility?.place;
+  const competition = [match.competition?.name, match.round]
+    .filter(Boolean)
+    .join(" · ");
+  const items = [
+    "Sljedeća utakmica",
+    teams,
+    kickoff,
+    venue,
+    competition,
+  ].filter((item): item is string => Boolean(item));
+
+  return { items, ariaLabel: items.join(" · ") };
+}
 
 export async function generateMetadata(): Promise<Metadata> {
   const tenant = await getTenant();
@@ -54,13 +96,7 @@ export default async function HomePage() {
       ? logo
       : logo.url;
 
-  const marqueeItems = [
-    tenant.displayName,
-    "Od 1925.",
-    "Stadion Glavica",
-    "Mravince · Dalmacija",
-    "Jedan klub · Jedna Sloga",
-  ];
+  const marquee = getNextMatchMarquee(matchSlots, tenant.displayName);
 
   return (
     <div>
@@ -68,7 +104,7 @@ export default async function HomePage() {
       <div className="flex h-[calc(100svh-5rem)] flex-col">
         <Hero tenant={tenant} news={heroNews} crestSrc={crestSrc} />
       </div>
-      <MarqueeStrip items={marqueeItems} />
+      <MarqueeStrip items={marquee.items} ariaLabel={marquee.ariaLabel} />
       <NewsSection news={allNews} crestSrc={crestSrc} />
       <NextMatchBar slots={matchSlots} />
       <StandingsSection rows={standings} />

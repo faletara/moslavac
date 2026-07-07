@@ -73,7 +73,7 @@ export function PageHero({
         lines={lines}
         ariaLabel={ariaLabel}
         delay={0.1}
-        className="select-none text-balance font-display font-black uppercase leading-[0.85] tracking-[-0.02em]"
+        className="select-none space-y-1 text-balance font-display font-black uppercase leading-[1.14] tracking-[-0.02em] sm:space-y-2"
         lineClassName={lineClassName}
       />
 

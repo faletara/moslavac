@@ -3,9 +3,7 @@ import { RevealHeading } from "@/components/animations";
 import { cn } from "@/lib/utils";
 
 interface SectionHeadProps {
-  /** Redni broj sekcije, npr. "01". */
-  index: string;
-  /** Mala uppercase najava uz broj. */
+  /** Mala uppercase najava sekcije. */
   eyebrow: string;
   /** Veliki Anton naslov — niz renderira više reveal linija. */
   title: string | string[];
@@ -17,12 +15,10 @@ interface SectionHeadProps {
 }
 
 /**
- * Editorial zaglavlje sekcije — potpis redizajna: gornji red s rednim brojem,
- * hairline linijom, eyebrow tekstom i opcionalnim linkom, ispod masivni Anton
- * naslov s clip-reveal ulaskom.
+ * Editorial zaglavlje sekcije: gornji red s eyebrow tekstom i opcionalnim
+ * linkom, ispod masivni Anton naslov s clip-reveal ulaskom.
  */
 export default function SectionHead({
-  index,
   eyebrow,
   title,
   link,
@@ -34,14 +30,7 @@ export default function SectionHead({
 
   return (
     <div className={cn(dark ? "text-white" : "text-foreground", className)}>
-      <div className="flex items-center gap-4">
-        <span className="font-display text-sm tabular-nums tracking-[0.2em] text-club-red">
-          N°{index}
-        </span>
-        <span
-          aria-hidden
-          className={cn("h-px flex-1", dark ? "bg-white/15" : "bg-foreground/15")}
-        />
+      <div className="flex items-center justify-between gap-4">
         <span
           className={cn(
             "text-[0.62rem] font-bold uppercase tracking-[0.3em]",
@@ -73,7 +62,7 @@ export default function SectionHead({
 
       <RevealHeading
         lines={lines}
-        className="mt-6 font-display uppercase leading-[0.92] tracking-normal"
+        className="mt-5 space-y-1 font-display uppercase leading-[1.14] tracking-normal sm:space-y-2"
         lineClassName="text-5xl sm:text-6xl md:text-7xl"
       />
     </div>

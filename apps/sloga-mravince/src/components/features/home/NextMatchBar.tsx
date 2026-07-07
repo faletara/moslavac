@@ -24,8 +24,8 @@ function TeamBlock({
   winner: boolean;
 }) {
   return (
-    <div className="flex flex-col items-center gap-5 text-center">
-      <div className="bg-white p-3 shadow-[0_18px_40px_-14px_rgba(0,0,0,0.7)] clip-corner sm:p-4">
+    <div className="grid grid-rows-[5.5rem_minmax(3rem,auto)] justify-items-center gap-5 text-center sm:grid-rows-[8rem_minmax(4rem,auto)]">
+      <div className="row-start-1 flex size-[5.5rem] items-center justify-center bg-white p-3 shadow-[0_18px_40px_-14px_rgba(0,0,0,0.7)] clip-corner sm:size-32 sm:p-4">
         <HnsCrest
           picture={picture}
           name={name}
@@ -35,7 +35,7 @@ function TeamBlock({
       </div>
       <span
         className={cn(
-          "max-w-36 font-display text-lg uppercase leading-[1.05] tracking-wide sm:max-w-52 sm:text-2xl",
+          "row-start-2 max-w-36 self-start font-display text-lg uppercase leading-[1.05] tracking-wide sm:max-w-52 sm:text-2xl",
           winner ? "text-white" : "text-white/60",
         )}
       >
@@ -97,7 +97,6 @@ export default function NextMatchBar({ slots }: { slots: MatchSlots }) {
 
       <div className="mx-auto max-w-6xl px-6">
         <SectionRow
-          index="02"
           eyebrow={isNext ? "Matchday" : "Posljednji rezultat"}
           meta={meta}
         />
@@ -176,22 +175,16 @@ export default function NextMatchBar({ slots }: { slots: MatchSlots }) {
   );
 }
 
-/** Gornji editorial red sekcije na tamnoj podlozi (broj + linija + meta). */
+/** Gornji editorial red sekcije na tamnoj podlozi. */
 function SectionRow({
-  index,
   eyebrow,
   meta,
 }: {
-  index: string;
   eyebrow: string;
   meta: string;
 }) {
   return (
-    <div className="flex items-center gap-4">
-      <span className="font-display text-sm tabular-nums tracking-[0.2em] text-club-red">
-        N°{index}
-      </span>
-      <span aria-hidden className="h-px flex-1 bg-white/15" />
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
       <span className="text-[0.62rem] font-bold uppercase tracking-[0.3em] text-white">
         {eyebrow}
       </span>

@@ -21,7 +21,7 @@ export default function StandingsSection({ rows }: { rows: TeamRanking[] }) {
 
   return (
     <section className="mx-auto max-w-6xl px-6 py-20 md:py-28">
-      <SectionHead index="03" eyebrow="Seniori · Prvenstvo" title="Tablica" />
+      <SectionHead eyebrow="Seniori · Prvenstvo" title="Tablica" />
 
       <FadeInView className="mt-12 md:mt-16">
         <div className="-mx-2 overflow-x-auto sm:mx-0">
