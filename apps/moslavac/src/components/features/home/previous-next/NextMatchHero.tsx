@@ -21,6 +21,14 @@ function formatRound(round: string | null): string | null {
   return /^\d+$/.test(trimmed) ? `Kolo ${trimmed}` : trimmed;
 }
 
+function TeamName({ name }: { name: string | null | undefined }) {
+  return (
+    <span className="line-clamp-2 min-h-[2.5em] max-w-[12ch] text-center text-base font-black uppercase leading-tight tracking-tight sm:text-lg md:max-w-[16ch] md:text-xl">
+      {name ?? "N/A"}
+    </span>
+  );
+}
+
 export function NextMatchHero({ match }: NextMatchHeroProps) {
   const { date, time } = formatDateTime(match.dateTimeUTC ?? 0);
   const competition = match.competition?.name ?? null;
@@ -61,15 +69,31 @@ export function NextMatchHero({ match }: NextMatchHeroProps) {
       </div>
 
       <FadeInView delay={0.1} className="w-full">
-        <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-6 sm:gap-12 md:gap-16">
-          <TeamCrest team={match.homeTeam} size="lg" className="w-full" />
+        <div className="grid w-full grid-cols-[1fr_auto_1fr] grid-rows-[auto_auto] items-start gap-x-6 gap-y-3 sm:gap-x-12 md:gap-x-16">
+          <TeamCrest
+            team={match.homeTeam}
+            size="lg"
+            showName={false}
+            className="col-start-1 row-start-1 w-full"
+          />
           <span
             aria-hidden
-            className="font-display text-4xl font-black uppercase leading-none text-stroke [--text-stroke-color:color-mix(in_oklab,var(--chalk)_45%,transparent)] sm:text-6xl md:text-7xl"
+            className="col-start-2 row-start-1 self-center font-display text-4xl font-black uppercase leading-none text-stroke [--text-stroke-color:color-mix(in_oklab,var(--chalk)_45%,transparent)] sm:text-6xl md:text-7xl"
           >
             VS
           </span>
-          <TeamCrest team={match.awayTeam} size="lg" className="w-full" />
+          <TeamCrest
+            team={match.awayTeam}
+            size="lg"
+            showName={false}
+            className="col-start-3 row-start-1 w-full"
+          />
+          <div className="col-start-1 row-start-2 justify-self-center">
+            <TeamName name={match.homeTeam?.name} />
+          </div>
+          <div className="col-start-3 row-start-2 justify-self-center">
+            <TeamName name={match.awayTeam?.name} />
+          </div>
         </div>
       </FadeInView>
 

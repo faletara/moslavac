@@ -48,18 +48,18 @@ export function TeamCrest({
 
   return (
     <div className={cn("flex flex-col items-center gap-3", className)}>
-      <span className="rounded-full bg-chalk p-2.5 shadow-[0_8px_30px_-10px_rgb(0_0_0/0.5)] sm:p-3">
+      <span className="inline-flex items-center justify-center rounded-full bg-chalk p-2.5 shadow-[0_8px_30px_-10px_rgb(0_0_0/0.5)] sm:p-3">
         <HnsCrest
           picture={picture}
           name={name}
           size={CREST_PX[size]}
-          className={cn(CREST_CLASS[size], "object-contain")}
+          className={cn(CREST_CLASS[size], "block object-contain")}
         />
       </span>
       {showName && (
         <span
           className={cn(
-            "line-clamp-2 text-center font-black uppercase leading-tight tracking-tight",
+            "line-clamp-2 min-h-[2.5em] text-center font-black uppercase leading-tight tracking-tight",
             NAME_SIZE[size],
             NAME_WIDTH[size],
           )}

@@ -81,7 +81,7 @@ export default function MatchHero({
         className="absolute inset-0 -z-10 bg-linear-to-b from-navy-deep/40 via-transparent to-navy-deep"
       />
 
-      <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 sm:py-24">
+      <div className="mx-auto w-full max-w-5xl px-4 py-16 sm:px-6 sm:py-20 lg:py-24">
         {/* Eyebrow cluster */}
         <div className="flex flex-col items-center gap-3 text-center">
           <motion.p
@@ -107,13 +107,13 @@ export default function MatchHero({
         </div>
 
         {/* Desktop — horizontal broadcast line: NAME · crest · score · crest · NAME */}
-        <div className="mt-16 hidden items-center gap-6 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:gap-10">
-          <div className="flex items-center justify-end gap-6">
+        <div className="mt-14 hidden items-center gap-6 lg:grid lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:gap-8 xl:gap-10">
+          <div className="flex min-w-0 items-center justify-end gap-5 xl:gap-6">
             <TeamName name={homeName} align="right" reduced={!!reduced} side="home" />
             <Crest picture={homePicture} name={homeName} reduced={!!reduced} side="home" />
           </div>
           {score}
-          <div className="flex items-center gap-6">
+          <div className="flex min-w-0 items-center gap-5 xl:gap-6">
             <Crest picture={awayPicture} name={awayName} reduced={!!reduced} side="away" />
             <TeamName name={awayName} align="left" reduced={!!reduced} side="away" />
           </div>
@@ -121,18 +121,18 @@ export default function MatchHero({
 
         {/* Mobile / tablet — compact scoreboard: crests + score aligned on one
             row, names directly below in the same grid so they stay aligned. */}
-        <div className="mt-12 grid grid-cols-[1fr_auto_1fr] items-center gap-x-3 gap-y-5 sm:mt-14 sm:gap-x-6 lg:hidden">
-          <div className="col-start-1 row-start-1 flex justify-center">
+        <div className="mx-auto mt-11 grid w-full max-w-3xl grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center justify-items-center gap-x-2 gap-y-4 sm:mt-14 sm:gap-x-4 lg:hidden">
+          <div className="col-start-1 row-start-1 flex min-w-0 justify-center">
             <Crest picture={homePicture} name={homeName} reduced={!!reduced} side="home" />
           </div>
-          <div className="col-start-2 row-start-1">{score}</div>
-          <div className="col-start-3 row-start-1 flex justify-center">
+          <div className="col-start-2 row-start-1 flex justify-center">{score}</div>
+          <div className="col-start-3 row-start-1 flex min-w-0 justify-center">
             <Crest picture={awayPicture} name={awayName} reduced={!!reduced} side="away" />
           </div>
-          <h2 className="col-start-1 row-start-2 text-balance text-center font-display text-xl font-black uppercase leading-[0.95] tracking-tighter text-foreground sm:text-2xl">
+          <h2 className="col-start-1 row-start-2 w-full min-w-0 max-w-[9ch] justify-self-center break-words text-center font-display text-lg font-black uppercase leading-[0.98] tracking-tight text-foreground sm:max-w-[11ch] sm:text-xl md:text-2xl">
             {homeName}
           </h2>
-          <h2 className="col-start-3 row-start-2 text-balance text-center font-display text-xl font-black uppercase leading-[0.95] tracking-tighter text-foreground sm:text-2xl">
+          <h2 className="col-start-3 row-start-2 w-full min-w-0 max-w-[9ch] justify-self-center break-words text-center font-display text-lg font-black uppercase leading-[0.98] tracking-tight text-foreground sm:max-w-[11ch] sm:text-xl md:text-2xl">
             {awayName}
           </h2>
         </div>
@@ -175,19 +175,19 @@ function Scoreline({
       transition={{ duration: 0.8, delay: 0.15, ease: EXPO_OUT }}
     >
       {hasResult ? (
-        <div className="flex items-center gap-3 font-display font-black uppercase leading-none tracking-tighter sm:gap-5">
-          <span className="text-7xl tabular-nums sm:text-8xl lg:text-9xl">
+        <div className="flex items-center gap-2 font-display font-black uppercase leading-none tracking-tight sm:gap-4">
+          <span className="text-6xl tabular-nums sm:text-7xl lg:text-8xl xl:text-9xl">
             {homeScore}
           </span>
-          <span className="text-3xl font-light text-foreground/30 sm:text-5xl lg:text-6xl">
+          <span className="text-2xl font-light text-foreground/30 sm:text-4xl lg:text-5xl xl:text-6xl">
             :
           </span>
-          <span className="text-7xl tabular-nums sm:text-8xl lg:text-9xl">
+          <span className="text-6xl tabular-nums sm:text-7xl lg:text-8xl xl:text-9xl">
             {awayScore}
           </span>
         </div>
       ) : (
-        <span className="font-display text-4xl font-black uppercase leading-none tracking-tighter tabular-nums sm:text-6xl lg:text-8xl">
+        <span className="font-display text-3xl font-black uppercase leading-none tracking-tight tabular-nums sm:text-5xl lg:text-7xl">
           {time}
         </span>
       )}
@@ -222,7 +222,7 @@ function Crest({
         picture={picture}
         name={name}
         size={128}
-        className="size-20 sm:size-28 lg:size-24 xl:size-28"
+        className="size-[4.75rem] sm:size-24 lg:size-[5.75rem] xl:size-24"
       />
     </motion.div>
   );
@@ -243,7 +243,7 @@ function TeamName({
   return (
     <motion.h2
       className={cn(
-        "text-balance font-display font-black uppercase leading-[0.9] tracking-tighter text-foreground text-4xl xl:text-5xl",
+        "max-w-[11ch] break-words font-display text-3xl font-black uppercase leading-[0.95] tracking-tight text-foreground xl:max-w-[13ch] xl:text-4xl",
         align === "right" ? "text-right" : "text-left",
       )}
       initial={{ opacity: 0, x: reduced ? 0 : fromX }}
@@ -254,4 +254,3 @@ function TeamName({
     </motion.h2>
   );
 }
-

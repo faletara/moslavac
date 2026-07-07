@@ -32,6 +32,12 @@ const positionSingular: Record<RosterPosition, string> = {
 	trener: "Stručni stožer",
 };
 
+function splitDisplayNameLines(name: string): [string, string | null] {
+	const parts = name.trim().split(/\s+/).filter(Boolean);
+	if (parts.length <= 1) return [parts[0] ?? name, null];
+	return [parts[0]!, parts.slice(1).join(" ")];
+}
+
 export default function FirstTeamCarousel({
 	players,
 	totalPlayers,
@@ -120,6 +126,7 @@ export default function FirstTeamCarousel({
 }
 
 function PlayerPoster({ player }: { player: FirstTeamPlayer }) {
+	const [nameLineOne, nameLineTwo] = splitDisplayNameLines(player.displayName);
 	const initials = player.displayName
 		.split(/\s+/)
 		.map((p) => p[0] ?? "")
@@ -192,8 +199,19 @@ function PlayerPoster({ player }: { player: FirstTeamPlayer }) {
 							{positionSingular[player.position]}
 						</span>
 					</div>
-					<h3 className="max-w-[80%] text-balance font-display font-black uppercase leading-[0.9] tracking-tighter text-chalk text-xl sm:text-2xl">
-						{player.displayName}
+					<h3
+						aria-label={player.displayName}
+						className="grid min-h-[1.8em] max-w-[80%] grid-rows-2 font-display text-xl font-black uppercase leading-[0.9] tracking-normal text-chalk sm:text-2xl"
+					>
+						<span className="block whitespace-nowrap">{nameLineOne}</span>
+						<span
+							aria-hidden={nameLineTwo == null}
+							className={
+								nameLineTwo == null ? "block invisible" : "block whitespace-nowrap"
+							}
+						>
+							{nameLineTwo ?? nameLineOne}
+						</span>
 					</h3>
 				</div>
 

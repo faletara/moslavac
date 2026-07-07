@@ -84,10 +84,10 @@ export default function MatchTabs({
       onValueChange={handleTabChange}
       className="mt-12 sm:mt-16"
     >
-      <div className="flex justify-start overflow-x-auto border-b border-border [scrollbar-width:none] sm:justify-center [&::-webkit-scrollbar]:hidden">
+      <div className="-mx-4 overflow-x-auto border-b border-border px-4 [scrollbar-width:none] sm:mx-0 sm:overflow-visible sm:px-0 [&::-webkit-scrollbar]:hidden">
         <TabsList
           variant="line"
-          className="w-max shrink-0 gap-0 [&>button]:px-3 [&>button]:text-xs [&>button]:font-black [&>button]:uppercase [&>button]:tracking-[0.15em] [&>button]:after:bottom-[-1px] [&>button]:after:h-0.5 [&>button]:after:bg-primary [&>button]:data-[state=active]:text-foreground sm:[&>button]:px-5 sm:[&>button]:text-sm sm:[&>button]:tracking-[0.18em]"
+          className="grid min-w-max shrink-0 grid-cols-5 gap-0 sm:w-full sm:min-w-0 [&>button]:min-w-0 [&>button]:px-2.5 [&>button]:text-[0.65rem] [&>button]:font-black [&>button]:uppercase [&>button]:tracking-[0.1em] [&>button]:after:bottom-[-1px] [&>button]:after:h-0.5 [&>button]:after:bg-primary [&>button]:data-[state=active]:text-foreground sm:[&>button]:px-3 sm:[&>button]:text-xs sm:[&>button]:tracking-[0.14em] md:[&>button]:px-5 md:[&>button]:text-sm md:[&>button]:tracking-[0.16em]"
         >
           <TabsTrigger value="pregled">Pregled</TabsTrigger>
           <TabsTrigger value="postave">Postave</TabsTrigger>
