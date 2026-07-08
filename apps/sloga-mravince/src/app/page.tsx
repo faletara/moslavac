@@ -10,7 +10,10 @@ import PlayersSection from "@/components/features/home/PlayersSection";
 import StadiumSection from "@/components/features/home/StadiumSection";
 import StandingsSection from "@/components/features/home/StandingsSection";
 import { formatDateParts } from "@/lib/helpers/date";
-import { fetchMatchSlots, fetchSeniorCompetition } from "@/lib/hns/competitions";
+import {
+  fetchMatchSlots,
+  fetchSeniorCompetition,
+} from "@/lib/hns/competitions";
 import { fetchTeamStandings } from "@/lib/hns/standings";
 import { fetchNewsPaginated } from "@/lib/payload/getNews";
 import { fetchRoster } from "@/lib/payload/getRoster";
@@ -103,7 +106,7 @@ export default async function HomePage() {
       <div className="flex h-[calc(100svh-5rem)] flex-col">
         <Hero tenant={tenant} news={heroNews} crestSrc={crestSrc} />
       </div>
-      <MarqueeStrip items={marquee.items} ariaLabel={marquee.ariaLabel} />
+      {/* <MarqueeStrip items={marquee.items} ariaLabel={marquee.ariaLabel} /> */}
       <NewsSection news={allNews} crestSrc={crestSrc} />
       <NextMatchBar slots={matchSlots} />
       <StandingsSection rows={standings} />

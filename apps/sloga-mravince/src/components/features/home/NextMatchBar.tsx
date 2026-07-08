@@ -13,7 +13,7 @@ function isRealMatch(match: HnsMatch | null | undefined): match is HnsMatch {
   );
 }
 
-/** Jedan tim: veliki grb na bijeloj pločici + Anton naziv. */
+/** Jedan tim: veliki grb + Anton naziv. */
 function TeamBlock({
   picture,
   name,
@@ -25,7 +25,7 @@ function TeamBlock({
 }) {
   return (
     <div className="grid grid-rows-[5.5rem_minmax(3rem,auto)] justify-items-center gap-5 text-center sm:grid-rows-[8rem_minmax(4rem,auto)]">
-      <div className="row-start-1 flex size-[5.5rem] items-center justify-center bg-white p-3 shadow-[0_18px_40px_-14px_rgba(0,0,0,0.7)] clip-corner sm:size-32 sm:p-4">
+      <div className="row-start-1 flex size-[5.5rem] items-center justify-center sm:size-32">
         <HnsCrest
           picture={picture}
           name={name}

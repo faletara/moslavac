@@ -7,12 +7,17 @@ interface HeaderProps {
   tenant: FrontendTenant;
 }
 
-const NAV_ITEMS = [
+type NavItem = {
+  label: string;
+  href?: string;
+};
+
+const NAV_ITEMS: readonly NavItem[] = [
   { label: "Novosti", href: "/novosti" },
-  { label: "Momčad" },
-  { label: "Raspored i rezultati" },
+  { label: "Momčad", href: "/momcad" },
+  { label: "Raspored i rezultati", href: "/raspored-i-rezultati" },
   { label: "Webshop" },
-] as const;
+];
 
 /**
  * Editorial ink header — crna traka s crvenim hairline potpisom na vrhu,

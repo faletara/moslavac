@@ -199,8 +199,8 @@ function HeroSlider({
               </motion.p>
 
               {/* Naslov — clip reveal */}
-              <h1 className="mt-5 font-display uppercase leading-[1.14] tracking-normal text-white">
-                <span className="block overflow-hidden pt-[0.18em] pb-[0.06em]">
+              <h1 className="mt-5 font-display uppercase leading-[1.28] tracking-normal text-white sm:leading-[1.24] md:leading-[1.22]">
+                <span className="block overflow-hidden pt-[0.3em] pb-[0.12em]">
                   <motion.span
                     variants={{
                       hidden: reduced ? {} : { y: "110%" },
@@ -209,7 +209,7 @@ function HeroSlider({
                         transition: { duration: 0.75, ease: EXPO_OUT },
                       },
                     }}
-                    className="block pt-[0.02em] text-balance text-4xl sm:text-5xl md:text-7xl"
+                    className="block pt-[0.04em] text-balance text-4xl sm:text-5xl md:text-7xl"
                   >
                     {active.title}
                   </motion.span>
