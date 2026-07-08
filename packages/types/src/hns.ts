@@ -34,6 +34,7 @@ export interface HnsTeamDetails {
   country: string | null;
   place: string | null;
   email: string | null;
+  phone: string | null;
   mobilePhone: string | null;
   address: string | null;
   hasTeams: boolean | null;

@@ -8,17 +8,15 @@ interface HeaderProps {
 }
 
 const NAV_ITEMS = [
-  "Novosti",
-  "Momčad",
-  "Raspored i rezultati",
-  "Webshop",
+  { label: "Novosti", href: "/novosti" },
+  { label: "Momčad" },
+  { label: "Raspored i rezultati" },
+  { label: "Webshop" },
 ] as const;
 
 /**
  * Editorial ink header — crna traka s crvenim hairline potpisom na vrhu,
  * grb + Anton wordmark lijevo, navigacija desno s underline hover animacijom.
- * Itemi su placeholderi i ne vode nigdje — zamijeni ih linkovima kad kreiraš
- * odgovarajuće rute.
  */
 export default function Header({ tenant }: HeaderProps) {
   const logo =
@@ -56,20 +54,30 @@ export default function Header({ tenant }: HeaderProps) {
           </span>
         </Link>
 
-        <nav
-          aria-label="Glavna navigacija"
-          className="ml-auto hidden md:block"
-        >
+        <nav aria-label="Glavna navigacija" className="ml-auto hidden md:block">
           <ul className="flex items-center gap-9">
             {NAV_ITEMS.map((item) => (
-              <li key={item}>
-                <span className="group relative cursor-default pb-1 text-[0.72rem] font-bold uppercase tracking-[0.22em] text-chalk/80 transition-colors hover:text-chalk">
-                  {item}
-                  <span
-                    aria-hidden
-                    className="absolute inset-x-0 -bottom-0.5 h-0.5 origin-left scale-x-0 bg-club-red transition-transform duration-300 ease-out group-hover:scale-x-100"
-                  />
-                </span>
+              <li key={item.label}>
+                {item.href ? (
+                  <Link
+                    href={item.href}
+                    className="group relative pb-1 text-[0.72rem] font-bold uppercase tracking-[0.22em] text-chalk/80 transition-colors hover:text-chalk"
+                  >
+                    {item.label}
+                    <span
+                      aria-hidden
+                      className="absolute inset-x-0 -bottom-0.5 h-0.5 origin-left scale-x-0 bg-club-red transition-transform duration-300 ease-out group-hover:scale-x-100"
+                    />
+                  </Link>
+                ) : (
+                  <span className="group relative cursor-default pb-1 text-[0.72rem] font-bold uppercase tracking-[0.22em] text-chalk/80 transition-colors hover:text-chalk">
+                    {item.label}
+                    <span
+                      aria-hidden
+                      className="absolute inset-x-0 -bottom-0.5 h-0.5 origin-left scale-x-0 bg-club-red transition-transform duration-300 ease-out group-hover:scale-x-100"
+                    />
+                  </span>
+                )}
               </li>
             ))}
           </ul>

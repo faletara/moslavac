@@ -7,7 +7,6 @@ import NewsSection from "@/components/features/home/NewsSection";
 import NextMatchBar from "@/components/features/home/NextMatchBar";
 import PartnersSection from "@/components/features/home/PartnersSection";
 import PlayersSection from "@/components/features/home/PlayersSection";
-import ShopSection from "@/components/features/home/ShopSection";
 import StadiumSection from "@/components/features/home/StadiumSection";
 import StandingsSection from "@/components/features/home/StandingsSection";
 import { formatDateParts } from "@/lib/helpers/date";
@@ -111,7 +110,6 @@ export default async function HomePage() {
       <PlayersSection players={roster} />
       <StadiumSection />
       <HeritageSection />
-      <ShopSection />
       <CtaSection tenant={tenant} />
       <PartnersSection />
     </div>

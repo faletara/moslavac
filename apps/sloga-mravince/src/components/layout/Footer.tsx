@@ -1,9 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { FrontendTenant, PayloadMedia } from "@/lib/payload/types";
+import type { HnsTeamDetails } from "@/types/hns";
 
 interface FooterProps {
   tenant: FrontendTenant;
+  clubDetails: HnsTeamDetails | null;
 }
 
 const CLUB_ITEMS = [
@@ -14,13 +16,18 @@ const CLUB_ITEMS = [
   "Video",
 ] as const;
 
+function textOrNull(value: string | null | undefined): string | null {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : null;
+}
+
 /**
  * Ink footer s masivnim Anton wordmarkom preko cijele širine, crvenim
  * hairline potpisom na vrhu i stupcima podataka. Prikazuje samo stvarne
- * podatke iz tenanta — kontakt i društvene mreže renderiraju se samo ako
- * postoje. Klupski linkovi su placeholderi (nema ruta još).
+ * podatke iz tenanta i HNS-a — kontakt i društvene mreže renderiraju se samo
+ * ako postoje. Klupski linkovi su placeholderi (nema ruta još).
  */
-export default function Footer({ tenant }: FooterProps) {
+export default function Footer({ tenant, clubDetails }: FooterProps) {
   const year = new Date().getFullYear();
   const logo =
     tenant.branding?.logo && typeof tenant.branding.logo === "object"
@@ -29,7 +36,26 @@ export default function Footer({ tenant }: FooterProps) {
 
   const wordmark = tenant.branding?.shortName ?? tenant.displayName;
   const { contact, social, branding } = tenant;
-  const location = [contact?.address, contact?.city].filter(Boolean).join(", ");
+  const clubName = clubDetails?.name ?? tenant.displayName;
+  const email = textOrNull(clubDetails?.email) ?? textOrNull(contact?.email);
+  const phone =
+    textOrNull(clubDetails?.phone) ??
+    textOrNull(clubDetails?.mobilePhone) ??
+    textOrNull(contact?.phone);
+  const tenantLocation = [contact?.address, contact?.city]
+    .filter(Boolean)
+    .join(", ");
+  const address =
+    textOrNull(clubDetails?.address) ?? textOrNull(tenantLocation);
+  const stadium = textOrNull(clubDetails?.facility?.name);
+  const place = textOrNull(clubDetails?.place) ?? textOrNull(contact?.city);
+  const identityLocation = address;
+  const infoItems = [
+    { label: "Puni naziv", value: clubName },
+    stadium && { label: "Stadion", value: stadium },
+    address && { label: "Adresa", value: address },
+    place && !address?.includes(place) && { label: "Mjesto", value: place },
+  ].filter(Boolean) as { label: string; value: string }[];
 
   const socials = [
     social?.facebook && { label: "Facebook", href: social.facebook },
@@ -69,15 +95,15 @@ export default function Footer({ tenant }: FooterProps) {
                 </span>
               </span>
             </Link>
-            {location && (
+            {identityLocation && (
               <p className="mt-6 max-w-xs text-sm leading-relaxed text-chalk/55">
-                {location}
+                {identityLocation}
               </p>
             )}
           </div>
 
           {/* Stupci */}
-          <div className="grid grid-cols-2 gap-12 sm:grid-cols-3 sm:gap-16">
+          <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-4 lg:gap-14">
             <div>
               <h3 className="mb-5 text-[0.62rem] font-black uppercase tracking-[0.3em] text-club-red">
                 Klub
@@ -93,29 +119,49 @@ export default function Footer({ tenant }: FooterProps) {
               </ul>
             </div>
 
-            {(contact?.email || contact?.phone) && (
+            {infoItems.length > 0 && (
+              <div>
+                <h3 className="mb-5 text-[0.62rem] font-black uppercase tracking-[0.3em] text-club-red">
+                  Podaci
+                </h3>
+                <ul className="space-y-4 text-sm text-chalk/70">
+                  {infoItems.map((item) => (
+                    <li key={item.label}>
+                      <span className="block text-[0.56rem] font-black uppercase tracking-[0.24em] text-chalk/35">
+                        {item.label}
+                      </span>
+                      <span className="mt-1 block max-w-56 leading-relaxed">
+                        {item.value}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {(email || phone) && (
               <div>
                 <h3 className="mb-5 text-[0.62rem] font-black uppercase tracking-[0.3em] text-club-red">
                   Kontakt
                 </h3>
                 <ul className="space-y-3 text-sm text-chalk/70">
-                  {contact?.email && (
+                  {email && (
                     <li>
                       <a
-                        href={`mailto:${contact.email}`}
+                        href={`mailto:${email}`}
                         className="break-all transition-colors hover:text-chalk"
                       >
-                        {contact.email}
+                        {email}
                       </a>
                     </li>
                   )}
-                  {contact?.phone && (
+                  {phone && (
                     <li>
                       <a
-                        href={`tel:${contact.phone.replace(/\s/g, "")}`}
+                        href={`tel:${phone.replace(/\s/g, "")}`}
                         className="transition-colors hover:text-chalk"
                       >
-                        {contact.phone}
+                        {phone}
                       </a>
                     </li>
                   )}

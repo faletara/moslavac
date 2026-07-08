@@ -45,7 +45,7 @@ export function RevealHeading({
         {lines.map((line) => (
           <span
             key={line}
-            className={cn("block whitespace-nowrap pt-[0.16em]", lineClassName)}
+            className={cn("block whitespace-nowrap pt-[0.24em]", lineClassName)}
           >
             {line}
           </span>
@@ -70,10 +70,10 @@ export function RevealHeading({
         <span
           key={line}
           aria-hidden
-          className="block overflow-hidden pt-[0.18em] pb-[0.04em]"
+          className="-mt-[0.08em] block overflow-hidden pt-[0.28em] pb-[0.06em]"
         >
           <motion.span
-            className={cn("block whitespace-nowrap pt-[0.02em]", lineClassName)}
+            className={cn("block whitespace-nowrap pt-[0.04em]", lineClassName)}
             variants={{
               hidden: { y: "110%" },
               show: { y: 0, transition: { duration: 0.7, ease: EXPO_OUT } },

@@ -2,14 +2,20 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
+
+type NavItem = {
+  label: string;
+  href?: string;
+};
 
 /**
  * Mobilni izbornik (< md): hamburger otvara slide-in ink drawer zdesna s
  * velikim Anton itemima i rednim brojevima. Zatvara se na Escape, klik na
  * pozadinu ili odabir itema; dok je otvoren zaključava scroll pozadine.
  */
-export default function MobileNav({ items }: { items: readonly string[] }) {
+export default function MobileNav({ items }: { items: readonly NavItem[] }) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -71,20 +77,35 @@ export default function MobileNav({ items }: { items: readonly string[] }) {
                 aria-label="Glavna navigacija"
                 className="flex flex-col gap-7 px-8 pt-12"
               >
-                {items.map((item, i) => (
-                  <span
-                    key={item}
-                    onClick={() => setOpen(false)}
-                    className="flex cursor-default items-baseline gap-4"
-                  >
-                    <span className="text-[0.6rem] font-bold tabular-nums tracking-[0.3em] text-club-red">
-                      0{i + 1}
+                {items.map((item, i) =>
+                  item.href ? (
+                    <Link
+                      key={item.label}
+                      href={item.href}
+                      onClick={() => setOpen(false)}
+                      className="group flex items-baseline gap-4"
+                    >
+                      <span className="text-[0.6rem] font-bold tabular-nums tracking-[0.3em] text-club-red">
+                        0{i + 1}
+                      </span>
+                      <span className="font-display text-4xl uppercase leading-none tracking-wide transition-colors group-hover:text-club-red">
+                        {item.label}
+                      </span>
+                    </Link>
+                  ) : (
+                    <span
+                      key={item.label}
+                      className="flex cursor-default items-baseline gap-4"
+                    >
+                      <span className="text-[0.6rem] font-bold tabular-nums tracking-[0.3em] text-club-red">
+                        0{i + 1}
+                      </span>
+                      <span className="font-display text-4xl uppercase leading-none tracking-wide text-chalk/80">
+                        {item.label}
+                      </span>
                     </span>
-                    <span className="font-display text-4xl uppercase leading-none tracking-wide transition-colors hover:text-club-red">
-                      {item}
-                    </span>
-                  </span>
-                ))}
+                  ),
+                )}
               </nav>
 
               <p className="mt-auto px-8 pb-8 text-[0.6rem] font-semibold uppercase tracking-[0.3em] text-chalk/40">

@@ -3,16 +3,32 @@
 import Image from "next/image";
 import { AnimatedCounter, FadeInView } from "@/components/animations";
 
-const STATS = [
-  { value: 1925, label: "Godina osnivanja" },
-  { value: 101, label: "Godina tradicije" },
-] as const;
+const FOUNDING_DATE = {
+  year: 1925,
+  month: 6,
+  day: 15,
+} as const;
+
+function getTraditionYears(now = new Date()): number {
+  const anniversaryThisYear = new Date(
+    now.getFullYear(),
+    FOUNDING_DATE.month - 1,
+    FOUNDING_DATE.day,
+  );
+  const fullYears = now.getFullYear() - FOUNDING_DATE.year;
+  return now < anniversaryThisYear ? fullYears - 1 : fullYears;
+}
 
 /**
  * Heritage — ink sekcija stoljetne priče: ogroman Anton "OD 1925.", brojači,
  * jubilarni grb 100 godina u chalk okviru sa zlatnim prstenom.
  */
 export default function HeritageSection() {
+  const stats = [
+    { value: FOUNDING_DATE.year, label: "Godina osnivanja" },
+    { value: getTraditionYears(), label: "Godina tradicije" },
+  ] as const;
+
   return (
     <section className="relative isolate overflow-hidden bg-ink-deep py-24 text-white md:py-32">
       {/* Zlatni hairline gore + zrno */}
@@ -51,12 +67,12 @@ export default function HeritageSection() {
             </h2>
 
             <p className="mt-8 max-w-md text-base leading-relaxed text-white/55">
-              Od 1925. u srcu Mravinca. Generacije igrača, navijača i klupskih
-              ljudi koji čine Slogu onim što jest.
+              Od 15. lipnja 1925. u srcu Mravinca. Generacije igrača, navijača
+              i klupskih ljudi koji čine Slogu onim što jest.
             </p>
 
             <div className="mt-12 grid grid-cols-2 gap-6">
-              {STATS.map(({ value, label }) => (
+              {stats.map(({ value, label }) => (
                 <div key={label} className="border-l border-white/12 pl-4">
                   <AnimatedCounter
                     value={value}

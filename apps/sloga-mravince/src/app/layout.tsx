@@ -6,6 +6,7 @@ import "./globals.css";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import Providers from "@/components/providers/Providers";
+import { fetchClubDetails } from "@/lib/hns/team";
 import { getTenant } from "@/lib/payload/getTenant";
 import { BASE_URL } from "@/lib/siteUrl";
 
@@ -42,6 +43,15 @@ function clubNameVariants(
   if (shortName) variants.add(shortName);
   variants.delete(displayName);
   return [...variants];
+}
+
+async function getClubDetailsForLayout() {
+  try {
+    return await fetchClubDetails();
+  } catch (error) {
+    console.error("Failed to fetch HNS club details for layout", error);
+    return null;
+  }
 }
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -89,7 +99,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const tenant = await getTenant();
+  const [tenant, clubDetails] = await Promise.all([
+    getTenant(),
+    getClubDetailsForLayout(),
+  ]);
 
   const logo = tenant.branding?.logo;
   const logoUrl = !logo ? null : typeof logo === "string" ? logo : logo.url;
@@ -153,7 +166,7 @@ export default async function RootLayout({
         <Providers tenant={tenant}>
           <Header tenant={tenant} />
           <main className="flex-1 overflow-x-clip">{children}</main>
-          <Footer tenant={tenant} />
+          <Footer tenant={tenant} clubDetails={clubDetails} />
         </Providers>
         <Analytics />
         <SpeedInsights />
