@@ -70,6 +70,7 @@ export function PageHero({
 
       <RevealHeading
         as="h1"
+        rhythm
         lines={lines}
         ariaLabel={ariaLabel}
         delay={0.1}

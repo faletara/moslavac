@@ -26,6 +26,12 @@
       "@/lib/api": ["../../packages/api/src/index"],
       "@/lib/api/*": ["../../packages/api/src/*"],
       "@/components/ui/*": ["../../packages/ui/src/*"],
+      "@/lib/helpers/*": ["../../packages/lib/src/helpers/*"],
+      "@/lib/app-shell/*": ["../../packages/app-shell/src/*"],
+      "@/components/animations": ["../../packages/ui/src/animations/index"],
+      "@/components/animations/*": ["../../packages/ui/src/animations/*"],
+      "@/components/providers/*": ["../../packages/app-shell/src/providers/*"],
+      "@/components/feedback/*": ["../../packages/app-shell/src/feedback/*"],
       "@/*": ["./src/*"]
     }
   },

@@ -1,6 +1,10 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+@source "../../../../packages/ui/src";
+@source "../../../../packages/lib/src";
+@source "../../../../packages/app-shell/src";
+
 @custom-variant dark (&:is(.dark *));
 
 /* NK Vrapče brand sustav — boje s dresa (žuta + sky plava) + premium navy. */
@@ -51,6 +55,14 @@
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
 
+  --color-cat-seniors: var(--cat-seniors);
+  --color-cat-juniors: var(--cat-juniors);
+  --color-cat-cadets: var(--cat-cadets);
+  --color-cat-older-pioneers: var(--cat-older-pioneers);
+  --color-cat-younger-pioneers: var(--cat-younger-pioneers);
+  --color-cat-limaci: var(--cat-limaci);
+  --color-cat-prstici: var(--cat-prstici);
+
   /* Komponente su oštrih kutova (NK Vrapče dizajn): token-radiusi = 0.
      Fiksni radiusi (rounded-full, rounded-xs) i var(--radius) drugdje (npr.
      sonner toast, slike vijesti) ostaju nepromijenjeni. */
@@ -95,6 +107,15 @@
   --chart-3: #0a1c33;
   --chart-4: #e6b500;
   --chart-5: #1685b8;
+
+  /* Age-category ramp — blue family (oldest → youngest = dark → light). */
+  --cat-seniors: #013f6b;
+  --cat-juniors: #01497d;
+  --cat-cadets: #015a99;
+  --cat-older-pioneers: #026cb6;
+  --cat-younger-pioneers: #1f7bbf;
+  --cat-limaci: #3389c7;
+  --cat-prstici: #4a98cf;
 }
 
 @layer base {

@@ -42,7 +42,7 @@ export default async function RootLayout({
   return (
     <html lang="hr" className={`${geistSans.variable} ${saira.variable}`}>
       <body>
-        <Providers>
+        <Providers tenant={tenant}>
           {/* Sadržaj klizi preko footera — neprozirni bijeli sloj iznad (z-10),
               s donjim razmakom jednakim visini footera da ga zadnji scroll otkrije. */}
           <div className="relative z-10 mb-[var(--footer-h,0px)] flex min-h-screen flex-col bg-canvas">

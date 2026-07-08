@@ -19,6 +19,11 @@ interface RevealHeadingProps {
   staggerChildren?: number;
   /** Accessible label if the visible lines differ from the full phrase. */
   ariaLabel?: string;
+  /**
+   * Extra vertical padding so tall display fonts (e.g. Anton) aren't clipped by
+   * the reveal mask. Opt-in per club — leave off for fonts that don't need it.
+   */
+  rhythm?: boolean;
 }
 
 /**
@@ -33,6 +38,7 @@ export function RevealHeading({
   delay = 0,
   staggerChildren = 0.12,
   ariaLabel,
+  rhythm = false,
 }: RevealHeadingProps) {
   const reduced = useReducedMotion();
   const label = ariaLabel ?? lines.join(" ");
@@ -43,7 +49,14 @@ export function RevealHeading({
     return (
       <Heading aria-label={label} className={className}>
         {lines.map((line) => (
-          <span key={line} className={cn("block whitespace-nowrap", lineClassName)}>
+          <span
+            key={line}
+            className={cn(
+              "block whitespace-nowrap",
+              rhythm && "pt-[0.24em]",
+              lineClassName,
+            )}
+          >
             {line}
           </span>
         ))}
@@ -64,9 +77,20 @@ export function RevealHeading({
       }}
     >
       {lines.map((line) => (
-        <span key={line} aria-hidden className="block overflow-hidden">
+        <span
+          key={line}
+          aria-hidden
+          className={cn(
+            "block overflow-hidden",
+            rhythm && "-mt-[0.08em] pt-[0.28em] pb-[0.06em]",
+          )}
+        >
           <motion.span
-            className={cn("block whitespace-nowrap", lineClassName)}
+            className={cn(
+              "block whitespace-nowrap",
+              rhythm && "pt-[0.04em]",
+              lineClassName,
+            )}
             variants={{
               hidden: { y: "110%" },
               show: { y: 0, transition: { duration: 0.7, ease: EXPO_OUT } },

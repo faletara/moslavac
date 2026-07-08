@@ -1,5 +1,1 @@
-import { NotFoundState } from "@/components/feedback/NotFoundState";
-
-export default function NotFound() {
-  return <NotFoundState />;
-}
+export { default } from "@/lib/app-shell/shell/not-found";

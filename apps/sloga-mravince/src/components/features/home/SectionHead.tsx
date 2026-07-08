@@ -62,6 +62,7 @@ export default function SectionHead({
 
       <RevealHeading
         lines={lines}
+        rhythm
         className="mt-5 space-y-1 font-display uppercase leading-[1.14] tracking-normal sm:space-y-2"
         lineClassName="text-5xl sm:text-6xl md:text-7xl"
       />

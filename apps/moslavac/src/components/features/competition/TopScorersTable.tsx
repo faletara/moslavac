@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { HnsCrest } from "@/components/HnsCrest";
-import { useMoslavacTeamId } from "@/components/providers/TenantProvider";
+import { useOurTeamId } from "@/components/providers/TenantProvider";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -31,7 +31,7 @@ export default function TopScorersTable({
   highlightTeamIds = [],
   emptyMessage = "Statistike strijelaca nisu dostupne.",
 }: TopScorersTableProps) {
-  const moslavacTeamId = useMoslavacTeamId();
+  const moslavacTeamId = useOurTeamId();
 
   if (isLoading) {
     return (

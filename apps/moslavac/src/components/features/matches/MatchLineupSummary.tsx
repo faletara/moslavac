@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { HnsCrest } from "@/components/HnsCrest";
-import { useMoslavacTeamId } from "@/components/providers/TenantProvider";
+import { useOurTeamId } from "@/components/providers/TenantProvider";
 import {
   isGoalEvent,
   isRedCardEvent,
@@ -38,7 +38,7 @@ export default function MatchLineupSummary({
   home,
   away,
 }: MatchLineupSummaryProps) {
-  const moslavacTeamId = useMoslavacTeamId();
+  const moslavacTeamId = useOurTeamId();
   const competitionId = match.competition?.id ?? null;
 
   const homeName = match.homeTeam?.name ?? "Domaći";

@@ -16,10 +16,10 @@ export function NotFoundState({
 }: NotFoundStateProps) {
   return (
     <section className="mx-auto flex min-h-[60vh] w-full max-w-2xl flex-col items-center justify-center gap-6 px-4 text-center">
-      <span className="font-display text-7xl font-extrabold leading-none tracking-tight text-brand-yellow/40 sm:text-8xl">
+      <span className="font-display text-7xl font-black leading-none tracking-tighter text-muted-foreground/30 sm:text-8xl">
         404
       </span>
-      <h1 className="font-display text-3xl font-extrabold uppercase leading-[1.05] tracking-tight text-ink sm:text-4xl md:text-5xl">
+      <h1 className="font-display text-3xl font-black uppercase leading-none tracking-tighter sm:text-4xl md:text-5xl">
         {title}
       </h1>
       <p className="max-w-md text-sm text-muted-foreground sm:text-base">
@@ -28,7 +28,7 @@ export function NotFoundState({
       <Button
         asChild
         variant="outline"
-        className="px-7 py-3 text-[0.7rem] font-bold uppercase tracking-[0.35em]"
+        className="rounded-full px-7 py-3 text-[0.7rem] font-bold uppercase tracking-[0.35em]"
       >
         <Link href={backHref}>{backLabel}</Link>
       </Button>

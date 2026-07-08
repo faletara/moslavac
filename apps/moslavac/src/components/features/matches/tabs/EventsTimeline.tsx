@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMoslavacTeamId } from "@/components/providers/TenantProvider";
+import { useOurTeamId } from "@/components/providers/TenantProvider";
 import { HnsCrest } from "@/components/HnsCrest";
 import {
   buildScoreProgression,
@@ -26,7 +26,7 @@ interface EventsTimelineProps {
  * rail — the rhythm of the bands carries the eye. Navy/blue, kept airy.
  */
 export default function EventsTimeline({ match, events }: EventsTimelineProps) {
-  const moslavacTeamId = useMoslavacTeamId();
+  const moslavacTeamId = useOurTeamId();
 
   const visible = (events ?? [])
     .filter(

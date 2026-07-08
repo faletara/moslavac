@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { FadeInView } from "@/components/animations";
 import { HnsCrest } from "@/components/HnsCrest";
-import { useMoslavacTeamId } from "@/components/providers/TenantProvider";
+import { useOurTeamId } from "@/components/providers/TenantProvider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { buildPlayerSlug } from "@/lib/slug";
 import type { HnsLineups, HnsMatch, HnsTeamPlayer } from "@/types/hns";
@@ -18,7 +18,7 @@ export default function MatchLineupsTab({
   match,
   lineups,
 }: MatchLineupsTabProps) {
-  const moslavacTeamId = useMoslavacTeamId();
+  const moslavacTeamId = useOurTeamId();
   const competitionId = match.competition?.id ?? null;
   const hasLineups =
     (lineups?.home?.players?.length ?? 0) > 0 ||
