@@ -1,22 +1,21 @@
 import "server-only";
-import { getHnsTeamId, hnsFetch } from "./client";
-import { tenantSlug } from "@/lib/payload/getTenant";
+import { getHnsTeamId } from "./client";
+import { hnsResource } from "./fetchResource";
 import type { HnsTeamDetails } from "@/types/hns";
 
 const TEAM_TTL = 3600;
 
-export async function fetchTeamDetails(params: {
+export function fetchTeamDetails(params: {
   teamId: string;
 }): Promise<HnsTeamDetails | null> {
-  if (!params.teamId) return null;
-  const filterTeamId = await getHnsTeamId();
-  return hnsFetch<HnsTeamDetails>(
-    `/api/live/team/${params.teamId}?teamIdFilter=${filterTeamId}`,
-    {
-      revalidate: TEAM_TTL,
-      tags: [`hns-${tenantSlug}-team-${params.teamId}`],
-    },
-  );
+  if (!params.teamId) return Promise.resolve(null);
+  // Path targets the requested team; the auto-appended teamIdFilter is our own
+  // team id (from getHnsTeamId), matching the previous behaviour.
+  return hnsResource<HnsTeamDetails>({
+    path: () => `/api/live/team/${params.teamId}`,
+    tag: `team-${params.teamId}`,
+    revalidate: TEAM_TTL,
+  });
 }
 
 /** Detalji vlastitog kluba (kontakt, adresa, stadion) iz HNS-a. */

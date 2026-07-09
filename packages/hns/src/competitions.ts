@@ -1,38 +1,23 @@
 import "server-only";
-import {
-  currentSeasonTag,
-  getHnsTeamId,
-  getSeniorCompetitionFilter,
-  hnsFetch,
-} from "./client";
-import { tenantSlug } from "@/lib/payload/getTenant";
+import { currentSeasonTag, getSeniorCompetitionFilter } from "./client";
+import { hnsList, hnsResource } from "./fetchResource";
 import { isFinished } from "./matchStatus";
 import { fetchUpcomingMatches } from "./matches";
-import type {
-  HnsCompetition,
-  HnsMatch,
-  MatchSlots,
-  PaginatedResult,
-} from "@/types/hns";
+import type { HnsCompetition, HnsMatch, MatchSlots } from "@/types/hns";
 
 const COMPETITIONS_TTL = 3600;
-const STANDINGS_TTL = 180;
 
 export async function fetchCurrentSeasonCompetitions(): Promise<
   HnsCompetition[]
 > {
-  const teamId = await getHnsTeamId();
-  const result = await hnsFetch<HnsCompetition[]>(
-    `/api/live/competition/list/active/${teamId}?teamIdFilter=${teamId}`,
-    {
-      revalidate: COMPETITIONS_TTL,
-      tags: [`hns-${tenantSlug}-competitions`],
-    },
-  );
-  if (!result) return [];
+  const competitions = await hnsList<HnsCompetition>({
+    path: (teamId) => `/api/live/competition/list/active/${teamId}`,
+    tag: "competitions",
+    revalidate: COMPETITIONS_TTL,
+  });
 
   const seasonTag = currentSeasonTag();
-  return result.filter((c) => c.name?.includes(seasonTag));
+  return competitions.filter((c) => c.name?.includes(seasonTag));
 }
 
 export async function fetchSeniorCompetition(): Promise<HnsCompetition | null> {
@@ -44,45 +29,38 @@ export async function fetchSeniorCompetition(): Promise<HnsCompetition | null> {
   return competitions.find((c) => c.name?.includes(filter)) ?? null;
 }
 
-export async function fetchCompetitionInfo(params: {
+export function fetchCompetitionInfo(params: {
   competitionId: number;
 }): Promise<HnsCompetition | null> {
-  const teamId = await getHnsTeamId();
-  return hnsFetch<HnsCompetition>(
-    `/api/live/competition/${params.competitionId}?teamIdFilter=${teamId}`,
-    {
-      revalidate: COMPETITIONS_TTL,
-      tags: [`hns-${tenantSlug}-competition-${params.competitionId}`],
-    },
-  );
+  return hnsResource<HnsCompetition>({
+    path: () => `/api/live/competition/${params.competitionId}`,
+    tag: `competition-${params.competitionId}`,
+    revalidate: COMPETITIONS_TTL,
+  });
 }
 
-async function fetchPastCompetitionMatches(
+function fetchPastCompetitionMatches(
   competitionId: number,
 ): Promise<HnsMatch[]> {
-  const teamId = await getHnsTeamId();
-  const result = await hnsFetch<PaginatedResult<HnsMatch>>(
-    `/api/live/competition/${competitionId}/matches/paginated/past/2/${teamId}?page=1&pageSize=75&teamIdFilter=${teamId}`,
-    {
-      revalidate: COMPETITIONS_TTL,
-      tags: [`hns-${tenantSlug}-competition-${competitionId}-matches`],
-    },
-  );
-  return result?.result ?? [];
+  return hnsList<HnsMatch>({
+    path: (teamId) =>
+      `/api/live/competition/${competitionId}/matches/paginated/past/2/${teamId}?page=1&pageSize=75`,
+    tag: `competition-${competitionId}-matches`,
+    revalidate: COMPETITIONS_TTL,
+    paginated: true,
+  });
 }
 
-async function fetchFutureCompetitionMatches(
+function fetchFutureCompetitionMatches(
   competitionId: number,
 ): Promise<HnsMatch[]> {
-  const teamId = await getHnsTeamId();
-  const result = await hnsFetch<PaginatedResult<HnsMatch>>(
-    `/api/live/competition/${competitionId}/matches/paginated/future/2/${teamId}?page=1&pageSize=75&teamIdFilter=${teamId}`,
-    {
-      revalidate: COMPETITIONS_TTL,
-      tags: [`hns-${tenantSlug}-competition-${competitionId}-matches`],
-    },
-  );
-  return result?.result ?? [];
+  return hnsList<HnsMatch>({
+    path: (teamId) =>
+      `/api/live/competition/${competitionId}/matches/paginated/future/2/${teamId}?page=1&pageSize=75`,
+    tag: `competition-${competitionId}-matches`,
+    revalidate: COMPETITIONS_TTL,
+    paginated: true,
+  });
 }
 
 export async function fetchCompetitionMatches(params: {
@@ -104,18 +82,16 @@ async function fetchAllMatchesPaged(
   competitionId: number,
   direction: "past" | "future",
 ): Promise<HnsMatch[]> {
-  const teamId = await getHnsTeamId();
   const all: HnsMatch[] = [];
 
   for (let page = 1; page <= MATCHES_MAX_PAGES; page++) {
-    const result = await hnsFetch<PaginatedResult<HnsMatch>>(
-      `/api/live/competition/${competitionId}/matches/paginated/${direction}/2/${teamId}?page=${page}&pageSize=${MATCHES_PAGE_SIZE}&teamIdFilter=${teamId}`,
-      {
-        revalidate: COMPETITIONS_TTL,
-        tags: [`hns-${tenantSlug}-competition-${competitionId}-all-matches`],
-      },
-    );
-    const batch = result?.result ?? [];
+    const batch = await hnsList<HnsMatch>({
+      path: (teamId) =>
+        `/api/live/competition/${competitionId}/matches/paginated/${direction}/2/${teamId}?page=${page}&pageSize=${MATCHES_PAGE_SIZE}`,
+      tag: `competition-${competitionId}-all-matches`,
+      revalidate: COMPETITIONS_TTL,
+      paginated: true,
+    });
     all.push(...batch);
     if (batch.length < MATCHES_PAGE_SIZE) break;
   }
@@ -139,25 +115,23 @@ export async function fetchMatchSlots(): Promise<MatchSlots> {
   const senior = await fetchSeniorCompetition();
   if (!senior?.id) return { next: null, previous: null };
 
-  const teamId = await getHnsTeamId();
-  const [pastResult, futureResult] = await Promise.all([
-    hnsFetch<PaginatedResult<HnsMatch>>(
-      `/api/live/competition/${senior.id}/matches/paginated/past/2/${teamId}?page=1&pageSize=3&teamIdFilter=${teamId}`,
-      {
-        revalidate: MATCH_SLOT_TTL,
-        tags: [`hns-${tenantSlug}-match-slots`],
-      },
-    ),
-    hnsFetch<PaginatedResult<HnsMatch>>(
-      `/api/live/competition/${senior.id}/matches/paginated/future/2/${teamId}?page=1&pageSize=1&teamIdFilter=${teamId}`,
-      {
-        revalidate: MATCH_SLOT_TTL,
-        tags: [`hns-${tenantSlug}-match-slots`],
-      },
-    ),
+  const [past, future] = await Promise.all([
+    hnsList<HnsMatch>({
+      path: (teamId) =>
+        `/api/live/competition/${senior.id}/matches/paginated/past/2/${teamId}?page=1&pageSize=3`,
+      tag: "match-slots",
+      revalidate: MATCH_SLOT_TTL,
+      paginated: true,
+    }),
+    hnsList<HnsMatch>({
+      path: (teamId) =>
+        `/api/live/competition/${senior.id}/matches/paginated/future/2/${teamId}?page=1&pageSize=1`,
+      tag: "match-slots",
+      revalidate: MATCH_SLOT_TTL,
+      paginated: true,
+    }),
   ]);
 
-  const past = pastResult?.result ?? [];
   const sortByDateDesc = (a: HnsMatch, b: HnsMatch) =>
     (b.dateTimeUTC ?? 0) - (a.dateTimeUTC ?? 0);
 
@@ -168,8 +142,7 @@ export async function fetchMatchSlots(): Promise<MatchSlots> {
   // finished, new one not yet tagged as current) it has no future matches.
   // Fall back to the team-wide upcoming query, but keep only senior matches
   // (that query returns every age group) by matching the senior filter.
-  const competitionNext =
-    unfinishedPast[0] ?? futureResult?.result?.[0] ?? null;
+  const competitionNext = unfinishedPast[0] ?? future[0] ?? null;
   let next: HnsMatch | null = competitionNext;
   if (!next) {
     const filter = await getSeniorCompetitionFilter();

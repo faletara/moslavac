@@ -4,30 +4,30 @@ import type {
   HnsMatch,
   HnsMatchEvent,
   HnsMatchInfo,
-  PaginatedResult,
 } from "@/types/hns";
-import { tenantSlug } from "@/lib/payload/getTenant";
-import { getHnsTeamId, hnsFetch } from "./client";
+import { hnsList, hnsResource } from "./fetchResource";
 
 const MATCH_TTL = 60;
 const LIVE_MATCH_TTL = 30;
 
-async function fetchPastTeamMatches(): Promise<HnsMatch[]> {
-  const teamId = await getHnsTeamId();
-  const result = await hnsFetch<PaginatedResult<HnsMatch>>(
-    `/api/live/team/${teamId}/matches/paginated/past/2?page=1&pageSize=75&teamIdFilter=${teamId}`,
-    { revalidate: MATCH_TTL, tags: [`hns-${tenantSlug}-team-matches`] },
-  );
-  return result?.result ?? [];
+function fetchPastTeamMatches(): Promise<HnsMatch[]> {
+  return hnsList<HnsMatch>({
+    path: (teamId) =>
+      `/api/live/team/${teamId}/matches/paginated/past/2?page=1&pageSize=75`,
+    tag: "team-matches",
+    revalidate: MATCH_TTL,
+    paginated: true,
+  });
 }
 
-async function fetchFutureTeamMatches(): Promise<HnsMatch[]> {
-  const teamId = await getHnsTeamId();
-  const result = await hnsFetch<PaginatedResult<HnsMatch>>(
-    `/api/live/team/${teamId}/matches/paginated/future/2?page=1&pageSize=75&teamIdFilter=${teamId}`,
-    { revalidate: MATCH_TTL, tags: [`hns-${tenantSlug}-team-matches`] },
-  );
-  return result?.result ?? [];
+function fetchFutureTeamMatches(): Promise<HnsMatch[]> {
+  return hnsList<HnsMatch>({
+    path: (teamId) =>
+      `/api/live/team/${teamId}/matches/paginated/future/2?page=1&pageSize=75`,
+    tag: "team-matches",
+    revalidate: MATCH_TTL,
+    paginated: true,
+  });
 }
 
 export async function fetchAllMatches(): Promise<HnsMatch[]> {
@@ -39,12 +39,13 @@ export async function fetchAllMatches(): Promise<HnsMatch[]> {
 }
 
 async function fetchTodayMatches(): Promise<HnsMatch[]> {
-  const teamId = await getHnsTeamId();
-  const result = await hnsFetch<PaginatedResult<HnsMatch>>(
-    `/api/live/team/${teamId}/matches/paginated/past/2?page=1&pageSize=10&teamIdFilter=${teamId}`,
-    { revalidate: MATCH_TTL, tags: [`hns-${tenantSlug}-today`] },
-  );
-  if (!result?.result) return [];
+  const matches = await hnsList<HnsMatch>({
+    path: (teamId) =>
+      `/api/live/team/${teamId}/matches/paginated/past/2?page=1&pageSize=10`,
+    tag: "today",
+    revalidate: MATCH_TTL,
+    paginated: true,
+  });
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -52,7 +53,7 @@ async function fetchTodayMatches(): Promise<HnsMatch[]> {
   const tomorrowMs = todayMs + 86_400_000;
   const nowMs = Date.now();
 
-  return result.result.filter((m) => {
+  return matches.filter((m) => {
     if (m.dateTimeUTC == null) return false;
     return (
       m.dateTimeUTC >= todayMs &&
@@ -62,13 +63,14 @@ async function fetchTodayMatches(): Promise<HnsMatch[]> {
   });
 }
 
-async function fetchFutureMatches(): Promise<HnsMatch[]> {
-  const teamId = await getHnsTeamId();
-  const result = await hnsFetch<PaginatedResult<HnsMatch>>(
-    `/api/live/team/${teamId}/matches/paginated/future/2?page=1&pageSize=15&teamIdFilter=${teamId}`,
-    { revalidate: MATCH_TTL, tags: [`hns-${tenantSlug}-upcoming`] },
-  );
-  return result?.result ?? [];
+function fetchFutureMatches(): Promise<HnsMatch[]> {
+  return hnsList<HnsMatch>({
+    path: (teamId) =>
+      `/api/live/team/${teamId}/matches/paginated/future/2?page=1&pageSize=15`,
+    tag: "upcoming",
+    revalidate: MATCH_TTL,
+    paginated: true,
+  });
 }
 
 export async function fetchUpcomingMatches(): Promise<HnsMatch[]> {
@@ -86,55 +88,42 @@ export async function fetchUpcomingMatches(): Promise<HnsMatch[]> {
   return merged.sort((a, b) => (a.dateTimeUTC ?? 0) - (b.dateTimeUTC ?? 0));
 }
 
-export async function fetchMatchInfo(params: {
+export function fetchMatchInfo(params: {
   matchId: number;
 }): Promise<HnsMatch | null> {
-  const teamId = await getHnsTeamId();
-  return hnsFetch<HnsMatch>(
-    `/api/live/match/${params.matchId}?teamIdFilter=${teamId}`,
-    {
-      revalidate: LIVE_MATCH_TTL,
-      tags: [`hns-${tenantSlug}-match-${params.matchId}`],
-    },
-  );
+  return hnsResource<HnsMatch>({
+    path: () => `/api/live/match/${params.matchId}`,
+    tag: `match-${params.matchId}`,
+    revalidate: LIVE_MATCH_TTL,
+  });
 }
 
-export async function fetchMatchEvents(params: {
+export function fetchMatchEvents(params: {
   matchId: number;
 }): Promise<HnsMatchEvent[]> {
-  const teamId = await getHnsTeamId();
-  const result = await hnsFetch<HnsMatchEvent[]>(
-    `/api/live/match/${params.matchId}/events?teamIdFilter=${teamId}&showComments=true`,
-    {
-      revalidate: LIVE_MATCH_TTL,
-      tags: [`hns-${tenantSlug}-match-${params.matchId}-events`],
-    },
-  );
-  return result ?? [];
+  return hnsList<HnsMatchEvent>({
+    path: () => `/api/live/match/${params.matchId}/events?showComments=true`,
+    tag: `match-${params.matchId}-events`,
+    revalidate: LIVE_MATCH_TTL,
+  });
 }
 
-export async function fetchMatchLineups(params: {
+export function fetchMatchLineups(params: {
   matchId: number;
 }): Promise<HnsLineups | null> {
-  const teamId = await getHnsTeamId();
-  return hnsFetch<HnsLineups>(
-    `/api/live/match/${params.matchId}/lineups?teamIdFilter=${teamId}`,
-    {
-      revalidate: MATCH_TTL,
-      tags: [`hns-${tenantSlug}-match-${params.matchId}-lineups`],
-    },
-  );
+  return hnsResource<HnsLineups>({
+    path: () => `/api/live/match/${params.matchId}/lineups`,
+    tag: `match-${params.matchId}-lineups`,
+    revalidate: MATCH_TTL,
+  });
 }
 
-export async function fetchMatchReferees(params: {
+export function fetchMatchReferees(params: {
   matchId: number;
 }): Promise<HnsMatchInfo | null> {
-  const teamId = await getHnsTeamId();
-  return hnsFetch<HnsMatchInfo>(
-    `/api/live/match/${params.matchId}/info?teamIdFilter=${teamId}`,
-    {
-      revalidate: MATCH_TTL,
-      tags: [`hns-${tenantSlug}-match-${params.matchId}-referees`],
-    },
-  );
+  return hnsResource<HnsMatchInfo>({
+    path: () => `/api/live/match/${params.matchId}/info`,
+    tag: `match-${params.matchId}-referees`,
+    revalidate: MATCH_TTL,
+  });
 }

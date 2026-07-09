@@ -1,6 +1,6 @@
 import "server-only";
-import { getHnsTeamId, hnsFetch } from "./client";
-import { tenantSlug } from "@/lib/payload/getTenant";
+import { getHnsTeamId } from "./client";
+import { hnsList } from "./fetchResource";
 import type { PlayerStats, TeamRanking } from "@/types/hns";
 
 const STANDINGS_TTL = 180;
@@ -9,22 +9,17 @@ export async function fetchTeamStandings(params: {
   competitionId: number;
 }): Promise<TeamRanking[]> {
   const teamId = await getHnsTeamId();
-  const result = await hnsFetch<TeamRanking[]>(
-    `/api/live/competition/${params.competitionId}/standings/official?teamIdFilter=${teamId}`,
-    {
-      revalidate: STANDINGS_TTL,
-      tags: [`hns-${tenantSlug}-standings-${params.competitionId}`],
-    },
-  );
-  return markOwnTeam(result, teamId);
+  const rows = await hnsList<TeamRanking>({
+    path: () =>
+      `/api/live/competition/${params.competitionId}/standings/official`,
+    tag: `standings-${params.competitionId}`,
+    revalidate: STANDINGS_TTL,
+  });
+  return markOwnTeam(rows, teamId);
 }
 
 // HNS ne popunjava `highlight` — označavamo redak našeg kluba usporedbom s teamId.
-function markOwnTeam(
-  rows: TeamRanking[] | null,
-  teamId: string,
-): TeamRanking[] {
-  if (!rows) return [];
+function markOwnTeam(rows: TeamRanking[], teamId: string): TeamRanking[] {
   const ownId = Number(teamId);
   return rows.map((row) => ({
     ...row,
@@ -36,32 +31,24 @@ export async function fetchTeamStandingsUnofficial(params: {
   competitionId: number;
 }): Promise<TeamRanking[]> {
   const teamId = await getHnsTeamId();
-  const result = await hnsFetch<TeamRanking[]>(
-    `/api/live/competition/${params.competitionId}/standings/unofficial?teamIdFilter=${teamId}`,
-    {
-      revalidate: STANDINGS_TTL,
-      tags: [
-        `hns-${tenantSlug}-standings-unofficial-${params.competitionId}`,
-      ],
-    },
-  );
-  return markOwnTeam(result, teamId);
+  const rows = await hnsList<TeamRanking>({
+    path: () =>
+      `/api/live/competition/${params.competitionId}/standings/unofficial`,
+    tag: `standings-unofficial-${params.competitionId}`,
+    revalidate: STANDINGS_TTL,
+  });
+  return markOwnTeam(rows, teamId);
 }
 
-export async function fetchCompetitionGoalStats(params: {
+export function fetchCompetitionGoalStats(params: {
   competitionId: number;
 }): Promise<PlayerStats[]> {
-  const teamId = await getHnsTeamId();
-  const result = await hnsFetch<PlayerStats[]>(
-    `/api/live/competition/${params.competitionId}/stats/goals/${teamId}?teamIdFilter=${teamId}`,
-    {
-      revalidate: STANDINGS_TTL,
-      tags: [
-        `hns-${tenantSlug}-stats-goals-${params.competitionId}`,
-      ],
-    },
-  );
-  return result ?? [];
+  return hnsList<PlayerStats>({
+    path: (teamId) =>
+      `/api/live/competition/${params.competitionId}/stats/goals/${teamId}`,
+    tag: `stats-goals-${params.competitionId}`,
+    revalidate: STANDINGS_TTL,
+  });
 }
 
 // HNS doesn't expose a competition-wide scorers endpoint; the path teamId
@@ -73,32 +60,26 @@ export async function fetchAllCompetitionScorers(params: {
   return fanOutCompetitionStats(params.competitionId, "goals");
 }
 
-export async function fetchCompetitionRedCardStats(params: {
+export function fetchCompetitionRedCardStats(params: {
   competitionId: number;
 }): Promise<PlayerStats[]> {
-  const teamId = await getHnsTeamId();
-  const result = await hnsFetch<PlayerStats[]>(
-    `/api/live/competition/${params.competitionId}/stats/redCards/${teamId}?teamIdFilter=${teamId}`,
-    {
-      revalidate: STANDINGS_TTL,
-      tags: [`hns-${tenantSlug}-stats-red-${params.competitionId}`],
-    },
-  );
-  return result ?? [];
+  return hnsList<PlayerStats>({
+    path: (teamId) =>
+      `/api/live/competition/${params.competitionId}/stats/redCards/${teamId}`,
+    tag: `stats-red-${params.competitionId}`,
+    revalidate: STANDINGS_TTL,
+  });
 }
 
-export async function fetchCompetitionYellowCardStats(params: {
+export function fetchCompetitionYellowCardStats(params: {
   competitionId: number;
 }): Promise<PlayerStats[]> {
-  const teamId = await getHnsTeamId();
-  const result = await hnsFetch<PlayerStats[]>(
-    `/api/live/competition/${params.competitionId}/stats/yellowCards/${teamId}?teamIdFilter=${teamId}`,
-    {
-      revalidate: STANDINGS_TTL,
-      tags: [`hns-${tenantSlug}-stats-yellow-${params.competitionId}`],
-    },
-  );
-  return result ?? [];
+  return hnsList<PlayerStats>({
+    path: (teamId) =>
+      `/api/live/competition/${params.competitionId}/stats/yellowCards/${teamId}`,
+    tag: `stats-yellow-${params.competitionId}`,
+    revalidate: STANDINGS_TTL,
+  });
 }
 
 // Same fan-out pattern as fetchAllCompetitionScorers — HNS scopes stats to
@@ -107,7 +88,6 @@ async function fanOutCompetitionStats(
   competitionId: number,
   statKind: "goals" | "yellowCards" | "redCards",
 ): Promise<PlayerStats[]> {
-  const teamId = await getHnsTeamId();
   const standings = await fetchTeamStandings({ competitionId });
   const teamIds = standings
     .map((row) => row.team?.id)
@@ -115,20 +95,17 @@ async function fanOutCompetitionStats(
 
   const perTeam = await Promise.all(
     teamIds.map((id) =>
-      hnsFetch<PlayerStats[]>(
-        `/api/live/competition/${competitionId}/stats/${statKind}/${id}?teamIdFilter=${teamId}`,
-        {
-          revalidate: STANDINGS_TTL,
-          tags: [
-            `hns-${tenantSlug}-stats-${statKind}-${competitionId}-team-${id}`,
-          ],
-        },
-      ),
+      hnsList<PlayerStats>({
+        path: () =>
+          `/api/live/competition/${competitionId}/stats/${statKind}/${id}`,
+        tag: `stats-${statKind}-${competitionId}-team-${id}`,
+        revalidate: STANDINGS_TTL,
+      }),
     ),
   );
 
   return perTeam
-    .flatMap((list) => list ?? [])
+    .flat()
     .sort((a, b) => (b.value ?? 0) - (a.value ?? 0));
 }
 

@@ -1,6 +1,5 @@
 import "server-only";
-import { getHnsTeamId, hnsFetch } from "./client";
-import { tenantSlug } from "@/lib/payload/getTenant";
+import { hnsResource } from "./fetchResource";
 
 interface HnsPicture {
   uuid: string;
@@ -8,14 +7,11 @@ interface HnsPicture {
 }
 
 export async function fetchHnsImageBytes(uuid: string): Promise<Buffer | null> {
-  const teamId = await getHnsTeamId();
-  const result = await hnsFetch<HnsPicture>(
-    `/api/live/images/${uuid}?teamIdFilter=${teamId}`,
-    {
-      revalidate: 86_400,
-      tags: [`hns-${tenantSlug}-image-${uuid}`],
-    },
-  );
+  const result = await hnsResource<HnsPicture>({
+    path: () => `/api/live/images/${uuid}`,
+    tag: `image-${uuid}`,
+    revalidate: 86_400,
+  });
   if (!result?.value) return null;
   return Buffer.from(result.value, "base64");
 }
