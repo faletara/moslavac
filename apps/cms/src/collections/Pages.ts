@@ -1,5 +1,4 @@
-import { tenantScopedAdmin } from '../access/tenantScopedAdmin'
-import { createCollection } from '../factories/createCollection'
+import { clubFeatureCollection } from '../factories/clubFeatureCollection'
 import { mediaArrayField, mediaField } from '../fields/media'
 
 /**
@@ -7,10 +6,8 @@ import { mediaArrayField, mediaField } from '../fields/media'
  * Jedan zapis po `key` slotu (Povijest, Navijači, Statut-uvod, Škola-uvod, Seniori-uvod).
  * Frontend dohvaća deterministički po `key` (vidi getPages.ts).
  */
-export const Pages = createCollection({
-  slug: 'pages',
+export const Pages = clubFeatureCollection('pages', {
   admin: {
-    ...tenantScopedAdmin('pages'),
     useAsTitle: 'title',
     defaultColumns: ['title', 'key', 'tenant'],
   },

@@ -1,6 +1,7 @@
 import "server-only";
 import { convertLexicalToHTML } from "@payloadcms/richtext-lexical/html";
 import type { ClubPage, PageKey } from "@/types/page";
+import { clubFeatureQuery } from "./clubFeatures";
 import { fetchOne } from "./fetchCollection";
 import { mediaObject } from "./media";
 import type { PayloadMedia } from "./types";
@@ -38,11 +39,13 @@ export function adaptPage(doc: PayloadPage): ClubPage {
   };
 }
 
+const pagesFeature = clubFeatureQuery("pages");
+
 export const fetchPageByKey = (params: {
   key: PageKey;
 }): Promise<ClubPage | null> =>
   fetchOne<PayloadPage, ClubPage>({
-    collection: "pages",
+    ...pagesFeature,
     where: { "where[key][equals]": params.key },
     adapt: adaptPage,
   });

@@ -1,5 +1,6 @@
 import "server-only";
 import type { BoardMember, BoardRoleGroup } from "@/types/board";
+import { clubFeatureQuery } from "./clubFeatures";
 import { fetchList } from "./fetchCollection";
 import { mediaObject } from "./media";
 import type { PayloadMedia } from "./types";
@@ -30,10 +31,11 @@ export function adaptBoardMember(doc: PayloadBoardMember): BoardMember {
   };
 }
 
+const boardFeature = clubFeatureQuery("board");
+
 export const fetchBoardMembers = (): Promise<BoardMember[]> =>
   fetchList<PayloadBoardMember, BoardMember>({
-    collection: "board-members",
-    tagPrefix: "board",
+    ...boardFeature,
     sort: "displayOrder",
     limit: 100,
     adapt: adaptBoardMember,

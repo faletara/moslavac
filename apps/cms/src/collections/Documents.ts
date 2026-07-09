@@ -1,15 +1,12 @@
-import { tenantScopedAdmin } from '../access/tenantScopedAdmin'
-import { createCollection } from '../factories/createCollection'
+import { clubFeatureCollection } from '../factories/clubFeatureCollection'
 import { displayOrderField } from '../fields/displayOrder'
 
 /**
  * Dokumenti kluba za preuzimanje (PDF): statut, pravilnici, obrasci, izvješća.
  * Zasebna upload kolekcija jer Media prima samo slike (`image/*`).
  */
-export const Documents = createCollection({
-  slug: 'documents',
+export const Documents = clubFeatureCollection('documents', {
   admin: {
-    ...tenantScopedAdmin('documents'),
     useAsTitle: 'title',
     defaultColumns: ['title', 'category', 'tenant'],
   },

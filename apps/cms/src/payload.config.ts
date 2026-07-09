@@ -8,6 +8,7 @@ import { fileURLToPath } from "url";
 import sharp from "sharp";
 
 import { isSuperAdmin, superAdminOnlyField } from "./access/roles";
+import { CLUB_FEATURES } from "@/lib/payload/clubFeatures";
 import { BoardMembers } from "./collections/BoardMembers";
 import { Documents } from "./collections/Documents";
 import { Equipment } from "./collections/Equipment";
@@ -28,6 +29,18 @@ const dirname = path.dirname(filename);
 if (!process.env.PAYLOAD_SECRET) {
 	throw new Error("PAYLOAD_SECRET env var is required");
 }
+
+const TENANT_COLLECTION_SLUGS = [
+	"news",
+	"media",
+	"roster",
+	"equipment",
+	...CLUB_FEATURES.map(({ slug }) => slug),
+] as const;
+
+const tenantCollections = Object.fromEntries(
+	TENANT_COLLECTION_SLUGS.map((slug) => [slug, {}]),
+);
 
 export default buildConfig({
 	admin: {
@@ -75,17 +88,7 @@ export default buildConfig({
 	sharp,
 	plugins: [
 		multiTenantPlugin<Config>({
-			collections: {
-				news: {},
-				media: {},
-				roster: {},
-				equipment: {},
-				pages: {},
-				documents: {},
-				"board-members": {},
-				"school-programs": {},
-				"gallery-albums": {},
-			},
+			collections: tenantCollections,
 			tenantsSlug: "tenants",
 			userHasAccessToAllTenants: (user) => isSuperAdmin(user),
 			tenantsArrayField: {

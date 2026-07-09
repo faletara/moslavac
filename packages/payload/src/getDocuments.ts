@@ -1,5 +1,6 @@
 import "server-only";
 import type { ClubDocument, DocumentCategory } from "@/types/document";
+import { clubFeatureQuery } from "./clubFeatures";
 import { fetchList } from "./fetchCollection";
 
 interface PayloadDocument {
@@ -22,11 +23,13 @@ export function adaptDocument(doc: PayloadDocument): ClubDocument {
   };
 }
 
+const documentsFeature = clubFeatureQuery("documents");
+
 export const fetchDocuments = (params?: {
   category?: DocumentCategory;
 }): Promise<ClubDocument[]> =>
   fetchList<PayloadDocument, ClubDocument>({
-    collection: "documents",
+    ...documentsFeature,
     where: params?.category
       ? { "where[category][equals]": params.category }
       : undefined,

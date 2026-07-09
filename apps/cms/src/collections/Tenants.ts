@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
+import { CLUB_FEATURE_OPTIONS } from '@/lib/payload/clubFeatures'
 import { isSuperAdmin, superAdminOnly } from '../access/roles'
-import { CLUB_FEATURES } from '../access/tenantScopedAdmin'
 import { mediaField } from '../fields/media'
 
 export const Tenants: CollectionConfig = {
@@ -41,7 +41,7 @@ export const Tenants: CollectionConfig = {
       name: 'features',
       type: 'select',
       hasMany: true,
-      options: CLUB_FEATURES,
+      options: CLUB_FEATURE_OPTIONS,
       access: {
         // Samo platforma (super-admin) uključuje rubrike klubu; klub si ih ne dodjeljuje sam.
         update: ({ req: { user } }) => isSuperAdmin(user),

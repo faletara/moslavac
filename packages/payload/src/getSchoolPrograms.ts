@@ -1,5 +1,6 @@
 import "server-only";
 import type { SchoolProgram } from "@/types/school";
+import { clubFeatureQuery } from "./clubFeatures";
 import { fetchList, fetchOne } from "./fetchCollection";
 import { mediaObject } from "./media";
 import type { PayloadMedia } from "./types";
@@ -29,10 +30,11 @@ export function adaptProgram(doc: PayloadSchoolProgram): SchoolProgram {
   };
 }
 
+const schoolFeature = clubFeatureQuery("school");
+
 export const fetchSchoolPrograms = (): Promise<SchoolProgram[]> =>
   fetchList<PayloadSchoolProgram, SchoolProgram>({
-    collection: "school-programs",
-    tagPrefix: "school",
+    ...schoolFeature,
     where: { "where[active][equals]": "true" },
     sort: "displayOrder",
     limit: 100,
@@ -43,8 +45,7 @@ export const fetchSchoolProgramById = (params: {
   id: string;
 }): Promise<SchoolProgram | null> =>
   fetchOne<PayloadSchoolProgram, SchoolProgram>({
-    collection: "school-programs",
-    tagPrefix: "school",
+    ...schoolFeature,
     where: {
       "where[id][equals]": params.id,
       "where[active][equals]": "true",

@@ -1,13 +1,10 @@
-import { tenantScopedAdmin } from '../access/tenantScopedAdmin'
-import { createCollection } from '../factories/createCollection'
+import { clubFeatureCollection } from '../factories/clubFeatureCollection'
 import { displayOrderField } from '../fields/displayOrder'
 import { mediaField } from '../fields/media'
 
 /** Uprava kluba — predsjedništvo, nadzorni odbor, stručni stožer. */
-export const BoardMembers = createCollection({
-  slug: 'board-members',
+export const BoardMembers = clubFeatureCollection('board', {
   admin: {
-    ...tenantScopedAdmin('board'),
     useAsTitle: 'name',
     defaultColumns: ['name', 'role', 'roleGroup', 'displayOrder', 'tenant'],
   },

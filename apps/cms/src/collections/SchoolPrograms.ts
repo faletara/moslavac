@@ -1,14 +1,11 @@
-import { tenantScopedAdmin } from '../access/tenantScopedAdmin'
-import { createCollection } from '../factories/createCollection'
+import { clubFeatureCollection } from '../factories/clubFeatureCollection'
 import { activeField } from '../fields/active'
 import { displayOrderField } from '../fields/displayOrder'
 import { mediaField } from '../fields/media'
 
 /** Škola nogometa — programi po dobnim skupinama (Limači, Zagici, Pioniri…). */
-export const SchoolPrograms = createCollection({
-  slug: 'school-programs',
+export const SchoolPrograms = clubFeatureCollection('school', {
   admin: {
-    ...tenantScopedAdmin('school'),
     useAsTitle: 'name',
     defaultColumns: ['name', 'ageRange', 'coach', 'active', 'displayOrder', 'tenant'],
   },

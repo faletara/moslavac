@@ -1,5 +1,6 @@
 import "server-only";
 import type { GalleryAlbum } from "@/types/gallery";
+import { clubFeatureQuery } from "./clubFeatures";
 import { fetchList, fetchOne } from "./fetchCollection";
 import { mediaObject } from "./media";
 import type { PayloadMedia } from "./types";
@@ -36,10 +37,11 @@ export function adaptAlbum(doc: PayloadAlbum): GalleryAlbum {
   };
 }
 
+const galleryFeature = clubFeatureQuery("gallery");
+
 export const fetchAlbums = (): Promise<GalleryAlbum[]> =>
   fetchList<PayloadAlbum, GalleryAlbum>({
-    collection: "gallery-albums",
-    tagPrefix: "gallery",
+    ...galleryFeature,
     sort: "displayOrder",
     limit: 100,
     adapt: adaptAlbum,
@@ -49,8 +51,7 @@ export const fetchAlbumBySlug = (params: {
   slug: string;
 }): Promise<GalleryAlbum | null> =>
   fetchOne<PayloadAlbum, GalleryAlbum>({
-    collection: "gallery-albums",
-    tagPrefix: "gallery",
+    ...galleryFeature,
     where: { "where[slug][equals]": params.slug },
     adapt: adaptAlbum,
   });

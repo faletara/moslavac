@@ -1,14 +1,11 @@
-import { tenantScopedAdmin } from '../access/tenantScopedAdmin'
-import { createCollection } from '../factories/createCollection'
+import { clubFeatureCollection } from '../factories/clubFeatureCollection'
 import { displayOrderField } from '../fields/displayOrder'
 import { mediaArrayField, mediaField } from '../fields/media'
 import { slugField } from '../fields/slug'
 
 /** Galerija — albumi fotografija (događaj → više slika). */
-export const GalleryAlbums = createCollection({
-  slug: 'gallery-albums',
+export const GalleryAlbums = clubFeatureCollection('gallery', {
   admin: {
-    ...tenantScopedAdmin('gallery'),
     useAsTitle: 'title',
     defaultColumns: ['title', 'date', 'displayOrder', 'tenant'],
   },
