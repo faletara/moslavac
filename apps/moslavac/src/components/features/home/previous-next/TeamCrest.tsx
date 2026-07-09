@@ -2,12 +2,12 @@
 
 import { HnsCrest } from "@/components/HnsCrest";
 import { cn } from "@/lib/utils";
-import type { HnsTeam } from "@/types/hns";
+import type { Team } from "@/types/hns";
 
 type CrestSize = "sm" | "md" | "lg";
 
 interface TeamCrestProps {
-  team: HnsTeam | null;
+  team: Team | null | undefined;
   size?: CrestSize;
   showName?: boolean;
   className?: string;

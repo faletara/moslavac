@@ -6,7 +6,7 @@ import { getHeadToHead } from "@/lib/helpers/form";
 import { formatDateShort } from "@/lib/helpers/date";
 import { buildMatchSlug } from "@/lib/slug";
 import { cn } from "@/lib/utils";
-import type { HnsMatch } from "@/types/hns";
+import type { Match } from "@/types/hns";
 import { MatchTabHeading } from "../shared/MatchTabHeading";
 
 interface HeadToHeadProps {
@@ -14,7 +14,7 @@ interface HeadToHeadProps {
   awayTeamId: number | null;
   homeTeamName: string;
   awayTeamName: string;
-  competitionMatches: HnsMatch[] | undefined;
+  competitionMatches: Match[] | undefined;
   currentMatchId: number;
   isLoading: boolean;
 }
@@ -73,7 +73,7 @@ function H2HRow({
   homeTeamName,
   awayTeamName,
 }: {
-  match: HnsMatch;
+  match: Match;
   homeTeamId: number;
   homeTeamName: string;
   awayTeamName: string;

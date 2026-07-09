@@ -12,7 +12,7 @@ import {
 } from "@/lib/helpers/competition";
 import { formatDateParts } from "@/lib/helpers/date";
 import { buildMatchSlug } from "@/lib/slug";
-import type { HnsMatch } from "@/types/hns";
+import type { Match } from "@/types/hns";
 
 const OUR_TEAM_KEYWORD = "moslavac";
 
@@ -137,7 +137,7 @@ function ScrollableRow({ children }: { children: React.ReactNode }) {
 export default function UpcomingMatchesView({
   matches,
 }: {
-  matches: HnsMatch[];
+  matches: Match[];
 }) {
   return (
     <section className="mx-auto w-full max-w-7xl space-y-12 px-4 py-20 sm:py-28">

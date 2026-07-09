@@ -12,17 +12,17 @@ import {
 import { getSeniorCompetitionFilter } from "@/lib/hns/client";
 import { isFinished } from "@/lib/hns/matchStatus";
 import { getTenant } from "@/lib/payload/getTenant";
-import type { HnsCompetition, HnsMatch } from "@/types/hns";
+import type { Competition, Match } from "@/types/hns";
 
 export const revalidate = 300;
 
-type MatchWithDate = HnsMatch & { dateTimeUTC: number };
+type MatchWithDate = Match & { dateTimeUTC: number };
 
 interface Props {
   searchParams: Promise<{ competitionId?: string }>;
 }
 
-function hasDate(match: HnsMatch): match is MatchWithDate {
+function hasDate(match: Match): match is MatchWithDate {
   return match.dateTimeUTC != null;
 }
 
@@ -31,7 +31,7 @@ function parseCompetitionId(value: string | undefined): number | null {
   return Number.isInteger(id) && id > 0 ? id : null;
 }
 
-function competitionLabel(competition: HnsCompetition): string {
+function competitionLabel(competition: Competition): string {
   return toReadableCompetitionName(competition.name) || "Natjecanje";
 }
 
@@ -40,10 +40,10 @@ function selectCompetition({
   seniorFilter,
   competitionId,
 }: {
-  competitions: HnsCompetition[];
+  competitions: Competition[];
   seniorFilter: string | null;
   competitionId: number | null;
-}): HnsCompetition | null {
+}): Competition | null {
   const valid = competitions.filter((competition) => competition.id != null);
   const fromUrl = valid.find((competition) => competition.id === competitionId);
   if (fromUrl) return fromUrl;
@@ -54,7 +54,7 @@ function selectCompetition({
   return senior ?? valid[0] ?? null;
 }
 
-function splitMatches(matches: HnsMatch[]) {
+function splitMatches(matches: Match[]) {
   const dated = matches.filter(hasDate);
   const upcoming = dated
     .filter((match) => !isFinished(match))
@@ -66,14 +66,14 @@ function splitMatches(matches: HnsMatch[]) {
   return { upcoming, results };
 }
 
-function scoreOf(match: HnsMatch): string | null {
+function scoreOf(match: Match): string | null {
   const home = match.homeTeamResult?.current;
   const away = match.awayTeamResult?.current;
   if (home != null && away != null) return `${home}:${away}`;
   return match.result || null;
 }
 
-function matchMeta(match: HnsMatch): string {
+function matchMeta(match: Match): string {
   return [match.competition?.name, match.round].filter(Boolean).join(" · ");
 }
 
@@ -91,11 +91,11 @@ function CompetitionSelector({
   competitions,
   selectedId,
 }: {
-  competitions: HnsCompetition[];
+  competitions: Competition[];
   selectedId: number | null;
 }) {
   const items = competitions.filter(
-    (competition): competition is HnsCompetition & { id: number } =>
+    (competition): competition is Competition & { id: number } =>
       competition.id != null,
   );
   if (items.length === 0) return null;

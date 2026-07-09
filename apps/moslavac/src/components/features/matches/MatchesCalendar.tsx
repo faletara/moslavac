@@ -30,7 +30,7 @@ import {
 } from "@/lib/helpers/competition";
 import { buildMatchSlug } from "@/lib/slug";
 import { cn } from "@/lib/utils";
-import type { HnsMatch } from "@/types/hns";
+import type { Match } from "@/types/hns";
 
 type View = "month" | "week" | "day";
 
@@ -45,7 +45,7 @@ type CalendarEvent = {
 };
 
 interface MatchesCalendarProps {
-	matches: HnsMatch[];
+	matches: Match[];
 }
 
 const WEEKDAY_LABELS = ["pon", "uto", "sri", "čet", "pet", "sub", "ned"];

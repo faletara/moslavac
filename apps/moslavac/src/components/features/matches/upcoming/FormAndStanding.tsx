@@ -4,7 +4,7 @@ import { HnsCrest } from "@/components/HnsCrest";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getRecentForm, type FormResult } from "@/lib/helpers/form";
 import { cn } from "@/lib/utils";
-import type { HnsMatch, TeamRanking } from "@/types/hns";
+import type { Match, TeamRanking } from "@/types/hns";
 import { MatchTabHeading } from "../shared/MatchTabHeading";
 
 interface FormAndStandingProps {
@@ -14,7 +14,7 @@ interface FormAndStandingProps {
   awayTeamName: string;
   homeTeamPicture: string | null;
   awayTeamPicture: string | null;
-  competitionMatches: HnsMatch[] | undefined;
+  competitionMatches: Match[] | undefined;
   standings: TeamRanking[] | undefined;
   isLoading: boolean;
 }

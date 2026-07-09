@@ -11,7 +11,7 @@ import {
 import { HnsCrest } from "@/components/HnsCrest";
 import { buildCompetitionSlug, buildPlayerSlug } from "@/lib/slug";
 import { cn } from "@/lib/utils";
-import type { HnsCompetition, PlayerStats, TeamRanking } from "@/types/hns";
+import type { Competition, PlayerStats, TeamRanking } from "@/types/hns";
 
 const rowVariants = {
 	hidden: { opacity: 0, x: -16 },
@@ -233,7 +233,7 @@ export default function SeasonDataView({
 	shortName,
 	ourTeamId,
 }: {
-	senior: HnsCompetition;
+	senior: Competition;
 	standings: TeamRanking[];
 	topScorers: PlayerStats[];
 	shortName: string;

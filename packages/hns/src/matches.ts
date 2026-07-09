@@ -1,17 +1,17 @@
 import "server-only";
 import type {
-  HnsLineups,
-  HnsMatch,
-  HnsMatchEvent,
-  HnsMatchInfo,
+  Lineups,
+  Match,
+  MatchEvent,
+  MatchInfo,
 } from "@/types/hns";
 import { hnsList, hnsResource } from "./fetchResource";
 
 const MATCH_TTL = 60;
 const LIVE_MATCH_TTL = 30;
 
-function fetchPastTeamMatches(): Promise<HnsMatch[]> {
-  return hnsList<HnsMatch>({
+function fetchPastTeamMatches(): Promise<Match[]> {
+  return hnsList<Match>({
     path: (teamId) =>
       `/api/live/team/${teamId}/matches/paginated/past/2?page=1&pageSize=75`,
     tag: "team-matches",
@@ -20,8 +20,8 @@ function fetchPastTeamMatches(): Promise<HnsMatch[]> {
   });
 }
 
-function fetchFutureTeamMatches(): Promise<HnsMatch[]> {
-  return hnsList<HnsMatch>({
+function fetchFutureTeamMatches(): Promise<Match[]> {
+  return hnsList<Match>({
     path: (teamId) =>
       `/api/live/team/${teamId}/matches/paginated/future/2?page=1&pageSize=75`,
     tag: "team-matches",
@@ -30,7 +30,7 @@ function fetchFutureTeamMatches(): Promise<HnsMatch[]> {
   });
 }
 
-export async function fetchAllMatches(): Promise<HnsMatch[]> {
+export async function fetchAllMatches(): Promise<Match[]> {
   const [past, future] = await Promise.all([
     fetchPastTeamMatches(),
     fetchFutureTeamMatches(),
@@ -38,8 +38,8 @@ export async function fetchAllMatches(): Promise<HnsMatch[]> {
   return [...past, ...future];
 }
 
-async function fetchTodayMatches(): Promise<HnsMatch[]> {
-  const matches = await hnsList<HnsMatch>({
+async function fetchTodayMatches(): Promise<Match[]> {
+  const matches = await hnsList<Match>({
     path: (teamId) =>
       `/api/live/team/${teamId}/matches/paginated/past/2?page=1&pageSize=10`,
     tag: "today",
@@ -63,8 +63,8 @@ async function fetchTodayMatches(): Promise<HnsMatch[]> {
   });
 }
 
-function fetchFutureMatches(): Promise<HnsMatch[]> {
-  return hnsList<HnsMatch>({
+function fetchFutureMatches(): Promise<Match[]> {
+  return hnsList<Match>({
     path: (teamId) =>
       `/api/live/team/${teamId}/matches/paginated/future/2?page=1&pageSize=15`,
     tag: "upcoming",
@@ -73,13 +73,13 @@ function fetchFutureMatches(): Promise<HnsMatch[]> {
   });
 }
 
-export async function fetchUpcomingMatches(): Promise<HnsMatch[]> {
+export async function fetchUpcomingMatches(): Promise<Match[]> {
   const [today, future] = await Promise.all([
     fetchTodayMatches(),
     fetchFutureMatches(),
   ]);
   const seen = new Set<number>();
-  const merged: HnsMatch[] = [];
+  const merged: Match[] = [];
   for (const m of [...today, ...future]) {
     if (m.id == null || seen.has(m.id)) continue;
     seen.add(m.id);
@@ -90,8 +90,8 @@ export async function fetchUpcomingMatches(): Promise<HnsMatch[]> {
 
 export function fetchMatchInfo(params: {
   matchId: number;
-}): Promise<HnsMatch | null> {
-  return hnsResource<HnsMatch>({
+}): Promise<Match | null> {
+  return hnsResource<Match>({
     path: () => `/api/live/match/${params.matchId}`,
     tag: `match-${params.matchId}`,
     revalidate: LIVE_MATCH_TTL,
@@ -100,8 +100,8 @@ export function fetchMatchInfo(params: {
 
 export function fetchMatchEvents(params: {
   matchId: number;
-}): Promise<HnsMatchEvent[]> {
-  return hnsList<HnsMatchEvent>({
+}): Promise<MatchEvent[]> {
+  return hnsList<MatchEvent>({
     path: () => `/api/live/match/${params.matchId}/events?showComments=true`,
     tag: `match-${params.matchId}-events`,
     revalidate: LIVE_MATCH_TTL,
@@ -110,8 +110,8 @@ export function fetchMatchEvents(params: {
 
 export function fetchMatchLineups(params: {
   matchId: number;
-}): Promise<HnsLineups | null> {
-  return hnsResource<HnsLineups>({
+}): Promise<Lineups | null> {
+  return hnsResource<Lineups>({
     path: () => `/api/live/match/${params.matchId}/lineups`,
     tag: `match-${params.matchId}-lineups`,
     revalidate: MATCH_TTL,
@@ -120,8 +120,8 @@ export function fetchMatchLineups(params: {
 
 export function fetchMatchReferees(params: {
   matchId: number;
-}): Promise<HnsMatchInfo | null> {
-  return hnsResource<HnsMatchInfo>({
+}): Promise<MatchInfo | null> {
+  return hnsResource<MatchInfo>({
     path: () => `/api/live/match/${params.matchId}/info`,
     tag: `match-${params.matchId}-referees`,
     revalidate: MATCH_TTL,

@@ -4,12 +4,12 @@ import { MapPin, Navigation } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatDateTime } from "@/lib/helpers/date";
 import { cn } from "@/lib/utils";
-import type { HnsMatch, HnsMatchInfo } from "@/types/hns";
+import type { Match, MatchInfo } from "@/types/hns";
 import { MatchSection } from "./MatchSection";
 
 interface MatchInfoCardProps {
-  match: HnsMatch;
-  refereeData: HnsMatchInfo | undefined;
+  match: Match;
+  refereeData: MatchInfo | undefined;
 }
 
 /**

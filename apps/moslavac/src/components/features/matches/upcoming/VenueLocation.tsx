@@ -1,9 +1,9 @@
 import { MapPin, Navigation } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { HnsFacility } from "@/types/hns";
+import type { Facility } from "@/types/hns";
 
 interface VenueLocationProps {
-  facility: HnsFacility | null | undefined;
+  facility: Facility | null | undefined;
 }
 
 export default function VenueLocation({ facility }: VenueLocationProps) {

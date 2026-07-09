@@ -1,10 +1,10 @@
 "use client";
 
 import type {
-  HnsLineups,
-  HnsMatch,
-  HnsMatchEvent,
-  HnsMatchInfo,
+  Lineups,
+  Match,
+  MatchEvent,
+  MatchInfo,
   TeamRanking,
 } from "@/types/hns";
 import MatchLineupSummary from "../MatchLineupSummary";
@@ -14,12 +14,12 @@ import MatchFormTab from "./MatchFormTab";
 import EventsTimeline from "./EventsTimeline";
 
 interface MatchOverviewTabProps {
-  match: HnsMatch;
-  events: HnsMatchEvent[] | undefined;
-  lineups: HnsLineups | undefined;
-  refereeData: HnsMatchInfo | undefined;
+  match: Match;
+  events: MatchEvent[] | undefined;
+  lineups: Lineups | undefined;
+  refereeData: MatchInfo | undefined;
   refereesLoading: boolean;
-  competitionMatches: HnsMatch[];
+  competitionMatches: Match[];
   standings: TeamRanking[];
 }
 

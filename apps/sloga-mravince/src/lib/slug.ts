@@ -1,4 +1,4 @@
-import type { HnsMatch } from "@/types/hns";
+import type { Match } from "@/types/hns";
 
 /**
  * SEO-friendly URL slugs.
@@ -33,7 +33,7 @@ export function parseTrailingId(slug: string): number {
   return m ? Number(m[1]) : NaN;
 }
 
-export function buildMatchSlug(m: HnsMatch): string {
+export function buildMatchSlug(m: Match): string {
   const home = slugify(m.homeTeam?.name ?? "domacin");
   const away = slugify(m.awayTeam?.name ?? "gost");
   let date = "";

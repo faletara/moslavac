@@ -9,14 +9,14 @@ import { formatDateTime } from "@/lib/helpers/date";
 import { getTenant } from "@/lib/payload/getTenant";
 import { BASE_URL } from "@/lib/siteUrl";
 import { buildMatchSlug, parseTrailingId } from "@/lib/slug";
-import type { HnsMatch } from "@/types/hns";
+import type { Match } from "@/types/hns";
 
 interface Params {
   matchId: string;
 }
 
 /** Absolute image URL for a match: home-team logo, falling back to the club OG image. */
-function matchImageUrl(match: HnsMatch): string {
+function matchImageUrl(match: Match): string {
   const picture = match.homeTeam?.picture ?? match.awayTeam?.picture;
   return picture
     ? `${BASE_URL}${getCometImageUrl(picture)}`

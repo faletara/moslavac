@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { getCometImageUrl } from "@/lib/api";
 import { fetchTeamDetails } from "@/lib/hns/team";
 import { getTenant } from "@/lib/payload/getTenant";
-import type { HnsFacility } from "@/types/hns";
+import type { Facility } from "@/types/hns";
 
 export const metadata: Metadata = {
   title: "O klubu",
@@ -226,7 +226,7 @@ function ContactGrid({
   );
 }
 
-function StadiumPanel({ facility }: { facility: HnsFacility }) {
+function StadiumPanel({ facility }: { facility: Facility }) {
   const name = facility.name?.trim() ?? "";
   const address = facility.address?.trim() ?? "";
   const place = facility.place?.trim() ?? "";

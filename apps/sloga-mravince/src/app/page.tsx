@@ -18,13 +18,13 @@ import { fetchTeamStandings } from "@/lib/hns/standings";
 import { fetchNewsPaginated } from "@/lib/payload/getNews";
 import { fetchRoster } from "@/lib/payload/getRoster";
 import { getTenant } from "@/lib/payload/getTenant";
-import type { HnsMatch, MatchSlots } from "@/types/hns";
+import type { Match, MatchSlots } from "@/types/hns";
 
 export const revalidate = 60;
 
 function isRealMatch(
-  match: HnsMatch | null | undefined,
-): match is HnsMatch & { dateTimeUTC: number } {
+  match: Match | null | undefined,
+): match is Match & { dateTimeUTC: number } {
   return (
     match != null && Object.keys(match).length > 0 && match.dateTimeUTC != null
   );

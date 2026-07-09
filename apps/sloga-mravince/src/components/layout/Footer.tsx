@@ -1,11 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { FrontendTenant, PayloadMedia } from "@/lib/payload/types";
-import type { HnsTeamDetails } from "@/types/hns";
+import type { Team } from "@/types/hns";
 
 interface FooterProps {
   tenant: FrontendTenant;
-  clubDetails: HnsTeamDetails | null;
+  clubDetails: Team | null;
 }
 
 const CLUB_ITEMS = [

@@ -9,10 +9,10 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import type {
-  HnsLineups,
-  HnsMatch,
-  HnsMatchEvent,
-  HnsMatchInfo,
+  Lineups,
+  Match,
+  MatchEvent,
+  MatchInfo,
   PlayerStats,
   TeamRanking,
 } from "@/types/hns";
@@ -33,13 +33,13 @@ type TabValue = (typeof TAB_VALUES)[number];
 const DEFAULT_TAB: TabValue = "pregled";
 
 interface MatchTabsProps {
-  match: HnsMatch;
-  events: HnsMatchEvent[] | undefined;
-  lineups: HnsLineups | undefined;
-  refereeData: HnsMatchInfo | undefined;
+  match: Match;
+  events: MatchEvent[] | undefined;
+  lineups: Lineups | undefined;
+  refereeData: MatchInfo | undefined;
   refereesLoading: boolean;
   standings: TeamRanking[];
-  competitionMatches: HnsMatch[];
+  competitionMatches: Match[];
   scorers: PlayerStats[];
 }
 

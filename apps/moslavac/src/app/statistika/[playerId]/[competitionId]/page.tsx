@@ -125,7 +125,7 @@ export default async function PlayerStatsPage({ params }: Props) {
 
       <PlayerHero
         name={playerName}
-        picture={picture}
+        picture={picture ?? null}
         eyebrowParts={eyebrowParts}
         subParts={subEyebrowParts}
         shirtNumber={shirtNumber ?? null}

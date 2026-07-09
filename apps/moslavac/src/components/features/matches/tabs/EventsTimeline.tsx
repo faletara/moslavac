@@ -11,12 +11,12 @@ import {
 } from "@/lib/helpers/events";
 import { buildPlayerSlug } from "@/lib/slug";
 import { cn } from "@/lib/utils";
-import type { HnsMatch, HnsMatchEvent } from "@/types/hns";
+import type { Match, MatchEvent } from "@/types/hns";
 import { EventIcon } from "../shared/EventIcon";
 
 interface EventsTimelineProps {
-  match: HnsMatch;
-  events: HnsMatchEvent[] | undefined;
+  match: Match;
+  events: MatchEvent[] | undefined;
 }
 
 /**
@@ -60,7 +60,7 @@ export default function EventsTimeline({ match, events }: EventsTimelineProps) {
     halfHome != null && halfAway != null ? `${halfHome}:${halfAway}` : null;
   const finalScore = `${match.homeTeamResult?.current ?? 0}:${match.awayTeamResult?.current ?? 0}`;
 
-  const minuteOf = (e: HnsMatchEvent) => e.minuteFull ?? e.minute ?? 0;
+  const minuteOf = (e: MatchEvent) => e.minuteFull ?? e.minute ?? 0;
   const firstHalf = visible.filter((e) => minuteOf(e) <= 45);
   const secondHalf = visible.filter((e) => minuteOf(e) > 45);
 
@@ -159,7 +159,7 @@ function EventRow({
   team,
   score,
 }: {
-  event: HnsMatchEvent;
+  event: MatchEvent;
   competitionId: number | null;
   homeIsMoslavac: boolean;
   team: { picture: string | null; name: string };

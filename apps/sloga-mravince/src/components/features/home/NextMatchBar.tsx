@@ -4,10 +4,10 @@ import { FadeInView } from "@/components/animations";
 import { HnsCrest } from "@/components/HnsCrest";
 import { formatDateParts } from "@/lib/helpers/date";
 import { cn } from "@/lib/utils";
-import type { HnsMatch, MatchSlots } from "@/types/hns";
+import type { Match, MatchSlots } from "@/types/hns";
 import Countdown from "./Countdown";
 
-function isRealMatch(match: HnsMatch | null | undefined): match is HnsMatch {
+function isRealMatch(match: Match | null | undefined): match is Match {
   return (
     match != null && Object.keys(match).length > 0 && match.dateTimeUTC != null
   );

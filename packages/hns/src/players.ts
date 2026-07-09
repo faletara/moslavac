@@ -1,8 +1,8 @@
 import "server-only";
 import { hnsList, hnsResource } from "./fetchResource";
 import type {
-  HnsTeamPlayer,
-  PaginatedResult,
+  TeamPlayer,
+  PaginatedResultsTeamPlayer,
   PlayerCompetitionStats,
 } from "@/types/hns";
 
@@ -10,9 +10,9 @@ const PLAYER_TTL = 3600;
 
 export function fetchPlayerDetails(params: {
   personId: string;
-}): Promise<HnsTeamPlayer | null> {
+}): Promise<TeamPlayer | null> {
   if (!params.personId) return Promise.resolve(null);
-  return hnsResource<HnsTeamPlayer>({
+  return hnsResource<TeamPlayer>({
     path: () => `/api/live/player/${params.personId}`,
     tag: `player-${params.personId}`,
     revalidate: PLAYER_TTL,
@@ -40,11 +40,11 @@ export async function fetchPlayerStats(params: {
 
 export async function searchPlayers(params: {
   keyword: string;
-}): Promise<PaginatedResult<HnsTeamPlayer>> {
+}): Promise<PaginatedResultsTeamPlayer> {
   if (!params.keyword.trim()) {
     return { result: [], size: 0 };
   }
-  const result = await hnsResource<PaginatedResult<HnsTeamPlayer>>({
+  const result = await hnsResource<PaginatedResultsTeamPlayer>({
     path: () =>
       `/api/live/player/search?keyword=${encodeURIComponent(params.keyword)}&page=0&pageSize=100`,
     revalidate: PLAYER_TTL,

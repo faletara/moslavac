@@ -6,15 +6,15 @@ import Link from "next/link";
 import { FadeInView, RevealHeading } from "@/components/animations";
 import { formatDateTime } from "@/lib/helpers/date";
 import { buildMatchSlug } from "@/lib/slug";
-import type { HnsMatch } from "@/types/hns";
+import type { Match } from "@/types/hns";
 import { CountdownTiles } from "./CountdownTiles";
 import { TeamCrest } from "./TeamCrest";
 
 interface NextMatchHeroProps {
-  match: HnsMatch;
+  match: Match;
 }
 
-function formatRound(round: string | null): string | null {
+function formatRound(round: string | null | undefined): string | null {
   if (!round) return null;
   const trimmed = round.trim();
   if (!trimmed) return null;

@@ -2,9 +2,9 @@ import Image from "next/image";
 import { FadeInView } from "@/components/animations";
 import { CardSlider } from "@/components/features/CardSlider";
 import type { PlayedMatchSummary } from "@/lib/helpers/form";
-import type { HnsTeam } from "@/types/hns";
+import type { Team } from "@/types/hns";
 
-function teamLogo(team: HnsTeam | null): string | null {
+function teamLogo(team: Team | null | undefined): string | null {
 	return team?.picture ? `/api/images/${team.picture}` : null;
 }
 
@@ -29,7 +29,7 @@ function TeamRow({
 	score,
 	won,
 }: {
-	team: HnsTeam | null;
+	team: Team | null | undefined;
 	score: number;
 	won: boolean;
 }) {

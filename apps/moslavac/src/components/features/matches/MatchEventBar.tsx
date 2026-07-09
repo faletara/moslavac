@@ -9,18 +9,18 @@ import {
   isYellowCardEvent,
 } from "@/lib/helpers/events";
 import { cn } from "@/lib/utils";
-import type { HnsMatchEvent } from "@/types/hns";
+import type { MatchEvent } from "@/types/hns";
 import { EventIcon } from "./shared/EventIcon";
 
 interface MatchEventBarProps {
-  events: HnsMatchEvent[];
+  events: MatchEvent[];
   homeName: string;
   homePicture: string | null;
   awayName: string;
   awayPicture: string | null;
 }
 
-function isBarEvent(e: HnsMatchEvent): boolean {
+function isBarEvent(e: MatchEvent): boolean {
   return (
     isGoalEvent(e) ||
     isYellowCardEvent(e) ||
@@ -51,7 +51,7 @@ export default function MatchEventBar({
 
   if (barEvents.length === 0) return null;
 
-  const minuteOf = (e: HnsMatchEvent) =>
+  const minuteOf = (e: MatchEvent) =>
     (e.minuteFull ?? e.minute ?? 0) + (e.stoppageTime ?? 0);
   const domainMax = Math.max(90, ...barEvents.map(minuteOf));
   const pct = (m: number) => Math.min(97, Math.max(3, (m / domainMax) * 100));
@@ -59,8 +59,8 @@ export default function MatchEventBar({
   // Stack events that sit too close horizontally into vertical "floors" away
   // from the rail so the icons never overlap (à la broadcast match centres).
   const MIN_GAP = 5; // percent of the rail before two icons would collide
-  const level = new Map<HnsMatchEvent, number>();
-  const assignFloors = (lane: HnsMatchEvent[]) => {
+  const level = new Map<MatchEvent, number>();
+  const assignFloors = (lane: MatchEvent[]) => {
     const sorted = [...lane].sort((a, b) => minuteOf(a) - minuteOf(b));
     let lastPct = -100;
     let floor = 0;

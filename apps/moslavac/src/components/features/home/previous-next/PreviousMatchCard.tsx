@@ -7,11 +7,11 @@ import { FadeInView, RevealHeading } from "@/components/animations";
 import { formatDateTime } from "@/lib/helpers/date";
 import type { FormResult } from "@/lib/helpers/form";
 import { buildMatchSlug } from "@/lib/slug";
-import type { HnsMatch } from "@/types/hns";
+import type { Match } from "@/types/hns";
 import { TeamCrest } from "./TeamCrest";
 
 interface PreviousMatchCardProps {
-  match: HnsMatch;
+  match: Match;
 }
 
 const OUTCOME_LABEL: Record<FormResult, string> = {
@@ -31,7 +31,7 @@ function isMoslavac(name: string | null | undefined): boolean {
 }
 
 function getOutcomeFromMoslavacPerspective(
-  match: HnsMatch,
+  match: Match,
 ): FormResult | null {
   const home = match.homeTeamResult?.current;
   const away = match.awayTeamResult?.current;
@@ -48,7 +48,7 @@ function getOutcomeFromMoslavacPerspective(
   return "D";
 }
 
-function formatRound(round: string | null): string | null {
+function formatRound(round: string | null | undefined): string | null {
   if (!round) return null;
   const trimmed = round.trim();
   if (!trimmed) return null;

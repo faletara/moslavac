@@ -1,4 +1,4 @@
-import type { HnsMatchEvent } from "@/types/hns";
+import type { MatchEvent } from "@/types/hns";
 
 export const formatEventTime = (
   minuteFull: number,
@@ -15,27 +15,27 @@ const YELLOW_FCD_NAMES = new Set(["YELLOW"]);
 const RED_FCD_NAMES = new Set(["RED", "SECOND_YELLOW"]);
 const SUBSTITUTION_FCD_NAMES = new Set(["SUBSTITUTION"]);
 
-const hasFcd = (event: HnsMatchEvent, set: Set<string>): boolean => {
+const hasFcd = (event: MatchEvent, set: Set<string>): boolean => {
   const fcd = event.eventType?.fcdName;
   return !!fcd && set.has(fcd);
 };
 
-export const isGoalEvent = (event: HnsMatchEvent): boolean =>
+export const isGoalEvent = (event: MatchEvent): boolean =>
   hasFcd(event, GOAL_FCD_NAMES);
 
-export const isPenaltyGoalEvent = (event: HnsMatchEvent): boolean =>
+export const isPenaltyGoalEvent = (event: MatchEvent): boolean =>
   hasFcd(event, PENALTY_GOAL_FCD_NAMES);
 
-export const isMissedPenaltyEvent = (event: HnsMatchEvent): boolean =>
+export const isMissedPenaltyEvent = (event: MatchEvent): boolean =>
   hasFcd(event, MISSED_PENALTY_FCD_NAMES);
 
-export const isYellowCardEvent = (event: HnsMatchEvent): boolean =>
+export const isYellowCardEvent = (event: MatchEvent): boolean =>
   hasFcd(event, YELLOW_FCD_NAMES);
 
-export const isRedCardEvent = (event: HnsMatchEvent): boolean =>
+export const isRedCardEvent = (event: MatchEvent): boolean =>
   hasFcd(event, RED_FCD_NAMES);
 
-export const isSubstitutionEvent = (event: HnsMatchEvent): boolean =>
+export const isSubstitutionEvent = (event: MatchEvent): boolean =>
   hasFcd(event, SUBSTITUTION_FCD_NAMES);
 
 export interface ScorerGoal {
@@ -52,7 +52,7 @@ export interface ScorerEntry {
 }
 
 const groupScorersForSide = (
-  events: HnsMatchEvent[],
+  events: MatchEvent[],
   side: "home" | "away",
 ): ScorerEntry[] => {
   const goals = events.filter(
@@ -95,7 +95,7 @@ const groupScorersForSide = (
 };
 
 export const getScorers = (
-  events: HnsMatchEvent[] | undefined,
+  events: MatchEvent[] | undefined,
 ): { home: ScorerEntry[]; away: ScorerEntry[] } => ({
   home: groupScorersForSide(events ?? [], "home"),
   away: groupScorersForSide(events ?? [], "away"),
@@ -109,7 +109,7 @@ export interface CardCounts {
 }
 
 export const getCardCounts = (
-  events: HnsMatchEvent[] | undefined,
+  events: MatchEvent[] | undefined,
 ): CardCounts => {
   const counts: CardCounts = {
     homeYellow: 0,
@@ -132,7 +132,7 @@ export const getCardCounts = (
 };
 
 export const countSubstitutions = (
-  events: HnsMatchEvent[] | undefined,
+  events: MatchEvent[] | undefined,
 ): number => (events ?? []).filter(isSubstitutionEvent).length;
 
 export interface ScoreSnapshot {
@@ -141,7 +141,7 @@ export interface ScoreSnapshot {
 }
 
 export const buildScoreProgression = (
-  events: HnsMatchEvent[] | undefined,
+  events: MatchEvent[] | undefined,
 ): Map<number, ScoreSnapshot> => {
   const map = new Map<number, ScoreSnapshot>();
   if (!events) return map;

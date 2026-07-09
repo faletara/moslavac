@@ -1,12 +1,12 @@
 "use client";
 
-import type { HnsMatch, TeamRanking } from "@/types/hns";
+import type { Match, TeamRanking } from "@/types/hns";
 import FormAndStanding from "../upcoming/FormAndStanding";
 import HeadToHead from "../upcoming/HeadToHead";
 
 interface MatchFormTabProps {
-  match: HnsMatch;
-  competitionMatches: HnsMatch[];
+  match: Match;
+  competitionMatches: Match[];
   standings: TeamRanking[];
 }
 

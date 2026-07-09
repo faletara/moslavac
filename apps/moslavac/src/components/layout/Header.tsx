@@ -27,13 +27,13 @@ import {
 } from "@/lib/helpers/competition";
 import { buildCompetitionSlug } from "@/lib/slug";
 import type { FrontendTenant, PayloadMedia } from "@/lib/payload/types";
-import type { HnsCompetition } from "@/types/hns";
+import type { Competition } from "@/types/hns";
 import { cn } from "@/lib/utils";
 import NavLink from "./NavLink";
 
 interface HeaderProps {
 	tenant: FrontendTenant;
-	competitions: HnsCompetition[];
+	competitions: Competition[];
 }
 
 const dropdownContentClass =

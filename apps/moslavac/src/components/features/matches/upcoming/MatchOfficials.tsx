@@ -2,10 +2,10 @@
 
 import { AnimatedLine, FadeInView } from "@/components/animations";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { HnsMatchInfo } from "@/types/hns";
+import type { MatchInfo } from "@/types/hns";
 
 interface MatchOfficialsProps {
-  refereeData: HnsMatchInfo | undefined;
+  refereeData: MatchInfo | undefined;
   isLoading: boolean;
 }
 

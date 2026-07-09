@@ -6,7 +6,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { formatDateTime } from "@/lib/helpers/date";
 import { buildMatchSlug } from "@/lib/slug";
 import { cn } from "@/lib/utils";
-import type { HnsMatch } from "@/types/hns";
+import type { Match } from "@/types/hns";
 
 function TeamCrest({ name, picture }: { name: string; picture: string }) {
 	return (
@@ -63,11 +63,11 @@ function TeamSide({
 	);
 }
 
-function isPlayed(match: HnsMatch) {
+function isPlayed(match: Match) {
 	return match.homeTeamResult != null && match.awayTeamResult != null;
 }
 
-function MatchRow({ match }: { match: HnsMatch }) {
+function MatchRow({ match }: { match: Match }) {
 	const { date, time } = formatDateTime(match.dateTimeUTC ?? 0);
 	const hasResult = isPlayed(match);
 
@@ -115,7 +115,7 @@ function MatchSection({
 	matches,
 }: {
 	label: string;
-	matches: HnsMatch[];
+	matches: Match[];
 }) {
 	if (matches.length === 0) return null;
 	return (
@@ -135,7 +135,7 @@ function MatchSection({
 export default function MatchesList({
 	matches,
 }: {
-	matches: HnsMatch[] | undefined;
+	matches: Match[] | undefined;
 }) {
 	if (!matches || matches.length === 0) {
 		return (

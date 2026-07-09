@@ -1,4 +1,4 @@
-import type { HnsMatch, PastMatch } from "@/types/hns";
+import type { Match, PastMatch } from "@/types/hns";
 
 export type FormResult = "W" | "D" | "L";
 
@@ -39,22 +39,22 @@ export function getStandingsForm(
 }
 
 export interface PlayedMatchSummary {
-  match: HnsMatch;
+  match: Match;
   result: FormResult;
   goalsFor: number;
   goalsAgainst: number;
   isHome: boolean;
 }
 
-const isPlayed = (match: HnsMatch): boolean =>
+const isPlayed = (match: Match): boolean =>
   match.homeTeamResult?.current != null &&
   match.awayTeamResult?.current != null;
 
-const involvesTeam = (match: HnsMatch, teamId: number): boolean =>
+const involvesTeam = (match: Match, teamId: number): boolean =>
   match.homeTeam?.id === teamId || match.awayTeam?.id === teamId;
 
 export function getTeamPlayedMatches(
-  matches: HnsMatch[],
+  matches: Match[],
   teamId: number,
 ): PlayedMatchSummary[] {
   return matches
@@ -77,7 +77,7 @@ export function getTeamPlayedMatches(
 }
 
 export function getRecentForm(
-  matches: HnsMatch[],
+  matches: Match[],
   teamId: number,
   limit = 5,
 ): PlayedMatchSummary[] {
@@ -85,7 +85,7 @@ export function getRecentForm(
 }
 
 export function getMatchOutcome(
-  match: HnsMatch | null | undefined,
+  match: Match | null | undefined,
   ourTeamId: number,
 ): FormResult | null {
   if (!match || !isPlayed(match) || !involvesTeam(match, ourTeamId)) return null;
@@ -106,10 +106,10 @@ export function getMatchOutcome(
 }
 
 export function getHeadToHead(
-  matches: HnsMatch[],
+  matches: Match[],
   teamAId: number,
   teamBId: number,
-): HnsMatch[] {
+): Match[] {
   return matches
     .filter(
       (m) =>

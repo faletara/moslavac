@@ -3,7 +3,7 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { HnsCrest } from "@/components/HnsCrest";
 import { cn } from "@/lib/utils";
-import type { HnsMatchEvent } from "@/types/hns";
+import type { MatchEvent } from "@/types/hns";
 import MatchEventBar from "./MatchEventBar";
 
 const EASE = [0.25, 0.1, 0.25, 1] as const;
@@ -26,7 +26,7 @@ interface MatchHeroProps {
   /** Attendance count, shown only for played matches with a positive value. */
   attendance: number | null;
   /** Match events — render the broadcast event bar when present. */
-  events?: HnsMatchEvent[];
+  events?: MatchEvent[];
 }
 
 /**

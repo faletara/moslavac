@@ -14,17 +14,17 @@ import {
 import { buildPlayerSlug } from "@/lib/slug";
 import { cn } from "@/lib/utils";
 import type {
-  HnsMatch,
-  HnsMatchEvent,
-  HnsTeamLineup,
-  HnsTeamPlayer,
+  Match,
+  MatchEvent,
+  TeamLineup,
+  TeamPlayer,
 } from "@/types/hns";
 import { EventIcon } from "./shared/EventIcon";
 
 interface MatchLineupSummaryProps {
-  match: HnsMatch;
-  home: HnsTeamLineup | null;
-  away: HnsTeamLineup | null;
+  match: Match;
+  home: TeamLineup | null;
+  away: TeamLineup | null;
 }
 
 /**
@@ -186,7 +186,7 @@ function PlayerRow({
   isMoslavac,
   compact = false,
 }: {
-  player: HnsTeamPlayer;
+  player: TeamPlayer;
   competitionId: number | null;
   isMoslavac: boolean;
   compact?: boolean;
@@ -257,7 +257,7 @@ function PlayerEvents({
   events,
   isStarter,
 }: {
-  events: HnsMatchEvent[] | null;
+  events: MatchEvent[] | null | undefined;
   isStarter: boolean;
 }) {
   const items = (events ?? []).filter(

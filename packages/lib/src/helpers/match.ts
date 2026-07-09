@@ -1,8 +1,8 @@
-import type { HnsMatch } from "@/types/hns";
+import type { Match } from "@/types/hns";
 
-export const groupAndSortMatches = (matches: HnsMatch[]) => {
-  const grouped: Record<string, HnsMatch[]> = matches.reduce(
-    (acc: Record<string, HnsMatch[]>, match) => {
+export const groupAndSortMatches = (matches: Match[]) => {
+  const grouped: Record<string, Match[]> = matches.reduce(
+    (acc: Record<string, Match[]>, match) => {
       const date = new Date(match.dateTimeUTC ?? 0);
       const monthYear = `${date.getFullYear()}-${date.getMonth() + 1}`;
       acc[monthYear] = acc[monthYear] || [];
