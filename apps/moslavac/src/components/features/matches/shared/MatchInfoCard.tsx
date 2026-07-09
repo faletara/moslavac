@@ -24,17 +24,17 @@ export default function MatchInfoCard({
   refereeData,
 }: MatchInfoCardProps) {
   const facility = match.facility;
-  const officials = (refereeData?.matchOfficials ?? []).filter(
+  const officials = (refereeData?.officials ?? []).filter(
     (o) => (o.name ?? "").trim() !== "",
   );
 
   const hasResult =
-    match.homeTeamResult != null && match.awayTeamResult != null;
+    match.score.home.current != null && match.score.away.current != null;
   const attendance = match.attendance ?? null;
 
   const { date, time } =
-    match.dateTimeUTC != null
-      ? formatDateTime(match.dateTimeUTC)
+    match.kickoffAtUtcMs != null
+      ? formatDateTime(match.kickoffAtUtcMs)
       : { date: "", time: "" };
 
   const facts: { label: string; value: string }[] = [

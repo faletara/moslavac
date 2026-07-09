@@ -32,14 +32,14 @@ export default function MatchOverviewTab({
   standings,
 }: MatchOverviewTabProps) {
   const hasResult =
-    match.homeTeamResult != null && match.awayTeamResult != null;
+    match.score.home.current != null && match.score.away.current != null;
 
   if (!hasResult) {
     // Pre-match Match Room — countdown, form/standing/H2H, then facts.
     return (
       <div className="mx-auto mt-12 flex max-w-4xl flex-col gap-20 sm:mt-16 sm:gap-28">
-        {match.dateTimeUTC != null && (
-          <MatchCountdown dateTimeUTC={match.dateTimeUTC} />
+        {match.kickoffAtUtcMs != null && (
+          <MatchCountdown kickoffAtUtcMs={match.kickoffAtUtcMs} />
         )}
         <MatchFormTab
           match={match}

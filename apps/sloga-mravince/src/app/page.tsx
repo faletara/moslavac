@@ -24,9 +24,9 @@ export const revalidate = 60;
 
 function isRealMatch(
   match: Match | null | undefined,
-): match is Match & { dateTimeUTC: number } {
+): match is Match & { kickoffAtUtcMs: number } {
   return (
-    match != null && Object.keys(match).length > 0 && match.dateTimeUTC != null
+    match != null && Object.keys(match).length > 0 && match.kickoffAtUtcMs != null
   );
 }
 
@@ -41,7 +41,7 @@ function getNextMatchMarquee(
 
   const match = slots.next;
   const { weekdayShort, day, monthShort, time } = formatDateParts(
-    match.dateTimeUTC,
+    match.kickoffAtUtcMs,
   );
   const teams =
     [match.homeTeam?.name, match.awayTeam?.name].filter(Boolean).join(" - ") ||

@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/carousel";
 import type { RosterPosition } from "@/types/roster";
 
-export interface FirstTeamPlayer {
+export interface FirstLineupPlayer {
 	id: number;
 	displayName: string;
 	position: RosterPosition;
@@ -42,7 +42,7 @@ export default function FirstTeamCarousel({
 	players,
 	totalPlayers,
 }: {
-	players: FirstTeamPlayer[];
+	players: FirstLineupPlayer[];
 	totalPlayers: number;
 }) {
 	return (
@@ -125,7 +125,7 @@ export default function FirstTeamCarousel({
 	);
 }
 
-function PlayerPoster({ player }: { player: FirstTeamPlayer }) {
+function PlayerPoster({ player }: { player: FirstLineupPlayer }) {
 	const [nameLineOne, nameLineTwo] = splitDisplayNameLines(player.displayName);
 	const initials = player.displayName
 		.split(/\s+/)

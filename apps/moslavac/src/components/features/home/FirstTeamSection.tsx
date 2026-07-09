@@ -5,7 +5,7 @@ import { fetchRoster } from "@/lib/payload/getRoster";
 import { buildPlayerSlug } from "@/lib/slug";
 import type { RosterEntry } from "@/types/roster";
 import FirstTeamCarousel, {
-	type FirstTeamPlayer,
+	type FirstLineupPlayer,
 } from "./FirstTeamCarousel";
 
 /** Players first (by club display order), staff last. */
@@ -51,7 +51,7 @@ export default async function FirstTeamSection() {
 	const cometPictures = await resolveCometPictures(ordered);
 	const competitionId = seniorCompetition?.id ?? null;
 
-	const players: FirstTeamPlayer[] = ordered.map((entry) => {
+	const players: FirstLineupPlayer[] = ordered.map((entry) => {
 		const cometUuid = cometPictures.get(entry.personId) ?? null;
 		const linkable = competitionId != null && entry.position !== "trener";
 		return {

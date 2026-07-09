@@ -9,7 +9,7 @@ import Countdown from "./Countdown";
 
 function isRealMatch(match: Match | null | undefined): match is Match {
   return (
-    match != null && Object.keys(match).length > 0 && match.dateTimeUTC != null
+    match != null && Object.keys(match).length > 0 && match.kickoffAtUtcMs != null
   );
 }
 
@@ -56,15 +56,15 @@ export default function NextMatchBar({ slots }: { slots: MatchSlots }) {
   const match = isNext ? slots.next : slots.previous;
   if (!isRealMatch(match)) return null;
 
-  const kickoff = match.dateTimeUTC as number;
+  const kickoff = match.kickoffAtUtcMs as number;
   const { weekdayShort, day, monthShort, time } = formatDateParts(kickoff);
   const meta = [match.competition?.name, match.round]
     .filter(Boolean)
     .join(" · ");
   const venue = match.facility?.name ?? match.facility?.place ?? null;
 
-  const home = match.homeTeamResult?.current;
-  const away = match.awayTeamResult?.current;
+  const home = match.score.home?.current;
+  const away = match.score.away?.current;
   const hasScore = home != null && away != null;
 
   const detailsHref = match.id != null ? `/utakmice/${match.id}` : null;
@@ -129,7 +129,7 @@ export default function NextMatchBar({ slots }: { slots: MatchSlots }) {
                 <Countdown target={kickoff} />
               ) : (
                 <span className="font-display text-6xl sm:text-8xl">
-                  {match.result ?? "–"}
+                  {match.teamResult ?? "–"}
                 </span>
               )}
             </div>

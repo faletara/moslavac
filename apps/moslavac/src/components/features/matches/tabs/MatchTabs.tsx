@@ -13,7 +13,7 @@ import type {
   Match,
   MatchEvent,
   MatchInfo,
-  PlayerStats,
+  CompetitionPlayerStat,
   TeamRanking,
 } from "@/types/hns";
 import MatchFormTab from "./MatchFormTab";
@@ -40,7 +40,7 @@ interface MatchTabsProps {
   refereesLoading: boolean;
   standings: TeamRanking[];
   competitionMatches: Match[];
-  scorers: PlayerStats[];
+  scorers: CompetitionPlayerStat[];
 }
 
 export default function MatchTabs({

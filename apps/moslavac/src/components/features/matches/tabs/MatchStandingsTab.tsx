@@ -95,7 +95,7 @@ function StandingsRow({
   const diff = goalsFor - goalsAgainst;
   const diffLabel = diff > 0 ? `+${diff}` : `${diff}`;
 
-  const form = getStandingsForm(row.m1, row.m2, row.m3, row.m4, row.m5);
+  const form = getStandingsForm(row.form);
 
   const teamName = row.team?.name ?? "—";
   const teamId = row.team?.id;

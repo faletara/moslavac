@@ -99,7 +99,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .filter((m) => m.id != null && m.allowDetail !== false)
       .map((m) => ({
         url: `${BASE_URL}/utakmice/${buildMatchSlug(m)}`,
-        lastModified: m.dateTimeUTC != null ? new Date(m.dateTimeUTC) : now,
+        lastModified: m.kickoffAtUtcMs != null ? new Date(m.kickoffAtUtcMs) : now,
         changeFrequency: "weekly" as const,
         priority: 0.6,
       }));

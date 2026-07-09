@@ -14,11 +14,11 @@ import {
 } from "@/components/ui/table";
 import { buildPlayerSlug } from "@/lib/slug";
 import { cn } from "@/lib/utils";
-import type { PlayerStats } from "@/types/hns";
+import type { CompetitionPlayerStat } from "@/types/hns";
 
 interface CardsTableProps {
-  yellowCards: PlayerStats[] | undefined;
-  redCards: PlayerStats[] | undefined;
+  yellowCards: CompetitionPlayerStat[] | undefined;
+  redCards: CompetitionPlayerStat[] | undefined;
   isLoading: boolean;
   competitionId: number | null;
   highlightTeamIds?: number[];
@@ -37,13 +37,13 @@ interface MergedRow {
 }
 
 function mergeCards(
-  yellow: PlayerStats[] = [],
-  red: PlayerStats[] = [],
+  yellow: CompetitionPlayerStat[] = [],
+  red: CompetitionPlayerStat[] = [],
 ): MergedRow[] {
   const map = new Map<string, MergedRow>();
 
   const upsert = (
-    s: PlayerStats,
+    s: CompetitionPlayerStat,
     field: "yellow" | "red",
     value: number,
   ): void => {

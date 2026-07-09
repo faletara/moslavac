@@ -1,33 +1,40 @@
 import "server-only";
 import type {
+  HnsLineups,
+  HnsMatch,
+  HnsMatchEvent,
+  HnsMatchInfo,
   Lineups,
   Match,
   MatchEvent,
   MatchInfo,
 } from "@/types/hns";
+import { adaptLineups, adaptMatch, adaptMatchEvent, adaptMatchInfo } from "./adapters";
 import { hnsList, hnsResource } from "./fetchResource";
 
 const MATCH_TTL = 60;
 const LIVE_MATCH_TTL = 30;
 
-function fetchPastTeamMatches(): Promise<Match[]> {
-  return hnsList<Match>({
+async function fetchPastTeamMatches(): Promise<Match[]> {
+  const matches = await hnsList<HnsMatch>({
     path: (teamId) =>
       `/api/live/team/${teamId}/matches/paginated/past/2?page=1&pageSize=75`,
     tag: "team-matches",
     revalidate: MATCH_TTL,
     paginated: true,
   });
+  return matches.map(adaptMatch);
 }
 
-function fetchFutureTeamMatches(): Promise<Match[]> {
-  return hnsList<Match>({
+async function fetchFutureTeamMatches(): Promise<Match[]> {
+  const matches = await hnsList<HnsMatch>({
     path: (teamId) =>
       `/api/live/team/${teamId}/matches/paginated/future/2?page=1&pageSize=75`,
     tag: "team-matches",
     revalidate: MATCH_TTL,
     paginated: true,
   });
+  return matches.map(adaptMatch);
 }
 
 export async function fetchAllMatches(): Promise<Match[]> {
@@ -39,13 +46,15 @@ export async function fetchAllMatches(): Promise<Match[]> {
 }
 
 async function fetchTodayMatches(): Promise<Match[]> {
-  const matches = await hnsList<Match>({
-    path: (teamId) =>
-      `/api/live/team/${teamId}/matches/paginated/past/2?page=1&pageSize=10`,
-    tag: "today",
-    revalidate: MATCH_TTL,
-    paginated: true,
-  });
+  const matches = (
+    await hnsList<HnsMatch>({
+      path: (teamId) =>
+        `/api/live/team/${teamId}/matches/paginated/past/2?page=1&pageSize=10`,
+      tag: "today",
+      revalidate: MATCH_TTL,
+      paginated: true,
+    })
+  ).map(adaptMatch);
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -54,23 +63,24 @@ async function fetchTodayMatches(): Promise<Match[]> {
   const nowMs = Date.now();
 
   return matches.filter((m) => {
-    if (m.dateTimeUTC == null) return false;
+    if (m.kickoffAtUtcMs == null) return false;
     return (
-      m.dateTimeUTC >= todayMs &&
-      m.dateTimeUTC < tomorrowMs &&
-      m.dateTimeUTC > nowMs
+      m.kickoffAtUtcMs >= todayMs &&
+      m.kickoffAtUtcMs < tomorrowMs &&
+      m.kickoffAtUtcMs > nowMs
     );
   });
 }
 
-function fetchFutureMatches(): Promise<Match[]> {
-  return hnsList<Match>({
+async function fetchFutureMatches(): Promise<Match[]> {
+  const matches = await hnsList<HnsMatch>({
     path: (teamId) =>
       `/api/live/team/${teamId}/matches/paginated/future/2?page=1&pageSize=15`,
     tag: "upcoming",
     revalidate: MATCH_TTL,
     paginated: true,
   });
+  return matches.map(adaptMatch);
 }
 
 export async function fetchUpcomingMatches(): Promise<Match[]> {
@@ -85,45 +95,51 @@ export async function fetchUpcomingMatches(): Promise<Match[]> {
     seen.add(m.id);
     merged.push(m);
   }
-  return merged.sort((a, b) => (a.dateTimeUTC ?? 0) - (b.dateTimeUTC ?? 0));
+  return merged.sort(
+    (a, b) => (a.kickoffAtUtcMs ?? 0) - (b.kickoffAtUtcMs ?? 0),
+  );
 }
 
-export function fetchMatchInfo(params: {
+export async function fetchMatchInfo(params: {
   matchId: number;
 }): Promise<Match | null> {
-  return hnsResource<Match>({
+  const match = await hnsResource<HnsMatch>({
     path: () => `/api/live/match/${params.matchId}`,
     tag: `match-${params.matchId}`,
     revalidate: LIVE_MATCH_TTL,
   });
+  return match ? adaptMatch(match) : null;
 }
 
-export function fetchMatchEvents(params: {
+export async function fetchMatchEvents(params: {
   matchId: number;
 }): Promise<MatchEvent[]> {
-  return hnsList<MatchEvent>({
+  const events = await hnsList<HnsMatchEvent>({
     path: () => `/api/live/match/${params.matchId}/events?showComments=true`,
     tag: `match-${params.matchId}-events`,
     revalidate: LIVE_MATCH_TTL,
   });
+  return events.map(adaptMatchEvent);
 }
 
-export function fetchMatchLineups(params: {
+export async function fetchMatchLineups(params: {
   matchId: number;
 }): Promise<Lineups | null> {
-  return hnsResource<Lineups>({
+  const lineups = await hnsResource<HnsLineups>({
     path: () => `/api/live/match/${params.matchId}/lineups`,
     tag: `match-${params.matchId}-lineups`,
     revalidate: MATCH_TTL,
   });
+  return adaptLineups(lineups);
 }
 
-export function fetchMatchReferees(params: {
+export async function fetchMatchReferees(params: {
   matchId: number;
 }): Promise<MatchInfo | null> {
-  return hnsResource<MatchInfo>({
+  const info = await hnsResource<HnsMatchInfo>({
     path: () => `/api/live/match/${params.matchId}/info`,
     tag: `match-${params.matchId}-referees`,
     revalidate: MATCH_TTL,
   });
+  return adaptMatchInfo(info);
 }

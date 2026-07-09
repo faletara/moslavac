@@ -17,7 +17,7 @@ import type {
   Match,
   MatchEvent,
   TeamLineup,
-  TeamPlayer,
+  LineupPlayer,
 } from "@/types/hns";
 import { EventIcon } from "./shared/EventIcon";
 
@@ -186,7 +186,7 @@ function PlayerRow({
   isMoslavac,
   compact = false,
 }: {
-  player: TeamPlayer;
+  player: LineupPlayer;
   competitionId: number | null;
   isMoslavac: boolean;
   compact?: boolean;
@@ -272,16 +272,16 @@ function PlayerEvents({
   return (
     <div className="flex shrink-0 flex-col items-end gap-1.5">
       {items.slice(0, 3).map((e, i) => {
-        const minute = e.minuteFull ?? e.minute ?? 0;
+        const minute = e.minute ?? 0;
         const sub = isSubstitutionEvent(e);
         return (
           <span
-            key={`${e.eventId ?? i}`}
+            key={`${e.id ?? i}`}
             className="flex items-center gap-1.5 text-[0.6rem] font-bold tabular-nums text-foreground/55"
           >
             {minute}&apos;
             <EventIcon
-              eventType={e.eventType?.name ?? ""}
+              typeName={e.type.name}
               subDirection={sub ? (isStarter ? "out" : "in") : undefined}
             />
           </span>

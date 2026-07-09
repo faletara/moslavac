@@ -16,14 +16,14 @@ import type { Competition, Match } from "@/types/hns";
 
 export const revalidate = 300;
 
-type MatchWithDate = Match & { dateTimeUTC: number };
+type MatchWithDate = Match & { kickoffAtUtcMs: number };
 
 interface Props {
   searchParams: Promise<{ competitionId?: string }>;
 }
 
 function hasDate(match: Match): match is MatchWithDate {
-  return match.dateTimeUTC != null;
+  return match.kickoffAtUtcMs != null;
 }
 
 function parseCompetitionId(value: string | undefined): number | null {
@@ -58,19 +58,19 @@ function splitMatches(matches: Match[]) {
   const dated = matches.filter(hasDate);
   const upcoming = dated
     .filter((match) => !isFinished(match))
-    .sort((a, b) => a.dateTimeUTC - b.dateTimeUTC);
+    .sort((a, b) => a.kickoffAtUtcMs - b.kickoffAtUtcMs);
   const results = dated
     .filter(isFinished)
-    .sort((a, b) => b.dateTimeUTC - a.dateTimeUTC);
+    .sort((a, b) => b.kickoffAtUtcMs - a.kickoffAtUtcMs);
 
   return { upcoming, results };
 }
 
 function scoreOf(match: Match): string | null {
-  const home = match.homeTeamResult?.current;
-  const away = match.awayTeamResult?.current;
+  const home = match.score.home?.current;
+  const away = match.score.away?.current;
   if (home != null && away != null) return `${home}:${away}`;
-  return match.result || null;
+  return match.teamResult || null;
 }
 
 function matchMeta(match: Match): string {
@@ -143,7 +143,7 @@ function MatchCard({
   variant: "upcoming" | "result";
 }) {
   const { weekdayShort, day, monthShort, time } = formatDateParts(
-    match.dateTimeUTC,
+    match.kickoffAtUtcMs,
   );
   const score = scoreOf(match);
   const venue = match.facility?.name ?? match.facility?.place;
@@ -295,7 +295,7 @@ export default async function ScheduleResultsPage({ searchParams }: Props) {
                 <div className="mt-10">
                   {upcoming.map((match) => (
                     <MatchCard
-                      key={match.id ?? match.dateTimeUTC}
+                      key={match.id ?? match.kickoffAtUtcMs}
                       match={match}
                       variant="upcoming"
                     />
@@ -318,7 +318,7 @@ export default async function ScheduleResultsPage({ searchParams }: Props) {
                 {results.length > 0 ? (
                   results.map((match) => (
                     <MatchCard
-                      key={match.id ?? match.dateTimeUTC}
+                      key={match.id ?? match.kickoffAtUtcMs}
                       match={match}
                       variant="result"
                     />

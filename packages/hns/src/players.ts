@@ -1,22 +1,31 @@
 import "server-only";
-import { hnsList, hnsResource } from "./fetchResource";
 import type {
-  TeamPlayer,
-  PaginatedResultsTeamPlayer,
+  HnsPaginatedResultsTeamPlayer,
+  HnsPlayerCompetitionStats,
+  HnsTeamPlayer,
+  Player,
   PlayerCompetitionStats,
+  PlayerSearchResult,
 } from "@/types/hns";
+import {
+  adaptPlayer,
+  adaptPlayerCompetitionStats,
+  adaptPlayerSearchResult,
+} from "./adapters";
+import { hnsList, hnsResource } from "./fetchResource";
 
 const PLAYER_TTL = 3600;
 
-export function fetchPlayerDetails(params: {
+export async function fetchPlayerDetails(params: {
   personId: string;
-}): Promise<TeamPlayer | null> {
-  if (!params.personId) return Promise.resolve(null);
-  return hnsResource<TeamPlayer>({
+}): Promise<Player | null> {
+  if (!params.personId) return null;
+  const player = await hnsResource<HnsTeamPlayer>({
     path: () => `/api/live/player/${params.personId}`,
     tag: `player-${params.personId}`,
     revalidate: PLAYER_TTL,
   });
+  return adaptPlayer(player);
 }
 
 export async function fetchPlayerStats(params: {
@@ -24,30 +33,35 @@ export async function fetchPlayerStats(params: {
   competitionId: number;
 }): Promise<PlayerCompetitionStats | null> {
   if (!params.personId || params.competitionId == null) return null;
-  const stats = await hnsList<PlayerCompetitionStats>({
+  const stats = await hnsList<HnsPlayerCompetitionStats>({
     path: (teamId) => `/api/live/player/${params.personId}/stats/${teamId}`,
     tag: `player-${params.personId}-stats-${params.competitionId}`,
     revalidate: PLAYER_TTL,
   });
-  return (
+  const stat =
     stats.find(
       (s) =>
         s.competition != null &&
         String(s.competition.id) === String(params.competitionId),
-    ) ?? null
-  );
+    ) ?? null;
+  return stat ? adaptPlayerCompetitionStats(stat) : null;
 }
 
 export async function searchPlayers(params: {
   keyword: string;
-}): Promise<PaginatedResultsTeamPlayer> {
-  if (!params.keyword.trim()) {
-    return { result: [], size: 0 };
-  }
-  const result = await hnsResource<PaginatedResultsTeamPlayer>({
+}): Promise<PlayerSearchResult[]> {
+  const keyword = params.keyword.trim();
+  if (!keyword) return [];
+
+  const result = await hnsResource<HnsPaginatedResultsTeamPlayer>({
     path: () =>
-      `/api/live/player/search?keyword=${encodeURIComponent(params.keyword)}&page=0&pageSize=100`,
+      `/api/live/player/search?keyword=${encodeURIComponent(keyword)}&page=0&pageSize=100`,
     revalidate: PLAYER_TTL,
   });
-  return result ?? { result: [], size: 0 };
+
+  return (
+    result?.result
+      ?.map((player) => adaptPlayerSearchResult(player))
+      .filter((player): player is PlayerSearchResult => player !== null) ?? []
+  );
 }

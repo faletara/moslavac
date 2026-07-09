@@ -33,8 +33,8 @@ function isMoslavac(name: string | null | undefined): boolean {
 function getOutcomeFromMoslavacPerspective(
   match: Match,
 ): FormResult | null {
-  const home = match.homeTeamResult?.current;
-  const away = match.awayTeamResult?.current;
+  const home = match.score.home?.current;
+  const away = match.score.away?.current;
   if (home == null || away == null) return null;
 
   const homeIsUs = isMoslavac(match.homeTeam?.name);
@@ -61,13 +61,13 @@ function formatAttendance(value: number | null | undefined): string | null {
 }
 
 export function PreviousMatchCard({ match }: PreviousMatchCardProps) {
-  const { date, time } = formatDateTime(match.dateTimeUTC ?? 0);
+  const { date, time } = formatDateTime(match.kickoffAtUtcMs ?? 0);
   const venue = match.facility?.place ?? match.facility?.name ?? null;
   const competition = match.competition?.name ?? null;
   const round = formatRound(match.round);
   const attendance = formatAttendance(match.attendance);
-  const home = match.homeTeamResult?.current;
-  const away = match.awayTeamResult?.current;
+  const home = match.score.home?.current;
+  const away = match.score.away?.current;
   const hasResult = home != null && away != null;
   const outcome = getOutcomeFromMoslavacPerspective(match);
   const outcomeLabel = outcome ? OUTCOME_LABEL[outcome] : null;
@@ -80,8 +80,8 @@ export function PreviousMatchCard({ match }: PreviousMatchCardProps) {
   );
 
   const halfTime =
-    match.homeTeamResult?.half != null && match.awayTeamResult?.half != null
-      ? `${match.homeTeamResult.half} – ${match.awayTeamResult.half}`
+    match.score.home?.half != null && match.score.away?.half != null
+      ? `${match.score.home.half} – ${match.score.away.half}`
       : null;
 
   const inner = (

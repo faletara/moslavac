@@ -37,8 +37,8 @@ export function buildMatchSlug(m: Match): string {
   const home = slugify(m.homeTeam?.name ?? "domacin");
   const away = slugify(m.awayTeam?.name ?? "gost");
   let date = "";
-  if (m.dateTimeUTC) {
-    const d = new Date(m.dateTimeUTC);
+  if (m.kickoffAtUtcMs) {
+    const d = new Date(m.kickoffAtUtcMs);
     date = `${d.getUTCDate()}-${d.getUTCMonth() + 1}-${d.getUTCFullYear()}`;
   }
   return [home, away, date, m.id].filter(Boolean).join("-");

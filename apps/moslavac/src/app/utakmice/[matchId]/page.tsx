@@ -35,9 +35,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const away = matchInfo.awayTeam?.name ?? "N/A";
   const title = `${home} - ${away}`;
   const hasResult =
-    matchInfo.homeTeamResult != null && matchInfo.awayTeamResult != null;
+    matchInfo.score.home.current != null && matchInfo.score.away.current != null;
   const score = hasResult
-    ? ` ${matchInfo.homeTeamResult?.current ?? 0}:${matchInfo.awayTeamResult?.current ?? 0}`
+    ? ` ${matchInfo.score.home?.current ?? 0}:${matchInfo.score.away?.current ?? 0}`
     : "";
   const competition = matchInfo.competition?.name?.trim();
   const description = `${home} protiv ${away}${score}${
@@ -96,11 +96,11 @@ export default async function MatchInfoPage({ params }: Props) {
         ])
       : [[], [], []];
 
-  const { date, time } = formatDateTime(matchInfo.dateTimeUTC ?? 0);
+  const { date, time } = formatDateTime(matchInfo.kickoffAtUtcMs ?? 0);
   const hasResult =
-    matchInfo.homeTeamResult != null && matchInfo.awayTeamResult != null;
-  const halfHome = matchInfo.homeTeamResult?.half;
-  const halfAway = matchInfo.awayTeamResult?.half;
+    matchInfo.score.home.current != null && matchInfo.score.away.current != null;
+  const halfHome = matchInfo.score.home?.half;
+  const halfAway = matchInfo.score.away?.half;
   const showHalfTime = hasResult && halfHome != null && halfAway != null;
   const attendance = matchInfo.attendance;
 
@@ -125,8 +125,8 @@ export default async function MatchInfoPage({ params }: Props) {
         awayName={matchInfo.awayTeam?.name ?? "N/A"}
         awayPicture={matchInfo.awayTeam?.picture ?? null}
         hasResult={hasResult}
-        homeScore={matchInfo.homeTeamResult?.current ?? 0}
-        awayScore={matchInfo.awayTeamResult?.current ?? 0}
+        homeScore={matchInfo.score.home?.current ?? 0}
+        awayScore={matchInfo.score.away?.current ?? 0}
         time={time}
         date={date}
         place={matchInfo.facility?.place?.trim() || null}

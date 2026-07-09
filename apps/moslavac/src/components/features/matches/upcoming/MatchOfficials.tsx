@@ -25,7 +25,7 @@ export default function MatchOfficials({
     );
   }
 
-  const officials = (refereeData?.matchOfficials ?? []).filter(
+  const officials = (refereeData?.officials ?? []).filter(
     (o) => (o.name ?? "").trim() !== "",
   );
 

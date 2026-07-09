@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 interface MatchCountdownProps {
-  dateTimeUTC: number;
+  kickoffAtUtcMs: number;
 }
 
 interface TimeParts {
@@ -26,15 +26,15 @@ function diffParts(target: number, now: number): TimeParts {
   return { days, hours, minutes, seconds, isPast: false };
 }
 
-export default function MatchCountdown({ dateTimeUTC }: MatchCountdownProps) {
+export default function MatchCountdown({ kickoffAtUtcMs }: MatchCountdownProps) {
   const [parts, setParts] = useState<TimeParts | null>(null);
 
   useEffect(() => {
-    const update = () => setParts(diffParts(dateTimeUTC, Date.now()));
+    const update = () => setParts(diffParts(kickoffAtUtcMs, Date.now()));
     update();
     const id = setInterval(update, 1000);
     return () => clearInterval(id);
-  }, [dateTimeUTC]);
+  }, [kickoffAtUtcMs]);
 
   if (!parts || parts.isPast) return null;
 

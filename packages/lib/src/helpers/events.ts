@@ -1,13 +1,11 @@
 import type { MatchEvent } from "@/types/hns";
 
 export const formatEventTime = (
-  minuteFull: number,
+  minute: number,
   stoppageTime?: number
-): string => (stoppageTime ? `${minuteFull}+${stoppageTime}` : `${minuteFull}'`);
+): string => (stoppageTime ? `${minute}+${stoppageTime}` : `${minute}'`);
 
-// HNS event types — keyed by stable `eventType.fcdName` enum (not the localized `name`,
-// which can vary, e.g. PENALTY_FAILED appears as both "Neiskorišteni kazneni udarac" and
-// "Promašaj"). Verified against /api/live/match/{id}/events.
+// Event types are keyed by the stable HNS fcd code exposed by the adapter.
 const GOAL_FCD_NAMES = new Set(["GOAL", "PENALTY", "PENALTY_GOAL", "OWN_GOAL"]);
 const PENALTY_GOAL_FCD_NAMES = new Set(["PENALTY", "PENALTY_GOAL"]);
 const MISSED_PENALTY_FCD_NAMES = new Set(["PENALTY_FAILED"]);
@@ -16,7 +14,7 @@ const RED_FCD_NAMES = new Set(["RED", "SECOND_YELLOW"]);
 const SUBSTITUTION_FCD_NAMES = new Set(["SUBSTITUTION"]);
 
 const hasFcd = (event: MatchEvent, set: Set<string>): boolean => {
-  const fcd = event.eventType?.fcdName;
+  const fcd = event.type.code;
   return !!fcd && set.has(fcd);
 };
 
@@ -58,7 +56,7 @@ const groupScorersForSide = (
   const goals = events.filter(
     (e) =>
       (isGoalEvent(e) || isMissedPenaltyEvent(e)) &&
-      (side === "home" ? e.homeTeam === true : e.homeTeam === false),
+      e.side === side,
   );
 
   const map = new Map<string, ScorerEntry>();
@@ -66,7 +64,7 @@ const groupScorersForSide = (
     const name = (goal.player?.name ?? "").trim() || "Nepoznat strijelac";
     const missed = isMissedPenaltyEvent(goal);
     const entry: ScorerGoal = {
-      minute: goal.minuteFull ?? goal.minute ?? 0,
+      minute: goal.minute ?? 0,
       isPenalty: missed || isPenaltyGoalEvent(goal),
       isMissedPenalty: missed,
     };
@@ -118,8 +116,8 @@ export const getCardCounts = (
     awayRed: 0,
   };
   for (const event of events ?? []) {
-    const isHome = event.homeTeam === true;
-    const isAway = event.homeTeam === false;
+    const isHome = event.side === "home";
+    const isAway = event.side === "away";
     if (isYellowCardEvent(event)) {
       if (isHome) counts.homeYellow += 1;
       else if (isAway) counts.awayYellow += 1;
@@ -147,8 +145,8 @@ export const buildScoreProgression = (
   if (!events) return map;
 
   const sorted = [...events].sort((a, b) => {
-    const aMin = a.minuteFull ?? a.minute ?? 0;
-    const bMin = b.minuteFull ?? b.minute ?? 0;
+    const aMin = a.minute ?? 0;
+    const bMin = b.minute ?? 0;
     if (aMin !== bMin) return aMin - bMin;
     return (a.orderNumber ?? 0) - (b.orderNumber ?? 0);
   });
@@ -157,9 +155,9 @@ export const buildScoreProgression = (
   let away = 0;
   for (const e of sorted) {
     if (!isGoalEvent(e)) continue;
-    if (e.homeTeam === true) home += 1;
-    else if (e.homeTeam === false) away += 1;
-    if (e.eventId != null) map.set(e.eventId, { home, away });
+    if (e.side === "home") home += 1;
+    else if (e.side === "away") away += 1;
+    if (e.id != null) map.set(e.id, { home, away });
   }
   return map;
 };

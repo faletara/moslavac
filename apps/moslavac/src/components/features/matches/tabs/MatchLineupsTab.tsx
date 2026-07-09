@@ -6,7 +6,7 @@ import { HnsCrest } from "@/components/HnsCrest";
 import { useOurTeamId } from "@/components/providers/TenantProvider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { buildPlayerSlug } from "@/lib/slug";
-import type { Lineups, Match, TeamPlayer } from "@/types/hns";
+import type { Lineups, Match, LineupPlayer } from "@/types/hns";
 import { MatchTabHeading } from "../shared/MatchTabHeading";
 
 interface MatchLineupsTabProps {
@@ -167,7 +167,7 @@ function PlayerRow({
   isMoslavac,
   muted = false,
 }: {
-  player: TeamPlayer;
+  player: LineupPlayer;
   competitionId: number | null;
   isMoslavac: boolean;
   muted?: boolean;

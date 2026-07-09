@@ -64,11 +64,11 @@ function TeamSide({
 }
 
 function isPlayed(match: Match) {
-	return match.homeTeamResult != null && match.awayTeamResult != null;
+	return match.score.home.current != null && match.score.away.current != null;
 }
 
 function MatchRow({ match }: { match: Match }) {
-	const { date, time } = formatDateTime(match.dateTimeUTC ?? 0);
+	const { date, time } = formatDateTime(match.kickoffAtUtcMs ?? 0);
 	const hasResult = isPlayed(match);
 
 	return (
@@ -86,9 +86,9 @@ function MatchRow({ match }: { match: Match }) {
 				<div className="flex min-w-20 flex-col items-center gap-1.5 sm:min-w-28">
 					{hasResult ? (
 						<span className="text-2xl font-black uppercase leading-none tracking-tighter tabular-nums sm:text-3xl">
-							{match.homeTeamResult?.current ?? 0}
+							{match.score.home?.current ?? 0}
 							<span className="px-1.5 text-muted-foreground/60">-</span>
-							{match.awayTeamResult?.current ?? 0}
+							{match.score.away?.current ?? 0}
 						</span>
 					) : (
 						<span className="text-xl font-black uppercase leading-none tracking-tighter tabular-nums sm:text-2xl">
@@ -147,10 +147,10 @@ export default function MatchesList({
 
 	const played = matches
 		.filter(isPlayed)
-		.sort((a, b) => (b.dateTimeUTC ?? 0) - (a.dateTimeUTC ?? 0));
+		.sort((a, b) => (b.kickoffAtUtcMs ?? 0) - (a.kickoffAtUtcMs ?? 0));
 	const upcoming = matches
 		.filter((m) => !isPlayed(m))
-		.sort((a, b) => (a.dateTimeUTC ?? 0) - (b.dateTimeUTC ?? 0));
+		.sort((a, b) => (a.kickoffAtUtcMs ?? 0) - (b.kickoffAtUtcMs ?? 0));
 
 	return (
 		<div className="space-y-12 sm:space-y-16">

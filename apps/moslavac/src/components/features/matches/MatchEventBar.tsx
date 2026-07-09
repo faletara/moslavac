@@ -45,14 +45,13 @@ export default function MatchEventBar({
   const barEvents = events.filter(
     (e) =>
       isBarEvent(e) &&
-      (e.homeTeam === true || e.homeTeam === false) &&
-      (e.minuteFull ?? e.minute) != null,
+      e.side != null &&
+      e.minute != null,
   );
 
   if (barEvents.length === 0) return null;
 
-  const minuteOf = (e: MatchEvent) =>
-    (e.minuteFull ?? e.minute ?? 0) + (e.stoppageTime ?? 0);
+  const minuteOf = (e: MatchEvent) => (e.minute ?? 0) + (e.stoppageTime ?? 0);
   const domainMax = Math.max(90, ...barEvents.map(minuteOf));
   const pct = (m: number) => Math.min(97, Math.max(3, (m / domainMax) * 100));
 
@@ -71,8 +70,8 @@ export default function MatchEventBar({
       lastPct = p;
     }
   };
-  assignFloors(barEvents.filter((e) => e.homeTeam === true));
-  assignFloors(barEvents.filter((e) => e.homeTeam === false));
+  assignFloors(barEvents.filter((e) => e.side === "home"));
+  assignFloors(barEvents.filter((e) => e.side === "away"));
 
   return (
     <motion.div
@@ -121,13 +120,13 @@ export default function MatchEventBar({
 
           {barEvents.map((e, i) => {
             const minute = minuteOf(e);
-            const isHome = e.homeTeam === true;
+            const isHome = e.side === "home";
             const floor = level.get(e) ?? 0;
             const offset = 6 + floor * 21;
             const label = `${e.player?.shortName ?? e.player?.name ?? ""} ${minute}'`.trim();
             return (
               <div
-                key={`${e.eventId ?? i}`}
+                key={`${e.id ?? i}`}
                 className={cn(
                   "group absolute -translate-x-1/2 origin-center scale-[0.7] sm:scale-100",
                   isHome ? "bottom-1/2" : "top-1/2",
@@ -140,7 +139,7 @@ export default function MatchEventBar({
                 }}
               >
                 <span title={label} className="block">
-                  <EventIcon eventType={e.eventType?.name ?? ""} />
+                  <EventIcon typeName={e.type.name} />
                 </span>
                 {/* Hover tooltip (desktop) */}
                 <span

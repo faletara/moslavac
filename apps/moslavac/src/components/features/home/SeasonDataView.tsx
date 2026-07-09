@@ -11,7 +11,7 @@ import {
 import { HnsCrest } from "@/components/HnsCrest";
 import { buildCompetitionSlug, buildPlayerSlug } from "@/lib/slug";
 import { cn } from "@/lib/utils";
-import type { Competition, PlayerStats, TeamRanking } from "@/types/hns";
+import type { Competition, CompetitionPlayerStat, TeamRanking } from "@/types/hns";
 
 const rowVariants = {
 	hidden: { opacity: 0, x: -16 },
@@ -137,7 +137,7 @@ function ScorerRow({
 	isMoslavac,
 	competitionId,
 }: {
-	row: PlayerStats;
+	row: CompetitionPlayerStat;
 	index: number;
 	isClub: boolean;
 	isMoslavac: boolean;
@@ -235,7 +235,7 @@ export default function SeasonDataView({
 }: {
 	senior: Competition;
 	standings: TeamRanking[];
-	topScorers: PlayerStats[];
+	topScorers: CompetitionPlayerStat[];
 	shortName: string;
 	ourTeamId: number | null;
 }) {

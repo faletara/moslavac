@@ -30,7 +30,7 @@ function TeamName({ name }: { name: string | null | undefined }) {
 }
 
 export function NextMatchHero({ match }: NextMatchHeroProps) {
-  const { date, time } = formatDateTime(match.dateTimeUTC ?? 0);
+  const { date, time } = formatDateTime(match.kickoffAtUtcMs ?? 0);
   const competition = match.competition?.name ?? null;
   const round = formatRound(match.round);
   const venue = match.facility?.place ?? match.facility?.name ?? null;
@@ -97,7 +97,7 @@ export function NextMatchHero({ match }: NextMatchHeroProps) {
         </div>
       </FadeInView>
 
-      <CountdownTiles targetUtc={match.dateTimeUTC ?? null} size="hero" />
+      <CountdownTiles targetUtc={match.kickoffAtUtcMs ?? null} size="hero" />
 
       {metaChips.length > 0 && (
         <FadeInView delay={0.5}>

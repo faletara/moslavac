@@ -55,7 +55,7 @@ export default function HeadToHead({
       <ul className="mx-auto mt-12 max-w-2xl divide-y divide-border/40">
         {h2h.slice(0, 5).map((match) => (
           <H2HRow
-            key={match.id ?? `${match.dateTimeUTC}`}
+            key={match.id ?? `${match.kickoffAtUtcMs}`}
             match={match}
             homeTeamId={homeTeamId}
             homeTeamName={homeTeamName}
@@ -80,8 +80,8 @@ function H2HRow({
 }) {
   const matchHomeId = match.homeTeam?.id;
   const homeWasUs = matchHomeId === homeTeamId;
-  const homeGoals = match.homeTeamResult?.current ?? 0;
-  const awayGoals = match.awayTeamResult?.current ?? 0;
+  const homeGoals = match.score.home?.current ?? 0;
+  const awayGoals = match.score.away?.current ?? 0;
 
   const ourGoals = homeWasUs ? homeGoals : awayGoals;
   const theirGoals = homeWasUs ? awayGoals : homeGoals;
@@ -120,7 +120,7 @@ function H2HRow({
           {homeGoals}:{awayGoals}
         </span>
         <span className="text-[0.6rem] font-medium uppercase tracking-[0.2em] text-muted-foreground tabular-nums">
-          {formatDateShort(match.dateTimeUTC ?? 0)}
+          {formatDateShort(match.kickoffAtUtcMs ?? 0)}
         </span>
       </Link>
     </li>

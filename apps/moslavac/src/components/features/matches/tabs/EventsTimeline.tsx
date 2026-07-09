@@ -31,12 +31,12 @@ export default function EventsTimeline({ match, events }: EventsTimelineProps) {
   const visible = (events ?? [])
     .filter(
       (e) =>
-        (e.homeTeam === true || e.homeTeam === false) &&
-        ((e.player?.name ?? "").trim() !== "" || e.eventType?.name),
+        e.side != null &&
+        ((e.player?.name ?? "").trim() !== "" || e.type.name),
     )
     .sort((a, b) => {
-      const am = a.minuteFull ?? a.minute ?? 0;
-      const bm = b.minuteFull ?? b.minute ?? 0;
+      const am = a.minute ?? 0;
+      const bm = b.minute ?? 0;
       if (am !== bm) return am - bm;
       return (a.orderNumber ?? 0) - (b.orderNumber ?? 0);
     });
@@ -53,14 +53,14 @@ export default function EventsTimeline({ match, events }: EventsTimelineProps) {
 
   const scoreMap = buildScoreProgression(events);
   const hasResult =
-    match.homeTeamResult != null && match.awayTeamResult != null;
-  const halfHome = match.homeTeamResult?.half;
-  const halfAway = match.awayTeamResult?.half;
+    match.score.home.current != null && match.score.away.current != null;
+  const halfHome = match.score.home.half;
+  const halfAway = match.score.away.half;
   const halfScore =
     halfHome != null && halfAway != null ? `${halfHome}:${halfAway}` : null;
-  const finalScore = `${match.homeTeamResult?.current ?? 0}:${match.awayTeamResult?.current ?? 0}`;
+  const finalScore = `${match.score.home.current ?? 0}:${match.score.away.current ?? 0}`;
 
-  const minuteOf = (e: MatchEvent) => e.minuteFull ?? e.minute ?? 0;
+  const minuteOf = (e: MatchEvent) => e.minute ?? 0;
   const firstHalf = visible.filter((e) => minuteOf(e) <= 45);
   const secondHalf = visible.filter((e) => minuteOf(e) > 45);
 
@@ -75,14 +75,12 @@ export default function EventsTimeline({ match, events }: EventsTimelineProps) {
 
       {firstHalf.map((event, i) => (
         <EventRow
-          key={`${event.eventId ?? `f${i}`}`}
+          key={`${event.id ?? `f${i}`}`}
           event={event}
           competitionId={competitionId}
           homeIsMoslavac={homeIsMoslavac}
-          team={teamProps(event.homeTeam === true)}
-          score={
-            event.eventId != null ? scoreMap.get(event.eventId) ?? null : null
-          }
+          team={teamProps(event.side === "home")}
+          score={event.id != null ? scoreMap.get(event.id) ?? null : null}
         />
       ))}
 
@@ -92,14 +90,12 @@ export default function EventsTimeline({ match, events }: EventsTimelineProps) {
 
       {secondHalf.map((event, i) => (
         <EventRow
-          key={`${event.eventId ?? `s${i}`}`}
+          key={`${event.id ?? `s${i}`}`}
           event={event}
           competitionId={competitionId}
           homeIsMoslavac={homeIsMoslavac}
-          team={teamProps(event.homeTeam === true)}
-          score={
-            event.eventId != null ? scoreMap.get(event.eventId) ?? null : null
-          }
+          team={teamProps(event.side === "home")}
+          score={event.id != null ? scoreMap.get(event.id) ?? null : null}
         />
       ))}
 
@@ -165,15 +161,17 @@ function EventRow({
   team: { picture: string | null; name: string };
   score: ScoreSnapshot | null;
 }) {
-  const minute = event.minuteFull ?? event.minute ?? 0;
+  const minute = event.minute ?? 0;
   const stoppage = event.stoppageTime ?? 0;
   const minuteLabel = stoppage > 0 ? `${minute}+${stoppage}` : `${minute}`;
 
   const playerName = event.player?.name?.trim() ?? "";
-  const player2Name = event.player2?.name?.trim() ?? "";
-  const eventTypeName = event.eventType?.name ?? "";
+  const secondaryPlayerName = event.secondaryPlayer?.name?.trim() ?? "";
+  const eventTypeName = event.type.name;
   const personId = event.player?.personId ?? null;
-  const eventIsMoslavac = event.homeTeam === homeIsMoslavac;
+  const eventIsMoslavac =
+    (event.side === "home" && homeIsMoslavac) ||
+    (event.side === "away" && !homeIsMoslavac);
   const isLinkable =
     eventIsMoslavac &&
     personId != null &&
@@ -238,9 +236,9 @@ function EventRow({
           )}
         </div>
 
-        {isSub && player2Name && (
+        {isSub && secondaryPlayerName && (
           <span className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground/70">
-            ↔ {player2Name}
+            ↔ {secondaryPlayerName}
           </span>
         )}
       </div>
@@ -260,13 +258,13 @@ function EventNode({
   if (isGoal) {
     return (
       <span className="flex size-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm">
-        <EventIcon eventType={eventTypeName} className="size-[1.15rem]" />
+        <EventIcon typeName={eventTypeName} className="size-[1.15rem]" />
       </span>
     );
   }
   if (isSub) {
-    return <EventIcon eventType={eventTypeName} className="size-5" />;
+    return <EventIcon typeName={eventTypeName} className="size-5" />;
   }
   // Cards (and anything else) — bare glyph, scaled up for presence.
-  return <EventIcon eventType={eventTypeName} className="scale-150" />;
+  return <EventIcon typeName={eventTypeName} className="scale-150" />;
 }

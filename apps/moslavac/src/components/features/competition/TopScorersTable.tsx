@@ -14,10 +14,10 @@ import {
 } from "@/components/ui/table";
 import { buildPlayerSlug } from "@/lib/slug";
 import { cn } from "@/lib/utils";
-import type { PlayerStats } from "@/types/hns";
+import type { CompetitionPlayerStat } from "@/types/hns";
 
 interface TopScorersTableProps {
-  scorers: PlayerStats[] | undefined;
+  scorers: CompetitionPlayerStat[] | undefined;
   isLoading: boolean;
   competitionId: number | null;
   highlightTeamIds?: number[];
@@ -96,7 +96,7 @@ function ScorerRow({
   isMoslavac,
   competitionId,
 }: {
-  scorer: PlayerStats;
+  scorer: CompetitionPlayerStat;
   position: number;
   highlight: boolean;
   isMoslavac: boolean;

@@ -146,7 +146,7 @@ export default function UpcomingMatchesView({
         <ScrollableRow>
           {matches.map((match) => {
             const { day, monthShort, weekdayShort, time } = formatDateParts(
-              match.dateTimeUTC ?? 0,
+              match.kickoffAtUtcMs ?? 0,
             );
             const category = getCompetitionCategory(match.competition?.name);
             const categoryLabel = getCategoryShortLabel(category);

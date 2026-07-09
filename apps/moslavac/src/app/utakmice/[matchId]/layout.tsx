@@ -59,15 +59,15 @@ export async function generateMetadata({
 
   const home = match.homeTeam?.name ?? "Domaćin";
   const away = match.awayTeam?.name ?? "Gost";
-  const homeScore = match.homeTeamResult?.current;
-  const awayScore = match.awayTeamResult?.current;
+  const homeScore = match.score.home?.current;
+  const awayScore = match.score.away?.current;
   const hasResult = homeScore != null && awayScore != null;
 
   const title = hasResult
     ? `${home} ${homeScore}:${awayScore} ${away}`
     : `${home} – ${away}`;
 
-  const { date } = formatDateTime(match.dateTimeUTC ?? 0);
+  const { date } = formatDateTime(match.kickoffAtUtcMs ?? 0);
   const parts = [
     match.competition?.name,
     date,
@@ -108,20 +108,20 @@ export default async function MatchLayout({
 
   const home = match.homeTeam?.name ?? "Domaćin";
   const away = match.awayTeam?.name ?? "Gost";
-  const homeScore = match.homeTeamResult?.current;
-  const awayScore = match.awayTeamResult?.current;
+  const homeScore = match.score.home?.current;
+  const awayScore = match.score.away?.current;
 
   // schema.org Event requires both startDate and location. Only emit the
   // SportsEvent when both are present, so we never produce an invalid item.
   const facility = match.facility;
 
   let jsonLd: Record<string, unknown> | null = null;
-  if (match.dateTimeUTC != null && facility?.name) {
-    const start = new Date(match.dateTimeUTC);
+  if (match.kickoffAtUtcMs != null && facility?.name) {
+    const start = new Date(match.kickoffAtUtcMs);
     // Football matches run ~105 min (2×45 + half-time); a reasonable endDate.
     const end = new Date(start.getTime() + 105 * 60 * 1000);
 
-    const { date } = formatDateTime(match.dateTimeUTC);
+    const { date } = formatDateTime(match.kickoffAtUtcMs);
     const description = [match.competition?.name, date, facility.place]
       .filter(Boolean)
       .join(" · ");

@@ -3,7 +3,7 @@ import { ArrowLeftRight, Icon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface EventIconProps {
-  eventType: string;
+  typeName: string;
   className?: string;
   /** Colours the substitution arrow: green for on, red for off. */
   subDirection?: "in" | "out";
@@ -14,11 +14,11 @@ interface EventIconProps {
  * and the lineups so a goal/card/substitution always reads the same.
  */
 export function EventIcon({
-  eventType,
+  typeName,
   className,
   subDirection,
 }: EventIconProps) {
-  const t = eventType.toLowerCase();
+  const t = typeName.toLowerCase();
 
   if (t.includes("žuti") || t.includes("zuti")) {
     return (

@@ -90,9 +90,9 @@ export function ResultsStrip({ results }: { results: PlayedMatchSummary[] }) {
 				>
 					{results.map((r, i) => {
 						const m = r.match;
-						const home = m.homeTeamResult?.current ?? 0;
-						const away = m.awayTeamResult?.current ?? 0;
-						const d = m.dateTimeUTC ? new Date(m.dateTimeUTC) : null;
+						const home = m.score.home?.current ?? 0;
+						const away = m.score.away?.current ?? 0;
+						const d = m.kickoffAtUtcMs ? new Date(m.kickoffAtUtcMs) : null;
 						return (
 							<article
 								key={m.id ?? i}

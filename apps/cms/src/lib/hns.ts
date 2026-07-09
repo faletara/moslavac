@@ -1,24 +1,8 @@
+import type { HnsTeamPlayer, PlayerSearchResult } from '@/types/hns'
+import { adaptPlayerSearchResult } from '@/lib/hns/adapters'
 import { hnsDispatcher } from './hnsDispatcher'
 
 const HNS_API_BASE = process.env.HNS_API_BASE ?? 'https://api-hns.analyticom.de'
-
-export interface HnsPlayerSearchResult {
-  personId: number
-  name: string
-  shortName: string | null
-  picture: string | null
-  position: string | null
-  shirtNumber: number | null
-}
-
-interface HnsRawPlayer {
-  personId: number | null
-  name: string | null
-  shortName: string | null
-  picture: string | null
-  position: string | null
-  shirtNumber: number | null
-}
 
 interface HnsPaginated<T> {
   result: T[]
@@ -30,7 +14,7 @@ export async function searchHnsPlayers(args: {
   teamId: string
   keyword: string
   pageSize?: number
-}): Promise<HnsPlayerSearchResult[]> {
+}): Promise<PlayerSearchResult[]> {
   const { apiKey, teamId, keyword, pageSize = 20 } = args
   const trimmed = keyword.trim()
   if (!trimmed) return []
@@ -59,18 +43,9 @@ export async function searchHnsPlayers(args: {
     )
   }
 
-  const data = (await response.json()) as HnsPaginated<HnsRawPlayer>
+  const data = (await response.json()) as HnsPaginated<HnsTeamPlayer>
 
   return (data.result ?? [])
-    .filter((p): p is HnsRawPlayer & { personId: number; name: string } =>
-      p.personId != null && typeof p.name === 'string',
-    )
-    .map((p) => ({
-      personId: p.personId,
-      name: p.name,
-      shortName: p.shortName,
-      picture: p.picture,
-      position: p.position,
-      shirtNumber: p.shirtNumber,
-    }))
+    .map((player) => adaptPlayerSearchResult(player))
+    .filter((player): player is PlayerSearchResult => player !== null)
 }

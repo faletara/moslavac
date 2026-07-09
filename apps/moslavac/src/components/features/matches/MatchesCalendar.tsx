@@ -76,11 +76,11 @@ export default function MatchesCalendar({ matches }: MatchesCalendarProps) {
 	const events = useMemo<CalendarEvent[]>(
 		() =>
 			matches
-				.filter((m) => m.id != null && m.dateTimeUTC != null)
+				.filter((m) => m.id != null && m.kickoffAtUtcMs != null)
 				.map((m) => ({
 					id: m.id as number,
 					slug: buildMatchSlug(m),
-					date: new Date(m.dateTimeUTC as number),
+					date: new Date(m.kickoffAtUtcMs as number),
 					home: m.homeTeam?.name ?? "N/A",
 					away: m.awayTeam?.name ?? "N/A",
 					competition: m.competition?.name ?? "",

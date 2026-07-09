@@ -1,6 +1,6 @@
 "use client";
 
-import type { PlayerStats } from "@/types/hns";
+import type { CompetitionPlayerStat } from "@/types/hns";
 import TopScorersTable from "../../competition/TopScorersTable";
 import { MatchTabHeading } from "../shared/MatchTabHeading";
 
@@ -8,7 +8,7 @@ interface MatchTopScorersTabProps {
   competitionId: number | null;
   homeTeamId: number | null;
   awayTeamId: number | null;
-  scorers: PlayerStats[];
+  scorers: CompetitionPlayerStat[];
 }
 
 export default function MatchTopScorersTab({
