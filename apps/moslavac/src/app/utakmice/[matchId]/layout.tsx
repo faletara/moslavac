@@ -75,6 +75,9 @@ export async function generateMetadata({
   ].filter(Boolean);
   const description = parts.join(" · ");
 
+  // As in `page.tsx`, no `images`: the generated per-match poster wins by file
+  // convention. `matchImageUrl` stays because the JSON-LD below still needs an
+  // absolute image URL.
   return {
     title,
     description,
@@ -85,7 +88,6 @@ export async function generateMetadata({
       type: "website",
       title,
       description,
-      images: [{ url: matchImageUrl(match), alt: `${home} – ${away}` }],
     },
   };
 }

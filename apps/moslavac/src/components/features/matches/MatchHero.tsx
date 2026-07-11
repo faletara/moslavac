@@ -27,6 +27,10 @@ interface MatchHeroProps {
   attendance: number | null;
   /** Match events — render the broadcast event bar when present. */
   events?: MatchEvent[];
+  /** Match is in play — surfaces the live badge. */
+  live?: boolean;
+  /** Current minute for a live match, e.g. `67'` or `45+2`. */
+  liveMinute?: string | null;
 }
 
 /**
@@ -48,6 +52,8 @@ export default function MatchHero({
   date,
   place,
   events,
+  live = false,
+  liveMinute,
 }: MatchHeroProps) {
   const reduced = useReducedMotion();
 
@@ -94,6 +100,16 @@ export default function MatchHero({
             {eyebrow}
             <span aria-hidden className="h-px w-8 bg-primary" />
           </motion.p>
+          {live && (
+            <span className="inline-flex items-center gap-2.5 bg-primary px-3.5 py-1.5 text-[0.6rem] font-bold uppercase tracking-[0.24em] text-primary-foreground">
+              <span className="relative flex size-2">
+                <span className="absolute inline-flex size-full animate-ping rounded-full bg-current opacity-75" />
+                <span className="relative inline-flex size-2 rounded-full bg-current" />
+              </span>
+              Uživo
+              {liveMinute && <span className="tabular-nums">· {liveMinute}</span>}
+            </span>
+          )}
           {subline.length > 0 && (
             <motion.p
               className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-foreground/45 sm:text-xs"

@@ -46,7 +46,12 @@ export async function generateMetadata(): Promise<Metadata> {
 
   const logo = tenant.branding?.logo;
   const logoUrl = !logo ? null : typeof logo === "string" ? logo : logo.url;
-  const ogImage = logoUrl ?? "/naslovna.jpg";
+
+  // `images` is spread in ONLY when the tenant supplies a logo. Setting it
+  // unconditionally (it used to fall back to /naslovna.jpg) overrides the
+  // file-based `opengraph-image.tsx`, which would leave every generated card —
+  // including the per-match posters — dead on arrival.
+  const ogImage = logoUrl;
 
   return {
     metadataBase: new URL(BASE_URL),
@@ -64,13 +69,15 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: name,
       title: name,
       description,
-      images: [{ url: ogImage, alt: name, width: 1200, height: 630 }],
+      ...(ogImage
+        ? { images: [{ url: ogImage, alt: name, width: 1200, height: 630 }] }
+        : {}),
     },
     twitter: {
       card: "summary_large_image",
       title: name,
       description,
-      images: [ogImage],
+      ...(ogImage ? { images: [ogImage] } : {}),
     },
   };
 }

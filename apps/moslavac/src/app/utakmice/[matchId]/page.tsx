@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { TrackEvent } from "@/components/analytics/TrackEvent";
 import MatchHero from "@/components/features/matches/MatchHero";
 import MatchTabs from "@/components/features/matches/tabs/MatchTabs";
+import { RefreshWhile } from "@/components/ui/refresh-while";
+import { isLive, liveMinute } from "@/lib/hns/matchStatus";
 import { fetchAllCompetitionMatches } from "@/lib/hns/competitions";
 import {
   fetchMatchEvents,
@@ -45,6 +47,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }. Rezultat, tijek utakmice, postave i statistika.`;
   const canonical = `${BASE_URL}/utakmice/${buildMatchSlug(matchInfo)}`;
 
+  // No `images` here on purpose: the per-match poster in `opengraph-image.tsx`
+  // is picked up by the file convention, and any explicit `images` would
+  // override it (which is exactly what the old /naslovna.jpg entry did).
   return {
     title,
     description,
@@ -53,13 +58,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: "website",
       title,
       description,
-      images: [{ url: "/naslovna.jpg", alt: title, width: 1200, height: 630 }],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: ["/naslovna.jpg"],
     },
   };
 }
@@ -111,6 +114,8 @@ export default async function MatchInfoPage({ params }: Props) {
     .filter(Boolean)
     .join(" · ");
 
+  const live = isLive(matchInfo);
+
   return (
     <div className="pb-24">
       <TrackEvent
@@ -118,7 +123,12 @@ export default async function MatchInfoPage({ params }: Props) {
         props={{ matchId: mid, competition: matchInfo.competition?.name ?? "" }}
       />
 
+      {/* Dok utakmica traje, stranica se sama osvježava — bez F5. */}
+      <RefreshWhile active={live} intervalMs={30_000} />
+
       <MatchHero
+        live={live}
+        liveMinute={liveMinute(matchInfo)}
         eyebrow={eyebrow}
         homeName={matchInfo.homeTeam?.name ?? "N/A"}
         homePicture={matchInfo.homeTeam?.picture ?? null}

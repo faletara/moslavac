@@ -1,4 +1,4 @@
-import { CalendarDays } from "lucide-react";
+import { ArrowRight, CalendarDays } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { HnsCrest } from "@/components/HnsCrest";
@@ -12,6 +12,7 @@ import {
 import { getSeniorCompetitionFilter } from "@/lib/hns/client";
 import { isFinished } from "@/lib/hns/matchStatus";
 import { getTenant } from "@/lib/payload/getTenant";
+import { buildMatchSlug } from "@/lib/slug";
 import type { Competition, Match } from "@/types/hns";
 
 export const revalidate = 300;
@@ -135,6 +136,12 @@ function TeamName({ name }: { name: string | null | undefined }) {
   );
 }
 
+/** HNS can withhold a match detail; without an id there is nothing to link to. */
+function detailHref(match: Match): string | null {
+  if (match.id == null || !match.allowDetail) return null;
+  return `/raspored-i-rezultati/${buildMatchSlug(match)}`;
+}
+
 function MatchCard({
   match,
   variant,
@@ -149,8 +156,9 @@ function MatchCard({
   const venue = match.facility?.name ?? match.facility?.place;
   const meta = matchMeta(match);
   const isUpcoming = variant === "upcoming";
+  const href = detailHref(match);
 
-  return (
+  const card = (
     <article className="group grid gap-5 border-b border-foreground/10 py-7 first:pt-0 lg:grid-cols-[8rem_1fr_8rem] lg:items-center">
       <div>
         <p className="font-display text-4xl uppercase leading-none text-club-red tabular-nums">
@@ -212,8 +220,29 @@ function MatchCard({
             {venue}
           </p>
         )}
+        {href && (
+          <span className="inline-flex items-center gap-2 pt-1 text-[0.6rem] font-black uppercase tracking-[0.16em] text-foreground/70 transition-colors group-hover:text-club-red">
+            Detalji
+            <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+          </span>
+        )}
       </div>
     </article>
+  );
+
+  if (!href) return card;
+
+  return (
+    <Link
+      href={href}
+      aria-label={`${match.homeTeam?.name ?? "Domaćin"} – ${match.awayTeam?.name ?? "Gost"}, detalji utakmice`}
+      // Crvena traka koja izraste uz lijevi rub retka — poster jezik. Namjerno
+      // bez podloge u sivom: puna siva ploha preko cijele širine izgledala je
+      // kao greška, a ne kao hover.
+      className="group relative block before:absolute before:inset-y-0 before:-left-4 before:w-1 before:scale-y-0 before:bg-club-red before:transition-transform before:duration-300 hover:before:scale-y-100"
+    >
+      {card}
+    </Link>
   );
 }
 

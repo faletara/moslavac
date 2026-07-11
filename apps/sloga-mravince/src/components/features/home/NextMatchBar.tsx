@@ -3,6 +3,7 @@ import Link from "next/link";
 import { FadeInView } from "@/components/animations";
 import { HnsCrest } from "@/components/HnsCrest";
 import { formatDateParts } from "@/lib/helpers/date";
+import { buildMatchSlug } from "@/lib/slug";
 import { cn } from "@/lib/utils";
 import type { Match, MatchSlots } from "@/types/hns";
 import Countdown from "./Countdown";
@@ -67,7 +68,10 @@ export default function NextMatchBar({ slots }: { slots: MatchSlots }) {
   const away = match.score.away?.current;
   const hasScore = home != null && away != null;
 
-  const detailsHref = match.id != null ? `/utakmice/${match.id}` : null;
+  const detailsHref =
+    match.id != null && match.allowDetail
+      ? `/raspored-i-rezultati/${buildMatchSlug(match)}`
+      : null;
 
   return (
     <section
@@ -77,7 +81,9 @@ export default function NextMatchBar({ slots }: { slots: MatchSlots }) {
       {/* Atmosfera: crveni sjaj + dijagonalni raster + zrno */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -left-40 top-1/2 -z-10 size-[42rem] -translate-y-1/2 rounded-full bg-club-red/20 blur-3xl"
+        // Na uskim ekranima isti sjaj proguta cijelu sekciju i pretvori ink u
+        // bordo — pa je ispod `md` bitno manji i tiši.
+        className="pointer-events-none absolute -left-24 top-1/2 -z-10 size-80 -translate-y-1/2 rounded-full bg-club-red/10 blur-2xl md:-left-40 md:size-168 md:bg-club-red/20 md:blur-3xl"
       />
       <div
         aria-hidden
