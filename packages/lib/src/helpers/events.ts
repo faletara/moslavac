@@ -144,10 +144,17 @@ export const buildScoreProgression = (
   const map = new Map<number, ScoreSnapshot>();
   if (!events) return map;
 
+  // Stoppage time has to break the tie before `orderNumber` does. A 45' and a
+  // 45+1' goal both report `minute: 45`, and HNS's `orderNumber` is not reliably
+  // chronological between them — it has been seen numbering the 45' goal after
+  // the 45+1' one, which would hand each of them the other's running score.
   const sorted = [...events].sort((a, b) => {
     const aMin = a.minute ?? 0;
     const bMin = b.minute ?? 0;
     if (aMin !== bMin) return aMin - bMin;
+    const aStop = a.stoppageTime ?? 0;
+    const bStop = b.stoppageTime ?? 0;
+    if (aStop !== bStop) return aStop - bStop;
     return (a.orderNumber ?? 0) - (b.orderNumber ?? 0);
   });
 

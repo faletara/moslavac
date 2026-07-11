@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
+import { ParallaxImage } from "@/components/animations";
 import { HnsCrest } from "@/components/HnsCrest";
 import { cn } from "@/lib/utils";
 import type { MatchEvent } from "@/types/hns";
@@ -72,7 +73,21 @@ export default function MatchHero({
   );
 
   return (
-    <section className="dark relative isolate -mt-20 flex min-h-[70svh] w-full items-center overflow-hidden bg-navy-deep pt-20 text-foreground">
+    <section className="dark relative isolate -mt-20 flex min-h-[62svh] w-full items-center overflow-hidden bg-navy-deep pt-20 text-foreground">
+      {/* Matchday photo behind the scoreboard. Flat navy read as an empty box —
+          the dark needs something to be dark ABOUT. Same grayscale + club-blue
+          duotone treatment as ComeToMatchSection, so it stays one language. */}
+      <ParallaxImage
+        src="/game.jpg"
+        alt=""
+        sizes="100vw"
+        priority
+        className="absolute inset-0 -z-30"
+        imageClassName="grayscale opacity-45 object-cover"
+        strength={12}
+      />
+      <div aria-hidden className="absolute inset-0 -z-20 bg-club/30 mix-blend-color" />
+
       {/* Floodlight glows */}
       <div
         aria-hidden
@@ -82,9 +97,10 @@ export default function MatchHero({
         aria-hidden
         className="absolute -right-[12vw] top-1/3 -z-20 size-[40vw] rounded-full bg-club/15 blur-[100px]"
       />
+      {/* Legibility floor: the scoreline must never fight the photo. */}
       <div
         aria-hidden
-        className="absolute inset-0 -z-10 bg-linear-to-b from-navy-deep/40 via-transparent to-navy-deep"
+        className="absolute inset-0 -z-10 bg-linear-to-b from-navy-deep/85 via-navy-deep/70 to-navy-deep/95"
       />
 
       <div className="mx-auto w-full max-w-5xl px-4 py-16 sm:px-6 sm:py-20 lg:py-24">

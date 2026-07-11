@@ -1,12 +1,15 @@
 "use client";
 
+import { motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
-import { useOurTeamId } from "@/components/providers/TenantProvider";
 import { HnsCrest } from "@/components/HnsCrest";
+import { useOurTeamId } from "@/components/providers/TenantProvider";
 import {
   buildScoreProgression,
   isGoalEvent,
+  isRedCardEvent,
   isSubstitutionEvent,
+  isYellowCardEvent,
   type ScoreSnapshot,
 } from "@/lib/helpers/events";
 import { buildPlayerSlug } from "@/lib/slug";
@@ -20,24 +23,35 @@ interface EventsTimelineProps {
 }
 
 /**
- * Editorial match timeline — kickoff / half-time / full-time land as distinct
- * bands, every event is a floating node with an oversized uppercase headline
- * (the player) and a muted label; goals carry the running score. No connecting
- * rail — the rhythm of the bands carries the eye. Navy/blue, kept airy.
+ * Broadcast run of play. Events hang off a single rail; the ordinary ones stay
+ * quiet on chalk while goals land as dark navy plates carrying the new score —
+ * so the eye can find "when did we score" without reading a word.
+ *
+ * Every row is a 3-column grid whose last column is `minmax(0,1fr)`, and the
+ * score sits INSIDE that column rather than in a rigid `shrink-0` one at the
+ * edge. That is deliberate: the page clips overflow (`overflow-x: clip` on
+ * body), so a rigid trailing column silently amputates itself on narrow screens
+ * instead of wrapping — which is exactly how the score went missing before.
  */
 export default function EventsTimeline({ match, events }: EventsTimelineProps) {
   const moslavacTeamId = useOurTeamId();
+  const reduced = useReducedMotion();
 
   const visible = (events ?? [])
     .filter(
-      (e) =>
-        e.side != null &&
-        ((e.player?.name ?? "").trim() !== "" || e.type.name),
+      (e) => e.side != null && ((e.player?.name ?? "").trim() !== "" || e.type.name),
     )
+    // Stoppage time MUST break the tie before `orderNumber` does. A 45' and a
+    // 45+1' event both report `minute: 45`, and HNS's `orderNumber` is not
+    // reliably chronological between them — it has been seen numbering the 45'
+    // goal after the 45+1' one, which rendered them back to front.
     .sort((a, b) => {
       const am = a.minute ?? 0;
       const bm = b.minute ?? 0;
       if (am !== bm) return am - bm;
+      const as = a.stoppageTime ?? 0;
+      const bs = b.stoppageTime ?? 0;
+      if (as !== bs) return as - bs;
       return (a.orderNumber ?? 0) - (b.orderNumber ?? 0);
     });
 
@@ -46,10 +60,14 @@ export default function EventsTimeline({ match, events }: EventsTimelineProps) {
   const competitionId = match.competition?.id ?? null;
   const homeIsMoslavac =
     moslavacTeamId != null && match.homeTeam?.id === moslavacTeamId;
-  const homePicture = match.homeTeam?.picture ?? null;
-  const awayPicture = match.awayTeam?.picture ?? null;
-  const homeName = match.homeTeam?.name ?? "Domaći";
-  const awayName = match.awayTeam?.name ?? "Gosti";
+  const homeTeam = {
+    picture: match.homeTeam?.picture ?? null,
+    name: match.homeTeam?.name ?? "Domaći",
+  };
+  const awayTeam = {
+    picture: match.awayTeam?.picture ?? null,
+    name: match.awayTeam?.name ?? "Gosti",
+  };
 
   const scoreMap = buildScoreProgression(events);
   const hasResult =
@@ -60,50 +78,53 @@ export default function EventsTimeline({ match, events }: EventsTimelineProps) {
     halfHome != null && halfAway != null ? `${halfHome}:${halfAway}` : null;
   const finalScore = `${match.score.home.current ?? 0}:${match.score.away.current ?? 0}`;
 
-  const minuteOf = (e: MatchEvent) => e.minute ?? 0;
-  const firstHalf = visible.filter((e) => minuteOf(e) <= 45);
-  const secondHalf = visible.filter((e) => minuteOf(e) > 45);
+  const firstHalf = visible.filter((e) => (e.minute ?? 0) <= 45);
+  const secondHalf = visible.filter((e) => (e.minute ?? 0) > 45);
 
-  const teamProps = (isHome: boolean) =>
-    isHome
-      ? { picture: homePicture, name: homeName }
-      : { picture: awayPicture, name: awayName };
+  let step = 0;
+  const rows = (list: MatchEvent[], prefix: string) =>
+    list.map((event, i) => (
+      <EventRow
+        key={event.id ?? `${prefix}${i}`}
+        event={event}
+        competitionId={competitionId}
+        homeIsMoslavac={homeIsMoslavac}
+        team={event.side === "home" ? homeTeam : awayTeam}
+        score={event.id != null ? (scoreMap.get(event.id) ?? null) : null}
+        index={step++}
+        reduced={!!reduced}
+      />
+    ));
 
   return (
-    <ol>
-      <Marker label="Početak" />
+    <ol className="relative">
+      {/* Šina koja povezuje čvorove — ispod je, pa je markeri prekrivaju.
+          `left` MORA biti sredina kolone s čvorom, izvedena iz mreže retka:
+            mobitel: 2.75rem (minuta) + 0.75rem (gap-x-3) + 1.125rem (pola čvora) = 4.625rem
+            sm:      3.5rem  (minuta) + 1rem    (gap-x-4) + 1.25rem  (pola čvora) = 5.75rem
+          Promijeniš li mrežu u EventRow, promijeni i ovo — inače linija promaši ikone. */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 left-[4.625rem] -z-10 w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-border to-transparent sm:left-[5.75rem]"
+      />
 
-      {firstHalf.map((event, i) => (
-        <EventRow
-          key={`${event.id ?? `f${i}`}`}
-          event={event}
-          competitionId={competitionId}
-          homeIsMoslavac={homeIsMoslavac}
-          team={teamProps(event.side === "home")}
-          score={event.id != null ? scoreMap.get(event.id) ?? null : null}
-        />
-      ))}
+      <Marker label="Početak" />
+      {rows(firstHalf, "f")}
 
       {(secondHalf.length > 0 || hasResult) && (
         <Marker label="Poluvrijeme" score={halfScore} />
       )}
-
-      {secondHalf.map((event, i) => (
-        <EventRow
-          key={`${event.id ?? `s${i}`}`}
-          event={event}
-          competitionId={competitionId}
-          homeIsMoslavac={homeIsMoslavac}
-          team={teamProps(event.side === "home")}
-          score={event.id != null ? scoreMap.get(event.id) ?? null : null}
-        />
-      ))}
+      {rows(secondHalf, "s")}
 
       {hasResult && <Marker label="Kraj" score={finalScore} emphatic />}
     </ol>
   );
 }
 
+/**
+ * Phase bands. Full-time is the only one that shouts — it carries the result, so
+ * it gets the club plate; the others are quiet rules that section the play.
+ */
 function Marker({
   label,
   score,
@@ -113,38 +134,63 @@ function Marker({
   score?: string | null;
   emphatic?: boolean;
 }) {
-  return (
-    <li className="my-5">
-      <div
-        className={cn(
-          "flex items-center gap-4 px-4 py-4 sm:px-6",
-          emphatic
-            ? "dark bg-navy-deep text-foreground"
-            : "border-y border-border bg-muted/60",
-        )}
-      >
-        <span
-          className={cn(
-            "font-display font-black uppercase leading-none tracking-tight",
-            emphatic
-              ? "text-2xl sm:text-3xl"
-              : "text-base text-muted-foreground sm:text-lg",
-          )}
-        >
+  // Full time is the one row that breaks the grid: it spans the whole width,
+  // rail column included, so the timeline visibly ends rather than carrying on.
+  if (emphatic) {
+    const [home, away] = score ? score.split(":") : [];
+
+    return (
+      <li className="dark mt-3 flex min-w-0 flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-sm bg-navy-deep px-5 py-5 text-foreground shadow-[0_22px_48px_-26px] shadow-navy-deep sm:px-7 sm:py-6">
+        <span className="text-[0.68rem] font-black uppercase tracking-[0.26em] text-foreground/70">
           {label}
         </span>
         {score && (
-          <span
-            className={cn(
-              "ml-auto font-display font-black tabular-nums leading-none",
-              emphatic ? "text-2xl sm:text-3xl" : "text-lg",
-            )}
-          >
-            {score}
+          <span className="text-4xl font-black tabular-nums leading-none tracking-tight sm:text-5xl">
+            {home}
+            <span className="mx-1 text-primary">:</span>
+            {away}
           </span>
         )}
-      </div>
+      </li>
+    );
+  }
+
+  return (
+    <li className="flex items-center gap-4 py-6 first:pt-0">
+      <span className="text-[0.62rem] font-black uppercase tracking-[0.24em] text-muted-foreground">
+        {label}
+      </span>
+      <span className="h-px flex-1 bg-border" />
+      {score && (
+        <span className="text-sm font-black tabular-nums leading-none text-foreground/70">
+          {score}
+        </span>
+      )}
     </li>
+  );
+}
+
+/** Jedan oblik čvora za sve — ispunjen je samo gol, jer njega oko traži. */
+function EventNode({ event, goal }: { event: MatchEvent; goal: boolean }) {
+  const card = isYellowCardEvent(event) || isRedCardEvent(event);
+
+  return (
+    <span
+      className={cn(
+        "flex size-9 items-center justify-center rounded-full sm:size-10",
+        goal
+          // Prsten u boji podloge "izrezuje" čvor iz šine koja prolazi ispod.
+          ? "bg-primary text-primary-foreground shadow-[0_8px_20px_-8px] shadow-primary/80 ring-4 ring-background"
+          : card
+            ? "bg-background ring-1 ring-border"
+            : "bg-muted text-muted-foreground ring-1 ring-border/60",
+      )}
+    >
+      <EventIcon
+        typeName={event.type.name}
+        className={goal ? "size-[1.15rem]" : undefined}
+      />
+    </span>
   );
 }
 
@@ -154,12 +200,16 @@ function EventRow({
   homeIsMoslavac,
   team,
   score,
+  index,
+  reduced,
 }: {
   event: MatchEvent;
   competitionId: number | null;
   homeIsMoslavac: boolean;
   team: { picture: string | null; name: string };
   score: ScoreSnapshot | null;
+  index: number;
+  reduced: boolean;
 }) {
   const minute = event.minute ?? 0;
   const stoppage = event.stoppageTime ?? 0;
@@ -167,8 +217,10 @@ function EventRow({
 
   const playerName = event.player?.name?.trim() ?? "";
   const secondaryPlayerName = event.secondaryPlayer?.name?.trim() ?? "";
-  const eventTypeName = event.type.name;
   const personId = event.player?.personId ?? null;
+  const goal = isGoalEvent(event);
+  const sub = isSubstitutionEvent(event);
+
   const eventIsMoslavac =
     (event.side === "home" && homeIsMoslavac) ||
     (event.side === "away" && !homeIsMoslavac);
@@ -177,94 +229,97 @@ function EventRow({
     personId != null &&
     competitionId != null &&
     event.player?.hideProfile !== true;
-  const isGoal = isGoalEvent(event);
-  const isSub = isSubstitutionEvent(event);
 
-  const title = playerName || eventTypeName;
-  const subtitle = playerName ? eventTypeName : "";
-
-  const TitleNode =
-    isLinkable && playerName ? (
-      <Link
-        href={`/statistika/${buildPlayerSlug({ personId, name: playerName })}/${competitionId}`}
-        className="transition-colors hover:text-primary"
-      >
-        {title}
-      </Link>
-    ) : (
-      <span>{title}</span>
-    );
+  // With no player (a team-level card, say) the event type is the only headline
+  // there is — so it is not repeated in the meta line underneath.
+  const title = playerName || event.type.name;
+  const typeInMeta = playerName !== "";
 
   return (
-    <li
+    <motion.li
+      initial={reduced ? false : { opacity: 0, y: 14 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{
+        duration: 0.45,
+        delay: Math.min(index * 0.04, 0.3),
+        ease: [0.16, 1, 0.3, 1],
+      }}
       className={cn(
-        "flex items-start gap-4 border-b border-border/40 px-4 py-6 sm:gap-5 sm:px-6 sm:py-7",
-        isGoal && "bg-primary/[0.035]",
+        "grid grid-cols-[2.75rem_2.25rem_minmax(0,1fr)] items-center gap-x-3 py-2.5 sm:grid-cols-[3.5rem_2.5rem_minmax(0,1fr)] sm:gap-x-4",
       )}
     >
-      <span className="w-9 shrink-0 pt-1 text-right font-display text-base font-black tabular-nums leading-none text-foreground/50 sm:w-11 sm:text-lg">
-        {minuteLabel}&apos;
+      <span
+        className={cn(
+          "text-right text-sm font-black tabular-nums leading-none sm:text-base",
+          goal ? "text-primary" : "text-foreground/40",
+        )}
+      >
+        {minuteLabel}
+        <span className="opacity-50">&apos;</span>
       </span>
 
-      <span className="flex w-9 shrink-0 justify-center pt-0.5">
-        <EventNode eventTypeName={eventTypeName} isGoal={isGoal} isSub={isSub} />
+      <span className="flex justify-center">
+        <EventNode event={event} goal={goal} />
       </span>
 
-      <div className="flex min-w-0 flex-1 flex-col gap-2">
-        <div className="flex items-start justify-between gap-3">
-          <h3 className="min-w-0 wrap-break-word font-display text-xl font-black uppercase leading-[0.9] tracking-tight sm:text-2xl">
-            {TitleNode}
+      {/* Gol je tamna ploča, ostalo tiho na kredi. Rezultat živi UNUTAR ove
+          kolone i smije se prelomiti — zato ne može izgurati redak iz ekrana. */}
+      <div
+        className={cn(
+          "flex min-w-0 flex-wrap items-center gap-x-4 gap-y-1 rounded-sm px-4 py-3.5 sm:px-5",
+          goal
+            ? "dark bg-navy-deep text-foreground shadow-[0_18px_40px_-24px] shadow-navy-deep/80"
+            : "bg-muted/40",
+        )}
+      >
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <h3 className="min-w-0 wrap-break-word text-base font-black uppercase leading-tight tracking-tight sm:text-lg">
+            {isLinkable && playerName ? (
+              <Link
+                href={`/statistika/${buildPlayerSlug({ personId, name: playerName })}/${competitionId}`}
+                className="transition-colors hover:text-primary"
+              >
+                {title}
+              </Link>
+            ) : (
+              title
+            )}
           </h3>
-          {isGoal && score && (
-            <span className="shrink-0 rounded bg-primary px-3.5 py-2 font-display text-sm font-black tabular-nums leading-none text-primary-foreground">
-              {score.home}:{score.away}
+
+          <div className="flex min-w-0 items-center gap-2">
+            <HnsCrest
+              picture={team.picture}
+              name={team.name}
+              size={22}
+              className="size-[1.05rem] shrink-0"
+            />
+            <span
+              className={cn(
+                "min-w-0 truncate text-[0.6rem] font-bold uppercase tracking-[0.16em]",
+                goal ? "text-foreground/60" : "text-muted-foreground",
+              )}
+            >
+              {team.name}
+              {typeInMeta && <span className="opacity-60"> · {event.type.name}</span>}
+            </span>
+          </div>
+
+          {sub && secondaryPlayerName && (
+            <span className="text-[0.66rem] font-semibold uppercase tracking-[0.1em] text-muted-foreground/70">
+              Izlazi {secondaryPlayerName}
             </span>
           )}
         </div>
 
-        <div className="flex items-center gap-2">
-          <HnsCrest
-            picture={team.picture}
-            name={team.name}
-            size={20}
-            className="size-4 shrink-0"
-          />
-          {subtitle && (
-            <span className="text-[0.65rem] font-bold uppercase tracking-[0.25em] text-muted-foreground">
-              {subtitle}
-            </span>
-          )}
-        </div>
-
-        {isSub && secondaryPlayerName && (
-          <span className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground/70">
-            ↔ {secondaryPlayerName}
+        {goal && score && (
+          <span className="shrink-0 text-2xl font-black tabular-nums leading-none tracking-tight sm:text-3xl">
+            {score.home}
+            <span className="mx-0.5 text-primary">:</span>
+            {score.away}
           </span>
         )}
       </div>
-    </li>
+    </motion.li>
   );
-}
-
-function EventNode({
-  eventTypeName,
-  isGoal,
-  isSub,
-}: {
-  eventTypeName: string;
-  isGoal: boolean;
-  isSub: boolean;
-}) {
-  if (isGoal) {
-    return (
-      <span className="flex size-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm">
-        <EventIcon typeName={eventTypeName} className="size-[1.15rem]" />
-      </span>
-    );
-  }
-  if (isSub) {
-    return <EventIcon typeName={eventTypeName} className="size-5" />;
-  }
-  // Cards (and anything else) — bare glyph, scaled up for presence.
-  return <EventIcon typeName={eventTypeName} className="scale-150" />;
 }
