@@ -186,7 +186,7 @@ function PlayerRow({
       }`}
     >
       <span className="w-6 text-right font-medium tabular-nums text-xs text-muted-foreground">
-        {player.shirtNumber ?? "—"}
+        {player.shirtNumber ?? "-"}
       </span>
       <HnsCrest
         picture={player.picture}

@@ -211,7 +211,7 @@ function StatRow({ stat }: { stat: ComparisonStat }) {
             : "font-medium text-muted-foreground",
         )}
       >
-        {home != null ? fmt(home) : "—"}
+        {home != null ? fmt(home) : "-"}
       </span>
 
       <div className="flex flex-col items-center gap-1.5">
@@ -248,7 +248,7 @@ function StatRow({ stat }: { stat: ComparisonStat }) {
             : "font-medium text-muted-foreground",
         )}
       >
-        {away != null ? fmt(away) : "—"}
+        {away != null ? fmt(away) : "-"}
       </span>
     </div>
   );

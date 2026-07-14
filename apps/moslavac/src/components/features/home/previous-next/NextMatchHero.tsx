@@ -1,8 +1,9 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { Fragment } from "react";
 import { FadeInView, RevealHeading } from "@/components/animations";
 import { formatDateTime } from "@/lib/helpers/date";
 import { buildMatchSlug } from "@/lib/slug";
@@ -29,7 +30,22 @@ function TeamName({ name }: { name: string | null | undefined }) {
   );
 }
 
+/** Metadata parts split by a thin rule instead of a separator glyph. */
+function MetaLine({ parts }: { parts: string[] }) {
+  return (
+    <p className="flex flex-wrap items-center justify-center gap-3 text-center text-xs font-medium uppercase tracking-[0.25em] text-muted-foreground sm:text-sm">
+      {parts.map((part, index) => (
+        <Fragment key={part}>
+          {index > 0 && <span aria-hidden className="h-3 w-px bg-current/20" />}
+          <span>{part}</span>
+        </Fragment>
+      ))}
+    </p>
+  );
+}
+
 export function NextMatchHero({ match }: NextMatchHeroProps) {
+  const reduced = useReducedMotion();
   const { date, time } = formatDateTime(match.kickoffAtUtcMs ?? 0);
   const competition = match.competition?.name ?? null;
   const round = formatRound(match.round);
@@ -45,13 +61,6 @@ export function NextMatchHero({ match }: NextMatchHeroProps) {
   const inner = (
     <article className="flex flex-col items-center gap-10 md:gap-14">
       <div className="flex flex-col items-center gap-4">
-        <FadeInView>
-          <p className="flex items-center gap-3 text-[0.6rem] font-medium uppercase tracking-[0.35em] text-muted-foreground sm:text-xs">
-            <span aria-hidden className="h-px w-8 bg-primary" />
-            Match centar
-            <span aria-hidden className="h-px w-8 bg-primary" />
-          </p>
-        </FadeInView>
         <RevealHeading
           lines={["Sljedeća", "utakmica"]}
           ariaLabel="Sljedeća utakmica"
@@ -61,9 +70,7 @@ export function NextMatchHero({ match }: NextMatchHeroProps) {
         />
         {subEyebrow.length > 0 && (
           <FadeInView delay={0.15}>
-            <p className="text-center text-xs font-medium uppercase tracking-[0.25em] text-muted-foreground sm:text-sm">
-              {subEyebrow.join(" · ")}
-            </p>
+            <MetaLine parts={subEyebrow} />
           </FadeInView>
         )}
       </div>
@@ -133,7 +140,10 @@ export function NextMatchHero({ match }: NextMatchHeroProps) {
   }
 
   return (
-    <motion.div whileHover={{ y: -2 }} transition={{ duration: 0.2 }}>
+    <motion.div
+      whileHover={reduced ? undefined : { y: -2 }}
+      transition={{ duration: 0.2 }}
+    >
       <Link href={`/utakmice/${buildMatchSlug(match)}`} className="group block">
         {inner}
       </Link>

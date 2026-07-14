@@ -115,10 +115,10 @@ export function CountdownTiles({
     );
   }
 
-  const dd = c ? String(c.days).padStart(2, "0") : "··";
-  const hh = c ? String(c.hours).padStart(2, "0") : "··";
-  const mm = c ? String(c.minutes).padStart(2, "0") : "··";
-  const ss = c ? String(c.seconds).padStart(2, "0") : "··";
+  const dd = c ? String(c.days).padStart(2, "0") : "00";
+  const hh = c ? String(c.hours).padStart(2, "0") : "00";
+  const mm = c ? String(c.minutes).padStart(2, "0") : "00";
+  const ss = c ? String(c.seconds).padStart(2, "0") : "00";
 
   return (
     <div

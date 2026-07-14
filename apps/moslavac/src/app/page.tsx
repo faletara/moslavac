@@ -16,7 +16,7 @@ export const revalidate = 60;
 export async function generateMetadata(): Promise<Metadata> {
   const tenant = await getTenant();
   const name = tenant.displayName;
-  const description = `Službena stranica ${name} – raspored utakmica, rezultati, tablica, vijesti i sve o klubu.`;
+  const description = `Službena stranica ${name} - raspored utakmica, rezultati, tablica, vijesti i sve o klubu.`;
 
   return {
     description,

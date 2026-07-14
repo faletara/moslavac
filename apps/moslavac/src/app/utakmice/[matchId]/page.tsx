@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     : "";
   const competition = matchInfo.competition?.name?.trim();
   const description = `${home} protiv ${away}${score}${
-    competition ? ` — ${competition}` : ""
+    competition ? `, ${competition}` : ""
   }. Rezultat, tijek utakmice, postave i statistika.`;
   const canonical = `${BASE_URL}/utakmice/${buildMatchSlug(matchInfo)}`;
 
@@ -107,12 +107,10 @@ export default async function MatchInfoPage({ params }: Props) {
   const showHalfTime = hasResult && halfHome != null && halfAway != null;
   const attendance = matchInfo.attendance;
 
-  const eyebrow = [
+  const eyebrowParts = [
     matchInfo.roundOrder != null ? `Kolo ${matchInfo.roundOrder}` : null,
     matchInfo.competition?.name?.trim() || null,
-  ]
-    .filter(Boolean)
-    .join(" · ");
+  ].filter((part): part is string => part != null);
 
   const live = isLive(matchInfo);
 
@@ -129,7 +127,7 @@ export default async function MatchInfoPage({ params }: Props) {
       <MatchHero
         live={live}
         liveMinute={liveMinute(matchInfo)}
-        eyebrow={eyebrow}
+        eyebrowParts={eyebrowParts}
         homeName={matchInfo.homeTeam?.name ?? "N/A"}
         homePicture={matchInfo.homeTeam?.picture ?? null}
         awayName={matchInfo.awayTeam?.name ?? "N/A"}

@@ -103,9 +103,9 @@ function ScorerRow({
   competitionId: number | null;
 }) {
   const personId = scorer.player?.personId ?? null;
-  const playerName = scorer.player?.name ?? "—";
+  const playerName = scorer.player?.name ?? "-";
   const playerPicture = scorer.player?.picture ?? null;
-  const teamName = scorer.team?.name ?? "—";
+  const teamName = scorer.team?.name ?? "-";
   const isLinkable =
     isMoslavac &&
     personId != null &&

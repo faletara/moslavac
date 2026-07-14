@@ -35,9 +35,12 @@ export default function NewsArticleHero({
             sizes="100vw"
             className="-z-20 object-cover"
           />
+          {/* The cover photo is user-uploaded, so its brightness is unknown —
+              the scrim has to hold AA on a white-sky photo too, top (back link)
+              included. Deeper stops only; the floodlit navy wash stays. */}
           <div
             aria-hidden
-            className="absolute inset-0 -z-10 bg-linear-to-t from-navy-deep via-navy-deep/70 to-navy-deep/25"
+            className="absolute inset-0 -z-10 bg-linear-to-t from-navy-deep via-navy-deep/85 to-navy-deep/65"
           />
         </>
       ) : (
@@ -62,7 +65,7 @@ export default function NewsArticleHero({
         <div className="mx-auto w-full max-w-3xl px-6 lg:px-8">
           <Link
             href="/novosti"
-            className="group inline-flex items-center gap-3 text-[0.65rem] font-medium uppercase tracking-[0.3em] text-foreground/70 transition-colors hover:text-foreground sm:text-xs"
+            className="group inline-flex items-center gap-3 text-[0.65rem] font-medium uppercase tracking-[0.3em] text-foreground/80 transition-colors hover:text-foreground sm:text-xs"
           >
             <ArrowLeft className="size-4 transition-transform duration-300 group-hover:-translate-x-1" />
             Sve vijesti
@@ -73,8 +76,10 @@ export default function NewsArticleHero({
       <div className="relative z-10 mx-auto w-full max-w-3xl px-6 pb-14 sm:pb-20 lg:px-8">
         <div className="flex flex-col gap-5">
           <span aria-hidden className="h-px w-12 bg-primary" />
-          <p className="text-[0.6rem] font-medium uppercase tracking-[0.4em] text-foreground/70 sm:text-xs">
-            {date} · {time}
+          <p className="flex items-center gap-3 text-[0.6rem] font-medium uppercase tracking-[0.4em] text-foreground/80 sm:text-xs">
+            <span>{date}</span>
+            <span aria-hidden className="h-3 w-px shrink-0 bg-current/20" />
+            <span>{time}</span>
           </p>
           <h1 className="text-balance font-display text-4xl font-black uppercase leading-[0.95] tracking-tight sm:text-5xl md:text-6xl">
             {title}

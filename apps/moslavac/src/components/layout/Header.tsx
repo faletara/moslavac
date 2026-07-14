@@ -56,8 +56,8 @@ export default function Header({ tenant, competitions }: HeaderProps) {
 	const reduced = useReducedMotion();
 	const pathname = usePathname();
 	// Na vrhu (ili dok je sakriven pri scrollu dolje) header nema podlogu ni
-	// border — stapa se sa stranicom kao na naslovnici. Solid podloga se pojavi
-	// tek kad se header VRATI niže (scroll gore, nije na vrhu) — tako nema
+	// border, stapa se sa stranicom kao na naslovnici. Solid podloga se pojavi
+	// tek kad se header VRATI niže (scroll gore, nije na vrhu), tako nema
 	// bljeska podloge tijekom klizanja prema gore.
 	const bare = (atTop || hidden) && !sheetOpen;
 	// Stranice s tamnim hero-om ispod headera traže svijetli tekst (dark).
@@ -73,7 +73,7 @@ export default function Header({ tenant, competitions }: HeaderProps) {
 
 	// Mirror open-state into a ref so the scroll listener can read it without
 	// being rebound on every open/close. Radix dropdowns lock body scroll when
-	// opening, which fires a synthetic scroll event — without this guard the
+	// opening, which fires a synthetic scroll event; without this guard the
 	// header would hide itself just as the user clicks the trigger, moving the
 	// anchored menu off-screen.
 	const menuOpenRef = useRef(false);
@@ -124,7 +124,7 @@ export default function Header({ tenant, competitions }: HeaderProps) {
 			}
 		};
 
-		// Sync state to the real scroll position on mount — the listener alone
+		// Sync state to the real scroll position on mount; the listener alone
 		// won't fire until the user scrolls, leaving the initial state stale.
 		update();
 
@@ -175,7 +175,7 @@ export default function Header({ tenant, competitions }: HeaderProps) {
 
 	return (
 		<header className="sticky top-0 z-50 h-20">
-			{/* Animaciju skrivanja radi unutarnji sloj — sticky element NIKAD nema
+			{/* Animaciju skrivanja radi unutarnji sloj: sticky element NIKAD nema
 			    transform jer kombinacija sticky+transform duplicira header (ghost)
 			    na iOS/mobilnim browserima pri overscroll-u na vrhu stranice. */}
 			<motion.div

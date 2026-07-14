@@ -56,6 +56,11 @@ export default function StandingsTable({
 						const teamName = row.team?.name ?? "";
 						const isClub = teamName.includes(shortName);
 						const picture = row.team?.picture ?? "";
+						// Na istaknutom retku (bg-muted) muted tekst pada ispod WCAG AA,
+						// zato brojčane ćelije kluba idu u punom foreground tonu.
+						const statCellClass = isClub
+							? "text-foreground"
+							: "text-muted-foreground";
 						return (
 							<tr
 								key={`${row.team?.id ?? teamName}-${i}`}
@@ -92,19 +97,44 @@ export default function StandingsTable({
 										</span>
 									</div>
 								</td>
-								<td className="hidden py-3 text-center tabular-nums text-muted-foreground sm:table-cell">
+								<td
+									className={cn(
+										"hidden py-3 text-center tabular-nums sm:table-cell",
+										statCellClass,
+									)}
+								>
 									{row.played ?? 0}
 								</td>
-								<td className="hidden py-3 text-center tabular-nums text-muted-foreground sm:table-cell">
+								<td
+									className={cn(
+										"hidden py-3 text-center tabular-nums sm:table-cell",
+										statCellClass,
+									)}
+								>
 									{row.wins ?? 0}
 								</td>
-								<td className="hidden py-3 text-center tabular-nums text-muted-foreground sm:table-cell">
+								<td
+									className={cn(
+										"hidden py-3 text-center tabular-nums sm:table-cell",
+										statCellClass,
+									)}
+								>
 									{row.draws ?? 0}
 								</td>
-								<td className="hidden py-3 text-center tabular-nums text-muted-foreground sm:table-cell">
+								<td
+									className={cn(
+										"hidden py-3 text-center tabular-nums sm:table-cell",
+										statCellClass,
+									)}
+								>
 									{row.losses ?? 0}
 								</td>
-								<td className="py-3 text-center tabular-nums text-muted-foreground">
+								<td
+									className={cn(
+										"py-3 text-center tabular-nums",
+										statCellClass,
+									)}
+								>
 									{row.goalsFor ?? 0}:{row.goalsAgainst ?? 0}
 								</td>
 								<td

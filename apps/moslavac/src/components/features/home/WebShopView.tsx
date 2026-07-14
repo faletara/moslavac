@@ -1,7 +1,7 @@
 "use client";
 
 import Autoplay from "embla-carousel-autoplay";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -16,16 +16,12 @@ import {
 import type { Equipment } from "@/types/equipment";
 
 export default function WebShopView({ items }: { items: Equipment[] }) {
+	const reduced = useReducedMotion();
+
 	return (
 		<section className="mx-auto w-full max-w-7xl space-y-14 px-4 py-20 sm:py-28">
 			<div className="flex flex-wrap items-end justify-between gap-6 border-b border-border pb-8">
 				<div className="flex flex-col gap-3">
-					<FadeInView delay={0.05}>
-						<p className="flex items-center gap-3 text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
-							<span aria-hidden className="h-px w-8 bg-primary" />
-							Službena oprema
-						</p>
-					</FadeInView>
 					<RevealHeading
 						lines={["Webshop"]}
 						delay={0.1}
@@ -46,7 +42,7 @@ export default function WebShopView({ items }: { items: Equipment[] }) {
 
 			<FadeInView>
 				<Carousel
-					plugins={[Autoplay({ delay: 5000 })]}
+					plugins={reduced ? [] : [Autoplay({ delay: 5000 })]}
 					opts={{ loop: true, align: "start" }}
 					className="w-full"
 				>
@@ -62,7 +58,7 @@ export default function WebShopView({ items }: { items: Equipment[] }) {
 									rel="noopener noreferrer"
 									aria-label={`Kupi ${item.displayName}`}
 									className="group flex flex-col gap-5"
-									whileHover={{ y: -4 }}
+									whileHover={reduced ? undefined : { y: -4 }}
 									transition={{ duration: 0.2 }}
 								>
 									<div className="relative aspect-square w-full overflow-hidden bg-secondary">

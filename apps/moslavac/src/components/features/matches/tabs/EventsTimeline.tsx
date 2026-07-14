@@ -301,7 +301,15 @@ function EventRow({
               )}
             >
               {team.name}
-              {typeInMeta && <span className="opacity-60"> · {event.type.name}</span>}
+              {typeInMeta && (
+                <>
+                  <span
+                    aria-hidden
+                    className="mx-1.5 inline-block h-3 w-px translate-y-[0.15em] bg-current/20"
+                  />
+                  <span className="opacity-60">{event.type.name}</span>
+                </>
+              )}
             </span>
           </div>
 

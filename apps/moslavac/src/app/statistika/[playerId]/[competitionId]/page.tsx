@@ -112,7 +112,7 @@ export default async function PlayerStatsPage({ params }: Props) {
   ].filter(Boolean) as string[];
 
   const subEyebrowParts = [
-    age != null ? `Dob · ${age}` : null,
+    age != null ? `Dob ${age}` : null,
     competitionName || null,
   ].filter(Boolean) as string[];
 

@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 interface PageHeroProps {
   /** Small uppercase label above the title, with a primary accent line. */
   eyebrow: string;
-  /** Title text — pass an array to render multiple reveal lines. */
+  /** Title text; pass an array to render multiple reveal lines. */
   title: string | string[];
   /** Description, meta line, or CTA rendered below the title. */
   children?: React.ReactNode;

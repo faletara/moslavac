@@ -13,7 +13,7 @@ export function FirstTeamHero({
 }: FirstTeamHeroProps) {
   return (
     <PageHero
-      eyebrow="Prva momčad · Sezona 2025/26"
+      eyebrow="Sezona 2025/26"
       title="Momčad"
       ariaLabel={`Momčad ${clubName}`}
       lineClassName="text-[16vw] sm:text-6xl md:text-7xl lg:text-8xl"

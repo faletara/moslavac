@@ -120,9 +120,9 @@ export default async function MatchOgImage({
     ? formatDateTime(match.kickoffAtUtcMs)
     : { date: "", time: "" };
 
-  const meta = [match.competition?.name?.trim(), date && `${date} · ${time}`]
+  const meta = [match.competition?.name?.trim(), date && `${date} ${time}`]
     .filter(Boolean)
-    .join("  ·  ");
+    .join("  /  ");
 
   return new ImageResponse(
     (

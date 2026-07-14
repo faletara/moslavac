@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import {
@@ -30,6 +30,17 @@ const listVariants = {
 	show: { transition: { staggerChildren: 0.04, delayChildren: 0.1 } },
 };
 
+/** No slide, no stagger — the rows are simply there. */
+const staticRowVariants = {
+	hidden: { opacity: 1, x: 0 },
+	show: { opacity: 1, x: 0 },
+};
+
+const staticListVariants = {
+	hidden: {},
+	show: {},
+};
+
 function ColumnTitle({ children }: { children: string }) {
 	return (
 		<RevealHeading
@@ -49,13 +60,14 @@ function StandingsRow({
 	index: number;
 	isClub: boolean;
 }) {
+	const reduced = useReducedMotion();
 	const teamName = row.team?.name ?? "";
 	const picture = row.team?.picture ?? "";
 	const position = row.position ?? index + 1;
 
 	return (
 		<motion.div
-			variants={rowVariants}
+			variants={reduced ? staticRowVariants : rowVariants}
 			className={cn(
 				"grid grid-cols-[2.5rem_1fr_auto] items-center gap-3 px-3 py-4 sm:grid-cols-[3rem_1fr_3.5rem_4.5rem_3.5rem] sm:gap-5",
 				isClub
@@ -143,6 +155,7 @@ function ScorerRow({
 	isMoslavac: boolean;
 	competitionId: number;
 }) {
+	const reduced = useReducedMotion();
 	const playerName = row.player?.name ?? "";
 	const playerPicture = row.player?.picture ?? "";
 	const personId = row.player?.personId ?? null;
@@ -151,7 +164,7 @@ function ScorerRow({
 
 	const inner = (
 		<motion.div
-			variants={rowVariants}
+			variants={reduced ? staticRowVariants : rowVariants}
 			className={cn(
 				"grid grid-cols-[2.5rem_1fr_auto] items-center gap-3 px-3 py-4 sm:gap-5",
 				isClub
@@ -239,6 +252,7 @@ export default function SeasonDataView({
 	shortName: string;
 	ourTeamId: number | null;
 }) {
+	const reduced = useReducedMotion();
 	const hasStandings = standings.length > 0;
 	const hasScorers = topScorers.length > 0;
 
@@ -296,7 +310,7 @@ export default function SeasonDataView({
 									initial="hidden"
 									whileInView="show"
 									viewport={{ once: true, margin: "-80px" }}
-									variants={listVariants}
+									variants={reduced ? staticListVariants : listVariants}
 								>
 									{standings.map((row, i) => {
 										const teamName = row.team?.name ?? "";
@@ -328,7 +342,7 @@ export default function SeasonDataView({
 									initial="hidden"
 									whileInView="show"
 									viewport={{ once: true, margin: "-80px" }}
-									variants={listVariants}
+									variants={reduced ? staticListVariants : listVariants}
 								>
 									{topScorers.map((row, i) => {
 										const teamName = row.team?.name ?? "";

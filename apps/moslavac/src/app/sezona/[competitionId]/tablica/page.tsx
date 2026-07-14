@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const slug = info ? buildCompetitionSlug(info) : competitionId;
   const name = info?.name ?? "Sezona";
   return {
-    title: `Ljestvica – ${name}`,
+    title: `Ljestvica - ${name}`,
     description: `Ljestvica i poredak za natjecanje ${name}.`,
     alternates: { canonical: `${BASE_URL}/sezona/${slug}/tablica` },
   };

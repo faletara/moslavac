@@ -28,7 +28,7 @@ export default function Footer({ tenant }: FooterProps) {
 
   return (
     <footer className="dark relative mt-24 overflow-hidden border-t-2 border-primary bg-navy-deep text-foreground">
-      {/* Hollow wordmark — full-width sign-off */}
+      {/* Hollow wordmark, full-width sign-off */}
       <FadeInView className="pointer-events-none select-none px-6 pt-14 lg:px-8">
         <p
           aria-hidden
@@ -97,7 +97,6 @@ export default function Footer({ tenant }: FooterProps) {
         >
           <StaggerItem className="space-y-5 py-10 md:border-r md:border-border/60 md:pr-10">
             <div className="flex items-baseline gap-3 text-[0.6rem] font-medium uppercase tracking-[0.4em] text-muted-foreground">
-              <span className="text-foreground">01</span>
               <span>Kontakt</span>
             </div>
             <ul className="space-y-2 text-sm leading-relaxed">
@@ -127,7 +126,6 @@ export default function Footer({ tenant }: FooterProps) {
 
           <StaggerItem className="space-y-5 border-t border-border/60 py-10 md:border-l-0 md:border-r md:border-t-0 md:border-border/60 md:px-10">
             <div className="flex items-baseline gap-3 text-[0.6rem] font-medium uppercase tracking-[0.4em] text-muted-foreground">
-              <span className="text-foreground">02</span>
               <span>Klub</span>
             </div>
             <ul className="space-y-2 text-sm leading-relaxed">
@@ -168,7 +166,6 @@ export default function Footer({ tenant }: FooterProps) {
 
           <StaggerItem className="space-y-5 border-t border-border/60 py-10 md:border-t-0 md:pl-10">
             <div className="flex items-baseline gap-3 text-[0.6rem] font-medium uppercase tracking-[0.4em] text-muted-foreground">
-              <span className="text-foreground">03</span>
               <span>Klub od 1933.</span>
             </div>
             <div className="space-y-3 text-sm leading-relaxed">
@@ -179,7 +176,7 @@ export default function Footer({ tenant }: FooterProps) {
               )}
               {founded && (
                 <p className="text-[0.6rem] font-medium uppercase tracking-[0.4em] text-muted-foreground">
-                  {founded} — Popovača
+                  {founded}, Popovača
                 </p>
               )}
             </div>
@@ -190,8 +187,8 @@ export default function Footer({ tenant }: FooterProps) {
         <FadeInView>
           <div className="flex flex-col gap-4 border-t border-border/60 py-6 text-[0.6rem] font-medium uppercase tracking-[0.35em] text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
             <p>
-              &copy; {new Date().getFullYear()} {tenant.displayName} — Sva prava
-              pridržana
+              &copy; {new Date().getFullYear()} {tenant.displayName}. Sva prava
+              pridržana.
             </p>
             <nav className="flex flex-wrap items-center gap-x-5 gap-y-2">
               <Link

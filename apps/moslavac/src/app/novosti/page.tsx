@@ -40,7 +40,7 @@ export default async function NewsPage({ searchParams }: Props) {
 
   return (
     <div className="mx-auto w-full max-w-5xl px-6 pt-16 pb-24 sm:pt-24 lg:px-8">
-      <PageHero eyebrow="Aktualno · Novosti kluba" title="Vijesti" />
+      <PageHero eyebrow="Novosti kluba" title="Vijesti" />
 
       <div className="mx-auto mt-16 max-w-4xl sm:mt-20">
         {content.length === 0 ? (
@@ -92,8 +92,9 @@ export default async function NewsPage({ searchParams }: Props) {
             <Link
               href={page > 2 ? `/novosti?page=${page - 1}` : "/novosti"}
               aria-disabled={page <= 1}
+              tabIndex={page <= 1 ? -1 : undefined}
               className={`group flex items-center gap-3 text-[0.65rem] font-medium uppercase tracking-[0.3em] text-muted-foreground transition-colors hover:text-foreground sm:text-xs ${
-                page <= 1 ? "pointer-events-none opacity-30" : ""
+                page <= 1 ? "pointer-events-none opacity-50" : ""
               }`}
             >
               <span className="h-px w-6 bg-current transition-all duration-300 group-hover:w-12 sm:w-8" />
@@ -101,15 +102,16 @@ export default async function NewsPage({ searchParams }: Props) {
             </Link>
 
             <span className="text-[0.65rem] font-medium uppercase tracking-[0.3em] text-muted-foreground tabular-nums sm:text-xs">
-              {String(page).padStart(2, "0")} —{" "}
+              {String(page).padStart(2, "0")} /{" "}
               {String(totalPages).padStart(2, "0")}
             </span>
 
             <Link
               href={`/novosti?page=${page + 1}`}
               aria-disabled={page >= totalPages}
+              tabIndex={page >= totalPages ? -1 : undefined}
               className={`group flex items-center gap-3 text-[0.65rem] font-medium uppercase tracking-[0.3em] text-muted-foreground transition-colors hover:text-foreground sm:text-xs ${
-                page >= totalPages ? "pointer-events-none opacity-30" : ""
+                page >= totalPages ? "pointer-events-none opacity-50" : ""
               }`}
             >
               Sljedeća

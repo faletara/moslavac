@@ -206,7 +206,7 @@ function PlayerRow({
           compact ? "w-8 text-2xl" : "w-9 text-3xl",
         )}
       >
-        {player.shirtNumber ?? "—"}
+        {player.shirtNumber ?? "-"}
       </span>
       <span
         aria-hidden

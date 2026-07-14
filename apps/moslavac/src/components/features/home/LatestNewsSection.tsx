@@ -16,12 +16,6 @@ function SectionHeader() {
 	return (
 		<div className="flex flex-wrap items-end justify-between gap-6 border-b border-border pb-8">
 			<div className="flex flex-col gap-3">
-				<FadeInView delay={0.05}>
-					<p className="flex items-center gap-3 text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
-						<span aria-hidden className="h-px w-8 bg-primary" />
-						Najnovije iz kluba
-					</p>
-				</FadeInView>
 				<RevealHeading
 					lines={["Vijesti"]}
 					delay={0.1}
@@ -44,11 +38,9 @@ function SectionHeader() {
 
 function NewsCard({
 	item,
-	index,
 	fallback,
 }: {
 	item: News;
-	index: number;
 	fallback: string;
 }) {
 	return (
@@ -78,15 +70,9 @@ function NewsCard({
 			</div>
 
 			<div className="mt-6 flex flex-1 flex-col gap-3">
-				<div className="flex items-center gap-3">
-					<span className="font-display text-sm font-black leading-none text-primary tabular-nums">
-						{String(index + 1).padStart(2, "0")}
-					</span>
-					<span aria-hidden className="h-3 w-px bg-border" />
-					<p className="text-[0.6rem] font-bold uppercase tracking-[0.3em] text-muted-foreground sm:text-xs">
-						{formatDateLong(item.date)}
-					</p>
-				</div>
+				<p className="text-[0.6rem] font-bold uppercase tracking-[0.3em] text-muted-foreground sm:text-xs">
+					{formatDateLong(item.date)}
+				</p>
 
 				<h3 className="line-clamp-3 text-balance font-display text-xl font-black uppercase leading-[1.05] transition-colors duration-300 group-hover:text-primary sm:text-2xl">
 					{item.title}
@@ -118,9 +104,9 @@ export default async function LatestNewsSection() {
 				className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-8"
 				staggerChildren={0.12}
 			>
-				{items.map((item, i) => (
+				{items.map((item) => (
 					<StaggerItem key={item.id}>
-						<NewsCard item={item} index={i} fallback={fallback} />
+						<NewsCard item={item} fallback={fallback} />
 					</StaggerItem>
 				))}
 			</StaggerContainer>

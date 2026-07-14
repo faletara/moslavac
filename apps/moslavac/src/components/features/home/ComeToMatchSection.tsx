@@ -24,13 +24,6 @@ export default function ComeToMatchSection() {
 			<div className="absolute inset-0 -z-10 bg-linear-to-r from-navy-deep/95 via-navy-deep/70 to-navy-deep/30" />
 
 			<div className="mx-auto flex max-w-7xl flex-col items-start gap-8 px-4 py-28 sm:py-40 md:px-6">
-				<FadeInView direction="up">
-					<p className="flex items-center gap-3 text-[0.6rem] font-medium uppercase tracking-[0.3em] text-foreground/70 sm:text-xs sm:tracking-[0.4em]">
-						<span aria-hidden className="h-px w-8 bg-primary" />
-						Podrži svoj klub
-					</p>
-				</FadeInView>
-
 				<RevealHeading
 					lines={["Dođi na", "utakmicu"]}
 					delay={0.1}
@@ -40,7 +33,7 @@ export default function ComeToMatchSection() {
 
 				<FadeInView direction="up" delay={0.2}>
 					<p className="max-w-md text-balance text-sm leading-relaxed text-foreground/70 sm:text-base">
-						Atmosfera, navijači i naša momčad — uživo na stadionu. Vidimo se na
+						Atmosfera, navijači i naša momčad, uživo na stadionu. Vidimo se na
 						tribinama.
 					</p>
 				</FadeInView>

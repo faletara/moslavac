@@ -35,8 +35,8 @@ export async function generateMetadata({
   const playerName = player?.name ?? null;
   const competitionName = competition?.name ?? null;
 
-  const title = playerName ? `${playerName} – Statistike` : "Statistike igrača";
-  const description = [playerName, competitionName].filter(Boolean).join(" · ");
+  const title = playerName ? `${playerName} - Statistike` : "Statistike igrača";
+  const description = [playerName, competitionName].filter(Boolean).join(", ");
 
   const playerSlug = player
     ? buildPlayerSlug({ personId, name: player.name })

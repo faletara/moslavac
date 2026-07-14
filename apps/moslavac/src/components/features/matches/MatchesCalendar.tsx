@@ -111,8 +111,8 @@ export default function MatchesCalendar({ matches }: MatchesCalendarProps) {
 			const end = endOfWeek(cursor, { weekStartsOn: 1 });
 			const sameMonth = isSameMonth(start, end);
 			return sameMonth
-				? `${format(start, "d.", { locale: hr })}–${format(end, "d. LLLL yyyy.", { locale: hr })}`
-				: `${format(start, "d. LLL", { locale: hr })} – ${format(end, "d. LLL yyyy.", { locale: hr })}`;
+				? `${format(start, "d.", { locale: hr })}-${format(end, "d. LLLL yyyy.", { locale: hr })}`
+				: `${format(start, "d. LLL", { locale: hr })} - ${format(end, "d. LLL yyyy.", { locale: hr })}`;
 		}
 		return format(cursor, "EEEE, d. LLLL yyyy.", { locale: hr });
 	}, [cursor, view]);
@@ -335,7 +335,7 @@ function MonthView({ cursor, events, onDayClick, onEventClick }: MonthViewProps)
 											{format(ev.date, "HH:mm")}
 										</span>
 										<span className="line-clamp-1 text-[0.7rem] font-semibold uppercase tracking-wider">
-											{ev.home} – {ev.away}
+											{ev.home} - {ev.away}
 										</span>
 									</button>
 								))}
@@ -417,7 +417,7 @@ function WeekView({ cursor, events, onDayClick, onEventClick }: WeekViewProps) {
 						<div className="flex flex-1 flex-col gap-3 border-t border-border/60 pt-3">
 							{dayEvents.length === 0 ? (
 								<span className="text-[0.65rem] font-medium uppercase tracking-[0.25em] text-muted-foreground/60">
-									—
+									-
 								</span>
 							) : (
 								dayEvents.map((ev) => (
@@ -444,7 +444,7 @@ function WeekView({ cursor, events, onDayClick, onEventClick }: WeekViewProps) {
 											</span>
 										</div>
 										<span className="line-clamp-2 text-xs font-semibold uppercase tracking-[0.08em]">
-											{ev.home} – {ev.away}
+											{ev.home} - {ev.away}
 										</span>
 										{ev.competition && (
 											<span className="line-clamp-1 text-[0.6rem] font-medium uppercase tracking-[0.25em] text-muted-foreground">
@@ -515,7 +515,7 @@ function DayView({ cursor, events, onEventClick }: DayViewProps) {
 										)}
 									</div>
 									<span className="line-clamp-2 text-sm font-semibold uppercase tracking-widest sm:text-base">
-										{ev.home} – {ev.away}
+										{ev.home} - {ev.away}
 									</span>
 								</div>
 							</button>

@@ -33,11 +33,6 @@ export default function SeasonTicketPromoSection() {
 
 				<FadeInView direction="right" delay={0.15}>
 					<div className="flex flex-col items-start gap-8">
-						<p className="flex items-center gap-3 text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
-							<span aria-hidden className="h-px w-8 bg-primary" />
-							Sezonska iskaznica
-						</p>
-
 						<RevealHeading
 							lines={["Postani naš", "12. igrač"]}
 							className="select-none text-balance font-display font-black uppercase leading-[0.85] tracking-[-0.02em]"

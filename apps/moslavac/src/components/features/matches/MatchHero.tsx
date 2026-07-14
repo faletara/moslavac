@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
+import { Fragment } from "react";
 import { ParallaxImage } from "@/components/animations";
 import { HnsCrest } from "@/components/HnsCrest";
 import { cn } from "@/lib/utils";
@@ -11,7 +12,8 @@ const EASE = [0.25, 0.1, 0.25, 1] as const;
 const EXPO_OUT = [0.16, 1, 0.3, 1] as const;
 
 interface MatchHeroProps {
-  eyebrow: string;
+  /** Match facts for the eyebrow, e.g. ["Kolo 12", "4. NL"] — rendered with hairline separators. */
+  eyebrowParts: string[];
   homeName: string;
   homePicture: string | null;
   awayName: string;
@@ -41,7 +43,7 @@ interface MatchHeroProps {
  * the brand; all the small match facts are intentionally dropped for impact.
  */
 export default function MatchHero({
-  eyebrow,
+  eyebrowParts,
   homeName,
   homePicture,
   awayName,
@@ -108,32 +110,47 @@ export default function MatchHero({
         <div className="flex flex-col items-center gap-3 text-center">
           <motion.p
             className="flex items-center justify-center gap-3 text-[0.6rem] font-bold uppercase tracking-[0.3em] text-foreground/70 sm:text-xs sm:tracking-[0.4em]"
-            initial={{ opacity: 0, y: reduced ? 0 : 10 }}
+            initial={reduced ? false : { opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: EASE }}
           >
             <span aria-hidden className="h-px w-8 bg-primary" />
-            {eyebrow}
+            {eyebrowParts.map((part, i) => (
+              <Fragment key={part}>
+                {i > 0 && <MetaDivider />}
+                <span>{part}</span>
+              </Fragment>
+            ))}
             <span aria-hidden className="h-px w-8 bg-primary" />
           </motion.p>
           {live && (
             <span className="inline-flex items-center gap-2.5 bg-primary px-3.5 py-1.5 text-[0.6rem] font-bold uppercase tracking-[0.24em] text-primary-foreground">
               <span className="relative flex size-2">
-                <span className="absolute inline-flex size-full animate-ping rounded-full bg-current opacity-75" />
+                <span className="absolute inline-flex size-full animate-ping rounded-full bg-current opacity-75 motion-reduce:animate-none" />
                 <span className="relative inline-flex size-2 rounded-full bg-current" />
               </span>
               Uživo
-              {liveMinute && <span className="tabular-nums">· {liveMinute}</span>}
+              {liveMinute && (
+                <>
+                  <MetaDivider />
+                  <span className="tabular-nums">{liveMinute}</span>
+                </>
+              )}
             </span>
           )}
           {subline.length > 0 && (
             <motion.p
-              className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-foreground/45 sm:text-xs"
-              initial={{ opacity: 0 }}
+              className="flex items-center justify-center gap-3 text-[0.6rem] font-medium uppercase tracking-[0.3em] text-foreground/70 sm:text-xs"
+              initial={reduced ? false : { opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
             >
-              {subline.join(" · ")}
+              {subline.map((part, i) => (
+                <Fragment key={part}>
+                  {i > 0 && <MetaDivider />}
+                  <span>{part}</span>
+                </Fragment>
+              ))}
             </motion.p>
           )}
         </div>
@@ -186,6 +203,11 @@ export default function MatchHero({
   );
 }
 
+/** Hairline rule between metadata tokens — replaces the old `·` glyph. */
+function MetaDivider() {
+  return <span aria-hidden className="h-3 w-px shrink-0 bg-current/20" />;
+}
+
 function Scoreline({
   hasResult,
   homeScore,
@@ -202,7 +224,7 @@ function Scoreline({
   return (
     <motion.div
       className="flex shrink-0 items-center justify-center"
-      initial={{ opacity: 0, scale: reduced ? 1 : 0.9 }}
+      initial={reduced ? false : { opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.8, delay: 0.15, ease: EXPO_OUT }}
     >
@@ -242,7 +264,7 @@ function Crest({
   return (
     <motion.div
       className="relative shrink-0"
-      initial={{ opacity: 0, x: reduced ? 0 : fromX }}
+      initial={reduced ? false : { opacity: 0, x: fromX }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.7, delay: 0.05, ease: EXPO_OUT }}
     >
@@ -278,7 +300,7 @@ function TeamName({
         "max-w-[11ch] break-words font-display text-3xl font-black uppercase leading-[0.95] tracking-tight text-foreground xl:max-w-[13ch] xl:text-4xl",
         align === "right" ? "text-right" : "text-left",
       )}
-      initial={{ opacity: 0, x: reduced ? 0 : fromX }}
+      initial={reduced ? false : { opacity: 0, x: fromX }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.7, delay: 0.1, ease: EXPO_OUT }}
     >

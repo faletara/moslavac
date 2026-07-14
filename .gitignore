@@ -39,3 +39,6 @@ next-env.d.ts
 
 # Test
 coverage/
+
+.claude/
+.agents/

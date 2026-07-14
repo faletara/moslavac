@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -66,7 +66,7 @@ export default function FirstTeamCarousel({
 						<FadeInView delay={0.05}>
 							<p className="flex items-center gap-3 text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
 								<span aria-hidden className="h-px w-8 bg-primary" />
-								Snaga kluba · {totalPlayers} igrača
+								{totalPlayers} igrača
 							</p>
 						</FadeInView>
 						<RevealHeading
@@ -126,6 +126,7 @@ export default function FirstTeamCarousel({
 }
 
 function PlayerPoster({ player }: { player: FirstLineupPlayer }) {
+	const reduced = useReducedMotion();
 	const [nameLineOne, nameLineTwo] = splitDisplayNameLines(player.displayName);
 	const initials = player.displayName
 		.split(/\s+/)
@@ -135,13 +136,16 @@ function PlayerPoster({ player }: { player: FirstLineupPlayer }) {
 		.toUpperCase();
 
 	return (
-		<motion.div whileHover={{ y: -6 }} transition={{ duration: 0.25 }}>
+		<motion.div
+			whileHover={reduced ? undefined : { y: -6 }}
+			transition={{ duration: 0.25 }}
+		>
 			<Link
 				href={player.href ?? "/prva-momcad"}
 				aria-label={
 					player.href
 						? `Statistika igrača ${player.displayName}`
-						: `Prva momčad — ${player.displayName}`
+						: `Prva momčad, ${player.displayName}`
 				}
 				className="group relative block aspect-3/4 overflow-hidden bg-linear-to-b from-club/30 to-navy-deep ring-1 ring-foreground/10 transition-shadow duration-500 hover:ring-primary/50 hover:shadow-[0_20px_60px_-20px_var(--club)]"
 			>

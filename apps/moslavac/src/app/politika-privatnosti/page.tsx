@@ -102,21 +102,21 @@ export default async function PrivacyPolicyPage() {
           <h2>3. Svrhe i pravne osnove obrade</h2>
           <ul>
             <li>
-              <strong>Pružanje sadržaja i rad web stranice</strong> — pravna
+              <strong>Pružanje sadržaja i rad web stranice</strong>. Pravna
               osnova: legitimni interes Kluba (čl. 6. st. 1. t. f) GDPR-a).
             </li>
             <li>
               <strong>Sigurnost i sprječavanje zlouporabe</strong> (server
-              logovi) — pravna osnova: legitimni interes.
+              logovi). Pravna osnova: legitimni interes.
             </li>
             <li>
-              <strong>Statistika posjeta</strong> — pravna osnova: legitimni
+              <strong>Statistika posjeta</strong>. Pravna osnova: legitimni
               interes Kluba za razumijevanje korištenja stranice. Obrada je
               ograničena na agregirane, anonimizirane podatke.
             </li>
             <li>
               <strong>Odgovor na upite</strong> putem objavljenog e-mail
-              kontakta — pravna osnova: legitimni interes / poduzimanje radnji
+              kontakta. Pravna osnova: legitimni interes / poduzimanje radnji
               prije sklapanja ugovora.
             </li>
           </ul>
@@ -145,25 +145,25 @@ export default async function PrivacyPolicyPage() {
           </p>
           <ul>
             <li>
-              <strong>Vercel Inc.</strong> (SAD) — hosting stranice, analitika,
+              <strong>Vercel Inc.</strong> (SAD): hosting stranice, analitika,
               speed insights. Obrada u skladu s Vercel DPA i standardnim
               ugovornim klauzulama EU.
             </li>
             <li>
-              <strong>Cloudflare, Inc.</strong> (SAD) — CDN i osnovna sigurnost.
+              <strong>Cloudflare, Inc.</strong> (SAD): CDN i osnovna sigurnost.
             </li>
             <li>
-              <strong>Cloudinary Ltd.</strong> — isporuka slika.
+              <strong>Cloudinary Ltd.</strong>: isporuka slika.
             </li>
             <li>
-              <strong>Cloudflare R2</strong> — pohrana slika i medijskih
+              <strong>Cloudflare R2</strong>: pohrana slika i medijskih
               datoteka.
             </li>
             <li>
-              <strong>OpenStreetMap Foundation</strong> — prikaz karte lokacije.
+              <strong>OpenStreetMap Foundation</strong>: prikaz karte lokacije.
             </li>
             <li>
-              <strong>Hrvatski nogometni savez (HNS)</strong> — javni podaci o
+              <strong>Hrvatski nogometni savez (HNS)</strong>: javni podaci o
               natjecanjima preuzimaju se iz HNS sustava radi prikaza rasporeda i
               rezultata.
             </li>
@@ -201,7 +201,7 @@ export default async function PrivacyPolicyPage() {
           </p>
           <ul>
             <li>
-              <strong>Pravo na pristup</strong> — saznati obrađuju li se vaši
+              <strong>Pravo na pristup</strong>: saznati obrađuju li se vaši
               podaci i koji.
             </li>
             <li>

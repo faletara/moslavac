@@ -44,7 +44,7 @@ export default async function KlubPage() {
         motto={motto}
       />
 
-      <SectionBlock index={1} eyebrow="O klubu" title="Osnovne informacije">
+      <SectionBlock title="Osnovne informacije">
         <InfoList
           rows={[
             { label: "Klub", value: displayName },
@@ -58,12 +58,12 @@ export default async function KlubPage() {
         />
       </SectionBlock>
 
-      <SectionBlock index={2} eyebrow="Kontakt" title="Kako nas kontaktirati">
+      <SectionBlock title="Kako nas kontaktirati">
         <ContactGrid email={email} phone={phone} social={social} />
       </SectionBlock>
 
       {facility && (
-        <SectionBlock index={3} eyebrow="Stadion" title={facility.name ?? "Stadion"}>
+        <SectionBlock title={facility.name ?? "Stadion"}>
           <StadiumPanel facility={facility} />
         </SectionBlock>
       )}
@@ -94,9 +94,11 @@ function Hero({
       </Avatar>
 
       <span className="h-px w-12 bg-primary" />
-      <p className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
-        Klub{founded != null ? ` · Osnovan ${founded}.` : ""}
-      </p>
+      {founded != null && (
+        <p className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
+          Osnovan {founded}.
+        </p>
+      )}
 
       <RevealHeading
         as="h1"
@@ -282,31 +284,18 @@ function StadiumPanel({ facility }: { facility: Facility }) {
 }
 
 function SectionBlock({
-  index,
-  eyebrow,
   title,
   children,
 }: {
-  index: number;
-  eyebrow: string;
   title: string;
   children: React.ReactNode;
 }) {
-  const indexStr = String(index).padStart(2, "0");
   return (
     <section className="space-y-12 sm:space-y-16">
-      <div className="grid grid-cols-[auto_1fr] items-baseline gap-x-5 gap-y-3 border-b border-border/60 pb-6 sm:gap-x-10">
-        <span className="font-display font-black tabular-nums leading-none tracking-tighter text-5xl text-foreground sm:text-7xl">
-          {indexStr}
-        </span>
-        <div className="flex flex-col gap-2 sm:gap-3">
-          <span className="text-[0.55rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.65rem] sm:tracking-[0.4em]">
-            {eyebrow}
-          </span>
-          <h2 className="font-display font-black uppercase leading-[0.85] tracking-[-0.02em] text-3xl sm:text-5xl md:text-6xl">
-            {title}
-          </h2>
-        </div>
+      <div className="border-b border-border/60 pb-6">
+        <h2 className="font-display font-black uppercase leading-[0.85] tracking-[-0.02em] text-3xl sm:text-5xl md:text-6xl">
+          {title}
+        </h2>
       </div>
       {children}
     </section>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useReducedMotion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -46,13 +47,6 @@ function TeamRow({
 function SectionTitle() {
   return (
     <div className="flex flex-col items-center gap-4">
-      <FadeInView>
-        <p className="flex items-center gap-3 text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
-          <span aria-hidden className="h-px w-8 bg-primary" />
-          Raspored
-          <span aria-hidden className="h-px w-8 bg-primary" />
-        </p>
-      </FadeInView>
       <FadeInView delay={0.05}>
         <h2 className="text-center font-display text-[13vw] font-black uppercase leading-[0.85] sm:text-6xl md:text-7xl lg:text-8xl">
           Sljedeće utakmice
@@ -63,6 +57,7 @@ function SectionTitle() {
 }
 
 function ScrollableRow({ children }: { children: React.ReactNode }) {
+  const reduced = useReducedMotion();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
@@ -93,14 +88,17 @@ function ScrollableRow({ children }: { children: React.ReactNode }) {
   const scrollBy = (direction: 1 | -1) => {
     const el = scrollRef.current;
     if (!el) return;
-    el.scrollBy({ left: direction * el.clientWidth * 0.8, behavior: "smooth" });
+    el.scrollBy({
+      left: direction * el.clientWidth * 0.8,
+      behavior: reduced ? "auto" : "smooth",
+    });
   };
 
   return (
     <div className="space-y-12">
       <div
         ref={scrollRef}
-        className="-mt-4 flex snap-x snap-mandatory gap-8 overflow-x-auto scroll-smooth px-1 pb-2 pt-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="-mt-4 flex snap-x snap-mandatory gap-8 overflow-x-auto scroll-smooth px-1 pb-2 pt-4 motion-reduce:scroll-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {children}
       </div>
@@ -159,7 +157,7 @@ export default function UpcomingMatchesView({
               <Link
                 key={match.id}
                 href={`/utakmice/${buildMatchSlug(match)}`}
-                aria-label={`${match.homeTeam?.name ?? ""} vs ${match.awayTeam?.name ?? ""} — ${day}. ${monthShort} ${time}`}
+                aria-label={`${match.homeTeam?.name ?? ""} vs ${match.awayTeam?.name ?? ""}, ${day}. ${monthShort} ${time}`}
                 className="group flex h-full w-72 shrink-0 snap-start flex-col gap-5 rounded-sm outline-none transition-transform duration-300 ease-out hover:-translate-y-1.5 focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-4"
               >
                 <div className="flex items-center gap-2">
@@ -169,9 +167,12 @@ export default function UpcomingMatchesView({
                     {categoryLabel}
                   </span>
                   {venueIndicator && (
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                      · {venueIndicator === "D" ? "Doma" : "Gost"}
-                    </span>
+                    <>
+                      <span aria-hidden className="h-3 w-px bg-current/20" />
+                      <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                        {venueIndicator === "D" ? "Doma" : "Gost"}
+                      </span>
+                    </>
                   )}
                 </div>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { HnsCrest } from "@/components/HnsCrest";
 import {
   isGoalEvent,
@@ -42,6 +42,8 @@ export default function MatchEventBar({
   awayName,
   awayPicture,
 }: MatchEventBarProps) {
+  const reduced = useReducedMotion();
+
   const barEvents = events.filter(
     (e) =>
       isBarEvent(e) &&
@@ -76,7 +78,7 @@ export default function MatchEventBar({
   return (
     <motion.div
       className="mx-auto w-full max-w-3xl"
-      initial={{ opacity: 0 }}
+      initial={reduced ? false : { opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8, delay: 0.5 }}
     >

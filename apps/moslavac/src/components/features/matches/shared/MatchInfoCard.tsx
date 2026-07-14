@@ -44,7 +44,7 @@ export default function MatchInfoCard({
     match.roundOrder != null
       ? { label: "Kolo", value: String(match.roundOrder) }
       : null,
-    date ? { label: "Datum", value: `${date} · ${time}` } : null,
+    date ? { label: "Datum", value: `${date} ${time}` } : null,
     hasResult && attendance != null && attendance > 0
       ? { label: "Gledatelja", value: String(attendance) }
       : null,

@@ -97,7 +97,7 @@ function StandingsRow({
 
   const form = getStandingsForm(row.form);
 
-  const teamName = row.team?.name ?? "—";
+  const teamName = row.team?.name ?? "-";
   const teamId = row.team?.id;
   const cellContent = (
     <div className="flex items-center gap-2">
@@ -121,7 +121,7 @@ function StandingsRow({
   return (
     <TableRow className={cn(highlight && "bg-muted/50 hover:bg-muted/70")}>
       <TableCell className="text-center text-xs font-medium tabular-nums text-muted-foreground">
-        {row.position ?? "—"}
+        {row.position ?? "-"}
       </TableCell>
       <TableCell className="min-w-0">
         {teamId != null && row.team?.allowDetail ? (
@@ -168,7 +168,7 @@ function StandingsRow({
 
 function FormStrip({ form }: { form: FormResult[] }) {
   if (form.length === 0) {
-    return <span className="text-[0.6rem] text-muted-foreground/60">—</span>;
+    return <span className="text-[0.6rem] text-muted-foreground/60">-</span>;
   }
   return (
     <div className="flex justify-center gap-1">

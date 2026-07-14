@@ -56,11 +56,11 @@ function mergeCards(
     } else {
       map.set(key, {
         personId,
-        playerName: s.player?.name ?? "—",
+        playerName: s.player?.name ?? "-",
         playerPicture: s.player?.picture ?? null,
         hideProfile: s.player?.hideProfile === true,
         teamId: s.team?.id ?? null,
-        teamName: s.team?.name ?? "—",
+        teamName: s.team?.name ?? "-",
         teamPicture: s.team?.picture ?? null,
         yellow: field === "yellow" ? value : 0,
         red: field === "red" ? value : 0,
@@ -226,10 +226,10 @@ function CardRow({
         </div>
       </TableCell>
       <TableCell className="text-center text-sm font-bold tabular-nums">
-        {row.yellow > 0 ? row.yellow : "—"}
+        {row.yellow > 0 ? row.yellow : "-"}
       </TableCell>
       <TableCell className="text-center text-sm font-bold tabular-nums">
-        {row.red > 0 ? row.red : "—"}
+        {row.red > 0 ? row.red : "-"}
       </TableCell>
     </TableRow>
   );

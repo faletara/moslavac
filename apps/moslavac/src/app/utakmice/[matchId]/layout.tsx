@@ -65,7 +65,7 @@ export async function generateMetadata({
 
   const title = hasResult
     ? `${home} ${homeScore}:${awayScore} ${away}`
-    : `${home} – ${away}`;
+    : `${home} - ${away}`;
 
   const { date } = formatDateTime(match.kickoffAtUtcMs ?? 0);
   const parts = [
@@ -73,7 +73,7 @@ export async function generateMetadata({
     date,
     match.facility?.place,
   ].filter(Boolean);
-  const description = parts.join(" · ");
+  const description = parts.join(", ");
 
   // As in `page.tsx`, no `images`: the generated per-match poster wins by file
   // convention. `matchImageUrl` stays because the JSON-LD below still needs an
@@ -126,12 +126,12 @@ export default async function MatchLayout({
     const { date } = formatDateTime(match.kickoffAtUtcMs);
     const description = [match.competition?.name, date, facility.place]
       .filter(Boolean)
-      .join(" · ");
+      .join(", ");
 
     jsonLd = {
       "@context": "https://schema.org",
       "@type": "SportsEvent",
-      name: `${home} – ${away}`,
+      name: `${home} - ${away}`,
       sport: "Football",
       startDate: start.toISOString(),
       endDate: end.toISOString(),
@@ -182,7 +182,7 @@ export default async function MatchLayout({
       {
         "@type": "ListItem",
         position: 3,
-        name: `${home} – ${away}`,
+        name: `${home} - ${away}`,
         item: `${BASE_URL}/utakmice/${buildMatchSlug(match)}`,
       },
     ],

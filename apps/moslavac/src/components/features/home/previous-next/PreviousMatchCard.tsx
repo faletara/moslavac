@@ -1,8 +1,9 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { Fragment } from "react";
 import { FadeInView, RevealHeading } from "@/components/animations";
 import { formatDateTime } from "@/lib/helpers/date";
 import type { FormResult } from "@/lib/helpers/form";
@@ -60,7 +61,30 @@ function formatAttendance(value: number | null | undefined): string | null {
   return `${new Intl.NumberFormat("hr-HR").format(value)} gledatelja`;
 }
 
+/** Metadata parts split by a thin rule instead of a separator glyph. */
+function MetaLine({
+  parts,
+  className,
+}: {
+  parts: string[];
+  className: string;
+}) {
+  return (
+    <p
+      className={`flex flex-wrap items-center justify-center gap-3 text-center ${className}`}
+    >
+      {parts.map((part, index) => (
+        <Fragment key={part}>
+          {index > 0 && <span aria-hidden className="h-3 w-px bg-current/20" />}
+          <span>{part}</span>
+        </Fragment>
+      ))}
+    </p>
+  );
+}
+
 export function PreviousMatchCard({ match }: PreviousMatchCardProps) {
+  const reduced = useReducedMotion();
   const { date, time } = formatDateTime(match.kickoffAtUtcMs ?? 0);
   const venue = match.facility?.place ?? match.facility?.name ?? null;
   const competition = match.competition?.name ?? null;
@@ -81,7 +105,7 @@ export function PreviousMatchCard({ match }: PreviousMatchCardProps) {
 
   const halfTime =
     match.score.home?.half != null && match.score.away?.half != null
-      ? `${match.score.home.half} – ${match.score.away.half}`
+      ? `${match.score.home.half} - ${match.score.away.half}`
       : null;
 
   const inner = (
@@ -104,9 +128,10 @@ export function PreviousMatchCard({ match }: PreviousMatchCardProps) {
           )}
           {subInfo.length > 0 && (
             <FadeInView delay={0.15}>
-              <p className="text-center text-xs font-medium uppercase tracking-[0.25em] text-muted-foreground sm:text-sm">
-                {subInfo.join(" · ")}
-              </p>
+              <MetaLine
+                parts={subInfo}
+                className="text-xs font-medium uppercase tracking-[0.25em] text-muted-foreground sm:text-sm"
+              />
             </FadeInView>
           )}
         </div>
@@ -133,7 +158,7 @@ export function PreviousMatchCard({ match }: PreviousMatchCardProps) {
               </div>
             ) : (
               <span className="font-display text-6xl font-black tabular-nums leading-none text-foreground/40 sm:text-7xl md:text-8xl">
-                —
+                -
               </span>
             )}
             {halfTime && (
@@ -148,9 +173,10 @@ export function PreviousMatchCard({ match }: PreviousMatchCardProps) {
 
       {metaParts.length > 0 && (
         <FadeInView delay={0.3}>
-          <p className="text-center text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground sm:text-sm">
-            {metaParts.join(" · ")}
-          </p>
+          <MetaLine
+            parts={metaParts}
+            className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground sm:text-sm"
+          />
         </FadeInView>
       )}
 
@@ -173,7 +199,10 @@ export function PreviousMatchCard({ match }: PreviousMatchCardProps) {
   }
 
   return (
-    <motion.div whileHover={{ y: -2 }} transition={{ duration: 0.2 }}>
+    <motion.div
+      whileHover={reduced ? undefined : { y: -2 }}
+      transition={{ duration: 0.2 }}
+    >
       <Link href={`/utakmice/${buildMatchSlug(match)}`} className="group block">
         {inner}
       </Link>

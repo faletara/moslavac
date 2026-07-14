@@ -18,7 +18,7 @@ export default async function MatchesPage() {
   return (
     <section className="mx-auto w-full max-w-7xl space-y-16 px-4 pt-16 pb-24 sm:space-y-20 sm:pt-24 lg:px-8">
       <PageHero
-        eyebrow="Raspored · Sezona 2025/26"
+        eyebrow="Sezona 2025/26"
         title="Utakmice"
         watermark="25/26"
         lineClassName="text-[15vw] sm:text-6xl md:text-7xl lg:text-8xl"
