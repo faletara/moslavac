@@ -16,7 +16,7 @@ export function HeroActions({ hasNextMatch }: HeroActionsProps) {
   return (
     <Link
       href={primary.href}
-      className="group inline-flex min-h-11 items-center justify-center gap-3 whitespace-nowrap rounded-full bg-chalk px-5 py-3.5 text-[0.65rem] font-bold uppercase tracking-[0.16em] text-navy-deep transition-colors duration-300 hover:bg-club hover:text-chalk focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-3 focus-visible:ring-offset-navy-deep sm:px-7 sm:text-xs sm:tracking-[0.22em]"
+      className="group inline-flex min-h-11 items-center justify-center gap-3 whitespace-nowrap rounded-full border border-foreground/20 bg-foreground/5 px-5 py-3.5 text-[0.65rem] font-bold uppercase tracking-[0.16em] text-foreground backdrop-blur-lg backdrop-saturate-150 transition-colors duration-300 hover:border-foreground/40 hover:bg-foreground/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-3 focus-visible:ring-offset-navy-deep sm:px-8 sm:text-xs sm:tracking-[0.3em]"
     >
       <span>{primary.label}</span>
       <ArrowRight
