@@ -167,7 +167,7 @@ export default function Hero({ tenant, hasNextMatch }: HeroProps) {
           </h1>
         </div>
 
-        {/* Matchday conversion first; the squad remains a secondary path. */}
+        {/* One clear matchday action; the squad remains available in navigation. */}
         <motion.div
           className="mt-10 md:mt-12"
           initial={{ opacity: 0, y: reduced ? 0 : 16 }}

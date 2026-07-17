@@ -6,14 +6,14 @@ Work the **frontier**: može se uzeti bilo koji ticket čiji su blokirajući tic
 
 ## Sljedeća utakmica postaje primarni put iz heroja
 
-**What to build:** Posjetitelj iz heroja dobiva izravan, vjerodostojan put prema sljedećoj utakmici i informacijama potrebnima za dolazak, dok se momčad zadržava kao sekundarna destinacija.
+**What to build:** Posjetitelj iz heroja dobiva jedan izravan, vjerodostojan put prema sljedećoj utakmici i informacijama potrebnima za dolazak, dok momčad ostaje dostupna kroz glavnu navigaciju.
 
 **Blocked by:** None — can start immediately.
 
 - [x] Primarna hero akcija glasi „Pogledaj sljedeću utakmicu” i vodi do aktualnog prikaza sljedeće utakmice.
 - [x] Kada je utakmica dostupna, posjetitelj bez dodatnog traženja može saznati datum, protivnika i lokaciju.
 - [x] Kada sljedeća utakmica nije dostupna, hero prikazuje smisleno stanje bez mrtve ili lažne poveznice.
-- [x] Put prema momčadi ostaje dostupan kao sekundarna akcija bez konkuriranja primarnoj konverziji.
+- [x] Hero ima najviše jednu akciju; put prema momčadi ostaje dostupan kroz glavnu navigaciju.
 - [x] Product i design pravila više si ne proturječe oko primarnog puta iz heroja.
 - [x] Akcije imaju vidljiv fokus i rade tipkovnicom na mobilnom i desktop prikazu.
 
