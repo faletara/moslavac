@@ -23,11 +23,11 @@ Work the **frontier**: može se uzeti bilo koji ticket čiji su blokirajući tic
 
 **Blocked by:** None — can start immediately.
 
-- [ ] S konfiguriranim URL-om korisnik dobiva ispravnu vanjsku poveznicu prema YouTube kanalu.
-- [ ] Bez konfiguriranog URL-a ne postoji akcija koja vodi na `#`, vraća korisnika na vrh ili se lažno predstavlja kao aktivna.
-- [ ] Prazno stanje zadržava vizualni ritam sekcije i jasno komunicira da kanal još nije dostupan.
-- [ ] YouTube ostaje posljednja sekcija početne stranice.
-- [ ] Crvena boja ostaje ograničena na YouTube kontekst i ne prelazi u klupske CTA-ove ili dekoraciju.
+- [x] S konfiguriranim URL-om korisnik dobiva ispravnu vanjsku poveznicu prema YouTube kanalu.
+- [x] Bez konfiguriranog URL-a ne postoji akcija koja vodi na `#`, vraća korisnika na vrh ili se lažno predstavlja kao aktivna.
+- [x] Prazno stanje zadržava vizualni ritam sekcije i jasno komunicira da kanal još nije dostupan.
+- [x] YouTube ostaje posljednja sekcija početne stranice.
+- [x] Crvena boja ostaje ograničena na YouTube kontekst i ne prelazi u klupske CTA-ove ili dekoraciju.
 
 ## Sadržaj ostaje vidljiv bez animacijskog runtimea
 

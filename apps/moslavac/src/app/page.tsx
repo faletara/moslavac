@@ -52,7 +52,7 @@ export default async function HomePage() {
       <WebShopCarousel />
       <ComeToMatchSection />
       <SeasonTicketPromoSection />
-      <YouTubePromoSection />
+      <YouTubePromoSection youtubeUrl={tenant.social?.youtube} />
     </div>
   );
 }

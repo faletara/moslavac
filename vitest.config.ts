@@ -18,6 +18,11 @@ export default defineConfig({
     // because it throws outside a React Server Component.
     alias: [
       { find: "server-only", replacement: here("./test/stubs/server-only.ts") },
+      {
+        find: "@/components/animations",
+        replacement: here("./packages/ui/src/animations/index.ts"),
+      },
+      { find: "@/lib/utils", replacement: here("./apps/moslavac/src/lib/utils.ts") },
       { find: /^@\/types\//, replacement: here("./packages/types/src/") },
       { find: /^@\/lib\/payload\//, replacement: here("./packages/payload/src/") },
       { find: /^@\/lib\/hns\//, replacement: here("./packages/hns/src/") },
