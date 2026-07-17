@@ -17,7 +17,7 @@ export function getBaseUrl(): string {
   if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
     return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
   }
-  return "http://localhost:3001";
+  return "http://localhost:43101";
 }
 
 export const BASE_URL = getBaseUrl();

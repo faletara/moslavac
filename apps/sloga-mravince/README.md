@@ -10,7 +10,7 @@ Scaffold skripta odradi kopiranje, postavljanje `package.json` (ime + port) i ge
 
 ```bash
 bash scripts/new-club.sh <slug> [port]
-# npr. bash scripts/new-club.sh nk-primjer 3004
+# npr. bash scripts/new-club.sh nk-primjer 43110
 ```
 
 Zatim slijedi korake koje skripta ispiše (Tenant u CMS-u, API key, pokretanje).
@@ -18,8 +18,8 @@ Zatim slijedi korake koje skripta ispiše (Tenant u CMS-u, API key, pokretanje).
 ## Ručni postupak (ako ne koristiš skriptu)
 
 1. **Kopiraj template:** `cp -r apps/template apps/<slug>` (obriši `node_modules`, `.next`, `.turbo`, `.env.local` u kopiji).
-2. **`apps/<slug>/package.json`:** `"name": "@moslavac/<slug>"` + zamijeni `-p 3003` svojim portom u `dev`/`dev:clean`/`start`.
-3. **Kreiraj Tenant** (`http://localhost:3002/admin/collections/tenants/create`):
+2. **`apps/<slug>/package.json`:** `"name": "@moslavac/<slug>"` + zamijeni `-p 43103` svojim portom u `dev`/`dev:clean`/`start`.
+3. **Kreiraj Tenant** (`http://localhost:43102/admin/collections/tenants/create`):
    - `slug` (mora odgovarati `PAYLOAD_TENANT_SLUG`), `displayName`, `branding.shortName`/`motto`/`founded`
    - `hns.apiKey`, `hns.teamId`, `hns.seniorCompetitionFilter`
    - `contact.*`, `social.*`, `payment.*`, `legal.*`
@@ -27,7 +27,7 @@ Zatim slijedi korake koje skripta ispiše (Tenant u CMS-u, API key, pokretanje).
    ```env
    NEXT_PUBLIC_SITE_URL=http://localhost:<port>   # u produkciji prava domena (za sitemap/robots/canonical)
    PAYLOAD_TENANT_SLUG=<slug>
-   PAYLOAD_API_URL=http://localhost:3002/api
+   PAYLOAD_API_URL=http://localhost:43102/api
    PAYLOAD_API_KEY=<api-key-iz-payload-admina>
    HNS_API_BASE=https://api-hns.analyticom.de
    ```

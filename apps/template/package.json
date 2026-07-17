@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3003",
-    "dev:clean": "rm -rf .next && next dev -p 3003",
+    "dev": "next dev -p 43103",
+    "dev:clean": "rm -rf .next && next dev -p 43103",
     "build": "next build",
-    "start": "next start -p 3003",
+    "start": "next start -p 43103",
     "lint": "eslint"
   },
   "engines": {

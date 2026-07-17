@@ -15,7 +15,7 @@ provideri, metadata i UI toolkit.
 
 ```bash
 bash scripts/new-club.sh <slug> [port]
-# npr. bash scripts/new-club.sh nk-primjer 3005
+# npr. bash scripts/new-club.sh nk-primjer 43110
 ```
 
 Radi: kopira `apps/template` → `apps/<slug>`, postavi `package.json`
@@ -24,7 +24,7 @@ Radi: kopira `apps/template` → `apps/<slug>`, postavi `package.json`
 
 ## 2. Tenant zapis u CMS-u
 
-U Payload adminu (`http://localhost:3002/admin` → **Tenants → Create**):
+U Payload adminu (`http://localhost:43102/admin` → **Tenants → Create**):
 
 | Polje | Obavezno | Opis |
 | --- | --- | --- |
@@ -52,7 +52,7 @@ U Payload adminu (`http://localhost:3002/admin` → **Tenants → Create**):
 | Var | Opis |
 | --- | --- |
 | `PAYLOAD_TENANT_SLUG` | = tenant `slug` |
-| `PAYLOAD_API_URL` | REST CMS-a (npr. `http://localhost:3002/api`) |
+| `PAYLOAD_API_URL` | REST CMS-a (npr. `http://localhost:43102/api`) |
 | `PAYLOAD_API_KEY` | API-key korisnik iz Payloada (za autenticirane pozive) |
 | `HNS_API_BASE` | HNS endpoint (default `https://api-hns.analyticom.de`) |
 | `NEXT_PUBLIC_SITE_URL` | Bazni URL (prod domena; lokalno `http://localhost:<port>`) |

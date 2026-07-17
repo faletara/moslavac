@@ -5,7 +5,7 @@
 #   bash scripts/new-club.sh <slug> [port]
 #
 # Primjer:
-#   bash scripts/new-club.sh nk-primjer 3004
+#   bash scripts/new-club.sh nk-primjer 43110
 #
 # Što radi:
 #   1. Kopira apps/template -> apps/<slug> (bez node_modules/.next/.turbo/.env.local)
@@ -21,7 +21,7 @@ ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 # --- args ---
 SLUG="${1:-}"
-PORT="${2:-3004}"
+PORT="${2:-43110}"
 
 if [[ -z "$SLUG" ]]; then
   echo "Greška: nedostaje slug." >&2
@@ -65,8 +65,8 @@ echo "→ Postavljam package.json (name @moslavac/$SLUG, port $PORT) ..."
 PKG="$TARGET_DIR/package.json"
 # name
 perl -0777 -pi -e "s{\"name\":\s*\"\@moslavac/template\"}{\"name\": \"\@moslavac/$SLUG\"}" "$PKG"
-# port (template koristi 3003 u dev/dev:clean/start)
-perl -0777 -pi -e "s{-p 3003}{-p $PORT}g" "$PKG"
+# port (template koristi 43103 u dev/dev:clean/start)
+perl -0777 -pi -e "s{-p 43103}{-p $PORT}g" "$PKG"
 
 # --- .env.local ---
 echo "→ Generiram .env.local ..."
@@ -74,7 +74,7 @@ ENV_OUT="$TARGET_DIR/.env.local"
 {
   echo "NEXT_PUBLIC_SITE_URL=http://localhost:$PORT"
   echo "PAYLOAD_TENANT_SLUG=$SLUG"
-  echo "PAYLOAD_API_URL=http://localhost:3002/api"
+  echo "PAYLOAD_API_URL=http://localhost:43102/api"
   echo "PAYLOAD_API_KEY="
   echo "HNS_API_BASE=https://api-hns.analyticom.de"
 } > "$ENV_OUT"
@@ -91,7 +91,7 @@ Dijeljeni sloj (podaci/UI) je u /packages.
 📖 Detaljan vodič: docs/NEW-CLUB.md
 
 Preostali koraci (ukratko):
-  1. Kreiraj Tenant zapis u Payload CMS-u (http://localhost:3002/admin):
+  1. Kreiraj Tenant zapis u Payload CMS-u (http://localhost:43102/admin):
        slug = $SLUG
        displayName, features, hns.apiKey, hns.teamId,
        branding / contact (uklj. city + region) / social / payment / legal
