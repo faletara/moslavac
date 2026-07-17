@@ -81,6 +81,9 @@ export default buildConfig({
 		outputFile: path.resolve(dirname, "payload-types.ts"),
 	},
 	db: postgresAdapter({
+		// This shared Neon database is migration-managed. Development schema push
+		// can block startup on an interactive data-loss prompt and must stay off.
+		push: false,
 		pool: {
 			connectionString: process.env.DATABASE_URL,
 		},
