@@ -4,6 +4,10 @@ import { fileURLToPath } from "node:url";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
+// Dev-only allowance so Impeccable live mode can load.
+const __impeccableLiveDev =
+  process.env.NODE_ENV === "development" ? " http://localhost:8400" : "";
+
 // Baseline Content-Security-Policy. Permissive on script/style ('unsafe-inline'
 // is required for the inline JSON-LD blocks and framer-motion inline styles;
 // 'unsafe-eval' keeps Next's dev HMR working). Tighten to nonce-based later via
@@ -11,11 +15,11 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
 // OpenStreetMap stadium embed and YouTube promo.
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com",
+  `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com${__impeccableLiveDev}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
-  "connect-src 'self' https://*.vercel-insights.com https://va.vercel-scripts.com",
+  `connect-src 'self' https://*.vercel-insights.com https://va.vercel-scripts.com${__impeccableLiveDev}`,
   "frame-src 'self' https://www.openstreetmap.org https://www.youtube.com https://www.youtube-nocookie.com",
   "media-src 'self' https:",
   "frame-ancestors 'self'",

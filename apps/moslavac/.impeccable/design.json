@@ -1,0 +1,247 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-16T16:15:10Z",
+  "title": "Design System: SNK Moslavac",
+  "extensions": {
+    "colorMeta": {
+      "club": {
+        "role": "primary",
+        "displayName": "Moslavac plava",
+        "canonical": "oklch(0.46 0.19 262)",
+        "tonalRamp": ["oklch(0.15 0.19 262)", "oklch(0.25 0.19 262)", "oklch(0.35 0.19 262)", "oklch(0.46 0.19 262)", "oklch(0.58 0.19 262)", "oklch(0.70 0.19 262)", "oklch(0.82 0.19 262)", "oklch(0.94 0.19 262)"]
+      },
+      "signal-red": {
+        "role": "secondary",
+        "displayName": "Signalna crvena",
+        "canonical": "oklch(0.55 0.21 27)",
+        "tonalRamp": ["oklch(0.15 0.21 27)", "oklch(0.25 0.21 27)", "oklch(0.35 0.21 27)", "oklch(0.46 0.21 27)", "oklch(0.58 0.21 27)", "oklch(0.70 0.21 27)", "oklch(0.82 0.21 27)", "oklch(0.94 0.21 27)"]
+      },
+      "navy": {
+        "role": "primary",
+        "displayName": "Navy tribina",
+        "canonical": "oklch(0.17 0.045 262)",
+        "tonalRamp": ["oklch(0.15 0.045 262)", "oklch(0.25 0.045 262)", "oklch(0.35 0.045 262)", "oklch(0.46 0.045 262)", "oklch(0.58 0.045 262)", "oklch(0.70 0.045 262)", "oklch(0.82 0.045 262)", "oklch(0.94 0.045 262)"]
+      },
+      "navy-deep": {
+        "role": "primary",
+        "displayName": "Ponoć pod reflektorima",
+        "canonical": "oklch(0.135 0.04 263)",
+        "tonalRamp": ["oklch(0.15 0.04 263)", "oklch(0.25 0.04 263)", "oklch(0.35 0.04 263)", "oklch(0.46 0.04 263)", "oklch(0.58 0.04 263)", "oklch(0.70 0.04 263)", "oklch(0.82 0.04 263)", "oklch(0.94 0.04 263)"]
+      },
+      "chalk": {
+        "role": "neutral",
+        "displayName": "Stadionska kreda",
+        "canonical": "oklch(0.975 0.004 250)",
+        "tonalRamp": ["oklch(0.15 0.004 250)", "oklch(0.25 0.004 250)", "oklch(0.35 0.004 250)", "oklch(0.46 0.004 250)", "oklch(0.58 0.004 250)", "oklch(0.70 0.004 250)", "oklch(0.82 0.004 250)", "oklch(0.95 0.004 250)"]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Klupska tinta",
+        "canonical": "oklch(0.19 0.035 262)",
+        "tonalRamp": ["oklch(0.15 0.035 262)", "oklch(0.25 0.035 262)", "oklch(0.35 0.035 262)", "oklch(0.46 0.035 262)", "oklch(0.58 0.035 262)", "oklch(0.70 0.035 262)", "oklch(0.82 0.035 262)", "oklch(0.94 0.035 262)"]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Čista površina",
+        "canonical": "oklch(0.99 0.002 250)",
+        "tonalRamp": ["oklch(0.15 0.002 250)", "oklch(0.25 0.002 250)", "oklch(0.35 0.002 250)", "oklch(0.46 0.002 250)", "oklch(0.58 0.002 250)", "oklch(0.70 0.002 250)", "oklch(0.82 0.002 250)", "oklch(0.95 0.002 250)"]
+      },
+      "muted-surface": {
+        "role": "neutral",
+        "displayName": "Tiha tribina",
+        "canonical": "oklch(0.945 0.008 252)",
+        "tonalRamp": ["oklch(0.15 0.008 252)", "oklch(0.25 0.008 252)", "oklch(0.35 0.008 252)", "oklch(0.46 0.008 252)", "oklch(0.58 0.008 252)", "oklch(0.70 0.008 252)", "oklch(0.82 0.008 252)", "oklch(0.95 0.008 252)"]
+      },
+      "muted-ink": {
+        "role": "neutral",
+        "displayName": "Prigušena tinta",
+        "canonical": "oklch(0.5 0.025 258)",
+        "tonalRamp": ["oklch(0.15 0.025 258)", "oklch(0.25 0.025 258)", "oklch(0.35 0.025 258)", "oklch(0.46 0.025 258)", "oklch(0.58 0.025 258)", "oklch(0.70 0.025 258)", "oklch(0.82 0.025 258)", "oklch(0.94 0.025 258)"]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Hladna linija",
+        "canonical": "oklch(0.9 0.012 254)",
+        "tonalRamp": ["oklch(0.15 0.012 254)", "oklch(0.25 0.012 254)", "oklch(0.35 0.012 254)", "oklch(0.46 0.012 254)", "oklch(0.58 0.012 254)", "oklch(0.70 0.012 254)", "oklch(0.82 0.012 254)", "oklch(0.94 0.012 254)"]
+      },
+      "destructive": {
+        "role": "secondary",
+        "displayName": "Destruktivna crvena",
+        "canonical": "oklch(0.577 0.245 27.325)",
+        "tonalRamp": ["oklch(0.15 0.245 27.325)", "oklch(0.25 0.245 27.325)", "oklch(0.35 0.245 27.325)", "oklch(0.46 0.245 27.325)", "oklch(0.58 0.245 27.325)", "oklch(0.70 0.245 27.325)", "oklch(0.82 0.245 27.325)", "oklch(0.94 0.245 27.325)"]
+      },
+      "category-seniors": {
+        "role": "tertiary",
+        "displayName": "Senior plava",
+        "canonical": "#013f6b",
+        "tonalRamp": ["oklch(0.15 0.10 245)", "oklch(0.25 0.10 245)", "oklch(0.35 0.10 245)", "oklch(0.46 0.10 245)", "oklch(0.58 0.10 245)", "oklch(0.70 0.10 245)", "oklch(0.82 0.10 245)", "oklch(0.94 0.10 245)"]
+      },
+      "category-juniors": {
+        "role": "tertiary",
+        "displayName": "Junior plava",
+        "canonical": "#01497d",
+        "tonalRamp": ["oklch(0.15 0.11 245)", "oklch(0.25 0.11 245)", "oklch(0.35 0.11 245)", "oklch(0.46 0.11 245)", "oklch(0.58 0.11 245)", "oklch(0.70 0.11 245)", "oklch(0.82 0.11 245)", "oklch(0.94 0.11 245)"]
+      },
+      "category-cadets": {
+        "role": "tertiary",
+        "displayName": "Kadet plava",
+        "canonical": "#015a99",
+        "tonalRamp": ["oklch(0.15 0.12 245)", "oklch(0.25 0.12 245)", "oklch(0.35 0.12 245)", "oklch(0.46 0.12 245)", "oklch(0.58 0.12 245)", "oklch(0.70 0.12 245)", "oklch(0.82 0.12 245)", "oklch(0.94 0.12 245)"]
+      },
+      "category-older-pioneers": {
+        "role": "tertiary",
+        "displayName": "Stariji pioniri plava",
+        "canonical": "#026cb6",
+        "tonalRamp": ["oklch(0.15 0.13 245)", "oklch(0.25 0.13 245)", "oklch(0.35 0.13 245)", "oklch(0.46 0.13 245)", "oklch(0.58 0.13 245)", "oklch(0.70 0.13 245)", "oklch(0.82 0.13 245)", "oklch(0.94 0.13 245)"]
+      },
+      "category-younger-pioneers": {
+        "role": "tertiary",
+        "displayName": "Mlađi pioniri plava",
+        "canonical": "#1f7bbf",
+        "tonalRamp": ["oklch(0.15 0.13 245)", "oklch(0.25 0.13 245)", "oklch(0.35 0.13 245)", "oklch(0.46 0.13 245)", "oklch(0.58 0.13 245)", "oklch(0.70 0.13 245)", "oklch(0.82 0.13 245)", "oklch(0.94 0.13 245)"]
+      },
+      "category-limaci": {
+        "role": "tertiary",
+        "displayName": "Limači plava",
+        "canonical": "#3389c7",
+        "tonalRamp": ["oklch(0.15 0.11 242)", "oklch(0.25 0.11 242)", "oklch(0.35 0.11 242)", "oklch(0.46 0.11 242)", "oklch(0.58 0.11 242)", "oklch(0.70 0.11 242)", "oklch(0.82 0.11 242)", "oklch(0.94 0.11 242)"]
+      },
+      "category-prstici": {
+        "role": "tertiary",
+        "displayName": "Prstići plava",
+        "canonical": "#4a98cf",
+        "tonalRamp": ["oklch(0.15 0.09 242)", "oklch(0.25 0.09 242)", "oklch(0.35 0.09 242)", "oklch(0.46 0.09 242)", "oklch(0.58 0.09 242)", "oklch(0.70 0.09 242)", "oklch(0.82 0.09 242)", "oklch(0.94 0.09 242)"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Kratki sportski iskazi i veliki naslovi sekcija." },
+      "headline": { "displayName": "Headline", "purpose": "Naslovi podstranica i velikih sadržajnih blokova." },
+      "title": { "displayName": "Title", "purpose": "Vijesti, igrači, utakmice i sadržajni redci." },
+      "body": { "displayName": "Body", "purpose": "Čitljiv opisni i informativni sadržaj." },
+      "label": { "displayName": "Label", "purpose": "Kratka navigacija, kategorije i CTA-ovi." }
+    },
+    "shadows": [
+      { "name": "floating-menu", "value": "0 12px 40px -12px rgb(0 0 0 / 0.18)", "purpose": "Dropdown i popover slojevi iznad stranice." },
+      { "name": "crest-on-field", "value": "0 8px 30px -10px rgb(0 0 0 / 0.5)", "purpose": "Mali svijetli grb na tamnoj fotografskoj površini." },
+      { "name": "club-hover-glow", "value": "0 20px 60px -20px var(--club)", "purpose": "Rijedak hover naglasak na fotografskoj kartici igrača." },
+      { "name": "live-signal", "value": "0 0 60px -12px var(--club-red)", "purpose": "Samo status uživo ili odbrojavanje." }
+    ],
+    "motion": [
+      { "name": "ease-standard", "value": "cubic-bezier(0.25, 0.1, 0.25, 1)", "purpose": "Zadano ublažavanje za stanje, header i fade prijelaze." },
+      { "name": "ease-expo-out", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Tipografski reveal i odlučni ulasci." },
+      { "name": "heading-reveal", "value": "700ms; 120ms stagger", "purpose": "Linije naslova ulaze iza maske; bez transformacije uz reduced motion." },
+      { "name": "fade-in-view", "value": "500ms; 24px travel", "purpose": "Sekundarni sadržaj ulazi jednom u viewportu." },
+      { "name": "header-return", "value": "400ms", "purpose": "Sticky header skriva se i vraća prema smjeru pomicanja." },
+      { "name": "marquee", "value": "36s linear infinite", "purpose": "Tihi ticker koji se zaustavlja uz reduced motion." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Club CTA",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Glavna klupska akcija na svijetloj površini.",
+      "html": "<button class=\"ds-btn-primary\">Pogledaj utakmicu</button>",
+      "css": ".ds-btn-primary { display:inline-flex; align-items:center; justify-content:center; min-height:44px; border:0; border-radius:9999px; background:var(--club); color:var(--chalk); padding:14px 32px; font:700 0.65rem/1.2 var(--font-geist-sans),Arial,sans-serif; letter-spacing:0.3em; text-transform:uppercase; cursor:pointer; transition:background-color 300ms cubic-bezier(0.25,0.1,0.25,1),color 300ms cubic-bezier(0.25,0.1,0.25,1); } .ds-btn-primary:hover { background:var(--foreground); } .ds-btn-primary:focus-visible { outline:3px solid color-mix(in oklab,var(--club) 50%,transparent); outline-offset:3px; } .ds-btn-primary:active { transform:translateY(1px); }"
+    },
+    {
+      "name": "Light Matchday CTA",
+      "kind": "button",
+      "refersTo": "button-light",
+      "description": "Svijetla akcija na navy ili fotografskoj pozadini.",
+      "html": "<button class=\"ds-btn-light\">Pogledaj raspored</button>",
+      "css": ".ds-btn-light { display:inline-flex; align-items:center; justify-content:center; min-height:44px; border:0; border-radius:9999px; background:var(--chalk); color:var(--navy-deep); padding:14px 32px; font:700 0.65rem/1.2 var(--font-geist-sans),Arial,sans-serif; letter-spacing:0.3em; text-transform:uppercase; cursor:pointer; transition:background-color 300ms cubic-bezier(0.25,0.1,0.25,1),color 300ms cubic-bezier(0.25,0.1,0.25,1); } .ds-btn-light:hover { background:var(--club); color:var(--chalk); } .ds-btn-light:focus-visible { outline:3px solid color-mix(in oklab,var(--chalk) 65%,transparent); outline-offset:3px; } .ds-btn-light:active { transform:translateY(1px); }"
+    },
+    {
+      "name": "Utility Outline Button",
+      "kind": "button",
+      "refersTo": "button-utility",
+      "description": "Kompaktna pomoćna radnja za kartu, kontakt i navigaciju.",
+      "html": "<button class=\"ds-btn-utility\">Pogledaj na karti</button>",
+      "css": ".ds-btn-utility { display:inline-flex; align-items:center; justify-content:center; height:36px; border:1px solid var(--border); border-radius:8px; background:var(--background); color:var(--foreground); padding:8px 16px; font:500 0.875rem/1.2 var(--font-geist-sans),Arial,sans-serif; cursor:pointer; transition:background-color 200ms,color 200ms,border-color 200ms; } .ds-btn-utility:hover { background:var(--accent); border-color:var(--input); } .ds-btn-utility:focus-visible { outline:3px solid color-mix(in oklab,var(--ring) 50%,transparent); outline-offset:2px; } .ds-btn-utility:active { background:var(--muted); }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input-default",
+      "description": "Mirno polje s jasnim plavim fokusom.",
+      "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"Pretraži vijesti\" />",
+      "css": ".ds-input { width:100%; min-width:0; height:36px; border:1px solid var(--input); border-radius:8px; background:transparent; color:var(--foreground); padding:4px 12px; font:400 1rem/1.4 var(--font-geist-sans),Arial,sans-serif; transition:border-color 200ms,box-shadow 200ms; } .ds-input::placeholder { color:var(--muted-foreground); } .ds-input:hover { border-color:var(--muted-foreground); } .ds-input:focus-visible { border-color:var(--ring); outline:0; box-shadow:0 0 0 3px color-mix(in oklab,var(--ring) 50%,transparent); } .ds-input:disabled { cursor:not-allowed; opacity:0.5; }"
+    },
+    {
+      "name": "Competition Category Chip",
+      "kind": "chip",
+      "refersTo": "chip-category",
+      "description": "Dobna ili natjecateljska kategorija iz plave klupske skale.",
+      "html": "<button class=\"ds-chip\">Seniori</button>",
+      "css": ".ds-chip { display:inline-flex; align-items:center; border:0; border-radius:9999px; background:var(--cat-seniors); color:var(--chalk); padding:4px 10px; font:700 0.6rem/1.2 var(--font-geist-sans),Arial,sans-serif; letter-spacing:0.15em; text-transform:uppercase; cursor:pointer; transition:filter 200ms,transform 200ms; } .ds-chip:hover { filter:brightness(1.14); } .ds-chip:focus-visible { outline:3px solid color-mix(in oklab,var(--club) 45%,transparent); outline-offset:2px; } .ds-chip:active { transform:translateY(1px); }"
+    },
+    {
+      "name": "Desktop Navigation",
+      "kind": "nav",
+      "refersTo": "navigation",
+      "description": "Kratka verzalna navigacija s tihim neaktivnim stanjem.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Glavna navigacija\"><a class=\"ds-nav-link ds-nav-link-active\" href=\"#\">Vijesti</a><a class=\"ds-nav-link\" href=\"#\">Utakmice</a><a class=\"ds-nav-link\" href=\"#\">Momčad</a></nav>",
+      "css": ".ds-nav { display:flex; align-items:center; gap:40px; font-family:var(--font-geist-sans),Arial,sans-serif; } .ds-nav-link { color:var(--muted-foreground); font-size:0.75rem; font-weight:500; letter-spacing:0.2em; text-decoration:none; text-transform:uppercase; transition:color 300ms; } .ds-nav-link:hover,.ds-nav-link-active { color:var(--foreground); } .ds-nav-link:focus-visible { border-radius:6px; outline:3px solid color-mix(in oklab,var(--ring) 50%,transparent); outline-offset:5px; } .ds-nav-link:active { color:var(--club); }"
+    },
+    {
+      "name": "Next Match Panel",
+      "kind": "custom",
+      "refersTo": "match-panel",
+      "description": "Dominantni događaj koji brzo prenosi protivnika, vrijeme i mjesto.",
+      "html": "<section class=\"ds-match\"><p class=\"ds-match-label\">Sljedeća utakmica</p><div class=\"ds-match-teams\"><strong>Moslavac</strong><span>VS</span><strong>Protivnik</strong></div><p class=\"ds-match-meta\">Nedjelja · 17:00 · Gradski stadion</p><a class=\"ds-match-link\" href=\"#\">Detalji utakmice</a></section>",
+      "css": ".ds-match { max-width:720px; border-radius:10px; background:var(--navy-deep); color:var(--chalk); padding:32px; font-family:var(--font-geist-sans),Arial,sans-serif; } .ds-match-label { margin:0 0 24px; color:color-mix(in oklab,var(--chalk) 70%,transparent); font-size:0.65rem; font-weight:700; letter-spacing:0.3em; text-transform:uppercase; } .ds-match-teams { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:24px; font-size:clamp(1.25rem,4vw,2rem); font-weight:900; line-height:1; text-align:center; text-transform:uppercase; } .ds-match-teams span { color:color-mix(in oklab,var(--chalk) 45%,transparent); font-size:1rem; } .ds-match-meta { margin:24px 0; color:color-mix(in oklab,var(--chalk) 72%,transparent); font-size:0.875rem; text-align:center; } .ds-match-link { display:block; color:var(--chalk); font-size:0.75rem; font-weight:700; letter-spacing:0.2em; text-align:center; text-decoration:underline; text-underline-offset:6px; text-transform:uppercase; } .ds-match-link:hover { color:color-mix(in oklab,var(--club) 55%,var(--chalk)); } .ds-match-link:focus-visible { border-radius:6px; outline:3px solid color-mix(in oklab,var(--chalk) 60%,transparent); outline-offset:4px; } .ds-match-link:active { color:var(--club); }"
+    },
+    {
+      "name": "News Story Link",
+      "kind": "card",
+      "refersTo": "news-story",
+      "description": "Ravan sadržajni blok u kojem tipografija i fotografija nose vijest, bez generičnog card chromea.",
+      "html": "<a class=\"ds-news\" href=\"#\"><span class=\"ds-news-media\" aria-hidden=\"true\"></span><span class=\"ds-news-date\">16. srpnja 2026.</span><strong class=\"ds-news-title\">Najnovije vijesti iz kluba</strong><span class=\"ds-news-action\">Pročitaj vijest</span></a>",
+      "css": ".ds-news { display:grid; gap:14px; color:var(--foreground); font-family:var(--font-geist-sans),Arial,sans-serif; text-decoration:none; } .ds-news-media { display:block; aspect-ratio:16/10; background:var(--navy); } .ds-news-date { color:var(--muted-foreground); font-size:0.65rem; font-weight:700; letter-spacing:0.3em; text-transform:uppercase; } .ds-news-title { max-width:24ch; font-size:1.5rem; font-weight:900; line-height:1.05; text-transform:uppercase; transition:color 300ms; } .ds-news-action { color:var(--muted-foreground); font-size:0.75rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; } .ds-news:hover .ds-news-title,.ds-news:hover .ds-news-action { color:var(--club); } .ds-news:focus-visible { border-radius:6px; outline:3px solid color-mix(in oklab,var(--ring) 50%,transparent); outline-offset:6px; } .ds-news:active .ds-news-title { color:var(--navy); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Reflektori domaćeg terena",
+    "overview": "Sustav treba djelovati kao trenutak prije početka domaće utakmice: reflektori su upaljeni, informacije su jasne, a energija dolazi iz stvarnih klupskih fotografija, momčadi i događaja. Vizual je borben, domaći i ponosan, ali nikad agresivan ili kaotičan.\n\nVelika sportska tipografija, duboke plave površine i ritam nalik prijenosu daju stranici autoritet službenog izvora. Svijetle stranice služe čitanju i podacima; tamne, fotografske dionice nose emociju utakmice. Sustav izričito odbija generičnu korporativnu prezentaciju, hladan statistički portal i prenatrpan portal za klađenje.",
+    "keyCharacteristics": [
+      "Službena informacija prije dekoracije.",
+      "Stvarne klupske fotografije kao glavni emocionalni materijal.",
+      "Plava, navy i kredasto bijela kao identitet; crvena samo kao semantički signal.",
+      "Veliki, zbijeni naslovi i miran, čitljiv tekst.",
+      "Pokret koji podsjeća na sportski prijenos i uvijek poštuje smanjeno kretanje."
+    ],
+    "rules": [
+      { "name": "The Blue Identity Rule", "body": "Moslavac plava, navy i kredasto bijela jedine su identitetske boje.", "section": "colors" },
+      { "name": "The Signal Red Rule", "body": "Crvena je dopuštena samo za YouTube, uživo, poraz i grešku; nikad za dekoraciju, klupske CTA-ove ili pozadinsku atmosferu.", "section": "colors" },
+      { "name": "The Contrast Rule", "body": "Tekst mora zadovoljiti WCAG 2.2 AA; sivi tekst na obojenoj površini je zabranjen — koristi nijansu iste plave obitelji ili prozirnost boje teksta.", "section": "colors" },
+      { "name": "The Matchday Scale Rule", "body": "Jedna poruka po velikom naslovu; mjerilo smije biti dramatično, ali gornja granica u redovnim sekcijama je 6rem, a razmak slova nikad nije uži od -0.04em.", "section": "typography" },
+      { "name": "The Readability Rule", "body": "Informativni sadržaj nikad nije pisan sitnim verzalom. Tekst manji od 0.75rem rezerviran je za kratke pomoćne oznake, ne za objašnjenja.", "section": "typography" },
+      { "name": "The Flat Home Ground Rule", "body": "Površine su ravne u mirovanju. Ako kartica istodobno ima obrub i široku mekanu sjenu, ukloni jedno.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do koristi Moslavac plavu, navy i kredasto bijelu kao jedine identitetske boje.",
+      "Do koristi signalnu crvenu samo za YouTube, uživo, poraz i sličan nedvosmislen status.",
+      "Do daje prednost stvarnim klupskim fotografijama, stvarnim rezultatima i službenim HNS podacima.",
+      "Do čini sljedeću utakmicu vidljivom bez traženja i vodi prema dolasku na stadion.",
+      "Do drži redovne display naslove na najviše 6rem i provjerava svaku dugu hrvatsku riječ na mobilnom prikazu.",
+      "Do osigurava tipkovničku navigaciju, jasne fokuse, WCAG 2.2 AA kontrast i alternativu za smanjeno kretanje.",
+      "Do koristi najviše jedan kratki eyebrow u heroju stranice; nemoj ga ponavljati iznad svake sekcije."
+    ],
+    "donts": [
+      "Don't pretvarati stranicu u generičnu korporativnu prezentaciju.",
+      "Don't pretvarati stranicu u hladan statistički portal.",
+      "Don't pretvarati stranicu u prenatrpan portal za klađenje.",
+      "Don't koristiti signalnu crvenu kao klupski akcent, dekorativnu pozadinu ili opći CTA.",
+      "Don't slagati beskrajne mreže jednakih kartica s ikonom, naslovom i tekstom.",
+      "Don't koristiti gradientni tekst, dekorativni glassmorphism ili bočne obojene trake na karticama.",
+      "Don't uparivati tanki obrub i široku mekanu sjenu na istom elementu.",
+      "Don't koristiti verzal za opisni tekst ili prigušenu boju teksta koja ne zadovoljava kontrast."
+    ]
+  }
+}
