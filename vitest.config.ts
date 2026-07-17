@@ -6,7 +6,11 @@ const here = (p: string) => fileURLToPath(new URL(p, import.meta.url));
 export default defineConfig({
   test: {
     environment: "node",
-    include: ["packages/**/*.test.ts", "apps/cms/src/access/**/*.test.ts"],
+    include: [
+      "packages/**/*.test.ts",
+      "apps/cms/src/access/**/*.test.ts",
+      "apps/moslavac/**/*.test.tsx",
+    ],
   },
   resolve: {
     // Packages are consumed as raw source via `@/` tsconfig path aliases; mirror

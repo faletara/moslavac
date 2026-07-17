@@ -5,6 +5,7 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Fragment } from "react";
 import { FadeInView, RevealHeading } from "@/components/animations";
+import { getMatchVenue } from "@/components/features/home/homeMatch";
 import { formatDateTime } from "@/lib/helpers/date";
 import { buildMatchSlug } from "@/lib/slug";
 import type { Match } from "@/types/hns";
@@ -49,7 +50,7 @@ export function NextMatchHero({ match }: NextMatchHeroProps) {
   const { date, time } = formatDateTime(match.kickoffAtUtcMs ?? 0);
   const competition = match.competition?.name ?? null;
   const round = formatRound(match.round);
-  const venue = match.facility?.place ?? match.facility?.name ?? null;
+  const venue = getMatchVenue(match);
 
   const subEyebrow = [competition, round].filter(
     (p): p is string => typeof p === "string" && p.length > 0,

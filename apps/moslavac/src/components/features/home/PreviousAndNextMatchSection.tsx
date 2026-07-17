@@ -1,4 +1,4 @@
-import { fetchMatchSlots } from "@/lib/hns/competitions";
+import type { MatchSlots } from "@/types/hns";
 import { NextMatchHero } from "./previous-next/NextMatchHero";
 import { PreviousMatchCard } from "./previous-next/PreviousMatchCard";
 
@@ -12,12 +12,14 @@ function isValidMatch<T extends object>(
  * Match centar — the dark scoreboard world that continues straight out of the
  * hero: upcoming fixture with countdown, then the latest result as a band.
  */
-export default async function PreviousAndNextMatchSection() {
-  const data = await fetchMatchSlots();
-
-  const nextMatch = data?.next ?? null;
-  const previousMatch = data?.previous ?? null;
-  const hasNext = isValidMatch(nextMatch);
+export default function PreviousAndNextMatchSection({
+  matchSlots,
+}: {
+  matchSlots: MatchSlots;
+}) {
+  const nextMatch = matchSlots.next ?? null;
+  const previousMatch = matchSlots.previous ?? null;
+  const hasNext = nextMatch != null;
   const hasPrev = isValidMatch(previousMatch);
 
   if (!hasNext && !hasPrev) return null;
@@ -25,7 +27,10 @@ export default async function PreviousAndNextMatchSection() {
   return (
     <section id="utakmice" className="scroll-mt-20">
       {hasNext && nextMatch != null && (
-        <div className="dark relative overflow-hidden bg-navy-deep text-foreground">
+        <div
+          id="sljedeca-utakmica"
+          className="dark relative scroll-mt-20 overflow-hidden bg-navy-deep text-foreground"
+        >
           {/* Faint centre glow keeps the scoreboard lit */}
           <div
             aria-hidden

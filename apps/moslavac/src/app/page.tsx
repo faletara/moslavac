@@ -9,6 +9,8 @@ import SeasonTicketPromoSection from "@/components/features/home/SeasonTicketPro
 import UpcomingMatchesSection from "@/components/features/home/UpcomingMatchesSection";
 import WebShopCarousel from "@/components/features/home/WebShopCarousel";
 import YouTubePromoSection from "@/components/features/home/YouTubePromoSection";
+import { getPromotableNextMatch } from "@/components/features/home/homeMatch";
+import { fetchMatchSlots } from "@/lib/hns/competitions";
 import { getTenant } from "@/lib/payload/getTenant";
 
 export const revalidate = 60;
@@ -27,12 +29,22 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const tenant = await getTenant();
+  const [tenant, matchSlots] = await Promise.all([
+    getTenant(),
+    fetchMatchSlots(),
+  ]);
+  const homepageMatchSlots = {
+    ...matchSlots,
+    next: getPromotableNextMatch(matchSlots.next),
+  };
 
   return (
     <div>
-      <Hero tenant={tenant} />
-      <PreviousAndNextMatchSection />
+      <Hero
+        tenant={tenant}
+        hasNextMatch={homepageMatchSlots.next != null}
+      />
+      <PreviousAndNextMatchSection matchSlots={homepageMatchSlots} />
       <LatestNewsSection />
       <FirstTeamSection />
       <UpcomingMatchesSection />

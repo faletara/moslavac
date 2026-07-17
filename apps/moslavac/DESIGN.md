@@ -241,7 +241,7 @@ Komponente trebaju djelovati izravno, sportski i samouvjereno. Primarne akcije s
 
 ### Matchday Hero
 
-Fotografija preko cijele površine, navy toniranje, golemo ime kluba i godina osnutka čine potpis naslovnice. Parallax i tipografski reveal stvaraju energiju samo kada korisnik nije zatražio smanjeno kretanje. Primarni put iz heroja vodi prema momčadi, dok prvi sadržajni blok mora brzo otkriti sljedeću utakmicu.
+Fotografija preko cijele površine, navy toniranje, golemo ime kluba i godina osnutka čine potpis naslovnice. Parallax i tipografski reveal stvaraju energiju samo kada korisnik nije zatražio smanjeno kretanje. Primarni put iz heroja vodi prema sljedećoj utakmici, dok momčad ostaje sekundarna akcija. Kada sljedeća utakmica nije dostupna, primarna akcija vodi prema rasporedu bez mrtvog sidra.
 
 ## 6. Do's and Don'ts
 

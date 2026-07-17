@@ -10,12 +10,12 @@ Work the **frontier**: može se uzeti bilo koji ticket čiji su blokirajući tic
 
 **Blocked by:** None — can start immediately.
 
-- [ ] Primarna hero akcija glasi „Pogledaj sljedeću utakmicu” i vodi do aktualnog prikaza sljedeće utakmice.
-- [ ] Kada je utakmica dostupna, posjetitelj bez dodatnog traženja može saznati datum, protivnika i lokaciju.
-- [ ] Kada sljedeća utakmica nije dostupna, hero prikazuje smisleno stanje bez mrtve ili lažne poveznice.
-- [ ] Put prema momčadi ostaje dostupan kao sekundarna akcija bez konkuriranja primarnoj konverziji.
-- [ ] Product i design pravila više si ne proturječe oko primarnog puta iz heroja.
-- [ ] Akcije imaju vidljiv fokus i rade tipkovnicom na mobilnom i desktop prikazu.
+- [x] Primarna hero akcija glasi „Pogledaj sljedeću utakmicu” i vodi do aktualnog prikaza sljedeće utakmice.
+- [x] Kada je utakmica dostupna, posjetitelj bez dodatnog traženja može saznati datum, protivnika i lokaciju.
+- [x] Kada sljedeća utakmica nije dostupna, hero prikazuje smisleno stanje bez mrtve ili lažne poveznice.
+- [x] Put prema momčadi ostaje dostupan kao sekundarna akcija bez konkuriranja primarnoj konverziji.
+- [x] Product i design pravila više si ne proturječe oko primarnog puta iz heroja.
+- [x] Akcije imaju vidljiv fokus i rade tipkovnicom na mobilnom i desktop prikazu.
 
 ## YouTube akcija prikazuje se samo kada postoji odredište
 

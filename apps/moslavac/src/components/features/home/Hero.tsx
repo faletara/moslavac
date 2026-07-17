@@ -8,20 +8,20 @@ import {
   useSpring,
   useTransform,
 } from "framer-motion";
-import { ArrowRight } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { useRef } from "react";
 import type { FrontendTenant } from "@/lib/payload/types";
+import { HeroActions } from "./HeroActions";
 
 type HeroProps = {
   tenant: FrontendTenant;
+  hasNextMatch: boolean;
 };
 
 const EXPO_OUT = [0.16, 1, 0.3, 1] as const;
 const EASE = [0.25, 0.1, 0.25, 1] as const;
 
-export default function Hero({ tenant }: HeroProps) {
+export default function Hero({ tenant, hasNextMatch }: HeroProps) {
   const reduced = useReducedMotion();
   const sectionRef = useRef<HTMLElement>(null);
   const founded = tenant.branding?.founded ?? null;
@@ -167,23 +167,14 @@ export default function Hero({ tenant }: HeroProps) {
           </h1>
         </div>
 
-        {/* Primary CTA */}
+        {/* Matchday conversion first; the squad remains a secondary path. */}
         <motion.div
           className="mt-10 md:mt-12"
           initial={{ opacity: 0, y: reduced ? 0 : 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.95, ease: EASE }}
         >
-          <Link
-            href="/prva-momcad"
-            className="group inline-flex items-center gap-3 rounded-full border border-foreground/20 bg-foreground/5 px-8 py-3.5 text-[0.65rem] font-bold uppercase tracking-[0.3em] text-foreground backdrop-blur-lg backdrop-saturate-150 transition-colors duration-300 hover:border-foreground/40 hover:bg-foreground/10 sm:text-xs"
-          >
-            Naša momčad
-            <ArrowRight
-              className="size-3.5 transition-transform duration-300 group-hover:translate-x-1"
-              strokeWidth={2.5}
-            />
-          </Link>
+          <HeroActions hasNextMatch={hasNextMatch} />
         </motion.div>
       </motion.div>
     </section>
