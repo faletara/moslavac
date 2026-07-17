@@ -8,19 +8,15 @@ export function getMatchVenue(match: Match | null): string | null {
 }
 
 /**
- * A homepage promotion promises the full matchday answer: when, who and where.
- * Partial HNS records remain available on the schedule, but must not power the
- * hero CTA or the official next-match panel.
+ * A homepage promotion needs a kickoff and both teams. HNS may publish the
+ * venue later, so a missing facility must not hide an otherwise valid fixture.
  */
 export function getPromotableNextMatch(match: Match | null): Match | null {
-  const venue = getMatchVenue(match);
-
   if (
     match?.kickoffAtUtcMs == null ||
     match.kickoffAtUtcMs <= 0 ||
     !match.homeTeam?.name?.trim() ||
-    !match.awayTeam?.name?.trim() ||
-    !venue
+    !match.awayTeam?.name?.trim()
   ) {
     return null;
   }
