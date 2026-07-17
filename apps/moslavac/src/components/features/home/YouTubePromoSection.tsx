@@ -2,18 +2,27 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import { FaYoutube } from "react-icons/fa";
-import { FadeInView, RevealHeading } from "@/components/animations";
+import {
+  AnimatedCounter,
+  FadeInView,
+  RevealHeading,
+} from "@/components/animations";
+import type { YouTubeChannelStats } from "@/lib/youtube/getChannelStats";
 
 type YouTubePromoSectionProps = {
   youtubeUrl?: string | null;
+  stats?: YouTubeChannelStats | null;
 };
 
 type YouTubePromoContentProps = YouTubePromoSectionProps & {
   reducedMotion: boolean;
 };
 
+const numberFormatter = new Intl.NumberFormat("hr-HR");
+
 export default function YouTubePromoSection({
   youtubeUrl,
+  stats,
 }: YouTubePromoSectionProps) {
   const reduced = useReducedMotion();
 
@@ -22,6 +31,7 @@ export default function YouTubePromoSection({
       <FadeInView direction="up" distance={32}>
         <YouTubePromoContent
           youtubeUrl={youtubeUrl}
+          stats={stats}
           reducedMotion={Boolean(reduced)}
         />
       </FadeInView>
@@ -29,8 +39,39 @@ export default function YouTubePromoSection({
   );
 }
 
+function ChannelStat({
+  value,
+  label,
+  reducedMotion,
+}: {
+  value: number;
+  label: string;
+  reducedMotion: boolean;
+}) {
+  const formatted = numberFormatter.format(value);
+
+  return (
+    <div className="flex flex-col items-center gap-1.5">
+      <span className="font-display text-3xl font-black tabular-nums leading-none sm:text-4xl">
+        {reducedMotion ? (
+          formatted
+        ) : (
+          <AnimatedCounter
+            value={value}
+            format={(n) => numberFormatter.format(n)}
+          />
+        )}
+      </span>
+      <span className="text-[0.55rem] font-medium uppercase tracking-[0.25em] text-muted-foreground sm:text-[0.65rem]">
+        {label}
+      </span>
+    </div>
+  );
+}
+
 export function YouTubePromoContent({
   youtubeUrl,
+  stats,
   reducedMotion,
 }: YouTubePromoContentProps) {
   const youtube = youtubeUrl ?? null;
@@ -64,6 +105,28 @@ export function YouTubePromoContent({
       <p className="max-w-xl text-balance text-sm leading-relaxed text-muted-foreground sm:text-base">
         {description}
       </p>
+
+      {hasChannel && stats ? (
+        <div className="flex flex-wrap items-start justify-center gap-x-10 gap-y-6 sm:gap-x-16">
+          {stats.subscriberCount != null ? (
+            <ChannelStat
+              value={stats.subscriberCount}
+              label="Pretplatnika"
+              reducedMotion={reducedMotion}
+            />
+          ) : null}
+          <ChannelStat
+            value={stats.videoCount}
+            label="Videa"
+            reducedMotion={reducedMotion}
+          />
+          <ChannelStat
+            value={stats.viewCount}
+            label="Pregleda"
+            reducedMotion={reducedMotion}
+          />
+        </div>
+      ) : null}
 
       <div className="flex min-h-11 items-center justify-center pt-2">
         {youtube ? (

@@ -14,14 +14,22 @@ interface AnimatedCounterProps {
 	value: number;
 	className?: string;
 	suffix?: string;
+	format?: (value: number) => string;
 }
 
-export function AnimatedCounter({ value, className, suffix = "" }: AnimatedCounterProps) {
+export function AnimatedCounter({
+	value,
+	className,
+	suffix = "",
+	format,
+}: AnimatedCounterProps) {
 	const ref = useRef<HTMLSpanElement>(null);
 	const reduced = useReducedMotion();
 	const inView = useInView(ref, { once: true });
 	const count = useMotionValue(0);
-	const text = useTransform(count, (latest) => `${Math.round(latest)}${suffix}`);
+	const render = (latest: number) =>
+		`${format ? format(Math.round(latest)) : Math.round(latest)}${suffix}`;
+	const text = useTransform(count, render);
 
 	useEffect(() => {
 		if (!inView || reduced) return;
@@ -32,7 +40,7 @@ export function AnimatedCounter({ value, className, suffix = "" }: AnimatedCount
 	if (reduced) {
 		return (
 			<span ref={ref} className={className}>
-				{`${Math.round(value)}${suffix}`}
+				{render(value)}
 			</span>
 		);
 	}

@@ -12,6 +12,7 @@ import YouTubePromoSection from "@/components/features/home/YouTubePromoSection"
 import { getPromotableNextMatch } from "@/components/features/home/homeMatch";
 import { fetchMatchSlots } from "@/lib/hns/competitions";
 import { getTenant } from "@/lib/payload/getTenant";
+import { getYouTubeChannelStats } from "@/lib/youtube/getChannelStats";
 
 export const revalidate = 60;
 
@@ -37,6 +38,7 @@ export default async function HomePage() {
     ...matchSlots,
     next: getPromotableNextMatch(matchSlots.next),
   };
+  const youtubeStats = await getYouTubeChannelStats(tenant.social?.youtube);
 
   return (
     <div>
@@ -52,7 +54,10 @@ export default async function HomePage() {
       <WebShopCarousel />
       <ComeToMatchSection />
       <SeasonTicketPromoSection />
-      <YouTubePromoSection youtubeUrl={tenant.social?.youtube} />
+      <YouTubePromoSection
+        youtubeUrl={tenant.social?.youtube}
+        stats={youtubeStats}
+      />
     </div>
   );
 }
