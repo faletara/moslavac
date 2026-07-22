@@ -16,6 +16,7 @@ const NAV_ITEMS: readonly NavItem[] = [
   { label: "Novosti", href: "/novosti" },
   { label: "Momčad", href: "/momcad" },
   { label: "Raspored i rezultati", href: "/raspored-i-rezultati" },
+  { label: "O klubu", href: "/o-klubu" },
 ];
 
 /**
