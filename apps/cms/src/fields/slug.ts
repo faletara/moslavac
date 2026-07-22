@@ -32,15 +32,20 @@ export const formatSlug: FieldHook = ({ value, originalDoc, data }) => {
  * Cijelo `slug` text polje (indexed, sidebar, auto-generira iz `title` preko
  * formatSlug). Koriste News i GalleryAlbums.
  */
-export const slugField = (opts: { label?: string; description?: string } = {}): Field => ({
+export const slugField = (
+  opts: { label?: string; description?: string; hidden?: boolean } = {},
+): Field => ({
   name: 'slug',
   label: opts.label ?? 'URL adresa (slug)',
   type: 'text',
   index: true,
-  admin: {
-    position: 'sidebar',
-    description: opts.description ?? 'Auto-generira se iz naziva ako ostaviš prazno.',
-  },
+  admin: opts.hidden
+    ? // Skriveno iz forme — formatSlug hook svejedno auto-generira iz naziva.
+      { hidden: true }
+    : {
+        position: 'sidebar',
+        description: opts.description ?? 'Auto-generira se iz naziva ako ostaviš prazno.',
+      },
   hooks: {
     beforeValidate: [formatSlug],
   },

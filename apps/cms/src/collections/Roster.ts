@@ -1,5 +1,4 @@
 import { createCollection } from '../factories/createCollection'
-import { displayOrderField } from '../fields/displayOrder'
 import { mediaField } from '../fields/media'
 
 export const Roster = createCollection({
@@ -7,7 +6,7 @@ export const Roster = createCollection({
   labels: { singular: 'Igrač', plural: 'Igrači (momčad)' },
   admin: {
     useAsTitle: 'displayName',
-    defaultColumns: ['displayName', 'position', 'jerseyNumber', 'captain', 'displayOrder'],
+    defaultColumns: ['displayName', 'position', 'jerseyNumber', 'captain'],
   },
   fields: [
     {
@@ -45,10 +44,6 @@ export const Roster = createCollection({
         { label: 'Trener', value: 'trener' },
       ],
     },
-    displayOrderField({
-      sidebar: false,
-      description: 'Redoslijed unutar pozicije (manji broj se prikazuje prvi).',
-    }),
     {
       name: 'jerseyNumber',
       label: 'Broj dresa',

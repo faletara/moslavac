@@ -1,6 +1,6 @@
 import { clubFeatureCollection } from '../factories/clubFeatureCollection'
 import { displayOrderField } from '../fields/displayOrder'
-import { mediaArrayField, mediaField } from '../fields/media'
+import { mediaField } from '../fields/media'
 import { slugField } from '../fields/slug'
 
 /** Galerija — albumi fotografija (događaj → više slika). */
@@ -33,7 +33,14 @@ export const GalleryAlbums = clubFeatureCollection('gallery', {
       label: 'Opis',
       type: 'textarea',
     },
-    mediaArrayField('photos', { label: 'Fotografije', withCaption: true }),
+    {
+      name: 'photos',
+      label: 'Fotografije',
+      type: 'upload',
+      relationTo: 'media',
+      hasMany: true,
+      admin: { description: 'Dodaj više slika odjednom (drag & drop u galeriju).' },
+    },
     displayOrderField({ description: 'Redoslijed prikaza albuma (manji broj prvi).' }),
   ],
 })

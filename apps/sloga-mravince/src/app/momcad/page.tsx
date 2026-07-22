@@ -2,8 +2,11 @@ import { Shield } from "lucide-react";
 import type { Metadata } from "next";
 import { RosterCategorySections } from "@/components/features/team/RosterCategorySections";
 import { InkPageHero } from "@/components/layout/InkPageHero";
+import { fetchSeniorCompetition } from "@/lib/hns/competitions";
 import { fetchRoster } from "@/lib/payload/getRoster";
 import { getTenant } from "@/lib/payload/getTenant";
+import { resolveCometPhotoUrls } from "@/lib/rosterPhotos";
+import { buildCompetitionSlug } from "@/lib/slug";
 import type { PayloadMedia } from "@/lib/payload/types";
 import type { RosterEntry, RosterPosition } from "@/types/roster";
 
@@ -68,8 +71,14 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function TeamPage() {
-  const [tenant, roster] = await Promise.all([getTenant(), fetchRoster()]);
+  const [tenant, roster, senior] = await Promise.all([
+    getTenant(),
+    fetchRoster(),
+    fetchSeniorCompetition(),
+  ]);
   const crestSrc = getCrestSrc(tenant.branding?.logo);
+  const cometPhotos = await resolveCometPhotoUrls(roster);
+  const competitionSlug = senior ? buildCompetitionSlug(senior) : null;
   const grouped = groupRoster(roster);
   const groups = POSITION_ORDER.map((position) => ({
     position,
@@ -93,7 +102,12 @@ export default async function TeamPage() {
             </p>
           </div>
         ) : (
-          <RosterCategorySections groups={groups} crestSrc={crestSrc} />
+          <RosterCategorySections
+            groups={groups}
+            crestSrc={crestSrc}
+            cometPhotos={cometPhotos}
+            competitionSlug={competitionSlug}
+          />
         )}
       </section>
     </div>

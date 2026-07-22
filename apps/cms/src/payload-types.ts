@@ -203,6 +203,11 @@ export interface Tenant {
      */
     seniorCompetitionFilter?: string | null;
   };
+  payment?: {
+    iban?: string | null;
+    recipient?: string | null;
+    seasonTicketPrice?: number | null;
+  };
   branding?: {
     shortName?: string | null;
     motto?: string | null;
@@ -213,28 +218,14 @@ export interface Tenant {
     email?: string | null;
     phone?: string | null;
     address?: string | null;
-    /**
-     * Npr. "Popovača".
-     */
     city?: string | null;
-    /**
-     * Npr. "Sisačko-moslavačka županija".
-     */
     region?: string | null;
-    /**
-     * Link karte (src iz Google/OpenStreetMap <iframe> koda) za prikaz lokacije.
-     */
     mapEmbedUrl?: string | null;
   };
   social?: {
     facebook?: string | null;
     youtube?: string | null;
     webshop?: string | null;
-  };
-  payment?: {
-    iban?: string | null;
-    recipient?: string | null;
-    seasonTicketPrice?: number | null;
   };
   legal?: {
     /**
@@ -260,9 +251,6 @@ export interface Tenant {
 export interface Media {
   id: number;
   tenant?: (number | null) | Tenant;
-  /**
-   * Ostavi prazno — automatski se popuni iz naziva datoteke.
-   */
   alt?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -310,16 +298,9 @@ export interface News {
   id: number;
   tenant?: (number | null) | Tenant;
   title: string;
-  /**
-   * Auto-generira se iz naziva ako ostaviš prazno.
-   */
   slug?: string | null;
   publishedAt?: string | null;
   thumbnail?: (number | null) | Media;
-  /**
-   * Kratki sažetak za kartice. Ako ostaviš prazno, generira se iz teksta.
-   */
-  excerpt?: string | null;
   content?: {
     root: {
       type: string;
@@ -335,6 +316,7 @@ export interface News {
     };
     [k: string]: unknown;
   } | null;
+  excerpt?: string | null;
   gallery?:
     | {
         image: number | Media;
@@ -360,10 +342,6 @@ export interface Roster {
    */
   displayName: string;
   position: 'vratar' | 'obrambeni' | 'vezni' | 'napadac' | 'trener';
-  /**
-   * Redoslijed unutar pozicije (manji broj se prikazuje prvi).
-   */
-  displayOrder?: number | null;
   jerseyNumber?: number | null;
   captain?: boolean | null;
   /**
@@ -577,13 +555,10 @@ export interface GalleryAlbum {
    */
   coverImage?: (number | null) | Media;
   description?: string | null;
-  photos?:
-    | {
-        image: number | Media;
-        caption?: string | null;
-        id?: string | null;
-      }[]
-    | null;
+  /**
+   * Dodaj više slika odjednom (drag & drop u galeriju).
+   */
+  photos?: (number | Media)[] | null;
   /**
    * Redoslijed prikaza albuma (manji broj prvi).
    */
@@ -749,6 +724,13 @@ export interface TenantsSelect<T extends boolean = true> {
         teamId?: T;
         seniorCompetitionFilter?: T;
       };
+  payment?:
+    | T
+    | {
+        iban?: T;
+        recipient?: T;
+        seasonTicketPrice?: T;
+      };
   branding?:
     | T
     | {
@@ -774,13 +756,6 @@ export interface TenantsSelect<T extends boolean = true> {
         youtube?: T;
         webshop?: T;
       };
-  payment?:
-    | T
-    | {
-        iban?: T;
-        recipient?: T;
-        seasonTicketPrice?: T;
-      };
   legal?:
     | T
     | {
@@ -801,8 +776,8 @@ export interface NewsSelect<T extends boolean = true> {
   slug?: T;
   publishedAt?: T;
   thumbnail?: T;
-  excerpt?: T;
   content?: T;
+  excerpt?: T;
   gallery?:
     | T
     | {
@@ -874,7 +849,6 @@ export interface RosterSelect<T extends boolean = true> {
   personId?: T;
   displayName?: T;
   position?: T;
-  displayOrder?: T;
   jerseyNumber?: T;
   captain?: T;
   photo?: T;
@@ -984,13 +958,7 @@ export interface GalleryAlbumsSelect<T extends boolean = true> {
   date?: T;
   coverImage?: T;
   description?: T;
-  photos?:
-    | T
-    | {
-        image?: T;
-        caption?: T;
-        id?: T;
-      };
+  photos?: T;
   displayOrder?: T;
   updatedAt?: T;
   createdAt?: T;

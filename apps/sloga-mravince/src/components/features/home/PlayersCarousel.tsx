@@ -1,8 +1,19 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useRef, useState } from "react";
-import type { RosterEntry, RosterPosition } from "@/types/roster";
+import type { RosterPosition } from "@/types/roster";
+
+export interface CarouselPlayer {
+  id: number;
+  displayName: string;
+  position: RosterPosition;
+  jerseyNumber: number | null;
+  captain: boolean;
+  photoUrl: string | null;
+  href: string | null;
+}
 
 const POSITION_LABEL: Record<Exclude<RosterPosition, "trener">, string> = {
   vratar: "Vratar",
@@ -18,22 +29,43 @@ function splitName(name: string): { first: string; last: string } {
   return { first: parts.join(" "), last };
 }
 
-/** Ink kartica igrača — ogroman ghost broj, Anton prezime, crveni detalji. */
-function PlayerCard({ player }: { player: RosterEntry }) {
+/** Ink kartica igrača — HNS portret (ili ghost broj kad slike nema), crveni detalji. */
+function PlayerCard({ player }: { player: CarouselPlayer }) {
   const { first, last } = splitName(player.displayName);
   const position =
     player.position !== "trener" ? POSITION_LABEL[player.position] : null;
 
-  return (
-    <article className="group relative h-80 w-60 shrink-0 snap-start overflow-hidden bg-ink-deep clip-corner sm:h-88 sm:w-68">
-      {/* Ghost broj — dominantni element, na hover se lagano pomakne */}
-      {player.jerseyNumber != null && (
-        <span
-          aria-hidden
-          className="[--text-stroke-color:rgba(255,255,255,0.14)] absolute -right-3 -top-4 select-none font-display text-[11rem] leading-none tabular-nums text-stroke transition-transform duration-500 ease-out group-hover:-translate-y-2 sm:text-[13rem]"
-        >
-          {player.jerseyNumber}
-        </span>
+  const cardClass =
+    "group relative block h-80 w-60 shrink-0 snap-start overflow-hidden bg-ink-deep clip-corner outline-none ring-club-red transition-shadow focus-visible:ring-2 sm:h-88 sm:w-68";
+
+  const body = (
+    <>
+      {player.photoUrl ? (
+        <>
+          {/* HNS portret — puni bleed, grayscale koji oživi na hover */}
+          <Image
+            src={player.photoUrl}
+            alt={player.displayName}
+            fill
+            sizes="(min-width: 640px) 272px, 240px"
+            className="object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.05]"
+          />
+          {/* Tamni gradijent pri dnu za čitljivost imena */}
+          <div
+            aria-hidden
+            className="absolute inset-0 bg-linear-to-t from-ink-deep via-ink-deep/45 to-transparent"
+          />
+        </>
+      ) : (
+        /* Ghost broj — fallback kad HNS slike nema */
+        player.jerseyNumber != null && (
+          <span
+            aria-hidden
+            className="[--text-stroke-color:rgba(255,255,255,0.14)] absolute -right-3 -top-4 select-none font-display text-[11rem] leading-none tabular-nums text-stroke transition-transform duration-500 ease-out group-hover:-translate-y-2 sm:text-[13rem]"
+          >
+            {player.jerseyNumber}
+          </span>
+        )
       )}
 
       {/* Crveni potpis uz lijevi rub */}
@@ -72,14 +104,28 @@ function PlayerCard({ player }: { player: RosterEntry }) {
           {last}
         </p>
       </div>
-    </article>
+    </>
   );
+
+  if (player.href) {
+    return (
+      <Link
+        href={player.href}
+        aria-label={`Statistika — ${player.displayName}`}
+        className={cardClass}
+      >
+        {body}
+      </Link>
+    );
+  }
+
+  return <article className={cardClass}>{body}</article>;
 }
 
 export default function PlayersCarousel({
   players,
 }: {
-  players: RosterEntry[];
+  players: CarouselPlayer[];
 }) {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = useState(0);

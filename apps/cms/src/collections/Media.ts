@@ -22,11 +22,10 @@ export const Media = createCollection({
   fields: [
     {
       name: 'alt',
-      label: 'Alt tekst (opis slike)',
       type: 'text',
-      admin: {
-        description: 'Ostavi prazno — automatski se popuni iz naziva datoteke.',
-      },
+      // Skriveno od editora — popunjava se automatski iz naziva datoteke
+      // (zadržava <img alt> / SEO bez ručnog unosa).
+      admin: { hidden: true },
       hooks: {
         beforeValidate: [altFromFilename],
       },

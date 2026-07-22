@@ -12,9 +12,7 @@ interface PayloadAlbum {
   date: string | null;
   coverImage: PayloadMedia | number | null;
   description: string | null;
-  photos:
-    | { id?: string; image: PayloadMedia | number; caption: string | null }[]
-    | null;
+  photos: (PayloadMedia | number)[] | null;
 }
 
 export function adaptAlbum(doc: PayloadAlbum): GalleryAlbum {
@@ -25,15 +23,10 @@ export function adaptAlbum(doc: PayloadAlbum): GalleryAlbum {
     date: doc.date ?? null,
     coverImage: mediaObject(doc.coverImage),
     description: doc.description ?? null,
-    photos:
-      doc.photos
-        ?.map((item) => {
-          const image = mediaObject(item.image);
-          return image ? { image, caption: item.caption ?? null } : null;
-        })
-        .filter((p): p is { image: PayloadMedia; caption: string | null } =>
-          Boolean(p),
-        ) ?? [],
+    photos: (doc.photos ?? [])
+      .map((item) => mediaObject(item))
+      .filter((img): img is PayloadMedia => Boolean(img))
+      .map((image) => ({ image, caption: null as string | null })),
   };
 }
 

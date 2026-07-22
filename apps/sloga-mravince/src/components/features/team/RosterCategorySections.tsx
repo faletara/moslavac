@@ -1,4 +1,6 @@
 import Image from "next/image";
+import Link from "next/link";
+import { buildPlayerSlug } from "@/lib/slug";
 import type { RosterEntry, RosterPosition } from "@/types/roster";
 
 export interface RosterCategoryGroup {
@@ -15,8 +17,16 @@ const POSITION_LABEL: Record<RosterPosition, string> = {
   trener: "Stožer",
 };
 
-function getPhotoSrc(player: RosterEntry): string | null {
-  return player.photo?.sizes?.card?.url ?? player.photo?.url ?? null;
+function getPhotoSrc(
+  player: RosterEntry,
+  cometPhotos: Map<number, string>,
+): string | null {
+  return (
+    player.photo?.sizes?.card?.url ??
+    player.photo?.url ??
+    cometPhotos.get(player.personId) ??
+    null
+  );
 }
 
 function splitName(name: string): { first: string; last: string } {
@@ -38,12 +48,12 @@ function initials(name: string): string {
 function PlayerImage({
   player,
   crestSrc,
+  photoSrc,
 }: {
   player: RosterEntry;
   crestSrc: string;
+  photoSrc: string | null;
 }) {
-  const photoSrc = getPhotoSrc(player);
-
   if (photoSrc) {
     return (
       <Image
@@ -75,18 +85,27 @@ function PlayerImage({
 function PlayerCard({
   player,
   crestSrc,
+  cometPhotos,
+  href,
 }: {
   player: RosterEntry;
   crestSrc: string;
+  cometPhotos: Map<number, string>;
+  href: string | null;
 }) {
   const { first, last } = splitName(player.displayName);
+  const photoSrc = getPhotoSrc(player, cometPhotos);
 
-  return (
-    <article className="group relative w-[min(82vw,17rem)] shrink-0 snap-start overflow-hidden bg-ink-deep text-chalk clip-corner sm:w-auto">
-      <div className="relative aspect-[4/5] bg-white">
-        <PlayerImage player={player} crestSrc={crestSrc} />
+  const cardClass =
+    "group relative block w-[min(82vw,17rem)] shrink-0 snap-start overflow-hidden bg-ink-deep text-chalk clip-corner outline-none ring-club-red transition-shadow focus-visible:ring-2 sm:w-auto";
+
+  const body = (
+    <>
+      <div className="relative aspect-4/5 overflow-hidden bg-white">
+        <PlayerImage player={player} crestSrc={crestSrc} photoSrc={photoSrc} />
         <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/82 via-black/10 to-transparent" />
-        {player.jerseyNumber != null && (
+        {/* Ghost broj samo kad nema fotke — inače smeta preko lica */}
+        {!photoSrc && player.jerseyNumber != null && (
           <span
             aria-hidden
             className="[--text-stroke-color:rgba(255,255,255,0.18)] absolute -right-3 -top-4 select-none font-display text-[8rem] leading-none text-stroke transition-transform duration-500 group-hover:-translate-y-1"
@@ -126,16 +145,46 @@ function PlayerCard({
           </div>
         </div>
       </div>
-    </article>
+    </>
   );
+
+  if (href) {
+    return (
+      <Link
+        href={href}
+        aria-label={`Statistika — ${player.displayName}`}
+        className={cardClass}
+      >
+        {body}
+      </Link>
+    );
+  }
+
+  return <article className={cardClass}>{body}</article>;
+}
+
+function playerHref(
+  player: RosterEntry,
+  competitionSlug: string | null,
+): string | null {
+  if (!competitionSlug || player.position === "trener" || player.personId == null)
+    return null;
+  return `/statistika/${buildPlayerSlug({
+    personId: player.personId,
+    name: player.displayName,
+  })}/${competitionSlug}`;
 }
 
 export function RosterCategorySections({
   groups,
   crestSrc,
+  cometPhotos,
+  competitionSlug,
 }: {
   groups: RosterCategoryGroup[];
   crestSrc: string;
+  cometPhotos: Map<number, string>;
+  competitionSlug: string | null;
 }) {
   return (
     <div className="space-y-20">
@@ -154,7 +203,13 @@ export function RosterCategorySections({
 
           <div className="mt-10 flex snap-x snap-mandatory gap-5 overflow-x-auto pb-2 [scrollbar-width:none] sm:grid sm:grid-cols-2 sm:overflow-visible lg:grid-cols-4 [&::-webkit-scrollbar]:hidden">
             {group.players.map((player) => (
-              <PlayerCard key={player.id} player={player} crestSrc={crestSrc} />
+              <PlayerCard
+                key={player.id}
+                player={player}
+                crestSrc={crestSrc}
+                cometPhotos={cometPhotos}
+                href={playerHref(player, competitionSlug)}
+              />
             ))}
           </div>
         </section>

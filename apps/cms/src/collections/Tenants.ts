@@ -7,6 +7,13 @@ import { mediaField } from '../fields/media'
 const superAdminUI = (_data: unknown, _sibling: unknown, { user }: { user?: unknown }): boolean =>
   isSuperAdmin(user as Parameters<typeof isSuperAdmin>[0])
 
+/** UI-uvjet: prikaži samo Moslavcu (ili super-adminu) — druge klubove ne zanima. */
+const moslavacOnlyUI = (
+  data: { slug?: string } | undefined,
+  _sibling: unknown,
+  { user }: { user?: unknown },
+): boolean => data?.slug === 'moslavac' || isSuperAdmin(user as Parameters<typeof isSuperAdmin>[0])
+
 export const Tenants: CollectionConfig = {
   slug: 'tenants',
   labels: { singular: 'Klub (postavke)', plural: 'Klubovi (postavke)' },
@@ -105,6 +112,19 @@ export const Tenants: CollectionConfig = {
       ],
     },
     {
+      name: 'payment',
+      type: 'group',
+      label: 'Plaćanje (sezonska iskaznica)',
+      admin: {
+        condition: moslavacOnlyUI,
+      },
+      fields: [
+        { name: 'iban', label: 'IBAN', type: 'text' },
+        { name: 'recipient', label: 'Primatelj', type: 'textarea' },
+        { name: 'seasonTicketPrice', label: 'Cijena sezonske (EUR)', type: 'number' },
+      ],
+    },
+    {
       type: 'tabs',
       tabs: [
         {
@@ -138,25 +158,18 @@ export const Tenants: CollectionConfig = {
                   name: 'city',
                   label: 'Mjesto',
                   type: 'text',
-                  admin: {
-                    description: 'Npr. "Popovača".',
-                  },
                 },
                 {
                   name: 'region',
                   label: 'Županija',
                   type: 'text',
-                  admin: {
-                    description: 'Npr. "Sisačko-moslavačka županija".',
-                  },
                 },
                 {
                   name: 'mapEmbedUrl',
-                  label: 'Karta (embed URL)',
                   type: 'text',
-                  admin: {
-                    description: 'Link karte (src iz Google/OpenStreetMap <iframe> koda) za prikaz lokacije.',
-                  },
+                  // Skriveno iz forme — nk-vrapce zadržava spremljenu vrijednost;
+                  // ostali klubovi fallbackaju na koordinate stadiona.
+                  admin: { hidden: true },
                 },
               ],
             },
@@ -173,21 +186,6 @@ export const Tenants: CollectionConfig = {
                 { name: 'facebook', label: 'Facebook', type: 'text' },
                 { name: 'youtube', label: 'YouTube', type: 'text' },
                 { name: 'webshop', label: 'Web trgovina', type: 'text' },
-              ],
-            },
-          ],
-        },
-        {
-          label: 'Plaćanje',
-          fields: [
-            {
-              name: 'payment',
-              type: 'group',
-              label: false,
-              fields: [
-                { name: 'iban', label: 'IBAN', type: 'text' },
-                { name: 'recipient', label: 'Primatelj', type: 'textarea' },
-                { name: 'seasonTicketPrice', label: 'Cijena sezonske (EUR)', type: 'number' },
               ],
             },
           ],

@@ -31,7 +31,7 @@ export function adaptRoster(doc: PayloadRosterEntry): RosterEntry {
 export const fetchRoster = (): Promise<RosterEntry[]> =>
   fetchList<PayloadRosterEntry, RosterEntry>({
     collection: "roster",
-    sort: "displayOrder",
+    sort: "displayName",
     limit: 100,
     authenticated: true,
     revalidate: 300,

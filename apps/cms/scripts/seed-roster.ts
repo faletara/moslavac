@@ -95,7 +95,6 @@ for (const player of roster) {
       position: player.position,
       jerseyNumber: player.jerseyNumber,
       captain: player.captain ?? false,
-      displayOrder: player.jerseyNumber ?? 99,
       tenant: tenant.id,
     },
   })

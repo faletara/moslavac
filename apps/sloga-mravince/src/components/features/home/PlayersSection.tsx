@@ -1,18 +1,43 @@
+import { fetchSeniorCompetition } from "@/lib/hns/competitions";
+import { resolveCometPhotoUrls } from "@/lib/rosterPhotos";
+import { buildCompetitionSlug, buildPlayerSlug } from "@/lib/slug";
 import type { RosterEntry } from "@/types/roster";
 import SectionHead from "./SectionHead";
-import PlayersCarousel from "./PlayersCarousel";
+import PlayersCarousel, { type CarouselPlayer } from "./PlayersCarousel";
 
 /**
  * Sekcija igrača — puna crvena pozornica s dijagonalnim rasterom i zrnom,
  * ink kartice s ogromnim ghost brojevima u horizontalnom scrollu.
  */
-export default function PlayersSection({
+export default async function PlayersSection({
   players,
 }: {
   players: RosterEntry[];
 }) {
   const squad = players.filter((p) => p.position !== "trener");
   if (squad.length === 0) return null;
+
+  const [cometPhotos, senior] = await Promise.all([
+    resolveCometPhotoUrls(squad),
+    fetchSeniorCompetition(),
+  ]);
+  const competitionSlug = senior ? buildCompetitionSlug(senior) : null;
+
+  const carouselPlayers: CarouselPlayer[] = squad.map((entry) => ({
+    id: entry.id,
+    displayName: entry.displayName,
+    position: entry.position,
+    jerseyNumber: entry.jerseyNumber,
+    captain: entry.captain,
+    photoUrl: entry.photo?.url ?? cometPhotos.get(entry.personId) ?? null,
+    href:
+      competitionSlug && entry.personId != null
+        ? `/statistika/${buildPlayerSlug({
+            personId: entry.personId,
+            name: entry.displayName,
+          })}/${competitionSlug}`
+        : null,
+  }));
 
   return (
     <section className="relative isolate overflow-hidden bg-club-red py-20 md:py-28">
@@ -38,7 +63,7 @@ export default function PlayersSection({
           link={{ href: "/momcad", label: "Svi igrači" }}
         />
         <div className="mt-12 md:mt-16">
-          <PlayersCarousel players={squad} />
+          <PlayersCarousel players={carouselPlayers} />
         </div>
       </div>
     </section>
