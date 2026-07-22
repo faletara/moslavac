@@ -4,6 +4,7 @@ import { mediaField } from '../fields/media'
 
 /** Uprava kluba — predsjedništvo, nadzorni odbor, stručni stožer. */
 export const BoardMembers = clubFeatureCollection('board', {
+  labels: { singular: 'Član uprave', plural: 'Uprava kluba' },
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['name', 'role', 'roleGroup', 'displayOrder', 'tenant'],
@@ -11,18 +12,20 @@ export const BoardMembers = clubFeatureCollection('board', {
   fields: [
     {
       name: 'name',
+      label: 'Ime i prezime',
       type: 'text',
       required: true,
-      admin: { description: 'Ime i prezime člana.' },
     },
     {
       name: 'role',
+      label: 'Funkcija',
       type: 'text',
       required: true,
-      admin: { description: 'Funkcija (npr. "Predsjednik", "Tajnik", "Trener vratara").' },
+      admin: { description: 'Npr. "Predsjednik", "Tajnik", "Trener vratara".' },
     },
     {
       name: 'roleGroup',
+      label: 'Sekcija',
       type: 'select',
       required: true,
       defaultValue: 'predsjednistvo',
@@ -34,19 +37,16 @@ export const BoardMembers = clubFeatureCollection('board', {
       ],
       admin: { description: 'Sekcija u kojoj se član prikazuje.' },
     },
-    mediaField('photo', { description: 'Fotografija člana (opcionalno).' }),
+    mediaField('photo', { label: 'Fotografija', description: 'Fotografija člana (opcionalno).' }),
     {
       name: 'email',
+      label: 'E-mail',
       type: 'email',
     },
     {
       name: 'phone',
+      label: 'Telefon',
       type: 'text',
-    },
-    {
-      name: 'bio',
-      type: 'textarea',
-      admin: { description: 'Kratki opis (opcionalno).' },
     },
     displayOrderField({ description: 'Redoslijed unutar sekcije (manji broj prvi).' }),
   ],

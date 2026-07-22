@@ -14,6 +14,5 @@ export interface BoardMember {
   photo: PayloadMedia | null;
   email: string | null;
   phone: string | null;
-  bio: string | null;
   displayOrder: number;
 }

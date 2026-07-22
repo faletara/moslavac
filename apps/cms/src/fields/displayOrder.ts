@@ -1,6 +1,7 @@
 import type { Field } from 'payload'
 
 interface DisplayOrderOptions {
+  label?: string
   description?: string
   /** Smjesti u sidebar (default true). Roster ga drži u glavnom stupcu. */
   sidebar?: boolean
@@ -9,6 +10,7 @@ interface DisplayOrderOptions {
 /** `displayOrder` number polje (default 0). Koristi 6 kolekcija. */
 export const displayOrderField = (opts: DisplayOrderOptions = {}): Field => ({
   name: 'displayOrder',
+  label: opts.label ?? 'Redoslijed',
   type: 'number',
   defaultValue: 0,
   admin: {

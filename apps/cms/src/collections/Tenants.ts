@@ -3,8 +3,13 @@ import { CLUB_FEATURE_OPTIONS } from '@/lib/payload/clubFeatures'
 import { isSuperAdmin, superAdminOnly } from '../access/roles'
 import { mediaField } from '../fields/media'
 
+/** UI-uvjet: polje/tab vidljivo samo platformi (super-adminu), ne vlasniku kluba. */
+const superAdminUI = (_data: unknown, _sibling: unknown, { user }: { user?: unknown }): boolean =>
+  isSuperAdmin(user as Parameters<typeof isSuperAdmin>[0])
+
 export const Tenants: CollectionConfig = {
   slug: 'tenants',
+  labels: { singular: 'Klub (postavke)', plural: 'Klubovi (postavke)' },
   admin: {
     useAsTitle: 'displayName',
     defaultColumns: ['displayName', 'slug', 'active'],
@@ -18,27 +23,35 @@ export const Tenants: CollectionConfig = {
   },
   fields: [
     {
+      name: 'displayName',
+      label: 'Naziv kluba',
+      type: 'text',
+      required: true,
+    },
+    {
       name: 'slug',
+      label: 'URL ključ (slug)',
       type: 'text',
       required: true,
       unique: true,
       index: true,
       admin: {
-        description: 'URL-safe identifier (e.g. "moslavac"). Used as tenant resolution key from frontend env.',
+        condition: superAdminUI,
+        description: 'Tehnički identifikator kluba — ne mijenjati (razbija stranicu).',
       },
     },
     {
-      name: 'displayName',
-      type: 'text',
-      required: true,
-    },
-    {
       name: 'active',
+      label: 'Klub aktivan',
       type: 'checkbox',
       defaultValue: true,
+      admin: {
+        condition: superAdminUI,
+      },
     },
     {
       name: 'features',
+      label: 'Uključene rubrike',
       type: 'select',
       hasMany: true,
       options: CLUB_FEATURE_OPTIONS,
@@ -47,97 +60,102 @@ export const Tenants: CollectionConfig = {
         update: ({ req: { user } }) => isSuperAdmin(user),
       },
       admin: {
-        description:
-          'Klub-specifične rubrike koje ovaj klub koristi — određuje vidljivost odgovarajućih kolekcija u adminu (Stranice, Dokumenti, Uprava, Škola, Galerija).',
+        condition: superAdminUI,
+        description: 'Rubrike koje klub koristi — određuje vidljivost kolekcija u adminu.',
       },
+    },
+    {
+      name: 'hns',
+      type: 'group',
+      label: 'HNS integracija',
+      admin: {
+        condition: superAdminUI,
+        description: 'Integracija s Hrvatskim nogometnim savezom (održava platforma).',
+      },
+      fields: [
+        {
+          name: 'apiKey',
+          label: 'API ključ',
+          type: 'text',
+          required: true,
+          access: {
+            read: ({ req: { user } }) => Boolean(user),
+          },
+          admin: {
+            description: 'Šalje se kao API_KEY header prema HNS-u. Skriveno od javnosti.',
+          },
+        },
+        {
+          name: 'teamId',
+          label: 'ID momčadi',
+          type: 'text',
+          required: true,
+          admin: {
+            description: 'ID momčadi kluba u HNS sustavu.',
+          },
+        },
+        {
+          name: 'seniorCompetitionFilter',
+          label: 'Filter seniorskog natjecanja',
+          type: 'text',
+          admin: {
+            description: 'Dio naziva natjecanja koji identificira seniorsko natjecanje.',
+          },
+        },
+      ],
     },
     {
       type: 'tabs',
       tabs: [
         {
-          label: 'HNS',
-          description: 'Hrvatski nogometni savez API integration',
-          fields: [
-            {
-              name: 'hns',
-              type: 'group',
-              fields: [
-                {
-                  name: 'apiKey',
-                  type: 'text',
-                  required: true,
-                  access: {
-                    read: ({ req: { user } }) => Boolean(user),
-                  },
-                  admin: {
-                    description: 'Sent as API_KEY header to HNS. Hidden from public reads.',
-                  },
-                },
-                {
-                  name: 'teamId',
-                  type: 'text',
-                  required: true,
-                  admin: {
-                    description: 'Club team ID in HNS system',
-                  },
-                },
-                {
-                  name: 'seniorCompetitionFilter',
-                  type: 'text',
-                  admin: {
-                    description: 'Substring matched against competition name to identify senior competition',
-                  },
-                },
-              ],
-            },
-          ],
-        },
-        {
-          label: 'Branding',
+          label: 'Izgled kluba',
           fields: [
             {
               name: 'branding',
               type: 'group',
+              label: false,
               fields: [
-                { name: 'shortName', type: 'text' },
-                { name: 'motto', type: 'text' },
-                { name: 'founded', type: 'number' },
-                mediaField('logo'),
+                { name: 'shortName', label: 'Kratki naziv', type: 'text' },
+                { name: 'motto', label: 'Moto', type: 'text' },
+                { name: 'founded', label: 'Godina osnutka', type: 'number' },
+                mediaField('logo', { label: 'Grb / logo' }),
               ],
             },
           ],
         },
         {
-          label: 'Contact',
+          label: 'Kontakt',
           fields: [
             {
               name: 'contact',
               type: 'group',
+              label: false,
               fields: [
-                { name: 'email', type: 'email' },
-                { name: 'phone', type: 'text' },
-                { name: 'address', type: 'textarea' },
+                { name: 'email', label: 'E-mail', type: 'email' },
+                { name: 'phone', label: 'Telefon', type: 'text' },
+                { name: 'address', label: 'Adresa', type: 'textarea' },
                 {
                   name: 'city',
+                  label: 'Mjesto',
                   type: 'text',
                   admin: {
-                    description: 'Mjesto (npr. "Popovača") — schema.org addressLocality.',
+                    description: 'Npr. "Popovača".',
                   },
                 },
                 {
                   name: 'region',
+                  label: 'Županija',
                   type: 'text',
                   admin: {
-                    description:
-                      'Županija (npr. "Sisačko-moslavačka županija") — schema.org addressRegion.',
+                    description: 'Npr. "Sisačko-moslavačka županija".',
                   },
                 },
                 {
                   name: 'mapEmbedUrl',
+                  label: 'Karta (embed URL)',
                   type: 'text',
                   admin: {
-                    description:
-                      'Google/OpenStreetMap embed URL (src iz <iframe>) za prikaz lokacije na stranici kontakta.',
+                    description: 'Link karte (src iz Google/OpenStreetMap <iframe> koda) za prikaz lokacije.',
                   },
                 },
               ],
@@ -145,57 +163,62 @@ export const Tenants: CollectionConfig = {
           ],
         },
         {
-          label: 'Social',
+          label: 'Društvene mreže',
           fields: [
             {
               name: 'social',
               type: 'group',
+              label: false,
               fields: [
-                { name: 'facebook', type: 'text' },
-                { name: 'youtube', type: 'text' },
-                { name: 'webshop', type: 'text' },
+                { name: 'facebook', label: 'Facebook', type: 'text' },
+                { name: 'youtube', label: 'YouTube', type: 'text' },
+                { name: 'webshop', label: 'Web trgovina', type: 'text' },
               ],
             },
           ],
         },
         {
-          label: 'Payment',
+          label: 'Plaćanje',
           fields: [
             {
               name: 'payment',
               type: 'group',
+              label: false,
               fields: [
-                { name: 'iban', type: 'text' },
-                { name: 'recipient', type: 'textarea' },
-                { name: 'seasonTicketPrice', type: 'number' },
+                { name: 'iban', label: 'IBAN', type: 'text' },
+                { name: 'recipient', label: 'Primatelj', type: 'textarea' },
+                { name: 'seasonTicketPrice', label: 'Cijena sezonske (EUR)', type: 'number' },
               ],
             },
           ],
         },
         {
-          label: 'Legal',
-          description: 'Pravni podaci o udruzi (Impressum, Politika privatnosti)',
+          label: 'Pravno',
+          description: 'Pravni podaci o udruzi (Impressum, Politika privatnosti).',
           fields: [
             {
               name: 'legal',
               type: 'group',
+              label: false,
               fields: [
                 {
                   name: 'oib',
+                  label: 'OIB',
                   type: 'text',
-                  admin: { description: 'OIB udruge (11 znamenki)' },
+                  admin: { description: 'OIB udruge (11 znamenki).' },
                 },
                 {
                   name: 'registryNumber',
+                  label: 'Registarski broj',
                   type: 'text',
-                  admin: { description: 'Registarski broj u Registru udruga RH' },
+                  admin: { description: 'Broj u Registru udruga RH.' },
                 },
                 {
                   name: 'registryAuthority',
+                  label: 'Nadležno tijelo upisa',
                   type: 'text',
                   admin: {
-                    description:
-                      'Nadležno tijelo upisa (npr. "Ured državne uprave u Sisačko-moslavačkoj županiji")',
+                    description: 'Npr. "Ured državne uprave u Sisačko-moslavačkoj županiji".',
                   },
                 },
               ],

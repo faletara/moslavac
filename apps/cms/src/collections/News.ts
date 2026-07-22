@@ -4,6 +4,7 @@ import { slugField } from '../fields/slug'
 
 export const News = createCollection({
   slug: 'news',
+  labels: { singular: 'Novost', plural: 'Novosti' },
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'publishedAt', 'tenant'],
@@ -11,12 +12,14 @@ export const News = createCollection({
   fields: [
     {
       name: 'title',
+      label: 'Naslov',
       type: 'text',
       required: true,
     },
-    slugField({ description: 'Auto-generated from title if left empty' }),
+    slugField(),
     {
       name: 'publishedAt',
+      label: 'Datum objave',
       type: 'date',
       defaultValue: () => new Date(),
       admin: {
@@ -26,18 +29,20 @@ export const News = createCollection({
         },
       },
     },
-    mediaField('thumbnail'),
+    mediaField('thumbnail', { label: 'Naslovna slika' }),
     {
       name: 'excerpt',
+      label: 'Sažetak',
       type: 'textarea',
       admin: {
-        description: 'Short summary for cards. Auto-generated from content if empty.',
+        description: 'Kratki sažetak za kartice. Ako ostaviš prazno, generira se iz teksta.',
       },
     },
     {
       name: 'content',
+      label: 'Tekst',
       type: 'richText',
     },
-    mediaArrayField('gallery'),
+    mediaArrayField('gallery', { label: 'Galerija' }),
   ],
 })

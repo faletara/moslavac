@@ -213,7 +213,7 @@ for (const item of equipment) {
     where: {
       and: [
         { tenant: { equals: tenant.id } },
-        { name: { equals: item.name } },
+        { displayName: { equals: item.displayName } },
       ],
     },
     limit: 1,
@@ -228,7 +228,6 @@ for (const item of equipment) {
   await payload.create({
     collection: 'equipment',
     data: {
-      name: item.name,
       displayName: item.displayName,
       category: item.category,
       price: item.price,

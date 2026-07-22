@@ -1,6 +1,7 @@
 import type { Field } from 'payload'
 
 interface MediaFieldOptions {
+  label?: string
   required?: boolean
   description?: string
 }
@@ -8,6 +9,7 @@ interface MediaFieldOptions {
 /** Single upload polje vezano na `media`. Koristi 7+ kolekcija. */
 export const mediaField = (name: string, opts: MediaFieldOptions = {}): Field => ({
   name,
+  label: opts.label ?? 'Slika',
   type: 'upload',
   relationTo: 'media',
   ...(opts.required ? { required: true } : {}),
@@ -15,6 +17,7 @@ export const mediaField = (name: string, opts: MediaFieldOptions = {}): Field =>
 })
 
 interface MediaArrayOptions {
+  label?: string
   /** Dodaj `caption` text polje uz svaku sliku (GalleryAlbums). */
   withCaption?: boolean
   description?: string
@@ -26,17 +29,19 @@ export const mediaArrayField = (
   opts: MediaArrayOptions = {},
 ): Field => ({
   name,
+  label: opts.label ?? 'Fotografije',
   type: 'array',
   ...(opts.description ? { admin: { description: opts.description } } : {}),
   fields: [
     {
       name: 'image',
+      label: 'Slika',
       type: 'upload',
       relationTo: 'media',
       required: true,
     },
     ...(opts.withCaption
-      ? [{ name: 'caption', type: 'text' } as Field]
+      ? [{ name: 'caption', label: 'Opis (natpis)', type: 'text' } as Field]
       : []),
   ],
 })

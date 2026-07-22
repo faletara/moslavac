@@ -13,7 +13,6 @@ interface PayloadBoardMember {
   photo: PayloadMedia | number | null;
   email: string | null;
   phone: string | null;
-  bio: string | null;
   displayOrder: number;
 }
 
@@ -26,7 +25,6 @@ export function adaptBoardMember(doc: PayloadBoardMember): BoardMember {
     photo: mediaObject(doc.photo),
     email: doc.email ?? null,
     phone: doc.phone ?? null,
-    bio: doc.bio ?? null,
     displayOrder: doc.displayOrder ?? 0,
   };
 }

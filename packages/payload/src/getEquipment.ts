@@ -15,12 +15,10 @@ type PayloadEquipmentCategory =
 interface PayloadEquipment {
   id: number;
   displayName: string;
-  name: string;
   category: PayloadEquipmentCategory;
   price: number;
   image: PayloadMedia | number | null;
   externalUrl: string;
-  description: string | null;
   displayOrder: number | null;
   featured: boolean | null;
   active: boolean | null;
@@ -39,13 +37,11 @@ export function adaptEquipment(doc: PayloadEquipment): Equipment {
   return {
     id: doc.id,
     displayName: doc.displayName,
-    name: doc.name,
     category: doc.category,
     price: doc.price,
     imagePath: url,
     imageAlt: alt || doc.displayName,
     externalUrl: doc.externalUrl,
-    description: doc.description ?? null,
     displayOrder: doc.displayOrder ?? 0,
     featured: doc.featured ?? false,
     tenantId: tenantSlugOf(doc.tenant),

@@ -176,27 +176,30 @@ export interface User {
  */
 export interface Tenant {
   id: number;
-  /**
-   * URL-safe identifier (e.g. "moslavac"). Used as tenant resolution key from frontend env.
-   */
-  slug: string;
   displayName: string;
+  /**
+   * Tehnički identifikator kluba — ne mijenjati (razbija stranicu).
+   */
+  slug?: string | null;
   active?: boolean | null;
   /**
-   * Klub-specifične rubrike koje ovaj klub koristi — određuje vidljivost odgovarajućih kolekcija u adminu (Stranice, Dokumenti, Uprava, Škola, Galerija).
+   * Rubrike koje klub koristi — određuje vidljivost kolekcija u adminu.
    */
   features?: ('pages' | 'documents' | 'board' | 'school' | 'gallery')[] | null;
-  hns: {
+  /**
+   * Integracija s Hrvatskim nogometnim savezom (održava platforma).
+   */
+  hns?: {
     /**
-     * Sent as API_KEY header to HNS. Hidden from public reads.
+     * Šalje se kao API_KEY header prema HNS-u. Skriveno od javnosti.
      */
     apiKey: string;
     /**
-     * Club team ID in HNS system
+     * ID momčadi kluba u HNS sustavu.
      */
     teamId: string;
     /**
-     * Substring matched against competition name to identify senior competition
+     * Dio naziva natjecanja koji identificira seniorsko natjecanje.
      */
     seniorCompetitionFilter?: string | null;
   };
@@ -211,15 +214,15 @@ export interface Tenant {
     phone?: string | null;
     address?: string | null;
     /**
-     * Mjesto (npr. "Popovača") — schema.org addressLocality.
+     * Npr. "Popovača".
      */
     city?: string | null;
     /**
-     * Županija (npr. "Sisačko-moslavačka županija") — schema.org addressRegion.
+     * Npr. "Sisačko-moslavačka županija".
      */
     region?: string | null;
     /**
-     * Google/OpenStreetMap embed URL (src iz <iframe>) za prikaz lokacije na stranici kontakta.
+     * Link karte (src iz Google/OpenStreetMap <iframe> koda) za prikaz lokacije.
      */
     mapEmbedUrl?: string | null;
   };
@@ -235,15 +238,15 @@ export interface Tenant {
   };
   legal?: {
     /**
-     * OIB udruge (11 znamenki)
+     * OIB udruge (11 znamenki).
      */
     oib?: string | null;
     /**
-     * Registarski broj u Registru udruga RH
+     * Broj u Registru udruga RH.
      */
     registryNumber?: string | null;
     /**
-     * Nadležno tijelo upisa (npr. "Ured državne uprave u Sisačko-moslavačkoj županiji")
+     * Npr. "Ured državne uprave u Sisačko-moslavačkoj županiji".
      */
     registryAuthority?: string | null;
   };
@@ -257,8 +260,10 @@ export interface Tenant {
 export interface Media {
   id: number;
   tenant?: (number | null) | Tenant;
-  alt: string;
-  caption?: string | null;
+  /**
+   * Ostavi prazno — automatski se popuni iz naziva datoteke.
+   */
+  alt?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -306,13 +311,13 @@ export interface News {
   tenant?: (number | null) | Tenant;
   title: string;
   /**
-   * Auto-generated from title if left empty
+   * Auto-generira se iz naziva ako ostaviš prazno.
    */
   slug?: string | null;
   publishedAt?: string | null;
   thumbnail?: (number | null) | Media;
   /**
-   * Short summary for cards. Auto-generated from content if empty.
+   * Kratki sažetak za kartice. Ako ostaviš prazno, generira se iz teksta.
    */
   excerpt?: string | null;
   content?: {
@@ -347,22 +352,22 @@ export interface Roster {
   id: number;
   tenant?: (number | null) | Tenant;
   /**
-   * Ime koje se prikazuje na stranici (može biti puno ime ili nadimak)
-   */
-  displayName: string;
-  /**
-   * Pretraži igrača po imenu — odabir automatski popuni personId i Display name. Mora biti odabran prije spremanja.
+   * Pretraži igrača po imenu — odabir automatski popuni ime. Odaberi prije spremanja.
    */
   personId: number;
+  /**
+   * Ime koje se prikazuje na stranici (puno ime ili nadimak).
+   */
+  displayName: string;
   position: 'vratar' | 'obrambeni' | 'vezni' | 'napadac' | 'trener';
   /**
-   * Redoslijed unutar pozicije (manji broj se prikazuje prvi)
+   * Redoslijed unutar pozicije (manji broj se prikazuje prvi).
    */
   displayOrder?: number | null;
   jerseyNumber?: number | null;
   captain?: boolean | null;
   /**
-   * Fotografija igrača
+   * Fotografija igrača.
    */
   photo?: (number | null) | Media;
   updatedAt: string;
@@ -376,40 +381,29 @@ export interface Equipment {
   id: number;
   tenant?: (number | null) | Tenant;
   /**
-   * Kratki naziv prikazan na kartici (npr. "Paket", "Polaris jakna")
+   * Naziv proizvoda prikazan na kartici (npr. "Dres domaći", "Polaris jakna").
    */
   displayName: string;
-  /**
-   * Pun naziv proizvoda (npr. "SNK Moslavac Popovača — paket")
-   */
-  name: string;
   category: 'paketi' | 'dresovi' | 'trenirke' | 'jakne' | 'dodaci';
-  /**
-   * Cijena u EUR
-   */
   price: number;
   /**
-   * Slika proizvoda (uploadaj u admin UI nakon kreiranja zapisa)
+   * Sliku uploadaj u galeriju i ovdje je odaberi.
    */
   image?: (number | null) | Media;
   /**
-   * Direktan link na proizvod na alpas.hr (mora počinjati s http:// ili https://)
+   * Direktan link na proizvod u web trgovini (mora počinjati s http:// ili https://).
    */
   externalUrl: string;
   /**
-   * Opcionalni kratki opis proizvoda
-   */
-  description?: string | null;
-  /**
-   * Redoslijed unutar kategorije (manji broj se prikazuje prvi)
+   * Redoslijed unutar kategorije (manji broj se prikazuje prvi).
    */
   displayOrder?: number | null;
   /**
-   * Prikaži u carouselu na naslovnici
+   * Prikaži proizvod u carouselu na naslovnici.
    */
   featured?: boolean | null;
   /**
-   * Sakrij proizvod bez brisanja (ako je isključeno)
+   * Isključi da sakriješ proizvod bez brisanja.
    */
   active?: boolean | null;
   updatedAt: string;
@@ -423,7 +417,7 @@ export interface Page {
   id: number;
   tenant?: (number | null) | Tenant;
   /**
-   * Odredi kojoj rubrici ovaj sadržaj pripada (jedan zapis po rubrici).
+   * Kojoj rubrici ovaj sadržaj pripada (jedan zapis po rubrici).
    */
   key: 'povijest' | 'navijaci' | 'statut' | 'skola-info' | 'seniori-info';
   /**
@@ -463,7 +457,7 @@ export interface Page {
       }[]
     | null;
   /**
-   * Kratki opis za tražilice (meta description).
+   * Kratki opis za Google (meta description).
    */
   seoDescription?: string | null;
   updatedAt: string;
@@ -477,7 +471,7 @@ export interface Document {
   id: number;
   tenant?: (number | null) | Tenant;
   /**
-   * Naziv dokumenta prikazan na stranici.
+   * Naziv prikazan na stranici.
    */
   title: string;
   category: 'statut' | 'pravilnik' | 'obrazac' | 'izvjesce' | 'ostalo';
@@ -504,12 +498,9 @@ export interface Document {
 export interface BoardMember {
   id: number;
   tenant?: (number | null) | Tenant;
-  /**
-   * Ime i prezime člana.
-   */
   name: string;
   /**
-   * Funkcija (npr. "Predsjednik", "Tajnik", "Trener vratara").
+   * Npr. "Predsjednik", "Tajnik", "Trener vratara".
    */
   role: string;
   /**
@@ -522,10 +513,6 @@ export interface BoardMember {
   photo?: (number | null) | Media;
   email?: string | null;
   phone?: string | null;
-  /**
-   * Kratki opis (opcionalno).
-   */
-  bio?: string | null;
   /**
    * Redoslijed unutar sekcije (manji broj prvi).
    */
@@ -545,7 +532,7 @@ export interface SchoolProgram {
    */
   name: string;
   /**
-   * Dobni raspon (npr. "U7–U9", "7–9 godina").
+   * Npr. "U7–U9", "7–9 godina".
    */
   ageRange?: string | null;
   /**
@@ -553,11 +540,11 @@ export interface SchoolProgram {
    */
   coach?: string | null;
   /**
-   * Termini treninga (npr. "Pon, Sri, Pet — 17:00–18:30").
+   * Npr. "Pon, Sri, Pet — 17:00–18:30".
    */
   schedule?: string | null;
   /**
-   * Opis programa — prikazuje se na kartici i kao glavni tekst ("O programu") na stranici programa.
+   * Prikazuje se na kartici i kao glavni tekst ("O programu") na stranici programa.
    */
   description?: string | null;
   photo?: (number | null) | Media;
@@ -566,7 +553,7 @@ export interface SchoolProgram {
    */
   displayOrder?: number | null;
   /**
-   * Sakrij program bez brisanja (ako je isključeno).
+   * Isključi da sakriješ program bez brisanja.
    */
   active?: boolean | null;
   updatedAt: string;
@@ -579,12 +566,9 @@ export interface SchoolProgram {
 export interface GalleryAlbum {
   id: number;
   tenant?: (number | null) | Tenant;
-  /**
-   * Naziv albuma.
-   */
   title: string;
   /**
-   * Auto-generiran iz naziva ako je prazno.
+   * Auto-generira se iz naziva ako ostaviš prazno.
    */
   slug?: string | null;
   date?: string | null;
@@ -754,8 +738,8 @@ export interface UsersSelect<T extends boolean = true> {
  * via the `definition` "tenants_select".
  */
 export interface TenantsSelect<T extends boolean = true> {
-  slug?: T;
   displayName?: T;
+  slug?: T;
   active?: T;
   features?: T;
   hns?:
@@ -835,7 +819,6 @@ export interface NewsSelect<T extends boolean = true> {
 export interface MediaSelect<T extends boolean = true> {
   tenant?: T;
   alt?: T;
-  caption?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -888,8 +871,8 @@ export interface MediaSelect<T extends boolean = true> {
  */
 export interface RosterSelect<T extends boolean = true> {
   tenant?: T;
-  displayName?: T;
   personId?: T;
+  displayName?: T;
   position?: T;
   displayOrder?: T;
   jerseyNumber?: T;
@@ -905,12 +888,10 @@ export interface RosterSelect<T extends boolean = true> {
 export interface EquipmentSelect<T extends boolean = true> {
   tenant?: T;
   displayName?: T;
-  name?: T;
   category?: T;
   price?: T;
   image?: T;
   externalUrl?: T;
-  description?: T;
   displayOrder?: T;
   featured?: T;
   active?: T;
@@ -971,7 +952,6 @@ export interface BoardMembersSelect<T extends boolean = true> {
   photo?: T;
   email?: T;
   phone?: T;
-  bio?: T;
   displayOrder?: T;
   updatedAt?: T;
   createdAt?: T;

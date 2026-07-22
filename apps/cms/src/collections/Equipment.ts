@@ -5,6 +5,7 @@ import { mediaField } from '../fields/media'
 
 export const Equipment = createCollection({
   slug: 'equipment',
+  labels: { singular: 'Proizvod (oprema)', plural: 'Oprema' },
   admin: {
     useAsTitle: 'displayName',
     defaultColumns: ['displayName', 'category', 'price', 'featured', 'active', 'displayOrder'],
@@ -12,22 +13,16 @@ export const Equipment = createCollection({
   fields: [
     {
       name: 'displayName',
+      label: 'Naziv',
       type: 'text',
       required: true,
       admin: {
-        description: 'Kratki naziv prikazan na kartici (npr. "Paket", "Polaris jakna")',
-      },
-    },
-    {
-      name: 'name',
-      type: 'text',
-      required: true,
-      admin: {
-        description: 'Pun naziv proizvoda (npr. "SNK Moslavac Popovača — paket")',
+        description: 'Naziv proizvoda prikazan na kartici (npr. "Dres domaći", "Polaris jakna").',
       },
     },
     {
       name: 'category',
+      label: 'Kategorija',
       type: 'select',
       required: true,
       options: [
@@ -40,23 +35,25 @@ export const Equipment = createCollection({
     },
     {
       name: 'price',
+      label: 'Cijena (EUR)',
       type: 'number',
       required: true,
       min: 0,
       admin: {
-        description: 'Cijena u EUR',
         step: 0.01,
       },
     },
     mediaField('image', {
-      description: 'Slika proizvoda (uploadaj u admin UI nakon kreiranja zapisa)',
+      label: 'Slika proizvoda',
+      description: 'Sliku uploadaj u galeriju i ovdje je odaberi.',
     }),
     {
       name: 'externalUrl',
+      label: 'Link na proizvod',
       type: 'text',
       required: true,
       admin: {
-        description: 'Direktan link na proizvod na alpas.hr (mora počinjati s http:// ili https://)',
+        description: 'Direktan link na proizvod u web trgovini (mora počinjati s http:// ili https://).',
       },
       validate: (value: string | null | undefined) => {
         if (!value) return 'Link je obavezan'
@@ -64,23 +61,17 @@ export const Equipment = createCollection({
         return true
       },
     },
-    {
-      name: 'description',
-      type: 'textarea',
-      admin: {
-        description: 'Opcionalni kratki opis proizvoda',
-      },
-    },
-    displayOrderField({ description: 'Redoslijed unutar kategorije (manji broj se prikazuje prvi)' }),
+    displayOrderField({ description: 'Redoslijed unutar kategorije (manji broj se prikazuje prvi).' }),
     {
       name: 'featured',
+      label: 'Istaknuto na naslovnici',
       type: 'checkbox',
       defaultValue: false,
       admin: {
         position: 'sidebar',
-        description: 'Prikaži u carouselu na naslovnici',
+        description: 'Prikaži proizvod u carouselu na naslovnici.',
       },
     },
-    activeField('Sakrij proizvod bez brisanja (ako je isključeno)'),
+    activeField('Isključi da sakriješ proizvod bez brisanja.'),
   ],
 })

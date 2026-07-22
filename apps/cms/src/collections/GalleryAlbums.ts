@@ -5,6 +5,7 @@ import { slugField } from '../fields/slug'
 
 /** Galerija — albumi fotografija (događaj → više slika). */
 export const GalleryAlbums = clubFeatureCollection('gallery', {
+  labels: { singular: 'Album', plural: 'Galerija (albumi)' },
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'date', 'displayOrder', 'tenant'],
@@ -12,25 +13,27 @@ export const GalleryAlbums = clubFeatureCollection('gallery', {
   fields: [
     {
       name: 'title',
+      label: 'Naziv albuma',
       type: 'text',
       required: true,
-      admin: { description: 'Naziv albuma.' },
     },
     slugField(),
     {
       name: 'date',
+      label: 'Datum',
       type: 'date',
       admin: {
         position: 'sidebar',
         date: { pickerAppearance: 'dayOnly' },
       },
     },
-    mediaField('coverImage', { description: 'Naslovna slika albuma.' }),
+    mediaField('coverImage', { label: 'Naslovna slika', description: 'Naslovna slika albuma.' }),
     {
       name: 'description',
+      label: 'Opis',
       type: 'textarea',
     },
-    mediaArrayField('photos', { withCaption: true }),
+    mediaArrayField('photos', { label: 'Fotografije', withCaption: true }),
     displayOrderField({ description: 'Redoslijed prikaza albuma (manji broj prvi).' }),
   ],
 })

@@ -6,6 +6,7 @@ import { displayOrderField } from '../fields/displayOrder'
  * Zasebna upload kolekcija jer Media prima samo slike (`image/*`).
  */
 export const Documents = clubFeatureCollection('documents', {
+  labels: { singular: 'Dokument', plural: 'Dokumenti' },
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'category', 'tenant'],
@@ -16,12 +17,14 @@ export const Documents = clubFeatureCollection('documents', {
   fields: [
     {
       name: 'title',
+      label: 'Naziv dokumenta',
       type: 'text',
       required: true,
-      admin: { description: 'Naziv dokumenta prikazan na stranici.' },
+      admin: { description: 'Naziv prikazan na stranici.' },
     },
     {
       name: 'category',
+      label: 'Kategorija',
       type: 'select',
       required: true,
       defaultValue: 'statut',
