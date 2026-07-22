@@ -10,9 +10,18 @@
  * NOTE: NEXT_PUBLIC_* values are inlined at build time, so the production build
  * must run with NEXT_PUBLIC_SITE_URL present (e.g. Vercel Production env var).
  */
+/**
+ * A trailing slash on the base URL leaks into every `${BASE_URL}/path`
+ * concatenation as a `//` double slash (sitemap `<loc>`, robots `Sitemap:`),
+ * so normalise it away regardless of how the env var was entered.
+ */
+function stripTrailingSlash(url: string): string {
+  return url.replace(/\/+$/, "");
+}
+
 export function getBaseUrl(): string {
   if (process.env.NEXT_PUBLIC_SITE_URL) {
-    return process.env.NEXT_PUBLIC_SITE_URL;
+    return stripTrailingSlash(process.env.NEXT_PUBLIC_SITE_URL);
   }
   if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
     return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
