@@ -8,27 +8,38 @@ import type {
 } from "@/types/hns";
 import { adaptCompetition, adaptMatch } from "./adapters";
 import { currentSeasonTag, getSeniorCompetitionFilter } from "./client";
-import { hnsList, hnsResource } from "./fetchResource";
+import { hnsList, hnsListResult, hnsResource } from "./fetchResource";
 import { isFinished } from "./matchStatus";
 import { fetchUpcomingMatches } from "./matches";
 
 const COMPETITIONS_TTL = 3600;
 
-export async function fetchCurrentSeasonCompetitions(): Promise<
-  Competition[]
-> {
-  const competitions = (
-    await hnsList<HnsCompetition>({
-      path: (teamId) => `/api/live/competition/list/active/${teamId}`,
-      tag: "competitions",
-      revalidate: COMPETITIONS_TTL,
-    })
-  )
-    .map(adaptCompetition)
-    .filter((competition): competition is Competition => competition !== null);
+/**
+ * Current-season competitions plus whether the HNS fetch succeeded. `ok: false`
+ * means the request failed (so callers can show "temporarily unavailable"
+ * instead of misreporting a failure as "no active competitions").
+ */
+export async function fetchCurrentSeasonCompetitionsResult(): Promise<{
+  competitions: Competition[];
+  ok: boolean;
+}> {
+  const { data, ok } = await hnsListResult<HnsCompetition>({
+    path: (teamId) => `/api/live/competition/list/active/${teamId}`,
+    tag: "competitions",
+    revalidate: COMPETITIONS_TTL,
+  });
 
   const seasonTag = currentSeasonTag();
-  return competitions.filter((c) => c.name.includes(seasonTag));
+  const competitions = data
+    .map(adaptCompetition)
+    .filter((competition): competition is Competition => competition !== null)
+    .filter((c) => c.name.includes(seasonTag));
+
+  return { competitions, ok };
+}
+
+export async function fetchCurrentSeasonCompetitions(): Promise<Competition[]> {
+  return (await fetchCurrentSeasonCompetitionsResult()).competitions;
 }
 
 export async function fetchSeniorCompetition(): Promise<Competition | null> {

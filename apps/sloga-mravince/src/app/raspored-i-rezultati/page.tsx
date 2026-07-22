@@ -7,7 +7,7 @@ import { toReadableCompetitionName } from "@/lib/helpers/competition";
 import { formatDateParts } from "@/lib/helpers/date";
 import {
   fetchAllCompetitionMatches,
-  fetchCurrentSeasonCompetitions,
+  fetchCurrentSeasonCompetitionsResult,
 } from "@/lib/hns/competitions";
 import { getSeniorCompetitionFilter } from "@/lib/hns/client";
 import { isFinished } from "@/lib/hns/matchStatus";
@@ -269,10 +269,11 @@ export default async function ScheduleResultsPage({ searchParams }: Props) {
   const { competitionId: competitionIdParam } = await searchParams;
   const competitionId = parseCompetitionId(competitionIdParam);
 
-  const [competitions, seniorFilter] = await Promise.all([
-    fetchCurrentSeasonCompetitions(),
-    getSeniorCompetitionFilter(),
-  ]);
+  const [{ competitions, ok: competitionsOk }, seniorFilter] =
+    await Promise.all([
+      fetchCurrentSeasonCompetitionsResult(),
+      getSeniorCompetitionFilter(),
+    ]);
   const selectedCompetition = selectCompetition({
     competitions,
     seniorFilter,
@@ -296,10 +297,12 @@ export default async function ScheduleResultsPage({ searchParams }: Props) {
           <div className="flex flex-col items-center justify-center border border-foreground/10 px-6 py-20 text-center clip-corner">
             <CalendarDays className="size-10 text-club-red" />
             <h2 className="mt-5 font-display text-4xl uppercase leading-none text-foreground">
-              Raspored uskoro
+              {competitionsOk ? "Raspored uskoro" : "Podaci nisu dostupni"}
             </h2>
             <p className="mt-4 max-w-md text-sm leading-relaxed text-muted-foreground">
-              Trenutno nema dostupnih natjecanja.
+              {competitionsOk
+                ? "Trenutno nema aktivnih natjecanja. Novi raspored objavljujemo pred početak sezone."
+                : "Raspored i rezultate trenutno ne možemo dohvatiti. Pokušajte ponovno kasnije."}
             </p>
           </div>
         ) : (

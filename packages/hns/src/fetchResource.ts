@@ -17,7 +17,15 @@ interface HnsSpec {
   teamFilter?: boolean;
 }
 
-async function hnsQuery<T>(spec: HnsSpec): Promise<T | null> {
+/**
+ * Runs the query and reports whether it succeeded, separately from the payload.
+ * `ok: false` means the transport threw (network/HTTP error) — distinct from a
+ * successful fetch that simply returned no data. Callers that must not present a
+ * failure as "empty" (e.g. the fixtures page) branch on `ok`.
+ */
+async function runHnsQuery<T>(
+  spec: HnsSpec,
+): Promise<{ data: T | null; ok: boolean }> {
   const teamId = await getHnsTeamId();
   let endpoint = spec.path(teamId);
   if (spec.teamFilter !== false) {
@@ -29,11 +37,23 @@ async function hnsQuery<T>(spec: HnsSpec): Promise<T | null> {
       revalidate: spec.revalidate,
       tags,
     });
-    return raw as T;
+    return { data: raw as T, ok: true };
   } catch (err) {
     console.error(`hnsFetch failed: ${endpoint}`, err);
-    return null;
+    return { data: null, ok: false };
   }
+}
+
+async function hnsQuery<T>(spec: HnsSpec): Promise<T | null> {
+  return (await runHnsQuery<T>(spec)).data;
+}
+
+function unwrapList<T>(
+  data: T[] | { result?: T[] } | null,
+  paginated?: boolean,
+): T[] {
+  if (!data) return [];
+  return paginated ? ((data as { result?: T[] }).result ?? []) : (data as T[]);
 }
 
 /** Fetch a single HNS resource. Resilient: returns null on error. */
@@ -50,6 +70,16 @@ export async function hnsList<T>(
   spec: HnsSpec & { paginated?: boolean },
 ): Promise<T[]> {
   const raw = await hnsQuery<T[] | { result?: T[] }>(spec);
-  if (!raw) return [];
-  return spec.paginated ? ((raw as { result?: T[] }).result ?? []) : (raw as T[]);
+  return unwrapList<T>(raw, spec.paginated);
+}
+
+/**
+ * Like `hnsList`, but also reports whether the fetch itself succeeded so callers
+ * can tell "HNS failed" apart from "HNS returned nothing".
+ */
+export async function hnsListResult<T>(
+  spec: HnsSpec & { paginated?: boolean },
+): Promise<{ data: T[]; ok: boolean }> {
+  const { data, ok } = await runHnsQuery<T[] | { result?: T[] }>(spec);
+  return { data: unwrapList<T>(data, spec.paginated), ok };
 }

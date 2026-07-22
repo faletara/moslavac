@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { runWithHnsContext } from "./context";
 import type { HnsFetchOptions, HnsTransport } from "./context";
-import { hnsList, hnsResource } from "./fetchResource";
+import { hnsList, hnsListResult, hnsResource } from "./fetchResource";
 
 type Call = { endpoint: string; opts?: HnsFetchOptions };
 
@@ -94,6 +94,33 @@ describe("hnsList", () => {
     );
 
     expect(result).toEqual([]);
+    expect(spy).toHaveBeenCalledOnce();
+    spy.mockRestore();
+  });
+});
+
+describe("hnsListResult", () => {
+  it("reports ok:true with the unwrapped data on success", async () => {
+    const { transport } = recorder({ result: [{ id: 1 }, { id: 2 }] });
+    const result = await runWithHnsContext(ctx(transport), () =>
+      hnsListResult<{ id: number }>({
+        path: () => `/api/live/x`,
+        revalidate: 60,
+        paginated: true,
+      }),
+    );
+    expect(result).toEqual({ data: [{ id: 1 }, { id: 2 }], ok: true });
+  });
+
+  it("reports ok:false with [] and logs when the transport errors", async () => {
+    const transport: HnsTransport = async () => {
+      throw new Error("boom");
+    };
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const result = await runWithHnsContext(ctx(transport), () =>
+      hnsListResult({ path: () => `/api/live/x`, revalidate: 60 }),
+    );
+    expect(result).toEqual({ data: [], ok: false });
     expect(spy).toHaveBeenCalledOnce();
     spy.mockRestore();
   });
