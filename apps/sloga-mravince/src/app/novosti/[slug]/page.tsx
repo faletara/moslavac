@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { formatDateLong } from "@/lib/helpers/date";
+import { htmlToMetaDescription } from "@/lib/helpers/text";
 import { fetchNewsBySlug } from "@/lib/payload/getNews";
 import { getTenant } from "@/lib/payload/getTenant";
 import { BASE_URL } from "@/lib/siteUrl";
@@ -22,7 +23,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   ]);
   if (!news) return {};
 
-  const description = news.excerpt ?? undefined;
+  // Fall back to a plain-text lead derived from the body so every article emits
+  // a meta description even when no explicit excerpt was entered in the CMS.
+  const description =
+    news.excerpt ??
+    (news.content ? htmlToMetaDescription(news.content) || undefined : undefined);
   const canonical = `/novosti/${news.slug ?? slug}`;
 
   return {
