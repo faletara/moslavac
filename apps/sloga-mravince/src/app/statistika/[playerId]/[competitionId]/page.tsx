@@ -7,7 +7,12 @@ import { getCometImageUrl } from "@/lib/api";
 import { fetchPlayerDetails, fetchPlayerStats } from "@/lib/hns/players";
 import { getTenant } from "@/lib/payload/getTenant";
 import type { PayloadMedia } from "@/lib/payload/types";
-import { parseTrailingId } from "@/lib/slug";
+import { BASE_URL } from "@/lib/siteUrl";
+import {
+  buildCompetitionSlug,
+  buildPlayerSlug,
+  parseTrailingId,
+} from "@/lib/slug";
 
 interface Props {
   params: Promise<{ playerId: string; competitionId: string }>;
@@ -61,6 +66,50 @@ export default async function PlayerStatsPage({ params }: Props) {
     playerStats?.competition?.name || null,
   ].filter(Boolean) as string[];
 
+  const canonical = `${BASE_URL}/statistika/${buildPlayerSlug({
+    personId: Number(personId),
+    name: playerDetails.name,
+  })}/${
+    playerStats?.competition
+      ? buildCompetitionSlug(playerStats.competition)
+      : competitionId
+  }`;
+
+  const athlete: Record<string, unknown> = {
+    "@type": "Person",
+    name: playerDetails.name,
+    ...(photoUrl ? { image: photoUrl } : {}),
+    ...(playerDetails.position ? { jobTitle: playerDetails.position } : {}),
+    memberOf: {
+      "@type": "SportsTeam",
+      name: tenant.displayName,
+      url: `${BASE_URL}/momcad`,
+    },
+  };
+
+  const jsonLd: Record<string, unknown>[] = [
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Početna", item: `${BASE_URL}/` },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Momčad",
+          item: `${BASE_URL}/momcad`,
+        },
+        { "@type": "ListItem", position: 3, name: playerDetails.name, item: canonical },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "ProfilePage",
+      url: canonical,
+      mainEntity: athlete,
+    },
+  ];
+
   const stats: PlayerStatsData = {
     appearances: playerStats?.matchesPlayed ?? 0,
     goals: playerStats?.goals ?? 0,
@@ -75,6 +124,14 @@ export default async function PlayerStatsPage({ params }: Props) {
 
   return (
     <div className="bg-background pb-20 sm:pb-28">
+      {jsonLd.map((schema) => (
+        <script
+          key={schema["@type"] as string}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        />
+      ))}
+
       <PlayerStatsHero
         firstName={first}
         lastName={last}

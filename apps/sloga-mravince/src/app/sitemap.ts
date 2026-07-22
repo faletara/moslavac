@@ -3,6 +3,7 @@ import {
   fetchAllCompetitionMatches,
   fetchCurrentSeasonCompetitions,
 } from "@/lib/hns/competitions";
+import { fetchNewsSitemapEntries } from "@/lib/payload/getNews";
 import { BASE_URL } from "@/lib/siteUrl";
 import { buildMatchSlug } from "@/lib/slug";
 import type { Match } from "@/types/hns";
@@ -48,9 +49,26 @@ async function matchEntries(fallback: Date): Promise<MetadataRoute.Sitemap> {
   }));
 }
 
+/**
+ * Every published news article. A failing fetch is swallowed (fetchList already
+ * returns [] on error) so the static routes still make it into the sitemap.
+ */
+async function newsEntries(fallback: Date): Promise<MetadataRoute.Sitemap> {
+  const entries = await fetchNewsSitemapEntries();
+  return entries.map((entry) => ({
+    url: `${BASE_URL}/novosti/${entry.slug}`,
+    lastModified: entry.updatedAt ? new Date(entry.updatedAt) : fallback,
+    changeFrequency: "monthly" as const,
+    priority: 0.5,
+  }));
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
-  const matches = await matchEntries(now).catch(() => []);
+  const [matches, news] = await Promise.all([
+    matchEntries(now).catch(() => []),
+    newsEntries(now).catch(() => []),
+  ]);
 
   return [
     {
@@ -77,6 +95,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "daily",
       priority: 0.8,
     },
+    ...news,
     ...matches,
   ];
 }

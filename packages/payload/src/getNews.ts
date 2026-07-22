@@ -89,3 +89,29 @@ export const fetchNewsById = (params: { id: string }): Promise<News | null> =>
     where: { "where[id][equals]": params.id },
     adapt: adaptNews,
   });
+
+/** Slug + timestamps only, for the sitemap. `depth: 0` and no lexical→HTML
+ * conversion keep it cheap even across the full news archive. */
+export interface NewsSitemapEntry {
+  slug: string;
+  date: string;
+  updatedAt: string;
+}
+
+export const fetchNewsSitemapEntries = (): Promise<NewsSitemapEntry[]> =>
+  fetchList<PayloadNews, NewsSitemapEntry | null>({
+    collection: "news",
+    sort: "-publishedAt",
+    limit: 1000,
+    depth: 0,
+    adapt: (doc) =>
+      doc.slug
+        ? {
+            slug: doc.slug,
+            date: doc.publishedAt ?? doc.createdAt,
+            updatedAt: doc.updatedAt ?? doc.publishedAt ?? doc.createdAt,
+          }
+        : null,
+  }).then((entries) =>
+    entries.filter((entry): entry is NewsSitemapEntry => entry !== null),
+  );
