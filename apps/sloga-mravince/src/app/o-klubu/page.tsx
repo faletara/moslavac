@@ -1,47 +1,38 @@
-import { ExternalLink, Mail, MapPin } from "lucide-react";
 import type { Metadata } from "next";
-import Link from "next/link";
+import Image from "next/image";
 import { InkPageHero } from "@/components/layout/InkPageHero";
+import { fetchPageByKey } from "@/lib/payload/getPages";
 import { getTenant } from "@/lib/payload/getTenant";
 import { BASE_URL } from "@/lib/siteUrl";
 
 export const revalidate = 3600;
 
-/**
- * Club history and facts. Content is deliberately anchored to stable,
- * sourced facts (founding, stadium, honours) rather than the current league
- * tier, which changes each season and would otherwise go stale here.
- */
-const HONOURS = [
-  { year: "2019.", title: "Prvak 1. ŽNL Splitsko-dalmatinske" },
-  { year: "2018.", title: "Osvajač Kupa NS Splitsko-dalmatinske županije" },
-  { year: "1970.", title: "Osvajač regionalnog kupa" },
-  { year: "1966./67.", title: "Prvak splitskog nogometnog podsaveza" },
-] as const;
+const PAGE_KEY = "povijest" as const;
+const FALLBACK_TITLE = "O klubu";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const tenant = await getTenant();
-  const description = `Povijest, stadion i uspjesi kluba ${tenant.displayName} — nogometni klub iz Mravinaca, osnovan 1925. godine.`;
+  const [page, tenant] = await Promise.all([
+    fetchPageByKey({ key: PAGE_KEY }),
+    getTenant(),
+  ]);
+  const title = page?.title ?? FALLBACK_TITLE;
+  const description =
+    page?.seoDescription ??
+    `Povijest i priča kluba ${tenant.displayName} — nogometni klub iz Mravinaca, osnovan 1925. godine.`;
 
   return {
-    title: "O klubu",
+    title,
     description,
     alternates: { canonical: "/o-klubu" },
-    openGraph: { title: `O klubu | ${tenant.displayName}`, description },
-    twitter: { title: `O klubu | ${tenant.displayName}`, description },
+    openGraph: { title: `${title} | ${tenant.displayName}`, description },
+    twitter: { title: `${title} | ${tenant.displayName}`, description },
   };
 }
 
 export default async function AboutPage() {
-  const tenant = await getTenant();
-  const name = tenant.displayName;
-  const address = tenant.contact?.address;
-  const city = tenant.contact?.city;
-  const region = tenant.contact?.region;
-  const email = tenant.contact?.email;
-  const facebook = tenant.social?.facebook;
-
-  const locationLine = [address, city, region].filter(Boolean).join(", ");
+  const page = await fetchPageByKey({ key: PAGE_KEY });
+  const title = page?.title ?? FALLBACK_TITLE;
+  const heroUrl = page?.heroImage?.sizes?.hero?.url ?? page?.heroImage?.url;
 
   const breadcrumb = {
     "@context": "https://schema.org",
@@ -51,7 +42,7 @@ export default async function AboutPage() {
       {
         "@type": "ListItem",
         position: 2,
-        name: "O klubu",
+        name: title,
         item: `${BASE_URL}/o-klubu`,
       },
     ],
@@ -64,142 +55,54 @@ export default async function AboutPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
       />
 
-      <InkPageHero title={["O", "klubu"]} watermark="1925" />
+      <InkPageHero title={page?.eyebrow ? [page.eyebrow, title] : [title]} watermark="1925" />
 
-      {/* Povijest */}
-      <section className="mx-auto max-w-4xl px-6 py-16 md:py-24 lg:px-8">
-        <p className="text-xs font-bold uppercase tracking-[0.3em] text-club-red">
-          Naša povijest
-        </p>
-        <h2 className="mt-4 font-display text-4xl uppercase leading-tight text-foreground sm:text-5xl">
-          Od 15. lipnja 1925.
-        </h2>
-        <div className="mt-8 space-y-5 text-base leading-relaxed text-foreground/80">
-          <p>
-            {name} osnovan je 15. lipnja 1925. godine u Mravincima, isprva pod
-            imenom <strong>Jadro</strong>. Osnivači kluba bili su profesor Ivo
-            Bućan, Albert Perko i skupina mjesnih srednjoškolaca.
+      <section className="mx-auto max-w-3xl px-6 py-16 md:py-24 lg:px-8">
+        {heroUrl && (
+          <figure className="relative mb-12 aspect-video w-full overflow-hidden clip-corner">
+            <Image
+              src={heroUrl}
+              alt={page?.heroImage?.alt || title}
+              fill
+              priority
+              sizes="(min-width: 768px) 768px, 100vw"
+              className="object-cover"
+            />
+          </figure>
+        )}
+
+        {page?.content ? (
+          <article
+            className="leading-relaxed text-foreground/85 [&_a]:text-club-red [&_a]:underline [&_h2]:mt-10 [&_h2]:font-display [&_h2]:text-3xl [&_h2]:uppercase [&_h2]:text-foreground [&_h3]:mt-6 [&_h3]:text-xl [&_h3]:font-semibold [&_img]:my-6 [&_img]:rounded-lg [&_li]:mt-1 [&_ol]:my-4 [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:my-4 [&_strong]:text-foreground [&_ul]:my-4 [&_ul]:list-disc [&_ul]:pl-6"
+            dangerouslySetInnerHTML={{ __html: page.content }}
+          />
+        ) : (
+          <p className="text-center text-xs font-bold uppercase tracking-[0.3em] text-muted-foreground">
+            Sadržaj uskoro.
           </p>
-          <p>
-            Kroz gotovo cijelo stoljeće klub je ostao u srcu Mravinca —
-            generacije igrača, navijača i klupskih ljudi izgradile su Slogu u
-            prepoznatljiv dio dalmatinske nogometne priče. Klupske boje su
-            crveno-bijele.
-          </p>
-        </div>
+        )}
       </section>
 
-      {/* Stadion Glavica */}
-      <section className="bg-ink-deep py-16 text-chalk md:py-24">
-        <div className="mx-auto max-w-4xl px-6 lg:px-8">
-          <p className="text-xs font-bold uppercase tracking-[0.3em] text-club-red">
-            Naš dom
-          </p>
-          <h2 className="mt-4 font-display text-4xl uppercase leading-tight sm:text-5xl">
-            Stadion Glavica
-          </h2>
-          <p className="mt-8 max-w-2xl text-base leading-relaxed text-chalk/70">
-            Domaće utakmice Sloga igra na stadionu Glavica u Mravincima.
-            Igralište je dovršeno 1974. godine, a stadion prima oko 1.000
-            gledatelja te uz teren okuplja klupske prostorije i pomoćne sadržaje.
-          </p>
-        </div>
-      </section>
-
-      {/* Uspjesi */}
-      <section className="mx-auto max-w-4xl px-6 py-16 md:py-24 lg:px-8">
-        <p className="text-xs font-bold uppercase tracking-[0.3em] text-club-red">
-          Trofeji
-        </p>
-        <h2 className="mt-4 font-display text-4xl uppercase leading-tight text-foreground sm:text-5xl">
-          Klupski uspjesi
-        </h2>
-        <ul className="mt-10 divide-y divide-foreground/10 border-y border-foreground/10">
-          {HONOURS.map((honour) => (
-            <li
-              key={`${honour.year}-${honour.title}`}
-              className="flex items-baseline gap-6 py-5"
-            >
-              <span className="w-24 shrink-0 font-display text-2xl tabular-nums text-club-red">
-                {honour.year}
-              </span>
-              <span className="text-base font-semibold uppercase tracking-wide text-foreground">
-                {honour.title}
-              </span>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {/* Lokacija i kontakt */}
-      <section className="bg-ink-deep py-16 text-chalk md:py-24">
-        <div className="mx-auto max-w-4xl px-6 lg:px-8">
-          <p className="text-xs font-bold uppercase tracking-[0.3em] text-club-red">
-            Kontakt
-          </p>
-          <h2 className="mt-4 font-display text-4xl uppercase leading-tight sm:text-5xl">
-            Gdje nas naći
-          </h2>
-          <div className="mt-10 grid gap-6 sm:grid-cols-2">
-            {locationLine && (
-              <div className="flex items-start gap-4">
-                <MapPin className="mt-0.5 size-5 shrink-0 text-club-red" />
-                <div>
-                  <p className="text-[0.62rem] font-black uppercase tracking-[0.2em] text-chalk/45">
-                    Adresa
-                  </p>
-                  <p className="mt-1 text-base text-chalk/85">{locationLine}</p>
-                </div>
-              </div>
-            )}
-            {email && (
-              <div className="flex items-start gap-4">
-                <Mail className="mt-0.5 size-5 shrink-0 text-club-red" />
-                <div>
-                  <p className="text-[0.62rem] font-black uppercase tracking-[0.2em] text-chalk/45">
-                    E-mail
-                  </p>
-                  <a
-                    href={`mailto:${email}`}
-                    className="mt-1 block text-base text-chalk/85 underline-offset-4 hover:text-chalk hover:underline"
-                  >
-                    {email}
-                  </a>
-                </div>
-              </div>
-            )}
-            {facebook && (
-              <div className="flex items-start gap-4">
-                <ExternalLink className="mt-0.5 size-5 shrink-0 text-club-red" />
-                <div>
-                  <p className="text-[0.62rem] font-black uppercase tracking-[0.2em] text-chalk/45">
-                    Društvene mreže
-                  </p>
-                  <a
-                    href={facebook}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-1 block text-base text-chalk/85 underline-offset-4 hover:text-chalk hover:underline"
-                  >
-                    Facebook
-                  </a>
-                </div>
-              </div>
-            )}
+      {page && page.gallery.length > 0 && (
+        <section className="mx-auto max-w-5xl px-6 pb-20 lg:px-8">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+            {page.gallery.map((media) => (
+              <figure
+                key={media.id}
+                className="group relative aspect-square overflow-hidden bg-muted"
+              >
+                <Image
+                  src={media.sizes?.card?.url ?? media.url}
+                  alt={media.alt || title}
+                  fill
+                  sizes="(min-width: 640px) 384px, 100vw"
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+              </figure>
+            ))}
           </div>
-
-          <p className="mt-12 text-sm text-chalk/60">
-            Želiš postati član ili navijati s tribina?{" "}
-            <Link
-              href="/novosti"
-              className="font-semibold text-chalk underline underline-offset-4"
-            >
-              Prati novosti
-            </Link>{" "}
-            i javi nam se.
-          </p>
-        </div>
-      </section>
+        </section>
+      )}
     </div>
   );
 }
