@@ -26,7 +26,8 @@ export default async function ContactPage() {
   const [tenant, club] = await Promise.all([getTenant(), fetchClubDetails()]);
   const name = tenant.displayName;
   const email = tenant.contact?.email ?? club?.email ?? null;
-  const phone = tenant.contact?.phone ?? club?.phone ?? club?.mobilePhone ?? null;
+  // Phone intentionally CMS-only — the HNS landline is unformatted/undesired.
+  const phone = tenant.contact?.phone ?? null;
   const facebook = tenant.social?.facebook ?? null;
   const iban = tenant.payment?.iban;
   const recipient = tenant.payment?.recipient;
