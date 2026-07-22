@@ -5,7 +5,19 @@ import type { PayloadFetchOptions, PayloadTransport } from "./context";
 // Resolved lazily rather than thrown at module load: the CMS imports this
 // shared data layer (transitively, via the HNS client) but never calls the
 // HTTP transport — it talks to Payload through the local API instead.
-const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL ?? "";
+/**
+ * A bare host without a scheme (e.g. `clubs-cms.vercel.app/api`, easy to paste
+ * into a Vercel env var) makes `fetch(`${base}${path}`)` throw `Invalid URL`
+ * and hard-fails the build. Prepend https:// so the value works either way; an
+ * empty value still errors clearly below.
+ */
+function normalizePayloadApiUrl(raw: string | undefined): string {
+  const trimmed = (raw ?? "").trim().replace(/\/+$/, "");
+  if (!trimmed) return "";
+  return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+}
+
+const PAYLOAD_API_URL = normalizePayloadApiUrl(process.env.PAYLOAD_API_URL);
 const PAYLOAD_API_KEY = process.env.PAYLOAD_API_KEY;
 
 /** Default production transport: the real HTTP call to Payload's REST API. */
