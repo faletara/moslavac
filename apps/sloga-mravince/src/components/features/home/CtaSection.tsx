@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { FadeInView } from "@/components/animations";
 import type { FrontendTenant } from "@/lib/payload/types";
 
@@ -9,15 +10,7 @@ import type { FrontendTenant } from "@/lib/payload/types";
 export default function CtaSection({ tenant }: { tenant: FrontendTenant }) {
   const clubName = tenant.branding?.shortName ?? tenant.displayName;
   const founded = tenant.branding?.founded ?? null;
-  const email = tenant.contact?.email ?? null;
   const phone = tenant.contact?.phone ?? null;
-  const facebook = tenant.social?.facebook ?? null;
-
-  const primary = email
-    ? { href: `mailto:${email}?subject=Učlanjenje u klub`, label: "Postani član" }
-    : facebook
-      ? { href: facebook, label: "Postani član" }
-      : null;
 
   return (
     <section className="relative isolate w-full overflow-hidden bg-ink-deep">
@@ -63,20 +56,18 @@ export default function CtaSection({ tenant }: { tenant: FrontendTenant }) {
           </p>
 
           <div className="mt-11 flex flex-wrap items-center gap-4">
-            {primary && (
-              <a
-                href={primary.href}
-                className="group inline-flex items-center gap-3 bg-club-red px-9 py-4 text-sm font-black uppercase tracking-[0.16em] text-white shadow-lg shadow-club-red/30 transition-colors duration-300 hover:bg-white hover:text-ink-deep"
+            <Link
+              href="/kontakt"
+              className="group inline-flex items-center gap-3 bg-club-red px-9 py-4 text-sm font-black uppercase tracking-[0.16em] text-white shadow-lg shadow-club-red/30 transition-colors duration-300 hover:bg-white hover:text-ink-deep"
+            >
+              Postani član
+              <span
+                aria-hidden
+                className="transition-transform duration-300 group-hover:translate-x-1"
               >
-                {primary.label}
-                <span
-                  aria-hidden
-                  className="transition-transform duration-300 group-hover:translate-x-1"
-                >
-                  →
-                </span>
-              </a>
-            )}
+                →
+              </span>
+            </Link>
             {phone && (
               <a
                 href={`tel:${phone.replace(/\s+/g, "")}`}
