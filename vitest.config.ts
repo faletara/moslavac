@@ -6,10 +6,12 @@ const here = (p: string) => fileURLToPath(new URL(p, import.meta.url));
 export default defineConfig({
   test: {
     environment: "node",
+    // Every Club app is covered by the same glob, so a new club is picked up
+    // without editing this file — divergence between clubs cannot hide from CI.
     include: [
       "packages/**/*.test.ts",
-      "apps/cms/src/access/**/*.test.ts",
-      "apps/moslavac/**/*.test.tsx",
+      "apps/*/src/**/*.test.ts",
+      "apps/*/src/**/*.test.tsx",
     ],
   },
   resolve: {
@@ -22,10 +24,26 @@ export default defineConfig({
         find: "@/components/animations",
         replacement: here("./packages/ui/src/animations/index.ts"),
       },
-      { find: "@/lib/utils", replacement: here("./apps/moslavac/src/lib/utils.ts") },
+      {
+        find: /^@\/components\/analytics\//,
+        replacement: here("./packages/ui/src/analytics/"),
+      },
+      { find: "@/lib/utils", replacement: here("./packages/ui/src/utils.ts") },
       { find: /^@\/types\//, replacement: here("./packages/types/src/") },
       { find: /^@\/lib\/payload\//, replacement: here("./packages/payload/src/") },
       { find: /^@\/lib\/hns\//, replacement: here("./packages/hns/src/") },
+      {
+        find: /^@\/lib\/app-shell\//,
+        replacement: here("./packages/app-shell/src/"),
+      },
+      {
+        find: /^@\/lib\/helpers\//,
+        replacement: here("./packages/lib/src/helpers/"),
+      },
+      {
+        find: /^@\/components\/ui\//,
+        replacement: here("./packages/ui/src/"),
+      },
     ],
   },
 });

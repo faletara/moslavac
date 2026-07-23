@@ -1,10 +1,10 @@
 import MatchesList from "@/components/features/competition/MatchesList";
-import { redirectToCanonical } from "@/lib/canonical";
+import { redirectToCanonical } from "@/lib/helpers/canonical";
 import {
   fetchCompetitionInfo,
   fetchCompetitionMatches,
 } from "@/lib/hns/competitions";
-import { buildCompetitionSlug, parseTrailingId } from "@/lib/slug";
+import { buildCompetitionSlug, parseTrailingId } from "@/lib/helpers/slug";
 
 interface Props {
   params: Promise<{ competitionId: string }>;

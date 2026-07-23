@@ -4,7 +4,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import { Fragment } from "react";
 import { RevealHeading } from "@/components/animations";
-import { getCometImageUrl } from "@/lib/api";
+import { getCometImageUrl } from "@/lib/hns/imageUrl";
 
 const EASE = [0.25, 0.1, 0.25, 1] as const;
 const EXPO_OUT = [0.16, 1, 0.3, 1] as const;

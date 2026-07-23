@@ -2,7 +2,7 @@
 
 Ova aplikacija je polazište za dodavanje novog kluba u monorepo. **Ne pokreće se u produkciji** — svrha joj je biti kopiran u `apps/<slug>/` i prilagođen.
 
-Template je **prazan Next.js app-shell** + kompletan data-sloj. Frontend (stranice, UI komponente, vizualni identitet) je namjerno prazan — gradiš ga od nule za svaki klub. Ostaje sve bitno za dohvat podataka: API rute, HNS i Payload integracija, te `api`/`serverApi` hookovi. Sve klub-specifične vrijednosti (ime, HNS key, kontakti…) dolaze iz Payload **Tenants** kolekcije. Referentnu, gotovu implementaciju frontenda imaš u `apps/moslavac`.
+Template je **prazan Next.js app-shell** + kompletan data-sloj. Frontend (stranice, UI komponente, vizualni identitet) je namjerno prazan — gradiš ga od nule za svaki klub. Ostaje sve bitno za dohvat podataka: API rute, HNS i Payload integracija, te podatkovni sloj `packages/payload` i `packages/hns`. Sve klub-specifične vrijednosti (ime, HNS key, kontakti…) dolaze iz Payload **Tenants** kolekcije. Referentnu, gotovu implementaciju frontenda imaš u `apps/moslavac`.
 
 ## Brzi start (preporučeno)
 
@@ -32,12 +32,12 @@ Zatim slijedi korake koje skripta ispiše (Tenant u CMS-u, API key, pokretanje).
    HNS_API_BASE=https://api-hns.analyticom.de
    ```
 5. **Pokreni:** `pnpm install && pnpm --filter @moslavac/<slug> dev`
-6. **Gradi frontend** u `apps/<slug>/src/app/` (prazan je): stranice, komponente, assete u `public/`, ikone. Podatke dohvaćaš preko `api.*` (klijent) / `serverApi.*` (server).
+6. **Gradi frontend** u `apps/<slug>/src/app/` (prazan je): stranice, komponente, assete u `public/`, ikone. Podatke dohvaćaš izravno iz `@/lib/payload/*` i `@/lib/hns/*` u server komponentama.
 7. **Deploy na Vercel:** novi projekt, `Root Directory: apps/<slug>`, postavi env vars (uključ. `NEXT_PUBLIC_SITE_URL` na pravu domenu), spoji domenu.
 
 ## Što template uključuje
 
-- **API sloj** (`src/lib/api/**`) — query-key factory pattern (vidi `.claude/rules/api-architecture.md`), `serverApi` za server komponente, `api` hookovi za klijent.
+- **Podatkovni sloj** (`packages/payload`, `packages/hns`) — server komponente ga zovu izravno; nema klijentskog dohvata (vidi `.claude/rules/api-architecture.md`).
 - **HNS integracija** (`src/lib/hns/**`) i **Payload integracija** (`src/lib/payload/**`, tenant resolution preko `PAYLOAD_TENANT_SLUG`).
 - **SEO baseline** — `app/sitemap.ts` (samo naslovnica — proširi kako dodaješ rute), `app/robots.ts`, `lib/siteUrl.ts`, `next.config.ts` headeri. Per-page metadata i schema.org gradiš sam.
 - **Slugovi** — `lib/slug.ts` (human-readable URL-ovi `/<slug>-<id>`, `parseTrailingId`).

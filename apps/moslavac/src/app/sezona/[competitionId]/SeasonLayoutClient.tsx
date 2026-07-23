@@ -1,6 +1,6 @@
 import SeasonTabsNav from "@/components/features/competition/SeasonTabsNav";
 import { PageHero } from "@/components/layout/PageHero";
-import { buildCompetitionSlug } from "@/lib/slug";
+import { buildCompetitionSlug } from "@/lib/helpers/slug";
 
 export default function SeasonLayoutClient({
   competitionId,

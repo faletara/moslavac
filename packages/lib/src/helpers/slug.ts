@@ -5,7 +5,7 @@ import type { Match } from "@/types/hns";
  *
  * The HNS API resolves matches, competitions and players ONLY by numeric id,
  * so those slugs carry the id as the trailing segment (e.g.
- * `moslavac-dinamo-zagreb-15-11-2024-101087009`) and `parseTrailingId` reads it
+ * `nas-klub-dinamo-zagreb-15-11-2024-101087009`) and `parseTrailingId` reads it
  * back out. Bare numeric ids keep working, so old URLs never break.
  */
 
@@ -45,15 +45,15 @@ export function buildMatchSlug(m: Match): string {
 }
 
 export function buildCompetitionSlug(c: {
-  id?: number | null;
-  name?: string | null;
+  id: number | null;
+  name: string | null;
 }): string {
   return c.id == null ? "" : `${slugify(c.name ?? "sezona")}-${c.id}`;
 }
 
 export function buildPlayerSlug(p: {
-  personId?: number | null;
-  name?: string | null;
+  personId: number | null;
+  name: string | null;
 }): string {
   return p.personId == null ? "" : `${slugify(p.name ?? "igrac")}-${p.personId}`;
 }

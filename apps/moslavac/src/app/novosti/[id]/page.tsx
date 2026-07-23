@@ -10,7 +10,7 @@ import {
   fetchNewsPaginated,
 } from "@/lib/payload/getNews";
 import { getTenant, tenantSlug } from "@/lib/payload/getTenant";
-import { redirectToCanonical } from "@/lib/canonical";
+import { redirectToCanonical } from "@/lib/helpers/canonical";
 import { BASE_URL } from "@/lib/siteUrl";
 
 interface Props {

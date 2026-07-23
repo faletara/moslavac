@@ -13,7 +13,6 @@ const raw = (over: Partial<RawBoard> = {}): RawBoard => ({
   photo: null,
   email: null,
   phone: null,
-  bio: null,
   displayOrder: 3,
   ...over,
 });
@@ -28,7 +27,6 @@ describe("adaptBoardMember", () => {
       photo: null,
       email: null,
       phone: null,
-      bio: null,
       displayOrder: 3,
     });
   });

@@ -17,9 +17,9 @@ import {
   fetchTeamStandings,
 } from "@/lib/hns/standings";
 import { formatDateTime } from "@/lib/helpers/date";
-import { redirectToCanonical } from "@/lib/canonical";
+import { redirectToCanonical } from "@/lib/helpers/canonical";
 import { BASE_URL } from "@/lib/siteUrl";
-import { buildMatchSlug, parseTrailingId } from "@/lib/slug";
+import { buildMatchSlug, parseTrailingId } from "@/lib/helpers/slug";
 
 interface Props {
   params: Promise<{ matchId: string }>;

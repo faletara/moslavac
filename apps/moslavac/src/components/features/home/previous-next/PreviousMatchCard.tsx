@@ -7,7 +7,7 @@ import { Fragment } from "react";
 import { FadeInView, RevealHeading } from "@/components/animations";
 import { formatDateTime } from "@/lib/helpers/date";
 import type { FormResult } from "@/lib/helpers/form";
-import { buildMatchSlug } from "@/lib/slug";
+import { buildMatchSlug } from "@/lib/helpers/slug";
 import type { Match } from "@/types/hns";
 import { TeamCrest } from "./TeamCrest";
 

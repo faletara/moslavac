@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { RevealHeading } from "@/components/animations";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { getCometImageUrl } from "@/lib/api";
+import { getCometImageUrl } from "@/lib/hns/imageUrl";
 import { fetchTeamDetails } from "@/lib/hns/team";
 import { getTenant } from "@/lib/payload/getTenant";
 import type { Facility } from "@/types/hns";

@@ -1,11 +1,11 @@
 import { HnsCrest } from "@/components/HnsCrest";
 import type { LineupPlayer, Lineups, Match, Team, TeamLineup } from "@/types/hns";
-import { EventIcon, eventKind } from "./EventIcon";
+import { EventIcon } from "./EventIcon";
 
 /** Znakovi golova/kartona/zamjena koje je igrač skupio, uz njegovo ime. */
 function PlayerEvents({ player }: { player: LineupPlayer }) {
   const kinds = player.events
-    .map((event) => eventKind(event.type?.name ?? ""))
+    .map((event) => event.kind)
     .filter((kind) => kind !== "other");
 
   if (kinds.length === 0) return null;

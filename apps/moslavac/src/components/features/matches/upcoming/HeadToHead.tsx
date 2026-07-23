@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getHeadToHead } from "@/lib/helpers/form";
 import { formatDateShort } from "@/lib/helpers/date";
-import { buildMatchSlug } from "@/lib/slug";
+import { buildMatchSlug } from "@/lib/helpers/slug";
 import { cn } from "@/lib/utils";
 import type { Match } from "@/types/hns";
 import { MatchTabHeading } from "../shared/MatchTabHeading";

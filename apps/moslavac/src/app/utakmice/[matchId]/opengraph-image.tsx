@@ -3,7 +3,7 @@ import { formatDateTime } from "@/lib/helpers/date";
 import { loadGoogleFont } from "@/lib/helpers/googleFont";
 import { fetchHnsCrestDataUri } from "@/lib/hns/images";
 import { fetchMatchInfo } from "@/lib/hns/matches";
-import { parseTrailingId } from "@/lib/slug";
+import { parseTrailingId } from "@/lib/helpers/slug";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";

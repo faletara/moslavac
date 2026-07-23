@@ -1,9 +1,10 @@
 import { soccerBall } from "@lucide/lab";
 import { ArrowLeftRight, Icon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { MatchEventKind } from "@/types/hns";
 
 interface EventIconProps {
-  typeName: string;
+  kind: MatchEventKind;
   className?: string;
   /** Colours the substitution arrow: green for on, red for off. */
   subDirection?: "in" | "out";
@@ -13,14 +14,8 @@ interface EventIconProps {
  * Single source of truth for event glyphs — used identically in the timeline
  * and the lineups so a goal/card/substitution always reads the same.
  */
-export function EventIcon({
-  typeName,
-  className,
-  subDirection,
-}: EventIconProps) {
-  const t = typeName.toLowerCase();
-
-  if (t.includes("žuti") || t.includes("zuti")) {
+export function EventIcon({ kind, className, subDirection }: EventIconProps) {
+  if (kind === "yellow") {
     return (
       <span
         role="img"
@@ -32,7 +27,7 @@ export function EventIcon({
       />
     );
   }
-  if (t.includes("crveni")) {
+  if (kind === "red") {
     return (
       <span
         role="img"
@@ -41,7 +36,7 @@ export function EventIcon({
       />
     );
   }
-  if (t.includes("zamjena")) {
+  if (kind === "sub") {
     return (
       <ArrowLeftRight
         aria-label={
@@ -62,22 +57,17 @@ export function EventIcon({
       />
     );
   }
-  const missedPenalty =
-    t.includes("neisko") || t.includes("promaš") || t.includes("promas");
-  if (
-    !missedPenalty &&
-    (t.includes("pogod") ||
-      t.includes("gol") ||
-      t.includes("goal") ||
-      t.includes("kazneni") ||
-      t.includes("penal"))
-  ) {
+  if (kind === "goal" || kind === "own-goal") {
     return (
       <Icon
         iconNode={soccerBall}
-        aria-label="Gol"
+        aria-label={kind === "own-goal" ? "Autogol" : "Gol"}
         strokeWidth={2}
-        className={cn("size-4", className)}
+        className={cn(
+          "size-4",
+          kind === "own-goal" && "text-red-500",
+          className,
+        )}
       />
     );
   }

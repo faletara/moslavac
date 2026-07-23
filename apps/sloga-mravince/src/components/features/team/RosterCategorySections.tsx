@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { buildPlayerSlug } from "@/lib/slug";
+import { buildPlayerSlug } from "@/lib/helpers/slug";
 import type { RosterEntry, RosterPosition } from "@/types/roster";
 
 export interface RosterCategoryGroup {

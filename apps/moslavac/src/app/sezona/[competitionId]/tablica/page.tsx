@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import StandingsTable from "@/components/features/competition/StandingsTable";
-import { redirectToCanonical } from "@/lib/canonical";
+import { redirectToCanonical } from "@/lib/helpers/canonical";
 import { fetchCompetitionInfo } from "@/lib/hns/competitions";
 import { fetchTeamStandings } from "@/lib/hns/standings";
 import { BASE_URL } from "@/lib/siteUrl";
-import { buildCompetitionSlug, parseTrailingId } from "@/lib/slug";
+import { buildCompetitionSlug, parseTrailingId } from "@/lib/helpers/slug";
 
 interface Props {
   params: Promise<{ competitionId: string }>;

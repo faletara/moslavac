@@ -13,8 +13,8 @@ const raw = (over: Partial<RawAlbum> = {}): RawAlbum => ({
   coverImage: { id: 1, url: "/cover.jpg", alt: "" },
   description: null,
   photos: [
-    { image: { id: 2, url: "/p1.jpg", alt: "" }, caption: "Prva" },
-    { image: 99, caption: null }, // unpopulated relation → dropped
+    { id: 2, url: "/p1.jpg", alt: "" },
+    99, // unpopulated relation → dropped
   ],
   ...over,
 });
@@ -38,9 +38,11 @@ describe("adaptAlbum", () => {
     const album = adaptAlbum(raw());
     expect(album.coverImage).toEqual({ id: 1, url: "/cover.jpg", alt: "" });
     expect(album.photos).toHaveLength(1);
+    // `caption` je uklonjen kao editorsko polje (ADR-0001), ali ostaje u
+    // domenskom tipu kao uvijek-null dok se ne prikazuje na frontendu.
     expect(album.photos[0]).toEqual({
       image: { id: 2, url: "/p1.jpg", alt: "" },
-      caption: "Prva",
+      caption: null,
     });
   });
 

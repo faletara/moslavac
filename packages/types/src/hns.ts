@@ -227,9 +227,22 @@ export interface PlayerSearchResult {
   shirtNumber: number | null;
 }
 
+/**
+ * Semantic classification of a match event, derived from the free-text HNS
+ * type name so components never parse that text themselves.
+ */
+export type MatchEventKind =
+  | "goal"
+  | "own-goal"
+  | "yellow"
+  | "red"
+  | "sub"
+  | "other";
+
 export interface MatchEvent {
   id: number | null;
   type: MatchEventType;
+  kind: MatchEventKind;
   phase: MatchPhase | null;
   phaseMinute: number | null;
   minute: number | null;

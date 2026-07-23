@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { getCometImageUrl } from "@/lib/api";
+import { getCometImageUrl } from "@/lib/hns/imageUrl";
 import { cn } from "@/lib/utils";
 
 interface HnsCrestProps {

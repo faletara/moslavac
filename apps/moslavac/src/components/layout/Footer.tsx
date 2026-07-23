@@ -21,6 +21,7 @@ export default function Footer({ tenant }: FooterProps) {
   const email = tenant.contact?.email;
   const phone = tenant.contact?.phone;
   const address = tenant.contact?.address;
+  const city = tenant.contact?.city;
   const logo =
     tenant.branding?.logo && typeof tenant.branding.logo === "object"
       ? (tenant.branding.logo as PayloadMedia)
@@ -165,18 +166,20 @@ export default function Footer({ tenant }: FooterProps) {
           </StaggerItem>
 
           <StaggerItem className="space-y-5 border-t border-border/60 py-10 md:border-t-0 md:pl-10">
-            <div className="flex items-baseline gap-3 text-[0.6rem] font-medium uppercase tracking-[0.4em] text-muted-foreground">
-              <span>Klub od 1933.</span>
-            </div>
+            {founded && (
+              <div className="flex items-baseline gap-3 text-[0.6rem] font-medium uppercase tracking-[0.4em] text-muted-foreground">
+                <span>Klub od {founded}.</span>
+              </div>
+            )}
             <div className="space-y-3 text-sm leading-relaxed">
               {motto && (
                 <p className="font-serif italic text-muted-foreground">
                   &ldquo;{motto}&rdquo;
                 </p>
               )}
-              {founded && (
+              {(founded || city) && (
                 <p className="text-[0.6rem] font-medium uppercase tracking-[0.4em] text-muted-foreground">
-                  {founded}, Popovača
+                  {[founded, city].filter(Boolean).join(", ")}
                 </p>
               )}
             </div>

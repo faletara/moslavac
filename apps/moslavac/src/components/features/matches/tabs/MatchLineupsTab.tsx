@@ -5,7 +5,7 @@ import { FadeInView } from "@/components/animations";
 import { HnsCrest } from "@/components/HnsCrest";
 import { useOurTeamId } from "@/components/providers/TenantProvider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { buildPlayerSlug } from "@/lib/slug";
+import { buildPlayerSlug } from "@/lib/helpers/slug";
 import type { Lineups, Match, LineupPlayer } from "@/types/hns";
 import { MatchTabHeading } from "../shared/MatchTabHeading";
 

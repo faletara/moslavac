@@ -3,7 +3,7 @@ import Link from "next/link";
 import { FadeInView } from "@/components/animations";
 import { HnsCrest } from "@/components/HnsCrest";
 import { formatDateParts } from "@/lib/helpers/date";
-import { buildMatchSlug } from "@/lib/slug";
+import { buildMatchSlug } from "@/lib/helpers/slug";
 import { cn } from "@/lib/utils";
 import type { Match, MatchSlots } from "@/types/hns";
 import Countdown from "./Countdown";

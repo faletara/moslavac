@@ -12,7 +12,7 @@ import {
 import { getSeniorCompetitionFilter } from "@/lib/hns/client";
 import { isFinished } from "@/lib/hns/matchStatus";
 import { getTenant } from "@/lib/payload/getTenant";
-import { buildMatchSlug } from "@/lib/slug";
+import { buildMatchSlug } from "@/lib/helpers/slug";
 import type { Competition, Match } from "@/types/hns";
 
 export const revalidate = 300;

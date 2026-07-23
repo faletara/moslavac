@@ -12,7 +12,7 @@ import {
   isYellowCardEvent,
   type ScoreSnapshot,
 } from "@/lib/helpers/events";
-import { buildPlayerSlug } from "@/lib/slug";
+import { buildPlayerSlug } from "@/lib/helpers/slug";
 import { cn } from "@/lib/utils";
 import type { Match, MatchEvent } from "@/types/hns";
 import { EventIcon } from "../shared/EventIcon";
@@ -187,7 +187,7 @@ function EventNode({ event, goal }: { event: MatchEvent; goal: boolean }) {
       )}
     >
       <EventIcon
-        typeName={event.type.name}
+        kind={event.kind}
         className={goal ? "size-[1.15rem]" : undefined}
       />
     </span>

@@ -11,7 +11,7 @@ import {
   buildCompetitionSlug,
   buildMatchSlug,
   buildPlayerSlug,
-} from "@/lib/slug";
+} from "@/lib/helpers/slug";
 
 export const revalidate = 3600;
 

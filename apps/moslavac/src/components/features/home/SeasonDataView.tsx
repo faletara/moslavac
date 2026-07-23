@@ -9,7 +9,7 @@ import {
 	RevealHeading,
 } from "@/components/animations";
 import { HnsCrest } from "@/components/HnsCrest";
-import { buildCompetitionSlug, buildPlayerSlug } from "@/lib/slug";
+import { buildCompetitionSlug, buildPlayerSlug } from "@/lib/helpers/slug";
 import { cn } from "@/lib/utils";
 import type { Competition, CompetitionPlayerStat, TeamRanking } from "@/types/hns";
 

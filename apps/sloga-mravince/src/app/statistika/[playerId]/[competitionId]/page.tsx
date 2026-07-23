@@ -3,7 +3,7 @@ import PlayerStatsBoard, {
   type PlayerStatsData,
 } from "@/components/features/players/PlayerStatsBoard";
 import PlayerStatsHero from "@/components/features/players/PlayerStatsHero";
-import { getCometImageUrl } from "@/lib/api";
+import { getCometImageUrl } from "@/lib/hns/imageUrl";
 import { fetchPlayerDetails, fetchPlayerStats } from "@/lib/hns/players";
 import { getTenant } from "@/lib/payload/getTenant";
 import type { PayloadMedia } from "@/lib/payload/types";
@@ -12,7 +12,7 @@ import {
   buildCompetitionSlug,
   buildPlayerSlug,
   parseTrailingId,
-} from "@/lib/slug";
+} from "@/lib/helpers/slug";
 
 interface Props {
   params: Promise<{ playerId: string; competitionId: string }>;

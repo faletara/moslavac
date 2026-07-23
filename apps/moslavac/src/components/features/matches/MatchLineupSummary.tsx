@@ -11,7 +11,7 @@ import {
   isSubstitutionEvent,
   isYellowCardEvent,
 } from "@/lib/helpers/events";
-import { buildPlayerSlug } from "@/lib/slug";
+import { buildPlayerSlug } from "@/lib/helpers/slug";
 import { cn } from "@/lib/utils";
 import type {
   Match,
@@ -281,7 +281,7 @@ function PlayerEvents({
           >
             {minute}&apos;
             <EventIcon
-              typeName={e.type.name}
+              kind={e.kind}
               subDirection={sub ? (isStarter ? "out" : "in") : undefined}
             />
           </span>

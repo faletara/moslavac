@@ -24,13 +24,18 @@ The deep, shared modules every Club app consumes (see `packages/README.md`):
 - **types** — domain types, the single source of truth (`News`, `Equipment`, …).
 - **payload** — Payload CMS data layer; fetchers return domain types.
 - **hns** — HNS (Croatian Football Federation) API client + fetchers.
-- **api** — client-side React Query hooks + query keys.
+- **app-shell** — providers, shell routes, feedback states, and the club
+  identity projection (`buildClubMetadata`, `ClubJsonLd`).
+- **lib** — framework-free helpers shared by every Club app.
+- **ui** — shadcn primitives plus shared app-level components.
+- **pwa** — web app manifest builder; **ai** — Lexical rich-text helpers.
 
 ## Data layer terms
 
 - **Domain type** — the shape a component consumes (`News`), distinct from the
   raw **Payload doc** / **HNS payload**. Mapping from raw → domain lives inside
   the `payload`/`hns` fetchers (no separate public adapter module).
-- **Two data paths** — server components call `packages/payload` & `packages/hns`
-  directly; client components use `api` hooks → route handler → same lib. See
+- **One data path** — server components call `packages/payload` & `packages/hns`
+  directly; nothing fetches data from the browser. The single route handler that
+  serves the browser is `/api/images/[uuid]`, which proxies HNS crest bytes. See
   each app's `.claude/rules/api-architecture.md`.

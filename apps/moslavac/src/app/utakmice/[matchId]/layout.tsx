@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getCometImageUrl } from "@/lib/api/images";
+import { getCometImageUrl } from "@/lib/hns/imageUrl";
 import {
   fetchAllCompetitionMatches,
   fetchCurrentSeasonCompetitions,
@@ -8,7 +8,7 @@ import { fetchMatchInfo } from "@/lib/hns/matches";
 import { formatDateTime } from "@/lib/helpers/date";
 import { getTenant } from "@/lib/payload/getTenant";
 import { BASE_URL } from "@/lib/siteUrl";
-import { buildMatchSlug, parseTrailingId } from "@/lib/slug";
+import { buildMatchSlug, parseTrailingId } from "@/lib/helpers/slug";
 import type { Match } from "@/types/hns";
 
 interface Params {

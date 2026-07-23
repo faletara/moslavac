@@ -141,7 +141,7 @@ export default function MatchEventBar({
                 }}
               >
                 <span title={label} className="block">
-                  <EventIcon typeName={e.type.name} />
+                  <EventIcon kind={e.kind} />
                 </span>
                 {/* Hover tooltip (desktop) */}
                 <span

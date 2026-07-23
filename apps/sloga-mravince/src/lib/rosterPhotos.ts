@@ -1,5 +1,5 @@
 import "server-only";
-import { getCometImageUrl } from "@/lib/api";
+import { getCometImageUrl } from "@/lib/hns/imageUrl";
 import { fetchPlayerDetails } from "@/lib/hns/players";
 import type { RosterEntry } from "@/types/roster";
 

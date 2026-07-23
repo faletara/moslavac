@@ -1,39 +1,8 @@
 import { ArrowLeftRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { MatchEventKind } from "@/types/hns";
 
-export type EventKind = "goal" | "own-goal" | "yellow" | "red" | "sub" | "other";
-
-/**
- * HNS names event types in free text, and the wording drifts between
- * competitions ("Pogodak", "Gol", "Kazneni udarac"). Match on substrings rather
- * than an id table so an unseen phrasing degrades to `other` instead of
- * throwing away the event.
- */
-export function eventKind(typeName: string): EventKind {
-  const t = typeName.toLowerCase();
-
-  if (t.includes("žuti") || t.includes("zuti")) return "yellow";
-  if (t.includes("crveni")) return "red";
-  if (t.includes("zamjena") || t.includes("izmjena")) return "sub";
-  if (t.includes("autogol") || t.includes("vlastita")) return "own-goal";
-
-  // "Neiskorišten kazneni udarac" must not read as a goal.
-  const missed =
-    t.includes("neisko") || t.includes("promaš") || t.includes("promas");
-  if (
-    !missed &&
-    (t.includes("pogod") ||
-      t.includes("gol") ||
-      t.includes("kazneni") ||
-      t.includes("penal"))
-  ) {
-    return "goal";
-  }
-
-  return "other";
-}
-
-const LABEL: Record<EventKind, string> = {
+const LABEL: Record<MatchEventKind, string> = {
   goal: "Gol",
   "own-goal": "Autogol",
   yellow: "Žuti karton",
@@ -50,7 +19,7 @@ export function EventIcon({
   kind,
   className,
 }: {
-  kind: EventKind;
+  kind: MatchEventKind;
   className?: string;
 }) {
   const label = LABEL[kind];

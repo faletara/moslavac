@@ -114,3 +114,109 @@ Work the **frontier**: može se uzeti bilo koji ticket čiji su blokirajući tic
 - [ ] Početna je vizualno i funkcionalno provjerena na mobitelu, tabletu, malom laptopu i širokom desktopu.
 - [ ] Statički i browser dizajnerski detektori nemaju neriješene kritične nalaze; namjerni izuzeci su dokumentirani.
 - [ ] Nova Impeccable kritika spremljena je kao trend snapshot i uspoređena s početnom ocjenom 29/40.
+
+---
+
+# Produbljivanje platformskog sloja
+
+Ticketi iz arhitektonskog pregleda (23. 7. 2026.). Cilj je pomaknuti logiku koja se
+kopirala po Club appovima iza postojećih seamova u `packages/`, kako bi se promjena,
+bug i verifikacija koncentrirali na jedno mjesto.
+
+`packages/payload` i `packages/hns` su referentni duboki moduli — mala sučelja,
+mapiranje raw → domenski tip skriveno unutra, testirano kroz interface preko
+injektiranog transporta. Ticketi ispod primjenjuju isti obrazac na ono što je
+ostalo iznad njih.
+
+## Identitet kluba projicira se u &lt;head&gt; iz jednog modula
+
+**What to build:** Metadata i schema.org podaci svakog Club appa izvode se iz Tenant zapisa kroz jedan zajednički modul, umjesto da se iznova grade u svakom `layout.tsx`.
+
+**Blocked by:** None — can start immediately.
+
+- [x] Naziv, opis, OG/twitter podaci i canonical URL svakog kluba izvode se iz Tenanta kroz jedno zajedničko sučelje.
+- [x] Organizacijski i website schema.org podaci prisutni su u svakom Club appu, uključujući nk-vrapce.
+- [ ] Nijedan app ne sadrži hardkodiran naziv mjesta, županije ili drugog klupskog podatka koji Tenant već nosi.
+      <!-- djelomično: mjesto/županija riješeni; klupska imena još su tvrdo kodirana u opisima stranica, alt tekstovima i footerima -->
+- [x] Klub bez popunjenog grada ili regije proizvodi valjan izlaz bez praznih ili izmišljenih polja.
+- [x] `layout.tsx` po appu zadržava samo ono što je stvarno klupsko: fontove i vizualni omotač.
+- [x] Provjera nad izvedbom metapodataka izvodi se jednom i vrijedi za sve klubove.
+- [x] Dodavanje novog kluba ne zahtijeva kopiranje logike metapodataka.
+
+## Vrsta utakmičnog događaja određuje se iza hns sučelja
+
+**What to build:** Prepoznavanje vrste događaja iz HNS podataka (žuti karton, crveni karton, izmjena, gol, autogol) živi jednom u podatkovnom sloju, dok Club appovi biraju samo vizualni prikaz.
+
+**Blocked by:** None — can start immediately.
+
+- [x] Domenski tip utakmičnog događaja nosi prepoznatu vrstu, a ne samo sirovi tekstualni naziv iz HNS-a.
+- [x] Autogol se u svakom Club appu razlikuje od običnog gola.
+- [x] Sve poznate varijante naziva izmjene prepoznaju se kao izmjena, neovisno o appu.
+- [x] Nepoznata vrsta događaja proizvodi definirano neutralno stanje umjesto tihog pogrešnog prikaza.
+- [x] Club appovi sadrže samo preslikavanje prepoznate vrste u vizualni prikaz; parsiranje teksta u njima više ne postoji.
+- [x] Provjera pokriva tablicu naziv → vrsta na jednom mjestu.
+- [ ] Vizualni identitet ikona po klubu ostaje nepromijenjen.
+      <!-- moslavac: autogol sada dobiva crveni ton (prije se prikazivao kao običan gol) — treba potvrda dizajna -->
+
+## Podatkovni put opisan je onako kako stvarno radi
+
+**What to build:** Dokumentacija i kod slažu se oko toga kako aplikacije dohvaćaju podatke, umjesto da opisuju klijentski put koji nije implementiran.
+
+**Blocked by:** None — can start immediately.
+
+- [x] Opis podatkovnog puta u projektnoj dokumentaciji odgovara onome što kod stvarno radi.
+- [x] Ne postoji paket, provider ili pravilo koje opisuje mogućnost bez ijednog korisnika u kodu.
+- [x] Pomoćna funkcija za HNS slike živi uz ostatak HNS sloja koji te slike poslužuje.
+- [x] Uklanjanje neiskorištene infrastrukture ne mijenja ponašanje nijednog Club appa.
+- [x] Novi razvijatelj ili agent iz dokumentacije dobiva jedan točan put, bez proturječja između kopija pravila.
+- [x] Ako se klijentski put kasnije uvede, dokumentiran je tek kad postoji zajednički modul koji ga podržava.
+
+## Zajednički helperi žive u platformskom sloju
+
+**What to build:** Pomoćni kod koji je danas identičan u svim Club appovima održava se na jednom mjestu, a appovi zadržavaju samo ono što okvir nužno traži na svojoj putanji.
+
+**Blocked by:** None — can start immediately.
+
+- [x] Pomoćne funkcije koje su danas identične u više appova postoje samo u jednoj izvedbi.
+- [x] Datoteke koje Next zahtijeva na točnoj putanji ostaju u appu, ali bez vlastite logike.
+- [x] Razlike koje su stvarno klupske i dalje su izražive bez kopiranja cijelog modula.
+- [ ] Svi Club appovi nakon promjene ponašaju se jednako kao prije.
+      <!-- resolveBaseUrl sada uklanja završnu kosu crtu i za moslavac/nk-vrapce/template (prije samo sloga) — ispravak, ali promjena ponašanja -->
+- [x] Zajednički helperi pokriveni su provjerom koja vrijedi za sve klubove.
+- [x] Novi klub dobiva ove mogućnosti bez kopiranja datoteka.
+
+## Testna konfiguracija pokriva sve Club appove
+
+**What to build:** Automatizirane provjere obuhvaćaju svaki Club app, tako da razilaženje između klubova više ne može proći neprimijećeno.
+
+**Blocked by:** None — can start immediately.
+
+- [x] Testna konfiguracija uključuje sve postojeće Club appove, ne samo moslavac.
+- [x] Dodavanje novog kluba ne zahtijeva ručnu izmjenu testne konfiguracije.
+- [x] Postojeće provjere i dalje prolaze i ne usporavaju se neprihvatljivo.
+- [x] Provjera koja bi uhvatila razilaženje između klubova postoji barem za jedan zajednički modul.
+
+## nk-vrapce prati istu platformsku razinu kao ostali klubovi
+
+**What to build:** Najstariji Club app dobiva iste platformske mogućnosti koje ostali appovi i scaffold već imaju, a organizacija koda slijedi zajedničku konvenciju.
+
+**Blocked by:** Identitet kluba projicira se u <head> iz jednog modula; Zajednički helperi žive u platformskom sloju.
+
+- [ ] nk-vrapce ima iste platformske mogućnosti kao ostali Club appovi.
+- [ ] Raspored značajki u kodu slijedi istu konvenciju kao ostali appovi.
+- [ ] Zaostatak koji su riješili prethodni ticketi ne rješava se ponovno ručno.
+- [ ] Vizualni identitet i sadržaj nk-vrapca ostaju nepromijenjeni.
+- [ ] Scaffold za nove klubove i live appovi opisuju istu razinu mogućnosti.
+
+## Aritmetika oko utakmica i tablice izvodi se jednom
+
+**What to build:** Izvođenje podataka za tablicu, formu i vremensku crtu događaja živi u podatkovnom sloju, dok svaki klub zadržava vlastiti vizualni prikaz.
+
+**Blocked by:** Vrsta utakmičnog događaja određuje se iza hns sučelja.
+
+- [ ] Izvođenje redaka tablice, isticanje vlastite momčadi i grupiranje događaja postoji u jednoj izvedbi.
+- [ ] Club appovi troše pripremljene podatke i odlučuju samo o prikazu.
+- [ ] Rubni slučajevi (bez tablice, bez događaja, momčad nije u tablici) ponašaju se jednako u svim klubovima.
+- [ ] Vizualni identitet prikaza po klubu ostaje nepromijenjen.
+- [ ] Izvođenje podataka pokriveno je provjerom na razini podatkovnog sloja.
+- [ ] Zajednički JSX se ne uvodi; dijeli se samo izvođenje podataka.

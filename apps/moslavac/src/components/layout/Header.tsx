@@ -25,7 +25,7 @@ import {
 	groupByCompetitionCategory,
 	toReadableCompetitionName,
 } from "@/lib/helpers/competition";
-import { buildCompetitionSlug } from "@/lib/slug";
+import { buildCompetitionSlug } from "@/lib/helpers/slug";
 import type { FrontendTenant, PayloadMedia } from "@/lib/payload/types";
 import type { Competition } from "@/types/hns";
 import { cn } from "@/lib/utils";

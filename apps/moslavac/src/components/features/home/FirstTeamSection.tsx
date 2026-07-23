@@ -1,8 +1,8 @@
-import { getCometImageUrl } from "@/lib/api";
+import { getCometImageUrl } from "@/lib/hns/imageUrl";
 import { fetchSeniorCompetition } from "@/lib/hns/competitions";
 import { fetchPlayerDetails } from "@/lib/hns/players";
 import { fetchRoster } from "@/lib/payload/getRoster";
-import { buildPlayerSlug } from "@/lib/slug";
+import { buildPlayerSlug } from "@/lib/helpers/slug";
 import type { RosterEntry } from "@/types/roster";
 import FirstTeamCarousel, {
 	type FirstLineupPlayer,

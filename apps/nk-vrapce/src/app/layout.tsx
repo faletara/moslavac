@@ -7,6 +7,8 @@ import Footer from "@/components/layout/Footer";
 import FooterReveal from "@/components/layout/FooterReveal";
 import Header from "@/components/layout/Header";
 import Providers from "@/components/providers/Providers";
+import ClubJsonLd from "@/lib/app-shell/identity/ClubJsonLd";
+import { buildClubMetadata } from "@/lib/app-shell/identity/clubIdentity";
 import { getClubContact } from "@/lib/club/getClubContact";
 import { getTenant } from "@/lib/payload/getTenant";
 import { BASE_URL } from "@/lib/siteUrl";
@@ -22,14 +24,9 @@ const saira = Saira_Condensed({
   weight: ["500", "600", "700", "800"],
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(BASE_URL),
-  title: {
-    default: "NK Vrapče",
-    template: "%s | NK Vrapče",
-  },
-  description: "Službena web stranica nogometnog kluba NK Vrapče.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildClubMetadata({ tenant: await getTenant(), baseUrl: BASE_URL });
+}
 
 export default async function RootLayout({
   children,
@@ -44,6 +41,7 @@ export default async function RootLayout({
   return (
     <html lang="hr" className={`${geistSans.variable} ${saira.variable}`}>
       <body>
+        <ClubJsonLd tenant={tenant} baseUrl={BASE_URL} />
         <Providers tenant={tenant}>
           {/* Sadržaj klizi preko footera — neprozirni bijeli sloj iznad (z-10),
               s donjim razmakom jednakim visini footera da ga zadnji scroll otkrije. */}

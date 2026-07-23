@@ -6,7 +6,7 @@ import {
   buildCompetitionSlug,
   buildPlayerSlug,
   parseTrailingId,
-} from "@/lib/slug";
+} from "@/lib/helpers/slug";
 
 interface Params {
   playerId: string;

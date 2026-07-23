@@ -7,7 +7,7 @@ import { fetchRoster } from "@/lib/payload/getRoster";
 import { getTenant } from "@/lib/payload/getTenant";
 import { resolveCometPhotoUrls } from "@/lib/rosterPhotos";
 import { BASE_URL } from "@/lib/siteUrl";
-import { buildCompetitionSlug } from "@/lib/slug";
+import { buildCompetitionSlug } from "@/lib/helpers/slug";
 import type { PayloadMedia } from "@/lib/payload/types";
 import type { RosterEntry, RosterPosition } from "@/types/roster";
 

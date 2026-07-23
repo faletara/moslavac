@@ -12,7 +12,7 @@ import {
   getCompetitionCategory,
 } from "@/lib/helpers/competition";
 import { formatDateParts } from "@/lib/helpers/date";
-import { buildMatchSlug } from "@/lib/slug";
+import { buildMatchSlug } from "@/lib/helpers/slug";
 import type { Match } from "@/types/hns";
 
 const OUR_TEAM_KEYWORD = "moslavac";

@@ -4,7 +4,7 @@ import {
   fetchCurrentSeasonCompetitions,
 } from "@/lib/hns/competitions";
 import { BASE_URL } from "@/lib/siteUrl";
-import { buildCompetitionSlug, parseTrailingId } from "@/lib/slug";
+import { buildCompetitionSlug, parseTrailingId } from "@/lib/helpers/slug";
 import SeasonLayoutClient from "./SeasonLayoutClient";
 
 interface Params {

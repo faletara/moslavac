@@ -1,19 +1,31 @@
 # Shared packages
 
-The platform layer that every club frontend (`apps/moslavac`, `apps/nk-vrapce`,
-`apps/template`) shares. Previously each app carried a byte-identical copy of all
-of this; it now lives here once.
+The platform layer that every club frontend (`apps/moslavac`, `apps/sloga-mravince`,
+`apps/nk-vrapce`, `apps/template`) shares. Previously each app carried a
+byte-identical copy of all of this; it now lives here once.
 
 | Package         | Concern                                                              |
 | --------------- | ------------------------------------------------------------------- |
 | `types/`        | Domain types — single source of truth (`News`, `Equipment`, HNS, …) |
 | `payload/`      | Payload CMS data layer (`getNews`, `getTenant`, `getPages`, …)      |
 | `hns/`          | HNS (Croatian FA) API client + fetchers (matches, standings, …)     |
-| `api/`          | Client-side React Query hooks + query keys (`api`, `queries`)       |
-| `ui/`           | shadcn UI primitives (`button`, `card`, …); radius is theme-driven   |
+| `app-shell/`    | Providers, shell routes, feedback states, club identity projection   |
+| `lib/`          | Framework-free helpers (date, match, competition, text, slug, …)    |
+| `ui/`           | shadcn primitives (`button`, `card`, …) plus shared app-level bits   |
+| `pwa/`          | Web app manifest builder                                             |
+| `ai/`           | Lexical rich-text helpers                                            |
 
-Dependency direction: `types ← {payload, hns, api}`, plus `hns → payload`
-(HNS keys come from the tenant config). No cycles between concerns.
+Dependency direction:
+
+```
+payload → types          hns → {types, payload}   (HNS keys come from the tenant)
+lib     → types          ui  → hns                (crest URLs)
+app-shell → {payload, ui}
+```
+
+`types → payload` also exists, type-only: the domain types reuse `PayloadMedia`.
+That is a type-level cycle with `payload → types` — harmless at runtime (erased at
+compile time), but worth knowing before adding a value import in that direction.
 
 ## How apps consume these
 
@@ -26,8 +38,8 @@ subpaths to here:
   "@/types/*":        ["../../packages/types/src/*"],
   "@/lib/payload/*":  ["../../packages/payload/src/*"],
   "@/lib/hns/*":      ["../../packages/hns/src/*"],
-  "@/lib/api":        ["../../packages/api/src/index"],
-  "@/lib/api/*":      ["../../packages/api/src/*"],
+  "@/lib/app-shell/*":["../../packages/app-shell/src/*"],
+  "@/lib/helpers/*":  ["../../packages/lib/src/helpers/*"],
   "@/*":              ["./src/*"]
 }
 ```

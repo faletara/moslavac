@@ -1,10 +1,15 @@
 import { HnsCrest } from "@/components/HnsCrest";
 import { cn } from "@/lib/utils";
-import type { Match, MatchEvent, Team } from "@/types/hns";
-import { EventIcon, type EventKind, eventKind } from "./EventIcon";
+import type {
+  Match,
+  MatchEvent,
+  MatchEventKind,
+  Team,
+} from "@/types/hns";
+import { EventIcon } from "./EventIcon";
 
 /** Događaji koje tijek prikazuje. Ostalo (statistika, komentari) se izostavlja. */
-const SHOWN: EventKind[] = ["goal", "own-goal", "yellow", "red", "sub"];
+const SHOWN: MatchEventKind[] = ["goal", "own-goal", "yellow", "red", "sub"];
 
 /**
  * HNS ne šalje "početak" i "kraj" kao imenovane tipove — šalje ih kao događaje
@@ -49,7 +54,7 @@ interface EventRow {
   kind: "event";
   key: string;
   minute: string;
-  eventKind: EventKind;
+  eventKind: MatchEventKind;
   player: string;
   detail: string | null;
   team: Team | null;
@@ -140,7 +145,7 @@ function buildRows(match: Match, events: MatchEvent[]): Row[] {
       continue;
     }
 
-    const kind = eventKind(event.type?.name ?? "");
+    const kind = event.kind;
     if (!SHOWN.includes(kind)) continue;
 
     const team = event.side === "home" ? match.homeTeam : match.awayTeam;

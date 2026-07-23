@@ -38,6 +38,7 @@ import type {
   TeamLineup,
   TeamRanking,
 } from "@/types/hns";
+import { eventKind } from "./eventKind";
 
 function text(value: string | null | undefined): string {
   return value?.trim() ?? "";
@@ -345,9 +346,11 @@ export function adaptPlayerSearchResult(
 }
 
 export function adaptMatchEvent(raw: HnsMatchEvent): MatchEvent {
+  const type = adaptMatchEventType(raw.eventType);
   return {
     id: nullableNumber(raw.eventId),
-    type: adaptMatchEventType(raw.eventType),
+    type,
+    kind: eventKind(type),
     phase: adaptMatchPhase(raw.matchPhase),
     phaseMinute: nullableNumber(raw.minute),
     minute: nullableNumber(raw.minuteFull ?? raw.minute),

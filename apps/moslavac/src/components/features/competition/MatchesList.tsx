@@ -4,7 +4,7 @@ import Link from "next/link";
 import { HnsCrest } from "@/components/HnsCrest";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { formatDateTime } from "@/lib/helpers/date";
-import { buildMatchSlug } from "@/lib/slug";
+import { buildMatchSlug } from "@/lib/helpers/slug";
 import { cn } from "@/lib/utils";
 import type { Match } from "@/types/hns";
 

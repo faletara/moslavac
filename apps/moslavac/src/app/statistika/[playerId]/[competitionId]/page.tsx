@@ -4,13 +4,13 @@ import { Progress } from "@/components/ui/progress";
 import { TrackEvent } from "@/components/analytics/TrackEvent";
 import PlayerHero from "@/components/features/players/PlayerHero";
 import { fetchPlayerDetails, fetchPlayerStats } from "@/lib/hns/players";
-import { redirectToCanonical } from "@/lib/canonical";
+import { redirectToCanonical } from "@/lib/helpers/canonical";
 import { BASE_URL } from "@/lib/siteUrl";
 import {
   buildCompetitionSlug,
   buildPlayerSlug,
   parseTrailingId,
-} from "@/lib/slug";
+} from "@/lib/helpers/slug";
 import { cn } from "@/lib/utils";
 
 interface Props {

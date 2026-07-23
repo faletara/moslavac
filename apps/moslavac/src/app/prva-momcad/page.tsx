@@ -16,7 +16,7 @@ import {
 	PlayerGridItem,
 } from "@/components/features/first-team/PlayerGrid";
 import { FadeInView } from "@/components/animations";
-import { getCometImageUrl } from "@/lib/api";
+import { getCometImageUrl } from "@/lib/hns/imageUrl";
 import { fetchSeniorCompetition } from "@/lib/hns/competitions";
 import { fetchPlayerDetails } from "@/lib/hns/players";
 import { fetchRoster } from "@/lib/payload/getRoster";

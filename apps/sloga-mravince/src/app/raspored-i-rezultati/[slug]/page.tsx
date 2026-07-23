@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import MatchHero from "@/components/features/matches/MatchHero";
 import MatchTabs from "@/components/features/matches/MatchTabs";
 import { RefreshWhile } from "@/components/ui/refresh-while";
-import { redirectToCanonical } from "@/lib/canonical";
+import { redirectToCanonical } from "@/lib/helpers/canonical";
 import { formatDateTime } from "@/lib/helpers/date";
 import {
   fetchAllCompetitionMatches,
@@ -20,7 +20,7 @@ import { isFinished, isLive } from "@/lib/hns/matchStatus";
 import { fetchTeamStandings } from "@/lib/hns/standings";
 import { getTenant } from "@/lib/payload/getTenant";
 import { BASE_URL } from "@/lib/siteUrl";
-import { buildMatchSlug, parseTrailingId } from "@/lib/slug";
+import { buildMatchSlug, parseTrailingId } from "@/lib/helpers/slug";
 import type { Match } from "@/types/hns";
 
 interface Props {

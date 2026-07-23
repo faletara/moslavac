@@ -5,7 +5,7 @@ import {
 } from "@/lib/hns/competitions";
 import { fetchNewsSitemapEntries } from "@/lib/payload/getNews";
 import { BASE_URL } from "@/lib/siteUrl";
-import { buildMatchSlug } from "@/lib/slug";
+import { buildMatchSlug } from "@/lib/helpers/slug";
 import type { Match } from "@/types/hns";
 
 export const revalidate = 3600;

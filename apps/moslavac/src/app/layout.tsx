@@ -6,6 +6,8 @@ import "./globals.css";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import Providers from "@/components/providers/Providers";
+import ClubJsonLd from "@/lib/app-shell/identity/ClubJsonLd";
+import { buildClubMetadata } from "@/lib/app-shell/identity/clubIdentity";
 import { fetchCurrentSeasonCompetitions } from "@/lib/hns/competitions";
 import { getTenant } from "@/lib/payload/getTenant";
 import { BASE_URL } from "@/lib/siteUrl";
@@ -16,70 +18,8 @@ const geistSans = Geist({
   display: "swap",
 });
 
-/**
- * Common alternate names people actually search for, derived generically from
- * the club's display name (e.g. "SNK Moslavac" → "Moslavac", "NK Moslavac").
- * Feeds schema.org `alternateName` so Google links these queries to the club
- * entity. Tenant-safe: no hardcoded names.
- */
-function clubNameVariants(
-  displayName: string,
-  shortName?: string | null,
-): string[] {
-  const variants = new Set<string>();
-  const prefixRe = /^(SNK|ŠNK|HNK|GNK|MNK|NK|NŠ|ŠK)\s+/i;
-  const bare = displayName.replace(prefixRe, "").trim();
-  if (bare && bare !== displayName) {
-    variants.add(bare);
-    variants.add(`NK ${bare}`);
-  }
-  if (shortName) variants.add(shortName);
-  variants.delete(displayName);
-  return [...variants];
-}
-
 export async function generateMetadata(): Promise<Metadata> {
-  const tenant = await getTenant();
-  const name = tenant.displayName;
-  const motto = tenant.branding?.motto;
-  const description = motto ?? `Službena web stranica nogometnog kluba ${name}`;
-
-  const logo = tenant.branding?.logo;
-  const logoUrl = !logo ? null : typeof logo === "string" ? logo : logo.url;
-
-  // `images` is spread in ONLY when the tenant supplies a logo. Setting it
-  // unconditionally (it used to fall back to /naslovna.jpg) overrides the
-  // file-based `opengraph-image.tsx`, which would leave every generated card —
-  // including the per-match posters — dead on arrival.
-  const ogImage = logoUrl;
-
-  return {
-    metadataBase: new URL(BASE_URL),
-    title: {
-      default: name,
-      template: `%s | ${name}`,
-    },
-    description,
-    alternates: {
-      canonical: "/",
-    },
-    openGraph: {
-      type: "website",
-      locale: "hr_HR",
-      siteName: name,
-      title: name,
-      description,
-      ...(ogImage
-        ? { images: [{ url: ogImage, alt: name, width: 1200, height: 630 }] }
-        : {}),
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: name,
-      description,
-      ...(ogImage ? { images: [ogImage] } : {}),
-    },
-  };
+  return buildClubMetadata({ tenant: await getTenant(), baseUrl: BASE_URL });
 }
 
 export default async function RootLayout({
@@ -91,57 +31,6 @@ export default async function RootLayout({
     getTenant(),
     fetchCurrentSeasonCompetitions(),
   ]);
-
-  const logo = tenant.branding?.logo;
-  const logoUrl = !logo ? null : typeof logo === "string" ? logo : logo.url;
-  const baseUrl = BASE_URL;
-  const sameAs = [tenant.social?.facebook, tenant.social?.youtube].filter(
-    (v): v is string => Boolean(v),
-  );
-  const shortName = tenant.branding?.shortName;
-  const motto = tenant.branding?.motto;
-  const altNames = clubNameVariants(tenant.displayName, shortName);
-  const founded = tenant.branding?.founded;
-  const address = tenant.contact?.address;
-  const email = tenant.contact?.email;
-  const phone = tenant.contact?.phone;
-
-  const orgJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "SportsOrganization",
-    "@id": `${baseUrl}/#organization`,
-    name: tenant.displayName,
-    ...(altNames.length > 0 ? { alternateName: altNames } : {}),
-    ...(motto ? { slogan: motto } : {}),
-    sport: "Football",
-    url: baseUrl,
-    ...(logoUrl ? { logo: logoUrl, image: logoUrl } : {}),
-    ...(founded ? { foundingDate: String(founded) } : {}),
-    ...(address
-      ? {
-          address: {
-            "@type": "PostalAddress",
-            streetAddress: address,
-            addressLocality: "Popovača",
-            addressRegion: "Sisačko-moslavačka županija",
-            addressCountry: "HR",
-          },
-        }
-      : {}),
-    ...(email ? { email } : {}),
-    ...(phone ? { telephone: phone } : {}),
-    ...(sameAs.length > 0 ? { sameAs } : {}),
-  };
-
-  const websiteJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "@id": `${baseUrl}/#website`,
-    name: tenant.displayName,
-    url: baseUrl,
-    inLanguage: "hr-HR",
-    publisher: { "@id": `${baseUrl}/#organization` },
-  };
 
   return (
     <html
@@ -156,14 +45,7 @@ export default async function RootLayout({
         />
       </head>
       <body className="flex min-h-screen flex-col">
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
-        />
+        <ClubJsonLd tenant={tenant} baseUrl={BASE_URL} />
         <Providers tenant={tenant}>
           <Header tenant={tenant} competitions={competitions} />
           <main className="flex-1">{children}</main>

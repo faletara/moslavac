@@ -7,7 +7,7 @@ import { Fragment } from "react";
 import { FadeInView, RevealHeading } from "@/components/animations";
 import { getMatchVenue } from "@/components/features/home/homeMatch";
 import { formatDateTime } from "@/lib/helpers/date";
-import { buildMatchSlug } from "@/lib/slug";
+import { buildMatchSlug } from "@/lib/helpers/slug";
 import type { Match } from "@/types/hns";
 import { CountdownTiles } from "./CountdownTiles";
 import { TeamCrest } from "./TeamCrest";

@@ -28,7 +28,7 @@ import {
 	getCategoryShortLabel,
 	getCompetitionCategory,
 } from "@/lib/helpers/competition";
-import { buildMatchSlug } from "@/lib/slug";
+import { buildMatchSlug } from "@/lib/helpers/slug";
 import { cn } from "@/lib/utils";
 import type { Match } from "@/types/hns";
 

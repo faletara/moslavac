@@ -1,6 +1,6 @@
 import { fetchSeniorCompetition } from "@/lib/hns/competitions";
 import { resolveCometPhotoUrls } from "@/lib/rosterPhotos";
-import { buildCompetitionSlug, buildPlayerSlug } from "@/lib/slug";
+import { buildCompetitionSlug, buildPlayerSlug } from "@/lib/helpers/slug";
 import type { RosterEntry } from "@/types/roster";
 import SectionHead from "./SectionHead";
 import PlayersCarousel, { type CarouselPlayer } from "./PlayersCarousel";
