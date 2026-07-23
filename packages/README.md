@@ -9,7 +9,7 @@ byte-identical copy of all of this; it now lives here once.
 | `types/`        | Domain types — single source of truth (`News`, `Equipment`, HNS, …) |
 | `payload/`      | Payload CMS data layer (`getNews`, `getTenant`, `getPages`, …)      |
 | `hns/`          | HNS (Croatian FA) API client + fetchers (matches, standings, …)     |
-| `app-shell/`    | Providers, shell routes, feedback states, club identity projection   |
+| `app-shell/`    | Providers, shell routes, feedback states, club identity, sitemap/robots |
 | `lib/`          | Framework-free helpers (date, match, competition, text, slug, …)    |
 | `ui/`           | shadcn primitives (`button`, `card`, …) plus shared app-level bits   |
 | `pwa/`          | Web app manifest builder                                             |
@@ -20,7 +20,7 @@ Dependency direction:
 ```
 payload → types          hns → {types, payload}   (HNS keys come from the tenant)
 lib     → types          ui  → hns                (crest URLs)
-app-shell → {payload, ui}
+app-shell → {payload, hns, ui}   (seo/sources reads news + matches)
 ```
 
 `types → payload` also exists, type-only: the domain types reuse `PayloadMedia`.

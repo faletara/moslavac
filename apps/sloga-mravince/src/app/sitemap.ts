@@ -1,113 +1,24 @@
 import type { MetadataRoute } from "next";
-import {
-  fetchAllCompetitionMatches,
-  fetchCurrentSeasonCompetitions,
-} from "@/lib/hns/competitions";
-import { fetchNewsSitemapEntries } from "@/lib/payload/getNews";
+import { buildSitemap } from "@/lib/app-shell/seo/sitemap";
+import { matchSource, newsSource } from "@/lib/app-shell/seo/sources";
 import { BASE_URL } from "@/lib/siteUrl";
-import { buildMatchSlug } from "@/lib/helpers/slug";
-import type { Match } from "@/types/hns";
 
 export const revalidate = 3600;
 
-/**
- * Every match of the current season that has a detail page. HNS decides whether
- * a match may be shown at all (`allowDetail`), so one it withholds is left out
- * here too — pointing Google at a 404 is worse than not pointing it anywhere.
- *
- * A failing competition is skipped rather than allowed to take the sitemap down
- * with it: a partial sitemap still gets the rest of the site indexed.
- */
-async function matchEntries(fallback: Date): Promise<MetadataRoute.Sitemap> {
-  const competitions = await fetchCurrentSeasonCompetitions();
-  const withId = competitions.filter(
-    (competition): competition is typeof competition & { id: number } =>
-      competition.id != null,
-  );
-
-  const results = await Promise.allSettled(
-    withId.map((competition) =>
-      fetchAllCompetitionMatches({ competitionId: competition.id }),
-    ),
-  );
-
-  const matches = new Map<number, Match>();
-  for (const result of results) {
-    if (result.status !== "fulfilled") continue;
-    for (const match of result.value) {
-      if (match.id != null && match.allowDetail) matches.set(match.id, match);
-    }
-  }
-
-  return [...matches.values()].map((match) => ({
-    url: `${BASE_URL}/raspored-i-rezultati/${buildMatchSlug(match)}`,
-    lastModified: match.kickoffAtUtcMs
-      ? new Date(match.kickoffAtUtcMs)
-      : fallback,
-    changeFrequency: "weekly" as const,
-    priority: 0.6,
-  }));
-}
-
-/**
- * Every published news article. A failing fetch is swallowed (fetchList already
- * returns [] on error) so the static routes still make it into the sitemap.
- */
-async function newsEntries(fallback: Date): Promise<MetadataRoute.Sitemap> {
-  const entries = await fetchNewsSitemapEntries();
-  return entries.map((entry) => ({
-    url: `${BASE_URL}/novosti/${entry.slug}`,
-    lastModified: entry.updatedAt ? new Date(entry.updatedAt) : fallback,
-    changeFrequency: "monthly" as const,
-    priority: 0.5,
-  }));
-}
-
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const now = new Date();
-  const [matches, news] = await Promise.all([
-    matchEntries(now).catch(() => []),
-    newsEntries(now).catch(() => []),
-  ]);
-
-  return [
-    {
-      url: `${BASE_URL}/`,
-      lastModified: now,
-      changeFrequency: "daily",
-      priority: 1,
-    },
-    {
-      url: `${BASE_URL}/novosti`,
-      lastModified: now,
-      changeFrequency: "daily",
-      priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/momcad`,
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.7,
-    },
-    {
-      url: `${BASE_URL}/raspored-i-rezultati`,
-      lastModified: now,
-      changeFrequency: "daily",
-      priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/o-klubu`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.6,
-    },
-    {
-      url: `${BASE_URL}/kontakt`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.6,
-    },
-    ...news,
-    ...matches,
-  ];
+export default function sitemap(): Promise<MetadataRoute.Sitemap> {
+  return buildSitemap({
+    baseUrl: BASE_URL,
+    routes: [
+      { path: "/", changeFrequency: "daily", priority: 1 },
+      { path: "/novosti", changeFrequency: "daily", priority: 0.8 },
+      { path: "/momcad", changeFrequency: "weekly", priority: 0.7 },
+      { path: "/raspored-i-rezultati", changeFrequency: "daily", priority: 0.8 },
+      { path: "/o-klubu", changeFrequency: "monthly", priority: 0.6 },
+      { path: "/kontakt", changeFrequency: "monthly", priority: 0.6 },
+    ],
+    sources: [
+      newsSource({ segment: "/novosti", priority: 0.5 }),
+      matchSource({ segment: "/raspored-i-rezultati" }),
+    ],
+  });
 }

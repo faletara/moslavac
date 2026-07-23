@@ -220,3 +220,56 @@ ostalo iznad njih.
 - [ ] Vizualni identitet prikaza po klubu ostaje nepromijenjen.
 - [ ] Izvođenje podataka pokriveno je provjerom na razini podatkovnog sloja.
 - [ ] Zajednički JSX se ne uvodi; dijeli se samo izvođenje podataka.
+
+## Sitemap i robots izvode se iz opisa ruta pojedinog kluba
+
+**What to build:** Svaki Club app opisuje samo svoje rute, dok se sam sitemap i pravila za robote grade jednom u platformskom sloju.
+
+**Blocked by:** None — can start immediately.
+
+- [x] Rute, izvori sadržaja i pravila za tražilice pojedinog kluba opisani su podacima, a ne ponovljenim kodom.
+- [x] Sitemap svakog kluba obuhvaća statične rute, novosti i utakmice neovisno o tome kako se te rute zovu na hrvatskom.
+- [x] Ispad jednog izvora podataka ne ruši cijeli sitemap.
+- [x] Pravila za tražilične i AI robote jednaka su u svim klubovima i mijenjaju se na jednom mjestu.
+      <!-- nk-vrapce prije nije propuštao /api/images/ ni AI-search robote; sada dobiva istu politiku — konvergencija, ne regresija -->
+- [x] Novi klub dobiva ispravan sitemap i robots bez kopiranja datoteka.
+- [x] Izvedba je pokrivena provjerom koja vrijedi za sve klubove.
+
+## Schema.org podaci pojedine stranice izvode se iz domenskih tipova
+
+**What to build:** Structured data za novost, utakmicu, igrača i navigacijski trag gradi se kroz jedno zajedničko sučelje, kao što se klupski identitet već gradi za `<head>`.
+
+**Blocked by:** Identitet kluba projicira se u <head> iz jednog modula.
+
+- [ ] Structured data pojedine stranice izvodi se iz domenskih tipova kroz jedno zajedničko sučelje.
+- [ ] Novost, utakmica, igrač i navigacijski trag proizvode isti oblik podataka u svakom klubu.
+- [ ] Nijedan Club app ne sadrži ručno složen schema.org objekt.
+- [ ] Nepotpuni podaci proizvode valjan izlaz bez praznih ili izmišljenih polja.
+- [ ] Pokrivenost structured data podacima ne razlikuje se od kluba do kluba.
+- [ ] Izvedba je pokrivena provjerom koja se izvodi jednom i vrijedi za sve klubove.
+
+## Stranica pojedine novosti izvodi se jednom, a klubovi biraju samo prikaz
+
+**What to build:** Razrješavanje novosti iz adrese, metapodaci, kanonska adresa i structured data žive u platformskom sloju, dok Club app donosi samo vlastiti vizualni prikaz.
+
+**Blocked by:** Schema.org podaci pojedine stranice izvode se iz domenskih tipova.
+
+- [ ] Razrješavanje novosti iz adrese, provjera pripadnosti klubu i stanje kada novost ne postoji postoje u jednoj izvedbi.
+- [ ] Naslov, opis, kanonska adresa i društveni podaci članka izvode se iz iste izvedbe u svakom klubu.
+- [ ] Adresa članka ima jedan kanonski oblik, a ostali oblici vode na njega.
+- [ ] Club app na toj stranici zadržava samo vlastiti vizualni prikaz.
+- [ ] Vizualni identitet stranice novosti po klubu ostaje nepromijenjen.
+- [ ] Ponašanje je pokriveno provjerom kroz zajedničko sučelje, a ne kroz pojedini app.
+
+## Preostale stranice značajki slijede isti obrazac
+
+**What to build:** Oprema, popis novosti i statistika igrača koriste istu zajedničku izvedbu dokazanu na stranici novosti, umjesto vlastite kopije po appu.
+
+**Blocked by:** Stranica pojedine novosti izvodi se jednom, a klubovi biraju samo prikaz.
+
+- [ ] Preostale stranice koje dijele isti obrazac koriste zajedničku izvedbu.
+- [ ] Klupske razlike u nazivima ruta i prikazu i dalje su izražive bez kopiranja izvedbe.
+- [ ] Nijedan Club app ne ponavlja razrješavanje podataka i metapodataka koje zajednička izvedba već nosi.
+- [ ] Rubni slučajevi (nema sadržaja, sadržaj drugog kluba, nepostojeća adresa) ponašaju se jednako u svim klubovima.
+- [ ] Vizualni identitet svake stranice po klubu ostaje nepromijenjen.
+- [ ] Novi klub dobiva te stranice bez kopiranja logike.
