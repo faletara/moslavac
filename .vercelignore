@@ -1,0 +1,9 @@
+.git
+node_modules
+**/node_modules
+**/.next
+**/.turbo
+**/.vercel
+.scratch
+*.pdf
+.env.vercel-prod

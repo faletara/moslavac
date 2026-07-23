@@ -32,7 +32,10 @@
       "Bash(/Users/adrianofaletar/.claude/skills/seo/.venv/bin/python scripts/render_page.py https://www.snk-moslavac.hr/novosti/u-subotu-smo-izgubili-na-domacem-terenu-od-vrbovca-0-1 --mode never --json)",
       "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('TEXT:', d['extracted_text'][:2000]\\); print\\('META robots:', 'noindex' in d['content']\\)\")",
       "Bash(awk -F'/' '{print $4}')",
-      "Bash(python3)"
+      "Bash(python3)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)"
     ]
   }
 }
