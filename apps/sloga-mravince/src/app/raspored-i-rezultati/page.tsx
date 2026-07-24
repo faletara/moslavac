@@ -191,7 +191,10 @@ function MatchCard({
   const href = detailHref(match);
 
   const card = (
-    <article className="group border-b border-foreground/10 py-8 first:pt-0 lg:grid lg:grid-cols-[8rem_1fr_8rem] lg:items-center lg:gap-5 lg:py-7">
+    // Bez `first:pt-0`: kartica s detaljima omotana je u <Link>, pa je uvijek
+    // prvo dijete svog omotača — pravilo bi ugasilo gornji padding svakoj
+    // kartici i broj dana bi sjeo na crtu iznad.
+    <article className="group border-b border-foreground/10 py-8 lg:grid lg:grid-cols-[8rem_1fr_8rem] lg:items-center lg:gap-5 lg:py-7">
       {/* Datum: u retku na mobitelu, u stupcu na širokom ekranu */}
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 lg:block">
         <p className="font-display text-4xl uppercase leading-none text-club-red tabular-nums">
@@ -367,7 +370,7 @@ export default async function ScheduleResultsPage({ searchParams }: Props) {
                   </h2>
                 </div>
 
-                <div className="mt-10">
+                <div className="mt-2">
                   {upcoming.map((match) => (
                     <MatchCard
                       key={match.id ?? match.kickoffAtUtcMs}
@@ -389,7 +392,7 @@ export default async function ScheduleResultsPage({ searchParams }: Props) {
                 </h2>
               </div>
 
-              <div className="mt-10">
+              <div className="mt-2">
                 {results.length > 0 ? (
                   results.map((match) => (
                     <MatchCard
