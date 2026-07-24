@@ -64,7 +64,7 @@ export default function Footer({ tenant, clubDetails }: FooterProps) {
   ].filter(Boolean) as { label: string; href: string }[];
 
   return (
-    <footer className="relative mt-24 overflow-hidden bg-ink-deep text-chalk">
+    <footer className="relative overflow-hidden bg-ink-deep text-chalk">
       {/* Crveni potpis */}
       <div aria-hidden className="h-0.75 w-full bg-club-red" />
       <div

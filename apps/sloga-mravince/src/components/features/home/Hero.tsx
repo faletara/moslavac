@@ -35,7 +35,14 @@ export default function Hero({ tenant, news, crestSrc }: HeroProps) {
     return <HeroFallback tenant={tenant} />;
   }
   const clubName = tenant.branding?.shortName ?? tenant.displayName;
-  return <HeroSlider news={news} crestSrc={crestSrc} clubName={clubName} />;
+  return (
+    <>
+      {/* Naslovnici h1 pripada klubu, ne naslovu vijesti koji se rotira svakih
+          nekoliko sekundi. Vizualno vodeći ostaje naslov aktivne vijesti. */}
+      <h1 className="sr-only">{tenant.displayName}</h1>
+      <HeroSlider news={news} crestSrc={crestSrc} clubName={clubName} />
+    </>
+  );
 }
 
 function HeroSlider({
@@ -199,7 +206,7 @@ function HeroSlider({
               </motion.p>
 
               {/* Naslov — clip reveal */}
-              <h1 className="mt-5 font-display uppercase leading-[1.28] tracking-normal text-white sm:leading-[1.24] md:leading-[1.22]">
+              <h2 className="mt-5 font-display uppercase leading-[1.28] tracking-normal text-white sm:leading-[1.24] md:leading-[1.22]">
                 <span className="block overflow-hidden pt-[0.3em] pb-[0.12em]">
                   <motion.span
                     variants={{
@@ -214,7 +221,7 @@ function HeroSlider({
                     {active.title}
                   </motion.span>
                 </span>
-              </h1>
+              </h2>
 
               <motion.div
                 variants={{

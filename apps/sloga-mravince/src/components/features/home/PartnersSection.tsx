@@ -4,16 +4,16 @@
  */
 export default function PartnersSection() {
   return (
-    <section className="mx-auto max-w-6xl px-6 py-16 md:py-20">
+    <section className="mx-auto max-w-6xl px-6 py-12 md:py-14">
       <div className="flex items-center gap-4">
         <span aria-hidden className="h-px flex-1 bg-foreground/15" />
-        <p className="text-[0.62rem] font-bold uppercase tracking-[0.34em] text-muted-foreground">
+        <h2 className="text-[0.62rem] font-bold uppercase tracking-[0.34em] text-muted-foreground">
           Naši partneri
-        </p>
+        </h2>
         <span aria-hidden className="h-px flex-1 bg-foreground/15" />
       </div>
 
-      <div className="mt-10 flex flex-wrap items-center justify-center gap-10 md:gap-16">
+      <div className="mt-8 flex flex-wrap items-center justify-center gap-10 md:gap-16">
         {/* Dodati /partners/blindo.svg ili .png u public/partners/ */}
         <a
           href="https://www.blindo.hr"

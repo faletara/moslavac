@@ -26,18 +26,18 @@ function isRealMatch(
   match: Match | null | undefined,
 ): match is Match & { kickoffAtUtcMs: number } {
   return (
-    match != null && Object.keys(match).length > 0 && match.kickoffAtUtcMs != null
+    match != null &&
+    Object.keys(match).length > 0 &&
+    match.kickoffAtUtcMs != null
   );
 }
 
+/** Traka se prikazuje samo kad stvarno postoji sljedeća utakmica. */
 function getNextMatchMarquee(
   slots: MatchSlots,
   clubName: string,
-): { items: string[]; ariaLabel: string } {
-  if (!isRealMatch(slots.next)) {
-    const items = ["Sljedeća utakmica", "Raspored uskoro", clubName];
-    return { items, ariaLabel: items.join(" · ") };
-  }
+): { items: string[]; ariaLabel: string } | null {
+  if (!isRealMatch(slots.next)) return null;
 
   const match = slots.next;
   const { weekdayShort, day, monthShort, time } = formatDateParts(
@@ -108,15 +108,19 @@ export default async function HomePage() {
       <div className="flex h-[calc(100svh-5rem)] flex-col">
         <Hero tenant={tenant} news={heroNews} crestSrc={crestSrc} />
       </div>
-      {/* <MarqueeStrip items={marquee.items} ariaLabel={marquee.ariaLabel} /> */}
+      {marquee && (
+        <MarqueeStrip items={marquee.items} ariaLabel={marquee.ariaLabel} />
+      )}
+
       <NewsSection news={allNews} crestSrc={crestSrc} />
       <NextMatchBar slots={matchSlots} />
+
       <StandingsSection rows={standings} />
+      <PartnersSection />
       <PlayersSection players={roster} />
       <StadiumSection />
       <HeritageSection />
       <CtaSection tenant={tenant} />
-      <PartnersSection />
     </div>
   );
 }

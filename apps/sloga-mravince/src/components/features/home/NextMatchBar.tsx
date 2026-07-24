@@ -191,9 +191,9 @@ function SectionRow({
 }) {
   return (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-      <span className="text-[0.62rem] font-bold uppercase tracking-[0.3em] text-white">
+      <h2 className="text-[0.62rem] font-bold uppercase tracking-[0.3em] text-white">
         {eyebrow}
-      </span>
+      </h2>
       {meta && (
         <span className="hidden text-[0.62rem] font-semibold uppercase tracking-[0.3em] text-white/40 sm:inline">
           · {meta}
