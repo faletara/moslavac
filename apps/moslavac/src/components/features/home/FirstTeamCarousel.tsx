@@ -5,6 +5,7 @@ import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { FadeInView, RevealHeading } from "@/components/animations";
+import { pluralize } from "@/lib/helpers/plural";
 import {
 	Carousel,
 	CarouselContent,
@@ -66,7 +67,11 @@ export default function FirstTeamCarousel({
 						<FadeInView delay={0.05}>
 							<p className="flex items-center gap-3 text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
 								<span aria-hidden className="h-px w-8 bg-primary" />
-								{totalPlayers} igrača
+								{pluralize(totalPlayers, {
+									one: "igrač",
+									few: "igrača",
+									many: "igrača",
+								})}
 							</p>
 						</FadeInView>
 						<RevealHeading

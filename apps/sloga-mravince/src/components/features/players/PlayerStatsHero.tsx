@@ -52,7 +52,12 @@ export default function PlayerStatsHero({
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-[repeating-linear-gradient(115deg,transparent,transparent_11px,rgba(255,255,255,0.04)_11px,rgba(255,255,255,0.04)_22px)]"
       />
-      <div aria-hidden className="absolute inset-0 bg-grain opacity-[0.06]" />
+      {/* Bez pointer-events-none ovaj sloj prekriva hero i guta klikove na
+          poveznicu natrag. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-grain opacity-[0.06]"
+      />
 
       {/* Ghost broj u pozadini */}
       {jerseyNumber != null && (
@@ -150,10 +155,15 @@ export default function PlayerStatsHero({
             initial="hidden"
             animate="show"
             transition={{ staggerChildren: 0.1, delayChildren: 0.2 }}
-            className="mt-4 font-display text-6xl uppercase leading-[0.92] text-chalk sm:text-8xl lg:text-9xl"
+            // Prored mora ostaviti mjesta kvačici na Č/Ć/Š/Ž: maska ispod reže
+            // sve što strši iznad retka, a ispod 1 kvačica ispada iz okvira.
+            className="mt-4 font-display text-6xl uppercase leading-[1.08] text-chalk sm:text-8xl lg:text-9xl"
           >
             {firstName && (
-              <span aria-hidden className="block overflow-hidden pb-[0.06em]">
+              <span
+              aria-hidden
+              className="block overflow-hidden pt-[0.18em] pb-[0.08em]"
+            >
                 <motion.span
                   variants={lineReveal}
                   className="block text-chalk/55"
@@ -162,7 +172,10 @@ export default function PlayerStatsHero({
                 </motion.span>
               </span>
             )}
-            <span aria-hidden className="block overflow-hidden pb-[0.06em]">
+            <span
+              aria-hidden
+              className="block overflow-hidden pt-[0.18em] pb-[0.08em]"
+            >
               <motion.span variants={lineReveal} className="block">
                 {lastName}
               </motion.span>

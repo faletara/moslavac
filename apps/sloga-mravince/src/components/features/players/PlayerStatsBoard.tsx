@@ -7,6 +7,7 @@ import {
   StaggerContainer,
   StaggerItem,
 } from "@/components/animations";
+import { pluralize } from "@/lib/helpers/plural";
 import { cn } from "@/lib/utils";
 
 export interface PlayerStatsData {
@@ -155,7 +156,11 @@ export default function PlayerStatsBoard({
           <FeatureTile
             label="Nastupi"
             value={stats.appearances}
-            context={`${stats.fullMatches} punih utakmica`}
+            context={pluralize(stats.fullMatches, {
+              one: "puna utakmica",
+              few: "pune utakmice",
+              many: "punih utakmica",
+            })}
             variant="ink"
           />
         </StaggerItem>

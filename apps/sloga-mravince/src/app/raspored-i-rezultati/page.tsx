@@ -136,6 +136,38 @@ function TeamName({ name }: { name: string | null | undefined }) {
   );
 }
 
+/**
+ * Redak momčadi na mobitelu: grb, naziv, pa golovi te momčadi. Simetrični
+ * raspored „domaćin — rezultat — gost” radi tek od `lg` naviše; na uskom
+ * ekranu imena se lome u tri retka, a grbovi ispadaju ispod teksta.
+ */
+function TeamLine({
+  team,
+  goals,
+}: {
+  team: Match["homeTeam"];
+  goals: number | null;
+}) {
+  return (
+    <div className="flex items-center gap-3">
+      <HnsCrest
+        picture={team?.picture}
+        name={team?.name}
+        size={40}
+        className="size-9 shrink-0 rounded-full bg-white p-1 ring-1 ring-black/5"
+      />
+      <span className="min-w-0 flex-1 font-display text-lg uppercase leading-tight text-foreground">
+        {team?.name ?? "—"}
+      </span>
+      {goals != null && (
+        <span className="font-display text-2xl uppercase leading-none tabular-nums text-ink-deep">
+          {goals}
+        </span>
+      )}
+    </div>
+  );
+}
+
 /** HNS can withhold a match detail; without an id there is nothing to link to. */
 function detailHref(match: Match): string | null {
   if (match.id == null || !match.allowDetail) return null;
@@ -159,20 +191,28 @@ function MatchCard({
   const href = detailHref(match);
 
   const card = (
-    <article className="group grid gap-5 border-b border-foreground/10 py-7 first:pt-0 lg:grid-cols-[8rem_1fr_8rem] lg:items-center">
-      <div>
+    <article className="group border-b border-foreground/10 py-8 first:pt-0 lg:grid lg:grid-cols-[8rem_1fr_8rem] lg:items-center lg:gap-5 lg:py-7">
+      {/* Datum: u retku na mobitelu, u stupcu na širokom ekranu */}
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 lg:block">
         <p className="font-display text-4xl uppercase leading-none text-club-red tabular-nums">
           {day}
         </p>
-        <p className="mt-1 text-xs font-black uppercase text-muted-foreground">
+        <p className="text-xs font-black uppercase text-muted-foreground lg:mt-1">
           {weekdayShort} · {monthShort}
         </p>
-        <p className="mt-3 text-xs font-bold uppercase text-foreground/70">
+        <p className="ml-auto text-xs font-bold uppercase text-foreground/70 lg:ml-0 lg:mt-3">
           {time}
         </p>
       </div>
 
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 sm:gap-6">
+      {/* Momčadi — mobilna lista */}
+      <div className="mt-5 flex flex-col gap-3 lg:hidden">
+        <TeamLine team={match.homeTeam} goals={match.score.home?.current ?? null} />
+        <TeamLine team={match.awayTeam} goals={match.score.away?.current ?? null} />
+      </div>
+
+      {/* Momčadi — simetrični raspored od lg naviše */}
+      <div className="hidden lg:grid lg:grid-cols-[1fr_auto_1fr] lg:items-center lg:gap-6">
         <div className="flex min-w-0 flex-col items-end gap-3 text-right sm:flex-row sm:items-center sm:justify-end">
           <TeamName name={match.homeTeam?.name} />
           <HnsCrest
@@ -209,23 +249,26 @@ function MatchCard({
         </div>
       </div>
 
-      <div className="space-y-2 text-left lg:text-right">
+      <div className="mt-5 space-y-2 text-left lg:mt-0 lg:text-right">
         {meta && (
           <p className="text-[0.6rem] font-black uppercase text-muted-foreground">
             {meta}
           </p>
         )}
-        {venue && (
-          <p className="text-xs font-semibold uppercase text-foreground/65">
-            {venue}
-          </p>
-        )}
-        {href && (
-          <span className="inline-flex items-center gap-2 pt-1 text-[0.6rem] font-black uppercase tracking-[0.16em] text-foreground/70 transition-colors group-hover:text-club-red">
-            Detalji
-            <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
-          </span>
-        )}
+        {/* Na mobitelu mjesto i „Detalji” dijele redak umjesto da rastu u vis. */}
+        <div className="flex items-center justify-between gap-3 lg:block lg:space-y-2">
+          {venue && (
+            <p className="min-w-0 text-xs font-semibold uppercase text-foreground/65">
+              {venue}
+            </p>
+          )}
+          {href && (
+            <span className="inline-flex shrink-0 items-center gap-2 text-[0.6rem] font-black uppercase tracking-[0.16em] text-foreground/70 transition-colors group-hover:text-club-red lg:pt-1">
+              Detalji
+              <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+            </span>
+          )}
+        </div>
       </div>
     </article>
   );
