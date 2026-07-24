@@ -40,14 +40,14 @@ describe("buildClubMetadata", () => {
     expect(meta.openGraph?.description).toBe("Ponos kvarta");
   });
 
-  it("izostavlja OG sliku kada klub nema logotip, da datotečni opengraph-image ostane na snazi", () => {
+  it("ne postavlja OG sliku, da datotečni opengraph-image ostane na snazi", () => {
     const meta = buildClubMetadata({ tenant: tenant(), baseUrl });
 
     expect(meta.openGraph).not.toHaveProperty("images");
     expect(meta.twitter).not.toHaveProperty("images");
   });
 
-  it("koristi logotip kao OG sliku kada je medij razriješen", () => {
+  it("ni klupski logotip ne nadjačava generiranu karticu s grbom", () => {
     const meta = buildClubMetadata({
       tenant: tenant({
         branding: { logo: { url: "https://cdn.example/logo.png" } },
@@ -55,15 +55,8 @@ describe("buildClubMetadata", () => {
       baseUrl,
     });
 
-    expect(meta.openGraph?.images).toEqual([
-      {
-        url: "https://cdn.example/logo.png",
-        alt: "ŠNK Primjer",
-        width: 1200,
-        height: 630,
-      },
-    ]);
-    expect(meta.twitter?.images).toEqual(["https://cdn.example/logo.png"]);
+    expect(meta.openGraph).not.toHaveProperty("images");
+    expect(meta.twitter).not.toHaveProperty("images");
   });
 });
 

@@ -103,11 +103,10 @@ export function buildClubMetadata({
   const name = tenant.displayName;
   const description = clubDescription(tenant);
 
-  // `images` is spread in ONLY when the tenant supplies a logo. Setting it
-  // unconditionally overrides the file-based `opengraph-image.tsx`, which would
-  // leave every generated card — including per-match posters — dead on arrival.
-  const ogImage = resolveLogoUrl(tenant);
-
+  // Slike se namjerno NE postavljaju ovdje: datotečni `opengraph-image.tsx`
+  // sam popuni og:image (a Next iz njega izvede i twitter:image). Postavljanje
+  // `images` nadjačalo bi generiranu karticu golim logotipom i ubilo bi svaku
+  // vlastitu sliku dublje rute — uključujući postere pojedine utakmice.
   return {
     metadataBase: new URL(baseUrl),
     title: {
@@ -124,15 +123,11 @@ export function buildClubMetadata({
       siteName: name,
       title: name,
       description,
-      ...(ogImage
-        ? { images: [{ url: ogImage, alt: name, width: 1200, height: 630 }] }
-        : {}),
     },
     twitter: {
       card: "summary_large_image",
       title: name,
       description,
-      ...(ogImage ? { images: [ogImage] } : {}),
     },
   };
 }

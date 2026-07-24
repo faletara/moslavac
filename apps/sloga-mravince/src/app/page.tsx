@@ -71,7 +71,9 @@ export async function generateMetadata(): Promise<Metadata> {
     description,
     alternates: { canonical: "/" },
     openGraph: { description },
-    twitter: { description },
+    // `card` se ponavlja jer twitter objekt stranice zamjenjuje onaj iz layouta;
+    // bez njega Next padne na `summary` i grb se prikaže kao sitna sličica.
+    twitter: { card: "summary_large_image", description },
   };
 }
 
