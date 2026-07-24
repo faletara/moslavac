@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   description: "Dresovi, oprema i navijački artikli NK Moslavac.",
   alternates: { canonical: "/oprema" },
 };
+import { pluralize } from "@/lib/helpers/plural";
 import { fetchEquipment } from "@/lib/payload/getEquipment";
 import { getTenant } from "@/lib/payload/getTenant";
 import type { Equipment, EquipmentCategory } from "@/types/equipment";
@@ -62,8 +63,12 @@ export default async function OpremaPage() {
       >
         <div className="flex flex-col items-center gap-8">
           <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
-            {items.length} proizvoda u ponudi. Sva oprema dostupna je za narudžbu
-            kod našeg partnera.
+            {pluralize(items.length, {
+              one: "proizvod",
+              few: "proizvoda",
+              many: "proizvoda",
+            })}{" "}
+            u ponudi. Sva oprema dostupna je za narudžbu kod našeg partnera.
           </p>
           {webshopHref && (
             <a

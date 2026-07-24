@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { pluralForm } from "@/lib/helpers/plural";
 import { buildPlayerSlug } from "@/lib/helpers/slug";
 import type { RosterEntry, RosterPosition } from "@/types/roster";
 
@@ -193,7 +194,12 @@ export function RosterCategorySections({
           <div className="flex flex-wrap items-end justify-between gap-5 border-b border-foreground/10 pb-6">
             <div>
               <p className="text-xs font-bold uppercase text-muted-foreground">
-                {String(group.players.length).padStart(2, "0")} članova
+                {String(group.players.length).padStart(2, "0")}{" "}
+                {pluralForm(group.players.length, {
+                  one: "član",
+                  few: "člana",
+                  many: "članova",
+                })}
               </p>
               <h2 className="mt-3 font-display text-5xl uppercase leading-none text-foreground sm:text-6xl">
                 {group.label}

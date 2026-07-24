@@ -5,6 +5,7 @@ import { HnsCrest } from "@/components/HnsCrest";
 import { InkPageHero } from "@/components/layout/InkPageHero";
 import { toReadableCompetitionName } from "@/lib/helpers/competition";
 import { formatDateParts } from "@/lib/helpers/date";
+import { pluralForm } from "@/lib/helpers/plural";
 import {
   fetchAllCompetitionMatches,
   fetchCurrentSeasonCompetitionsResult,
@@ -16,6 +17,12 @@ import { buildMatchSlug } from "@/lib/helpers/slug";
 import type { Competition, Match } from "@/types/hns";
 
 export const revalidate = 300;
+
+const MATCH_FORMS = {
+  one: "utakmica",
+  few: "utakmice",
+  many: "utakmica",
+};
 
 type MatchWithDate = Match & { kickoffAtUtcMs: number };
 
@@ -363,7 +370,8 @@ export default async function ScheduleResultsPage({ searchParams }: Props) {
                 <div className="border-b border-foreground/10 pb-6">
                   <p className="text-xs font-bold uppercase text-muted-foreground">
                     {selectedName ?? "Natjecanje"} ·{" "}
-                    {String(upcoming.length).padStart(2, "0")} utakmica
+                    {String(upcoming.length).padStart(2, "0")}{" "}
+                    {pluralForm(upcoming.length, MATCH_FORMS)}
                   </p>
                   <h2 className="mt-3 font-display text-5xl uppercase leading-none text-foreground sm:text-6xl">
                     Nadolazeće utakmice
@@ -385,7 +393,8 @@ export default async function ScheduleResultsPage({ searchParams }: Props) {
             <section>
               <div className="border-b border-foreground/10 pb-6">
                 <p className="text-xs font-bold uppercase text-muted-foreground">
-                  {String(results.length).padStart(2, "0")} utakmica
+                  {String(results.length).padStart(2, "0")}{" "}
+                  {pluralForm(results.length, MATCH_FORMS)}
                 </p>
                 <h2 className="mt-3 font-display text-5xl uppercase leading-none text-foreground sm:text-6xl">
                   Rezultati

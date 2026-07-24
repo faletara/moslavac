@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { AnimatedCounter, FadeInView } from "@/components/animations";
+import { pluralForm } from "@/lib/helpers/plural";
 
 const FOUNDING_DATE = {
   year: 1925,
@@ -24,9 +25,18 @@ function getTraditionYears(now = new Date()): number {
  * jubilarni grb 100 godina u chalk okviru sa zlatnim prstenom.
  */
 export default function HeritageSection() {
+  const traditionYears = getTraditionYears();
   const stats = [
+    // „Godina osnivanja” je godina, ne broj — ne sklanja se.
     { value: FOUNDING_DATE.year, label: "Godina osnivanja" },
-    { value: getTraditionYears(), label: "Godina tradicije" },
+    {
+      value: traditionYears,
+      label: `${pluralForm(traditionYears, {
+        one: "Godina",
+        few: "Godine",
+        many: "Godina",
+      })} tradicije`,
+    },
   ] as const;
 
   return (

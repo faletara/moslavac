@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import { useCountdown } from "@/lib/helpers/countdown";
+import { TIME_UNIT_FORMS, pluralForm } from "@/lib/helpers/plural";
 import { cn } from "@/lib/utils";
 
 const EASE = [0.25, 0.1, 0.25, 1] as const;
@@ -128,10 +129,30 @@ export function CountdownTiles({
         className,
       )}
     >
-      <Tile value={dd} label="dana" delay={0.3} size={size} />
-      <Tile value={hh} label="sati" delay={0.35} size={size} />
-      <Tile value={mm} label="min" delay={0.4} size={size} />
-      <Tile value={ss} label="sek" delay={0.45} size={size} />
+      <Tile
+        value={dd}
+        label={pluralForm(c?.days ?? 0, TIME_UNIT_FORMS.day)}
+        delay={0.3}
+        size={size}
+      />
+      <Tile
+        value={hh}
+        label={pluralForm(c?.hours ?? 0, TIME_UNIT_FORMS.hour)}
+        delay={0.35}
+        size={size}
+      />
+      <Tile
+        value={mm}
+        label={pluralForm(c?.minutes ?? 0, TIME_UNIT_FORMS.minute)}
+        delay={0.4}
+        size={size}
+      />
+      <Tile
+        value={ss}
+        label={pluralForm(c?.seconds ?? 0, TIME_UNIT_FORMS.second)}
+        delay={0.45}
+        size={size}
+      />
     </div>
   );
 }

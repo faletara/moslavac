@@ -1,4 +1,5 @@
 import { HnsCrest } from "@/components/HnsCrest";
+import { pluralForm } from "@/lib/helpers/plural";
 import { cn } from "@/lib/utils";
 import type { Match, MatchOutcome, TeamRanking } from "@/types/hns";
 
@@ -52,7 +53,12 @@ function TeamRow({ row }: { row: TeamRanking }) {
         </p>
         <p className="mt-0.5 text-[0.62rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">
           {row.position != null ? `${row.position}. mjesto` : "—"} ·{" "}
-          <span className="tabular-nums">{row.points}</span> bodova
+          <span className="tabular-nums">{row.points}</span>{" "}
+          {pluralForm(row.points, {
+            one: "bod",
+            few: "boda",
+            many: "bodova",
+          })}
         </p>
       </div>
 

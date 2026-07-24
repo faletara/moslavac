@@ -7,6 +7,7 @@ import { Fragment } from "react";
 import { FadeInView, RevealHeading } from "@/components/animations";
 import { formatDateTime } from "@/lib/helpers/date";
 import type { FormResult } from "@/lib/helpers/form";
+import { pluralForm } from "@/lib/helpers/plural";
 import { buildMatchSlug } from "@/lib/helpers/slug";
 import type { Match } from "@/types/hns";
 import { TeamCrest } from "./TeamCrest";
@@ -58,7 +59,13 @@ function formatRound(round: string | null | undefined): string | null {
 
 function formatAttendance(value: number | null | undefined): string | null {
   if (value == null || value <= 0) return null;
-  return `${new Intl.NumberFormat("hr-HR").format(value)} gledatelja`;
+  // Oblik se bira po sirovom broju: formatirani niz nosi tisućicu („1.021”).
+  const noun = pluralForm(value, {
+    one: "gledatelj",
+    few: "gledatelja",
+    many: "gledatelja",
+  });
+  return `${new Intl.NumberFormat("hr-HR").format(value)} ${noun}`;
 }
 
 /** Metadata parts split by a thin rule instead of a separator glyph. */

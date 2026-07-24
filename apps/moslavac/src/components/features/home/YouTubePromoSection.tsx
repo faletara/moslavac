@@ -7,6 +7,7 @@ import {
   FadeInView,
   RevealHeading,
 } from "@/components/animations";
+import { pluralForm } from "@/lib/helpers/plural";
 import type { YouTubeChannelStats } from "@/lib/youtube/getChannelStats";
 
 type YouTubePromoSectionProps = {
@@ -111,18 +112,30 @@ export function YouTubePromoContent({
           {stats.subscriberCount != null ? (
             <ChannelStat
               value={stats.subscriberCount}
-              label="Pretplatnika"
+              label={pluralForm(stats.subscriberCount, {
+                one: "Pretplatnik",
+                few: "Pretplatnika",
+                many: "Pretplatnika",
+              })}
               reducedMotion={reducedMotion}
             />
           ) : null}
           <ChannelStat
             value={stats.videoCount}
-            label="Videa"
+            label={pluralForm(stats.videoCount, {
+              one: "Video",
+              few: "Videa",
+              many: "Videa",
+            })}
             reducedMotion={reducedMotion}
           />
           <ChannelStat
             value={stats.viewCount}
-            label="Pregleda"
+            label={pluralForm(stats.viewCount, {
+              one: "Pregled",
+              few: "Pregleda",
+              many: "Pregleda",
+            })}
             reducedMotion={reducedMotion}
           />
         </div>

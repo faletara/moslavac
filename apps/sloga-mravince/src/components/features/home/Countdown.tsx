@@ -1,6 +1,11 @@
 "use client";
 
 import { type CountdownState, useCountdown } from "@/lib/helpers/countdown";
+import {
+  TIME_UNIT_FORMS,
+  type PluralForms,
+  pluralForm,
+} from "@/lib/helpers/plural";
 import { cn } from "@/lib/utils";
 
 interface CountdownProps {
@@ -9,12 +14,12 @@ interface CountdownProps {
   className?: string;
 }
 
-const TILES: { key: keyof CountdownState; label: string }[] = [
-  { key: "days", label: "Dana" },
-  { key: "hours", label: "Sati" },
-  { key: "minutes", label: "Min" },
-  { key: "seconds", label: "Sek" },
-];
+const TILES = [
+  { key: "days", forms: TIME_UNIT_FORMS.day },
+  { key: "hours", forms: TIME_UNIT_FORMS.hour },
+  { key: "minutes", forms: TIME_UNIT_FORMS.minute },
+  { key: "seconds", forms: TIME_UNIT_FORMS.second },
+] satisfies { key: keyof CountdownState; forms: PluralForms }[];
 
 /**
  * Live odbrojavanje do početka utakmice u Anton pločicama s odrezanim kutom.
@@ -25,7 +30,7 @@ export default function Countdown({ target, className }: CountdownProps) {
 
   return (
     <div className={cn("flex items-start gap-2.5 sm:gap-4", className)}>
-      {TILES.map(({ key, label }, i) => (
+      {TILES.map(({ key, forms }, i) => (
         <div key={key} className="flex items-start gap-2.5 sm:gap-4">
           {i > 0 && (
             <span
@@ -40,7 +45,7 @@ export default function Countdown({ target, className }: CountdownProps) {
               {state ? String(state[key]).padStart(2, "0") : "––"}
             </span>
             <span className="mt-2 text-[0.58rem] font-bold uppercase tracking-[0.28em] text-white/45">
-              {label}
+              {pluralForm(state ? state[key] : 0, forms)}
             </span>
           </div>
         </div>

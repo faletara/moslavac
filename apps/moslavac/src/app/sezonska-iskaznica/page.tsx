@@ -3,6 +3,7 @@ import { ArrowDown } from "lucide-react";
 import type { Metadata } from "next";
 import { TrackEvent } from "@/components/analytics/TrackEvent";
 import { PageHero } from "@/components/layout/PageHero";
+import { pluralize } from "@/lib/helpers/plural";
 import { getTenant } from "@/lib/payload/getTenant";
 
 export const metadata: Metadata = {
@@ -75,7 +76,7 @@ export default async function SeasonTicketPage() {
               Napravili smo članske iskaznice za narednu sezonu. Cijena članske
               iskaznice je{" "}
               <span className="font-semibold text-foreground">
-                {price} eura
+                {pluralize(price, { one: "euro", few: "eura", many: "eura" })}
               </span>{" "}
               te se može kupiti uplatom na račun od {shortName}. Također,
               članske iskaznice će se moći kupiti na tribini na svakoj domaćoj

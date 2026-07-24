@@ -1,6 +1,7 @@
 import { HnsCrest } from "@/components/HnsCrest";
 import Countdown from "@/components/features/home/Countdown";
 import { formatDateParts } from "@/lib/helpers/date";
+import { pluralForm } from "@/lib/helpers/plural";
 import { calledOffLabel, isLive, liveMinute } from "@/lib/hns/matchStatus";
 import { cn } from "@/lib/utils";
 import type { Match } from "@/types/hns";
@@ -189,7 +190,14 @@ export default function MatchHero({ match }: { match: Match }) {
             )}
             {attendance != null && attendance > 0 && (
               <MetaItem>
-                <span className="tabular-nums">{attendance} gledatelja</span>
+                <span className="tabular-nums">
+                  {attendance}{" "}
+                  {pluralForm(attendance, {
+                    one: "gledatelj",
+                    few: "gledatelja",
+                    many: "gledatelja",
+                  })}
+                </span>
               </MetaItem>
             )}
           </div>

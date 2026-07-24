@@ -31,3 +31,16 @@ export function pluralForm(count: number, forms: PluralForms): string {
 export function pluralize(count: number, forms: PluralForms): string {
   return `${count} ${pluralForm(count, forms)}`;
 }
+
+/**
+ * Jedinice odbrojavanja do utakmice. Dijele ih sva klupska odbrojavanja, pa se
+ * „1 sat / 2 sata / 5 sati” ispravlja na jednom mjestu. Oznake se ionako
+ * prikazuju verzalom, pa mala slova ovdje ne utječu na izgled.
+ */
+export const TIME_UNIT_FORMS = {
+  day: { one: "dan", few: "dana", many: "dana" },
+  hour: { one: "sat", few: "sata", many: "sati" },
+  // Kratice se ne sklanjaju, ali stoje ovdje da pločice imaju jedinstven oblik.
+  minute: { one: "min", few: "min", many: "min" },
+  second: { one: "sek", few: "sek", many: "sek" },
+} satisfies Record<string, PluralForms>;

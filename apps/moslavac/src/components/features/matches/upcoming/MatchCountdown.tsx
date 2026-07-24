@@ -1,6 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {
+  TIME_UNIT_FORMS,
+  type PluralForms,
+  pluralForm,
+} from "@/lib/helpers/plural";
 
 interface MatchCountdownProps {
   kickoffAtUtcMs: number;
@@ -45,23 +50,29 @@ export default function MatchCountdown({ kickoffAtUtcMs }: MatchCountdownProps) 
       </h2>
 
       <div className="mt-6 grid grid-cols-4 gap-3 mx-auto max-w-md sm:gap-6">
-        <CountdownCell value={parts.days} label="Dana" />
-        <CountdownCell value={parts.hours} label="Sati" />
-        <CountdownCell value={parts.minutes} label="Min" />
-        <CountdownCell value={parts.seconds} label="Sek" />
+        <CountdownCell value={parts.days} forms={TIME_UNIT_FORMS.day} />
+        <CountdownCell value={parts.hours} forms={TIME_UNIT_FORMS.hour} />
+        <CountdownCell value={parts.minutes} forms={TIME_UNIT_FORMS.minute} />
+        <CountdownCell value={parts.seconds} forms={TIME_UNIT_FORMS.second} />
       </div>
     </section>
   );
 }
 
-function CountdownCell({ value, label }: { value: number; label: string }) {
+function CountdownCell({
+  value,
+  forms,
+}: {
+  value: number;
+  forms: PluralForms;
+}) {
   return (
     <div className="flex flex-col items-center gap-2">
       <span className="font-black tabular-nums leading-none text-3xl sm:text-5xl">
         {String(value).padStart(2, "0")}
       </span>
       <span className="text-[0.55rem] font-medium uppercase tracking-[0.25em] text-muted-foreground sm:text-[0.6rem] sm:tracking-[0.3em]">
-        {label}
+        {pluralForm(value, forms)}
       </span>
     </div>
   );
