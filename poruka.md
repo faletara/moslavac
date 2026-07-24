@@ -1,21 +1,12 @@
-Pozdrav, ja sam Adriano, student FER-a. Vidio sam da imate web stranicu, pa bih vam rado napravio moderniju verziju gdje je sve automatizirano (raspored, rezultati, tablica se sami ažuriraju).
+Pozdrav! Ja sam Adriano, student FER-a, radim web stranice za nogometne klubove. Vidio sam da nemate svoju stranicu, pa sam vam se javio.
 
-Evo primjera:
+Evo par primjera:
+hnkslogamravince.com
+snk-moslavac.hr
 
-• SNK Moslavac → https://www.snk-moslavac.hr/
-• NK Vrapče (u izradi) → https://nk-vrapce.vercel.app/
+Rezultati, tablica, raspored i strijelci se ažuriraju sami, ne trebate ništa unositi.
 
-Izrada je besplatna (skupljam još par klubova za portfolio), a za održavanje se dogovorimo ako vam se svidi.
+Izradu radim besplatno. Ako vas zanima, napravim demo s vašim grbom i bojama da vidite kako bi izgledalo, pa ako vam se svidi dogovorimo se.
+Javite ako želite.
 
-Lp, Adriano
-
-Pozdrav, ja sam Adriano, student FER-a, htio bih Vam napraviti web stranicu gdje je sve automatizirano (raspored, rezultati, tablica se sami ažuriraju).
-
-Evo primjera:
-
-• SNK Moslavac → https://www.snk-moslavac.hr/
-• NK Vrapče (u izradi) → https://nk-vrapce.vercel.app/
-
-Izrada je besplatna (skupljam još par klubova za portfolio), a za održavanje se dogovorimo ako vam se svidi.
-
-Lp, Adriano
+Adriano

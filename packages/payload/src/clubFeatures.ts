@@ -1,4 +1,5 @@
 export const CLUB_FEATURES = [
+  { feature: "equipment", slug: "equipment", label: "Oprema (webshop)" },
   { feature: "pages", slug: "pages", label: "Stranice (povijest, statut…)" },
   { feature: "documents", slug: "documents", label: "Dokumenti" },
   { feature: "board", slug: "board-members", label: "Uprava" },

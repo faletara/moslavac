@@ -7,7 +7,7 @@ import { buildConfig } from "payload";
 import { fileURLToPath } from "url";
 import sharp from "sharp";
 
-import { isSuperAdmin, superAdminOnlyField } from "./access/roles";
+import { isSuperAdmin } from "./access/roles";
 import { CLUB_FEATURES } from "@/lib/payload/clubFeatures";
 import { BoardMembers } from "./collections/BoardMembers";
 import { Documents } from "./collections/Documents";
@@ -34,7 +34,6 @@ const TENANT_COLLECTION_SLUGS = [
 	"news",
 	"media",
 	"roster",
-	"equipment",
 	...CLUB_FEATURES.map(({ slug }) => slug),
 ] as const;
 
@@ -45,13 +44,21 @@ const tenantCollections = Object.fromEntries(
 export default buildConfig({
 	admin: {
 		user: Users.slug,
+		components: {
+			// Vlasniku kluba: izbornik bez kolekcije "Klubovi", umjesto nje link
+			// ravno na njegov zapis (bez međurute na listu → bez bljeska).
+			beforeNavLinks: ["@/components/ClubSettingsLink#ClubSettingsLink"],
+			Nav: "@/components/ClubNav#ClubNav",
+		},
 		importMap: {
 			baseDir: path.resolve(dirname),
 		},
 	},
+	// Redoslijed određuje navigaciju: postavke kluba idu na vrh (Users je
+	// vlasniku kluba skriven).
 	collections: [
-		Users,
 		Tenants,
+		Users,
 		News,
 		Media,
 		Roster,
@@ -95,16 +102,10 @@ export default buildConfig({
 			tenantsSlug: "tenants",
 			userHasAccessToAllTenants: (user) => isSuperAdmin(user),
 			tenantsArrayField: {
-				// Samo super-admin smije dodjeljivati korisnike tenantima —
-				// inače bi tenant-admin sam sebi mogao dodati tuđi klub.
-				arrayFieldAccess: {
-					create: superAdminOnlyField,
-					update: superAdminOnlyField,
-				},
-				tenantFieldAccess: {
-					create: superAdminOnlyField,
-					update: superAdminOnlyField,
-				},
+				// Polje je deklarirano ručno u `Users` kolekciji da mu možemo dati
+				// `admin.condition` (tenant-admin ne vidi dodjelu klubova).
+				// Access — samo super-admin dodjeljuje — definiran je tamo.
+				includeDefaultField: false,
 			},
 		}),
 		s3Storage({

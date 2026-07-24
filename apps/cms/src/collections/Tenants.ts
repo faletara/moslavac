@@ -1,11 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { CLUB_FEATURE_OPTIONS } from '@/lib/payload/clubFeatures'
-import { isSuperAdmin, superAdminOnly } from '../access/roles'
+import { isSuperAdmin, superAdminOnly, superAdminUI } from '../access/roles'
 import { mediaField } from '../fields/media'
-
-/** UI-uvjet: polje/tab vidljivo samo platformi (super-adminu), ne vlasniku kluba. */
-const superAdminUI = (_data: unknown, _sibling: unknown, { user }: { user?: unknown }): boolean =>
-  isSuperAdmin(user as Parameters<typeof isSuperAdmin>[0])
 
 /** UI-uvjet: prikaži samo Moslavcu (ili super-adminu) — druge klubove ne zanima. */
 const moslavacOnlyUI = (
@@ -16,10 +12,13 @@ const moslavacOnlyUI = (
 
 export const Tenants: CollectionConfig = {
   slug: 'tenants',
-  labels: { singular: 'Klub (postavke)', plural: 'Klubovi (postavke)' },
+  labels: { singular: 'Postavke kluba', plural: 'Klubovi' },
   admin: {
     useAsTitle: 'displayName',
     defaultColumns: ['displayName', 'slug', 'active'],
+    // Kolekcija ostaje vidljiva svima: skrivenoj kolekciji Payload vraća Not
+    // Found i na edit ruti. Vlasnika kluba s liste preusmjerava
+    // `admin/clubOwnerRedirect` prije renderiranja.
   },
   access: {
     read: () => true,

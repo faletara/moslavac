@@ -1,10 +1,13 @@
 import { activeField } from '../fields/active'
-import { createCollection } from '../factories/createCollection'
+import { clubFeatureCollection } from '../factories/clubFeatureCollection'
 import { displayOrderField } from '../fields/displayOrder'
 import { mediaField } from '../fields/media'
 
-export const Equipment = createCollection({
-  slug: 'equipment',
+/**
+ * Webshop proizvodi. Rubrika je opcionalna — vide je samo klubovi koji imaju
+ * `equipment` u `tenant.features` (Moslavac, Vrapče). Slug ostaje `equipment`.
+ */
+export const Equipment = clubFeatureCollection('equipment', {
   labels: { singular: 'Proizvod (oprema)', plural: 'Oprema' },
   admin: {
     useAsTitle: 'displayName',

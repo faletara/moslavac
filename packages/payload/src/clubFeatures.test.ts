@@ -25,6 +25,12 @@ describe("club feature registry", () => {
     );
   });
 
+  it("keeps the equipment slug pinned to its existing table", () => {
+    // Slug je ime postgres tablice s 28 proizvoda Moslavca i Vrapča —
+    // preimenovanje bi Payload protumačio kao novu, praznu kolekciju.
+    expect(getClubFeature("equipment").slug).toBe("equipment");
+  });
+
   it("keeps feature names and collection slugs unique", () => {
     const features = CLUB_FEATURES.map(({ feature }) => feature);
     const slugs = CLUB_FEATURES.map(({ slug }) => slug);
