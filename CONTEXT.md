@@ -24,11 +24,21 @@ The deep, shared modules every Club app consumes (see `packages/README.md`):
 - **types** — domain types, the single source of truth (`News`, `Equipment`, …).
 - **payload** — Payload CMS data layer; fetchers return domain types.
 - **hns** — HNS (Croatian Football Federation) API client + fetchers.
-- **app-shell** — providers, shell routes, feedback states, and the club
-  identity projection (`buildClubMetadata`, `ClubJsonLd`).
+- **app-shell** — the root shell (`ClubRootShell`) and its route factories
+  (`clubMetadataRoute`, `clubManifestRoute`), providers, shell routes, feedback
+  states, and the club identity projection (`buildClubMetadata`, `ClubJsonLd`,
+  `buildClubManifest`).
+- **config** — shared build config: `clubNextConfig` (security headers incl. CSP,
+  image loader, turbopack root). Imported by relative path from an app's
+  `next.config.ts`, which loads before the `@/` aliases apply.
 - **lib** — framework-free helpers shared by every Club app.
 - **ui** — shadcn primitives plus shared app-level components.
-- **pwa** — web app manifest builder; **ai** — Lexical rich-text helpers.
+- **ai** — Lexical rich-text helpers.
+
+A Club app's own knobs are few and named: `src/lib/siteUrl.ts` (dev port),
+`src/lib/theme.ts` (`THEME_COLOR`, mirroring `globals.css` for the PWA chrome
+bar), `globals.css`, its Header/Footer, and `app/icon.png` + `app/apple-icon.png`
+at 256×256 and 180×180 — the sizes `buildClubManifest` declares.
 
 ## Data layer terms
 

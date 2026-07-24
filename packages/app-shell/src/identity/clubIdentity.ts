@@ -55,7 +55,8 @@ function resolveLogoUrl(tenant: FrontendTenant): string | null {
   return typeof logo === "string" ? logo : logo.url;
 }
 
-function clubDescription(tenant: FrontendTenant): string {
+/** Shared with the manifest projection so both describe the club identically. */
+export function clubDescription(tenant: FrontendTenant): string {
   return (
     tenant.branding?.motto ??
     `Službena web stranica nogometnog kluba ${tenant.displayName}`

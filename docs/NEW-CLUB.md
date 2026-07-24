@@ -83,11 +83,17 @@ Sve klupske ručice su na malo mjesta:
   - oblik: `--radius` (0 = oštri kutovi)
   - dobne kategorije (chipovi): `--cat-seniors … --cat-prstici` (tamno → svijetlo)
 - **Font** — default Geist (tijelo + naslovi). Za zaseban display font: importaj
-  drugi `next/font` u `app/layout.tsx`, izloži `--font-<x>` na `<html>`, pa u
-  `globals.css` `@theme inline` postavi `--font-display: var(--font-<x>)`.
+  drugi `next/font` u `app/layout.tsx` i proslijedi obje varijable kroz
+  `fontVariables` na `<ClubRootShell>`, pa u `globals.css` `@theme inline`
+  postavi `--font-display: var(--font-<x>)`.
+- **Boja PWA trake** — `apps/<slug>/src/lib/theme.ts` (`THEME_COLOR`). Ručno
+  zrcali `--club` iz `globals.css`; mijenjaj ih u istoj izmjeni.
+- **Ikone** — zamijeni `app/icon.png` (256×256) i `app/apple-icon.png` (180×180)
+  grbom kluba. Te dimenzije `buildClubManifest` deklarira u manifestu, pa ako
+  isporučiš drugu veličinu Chrome odbaci ikonu — promijeni oboje zajedno.
+  `app/opengraph-image.tsx` se i dalje generira iz tenanta.
 - **public/** — zamijeni placeholdere stvarnim materijalima kluba (grb se inače
-  vuče iz CMS `branding.logo`; favicon/OG se generiraju iz tenanta —
-  `app/icon.tsx`, `app/opengraph-image.tsx` — ili ih nadjačaj stvarnim datotekama).
+  vuče iz CMS `branding.logo`).
 
 Stranice gradiš sam od nule, ali podaci su spremni: server komponente zovu
 `@/lib/payload/*` i `@/lib/hns/*` izravno, klijent koristi `api.*` hookove —

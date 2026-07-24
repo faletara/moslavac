@@ -22,7 +22,6 @@
       "@/types/*": ["../../packages/types/src/*"],
       "@/lib/payload/*": ["../../packages/payload/src/*"],
       "@/lib/hns/*": ["../../packages/hns/src/*"],
-      "@/lib/pwa/*": ["../../packages/pwa/src/*"],
       "@/components/ui/*": ["../../packages/ui/src/*"],
       "@/lib/utils": ["../../packages/ui/src/utils"],
       "@/components/analytics/*": ["../../packages/ui/src/analytics/*"],

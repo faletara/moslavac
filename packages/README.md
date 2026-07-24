@@ -9,10 +9,10 @@ byte-identical copy of all of this; it now lives here once.
 | `types/`        | Domain types — single source of truth (`News`, `Equipment`, HNS, …) |
 | `payload/`      | Payload CMS data layer (`getNews`, `getTenant`, `getPages`, …)      |
 | `hns/`          | HNS (Croatian FA) API client + fetchers (matches, standings, …)     |
-| `app-shell/`    | Providers, shell routes, feedback states, club identity, sitemap/robots |
+| `app-shell/`    | Root shell, providers, shell routes, feedback states, club identity (metadata/JSON-LD/manifest), sitemap/robots |
+| `config/`       | Shared build config — `clubNextConfig` (security headers, image loader) |
 | `lib/`          | Framework-free helpers (date, match, competition, text, slug, …)    |
 | `ui/`           | shadcn primitives (`button`, `card`, …) plus shared app-level bits   |
-| `pwa/`          | Web app manifest builder                                             |
 | `ai/`           | Lexical rich-text helpers                                            |
 
 Dependency direction:
@@ -48,6 +48,10 @@ So `import { fetchLatestNews } from "@/lib/payload/getNews"` resolves here, whil
 everything else (`@/lib/validate`, `@/components/*`, …) stays app-local. Next /
 Turbopack honours these paths (turbopack `root` is the monorepo root), and the
 package files themselves use `@/types/*` + relative imports, resolved the same way.
+
+`config/` is the exception: `next.config.ts` is loaded before those aliases apply,
+so an app imports it by relative path — `import { clubNextConfig } from
+"../../packages/config/src/next"`.
 
 A club is now a thin `apps/<club>` (routes, components, club config) over this
 shared layer.
