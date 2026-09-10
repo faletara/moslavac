@@ -1,10 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import {
-  FadeInView,
-  StaggerContainer,
-  StaggerItem,
-} from "@/components/animations";
+import { FadeInView } from "@/components/animations";
 import { formatDateLong } from "@/lib/helpers/date";
 import { cn } from "@/lib/utils";
 import type { News } from "@/types/news";
@@ -82,11 +78,9 @@ function FeatureCard({ item, crestSrc }: { item: News; crestSrc: string }) {
 function ListRow({
   item,
   crestSrc,
-  index,
 }: {
   item: News;
   crestSrc: string;
-  index: number;
 }) {
   return (
     <Link
@@ -127,12 +121,10 @@ export default function NewsSection({
 
   const [feature, ...rest] = items;
   const side = rest.slice(0, 3);
-  const bottom = rest.slice(3, 7);
 
   return (
     <section className="mx-auto max-w-6xl px-6 py-20 md:py-28">
       <SectionHead
-        eyebrow="Aktualno iz kluba"
         title="Novosti"
         link={{ href: "/novosti", label: "Sve vijesti" }}
       />
@@ -144,42 +136,13 @@ export default function NewsSection({
           </div>
           {side.length > 0 && (
             <div className="flex flex-col justify-center lg:col-span-5">
-              {side.map((item, i) => (
-                <ListRow
-                  key={item.id}
-                  item={item}
-                  crestSrc={crestSrc}
-                  index={i + 2}
-                />
+              {side.map((item) => (
+                <ListRow key={item.id} item={item} crestSrc={crestSrc} />
               ))}
             </div>
           )}
         </div>
       </FadeInView>
-      {/*
-      {bottom.length > 0 && (
-        <StaggerContainer className="mt-12 grid grid-cols-2 gap-x-5 gap-y-10 md:mt-16 lg:grid-cols-4">
-          {bottom.map((item) => (
-            <StaggerItem key={item.id}>
-              <Link href={`/novosti/${item.slug}`} className="group block">
-                <Thumb
-                  item={item}
-                  crestSrc={crestSrc}
-                  sizes="(max-width: 768px) 50vw, 25vw"
-                  className="aspect-16/10 clip-corner"
-                />
-                <h3 className="mt-4 line-clamp-3 font-bold leading-snug tracking-tight transition-colors group-hover:text-club-red">
-                  {item.title}
-                </h3>
-                <p className="mt-1.5 text-xs text-muted-foreground">
-                  {formatDateLong(item.date)}
-                </p>
-              </Link>
-            </StaggerItem>
-          ))}
-        </StaggerContainer>
-      )} */}
-
       <div className="mt-12 sm:hidden">
         <Link
           href="/novosti"

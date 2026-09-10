@@ -29,8 +29,10 @@ export function MatchResultCard({ match }: { match: Match }) {
         <TeamSide name={home.name} picture={home.picture} />
 
         <div className="text-center">
-          <p className="text-4xl font-bold tabular-nums md:text-5xl">
-            {homeGoals}:{awayGoals}
+          <p className="font-display text-5xl leading-none tabular-nums md:text-6xl">
+            {homeGoals}
+            <span className="mx-1.5 text-club-red">:</span>
+            {awayGoals}
           </p>
           {date && (
             <p className="mt-2 text-xs uppercase tracking-widest text-muted-foreground">
@@ -62,7 +64,9 @@ function TeamSide({
   return (
     <div className="flex flex-1 flex-col items-center gap-3 text-center">
       <HnsCrest picture={picture} name={name} size={56} />
-      <span className="text-sm font-bold uppercase leading-tight">{name}</span>
+      <span className="font-display text-base uppercase leading-tight tracking-wide sm:text-lg">
+        {name}
+      </span>
     </div>
   );
 }

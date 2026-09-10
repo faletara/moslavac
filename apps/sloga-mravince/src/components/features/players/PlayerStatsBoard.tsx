@@ -137,9 +137,9 @@ export default function PlayerStatsBoard({
       {/* Naslov sekcije */}
       <FadeInView className="flex items-center gap-4">
         <span aria-hidden className="h-px w-10 bg-club-red" />
-        <span className="text-[0.6rem] font-bold uppercase tracking-[0.28em] text-muted-foreground sm:text-[0.62rem] sm:tracking-[0.32em]">
-          Učinak{stats.competitionName ? ` — ${stats.competitionName}` : ""}
-        </span>
+        <h2 className="text-[0.6rem] font-bold uppercase tracking-[0.28em] text-muted-foreground sm:text-[0.62rem] sm:tracking-[0.32em]">
+          Učinak{stats.competitionName ? `: ${stats.competitionName}` : ""}
+        </h2>
       </FadeInView>
 
       {/* Featured pločice */}

@@ -151,7 +151,7 @@ export default async function TeamPage() {
         />
       ))}
 
-      <InkPageHero title="Momčad" watermark="Momčad" />
+      <InkPageHero title="Momčad" />
 
       <section className="mx-auto max-w-6xl px-6 py-16 md:py-24 lg:px-8">
         {roster.length === 0 ? (

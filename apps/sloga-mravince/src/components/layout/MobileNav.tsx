@@ -3,7 +3,9 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
 
 type NavItem = {
   label: string;
@@ -19,6 +21,14 @@ type NavItem = {
  */
 export default function MobileNav({ items }: { items: readonly NavItem[] }) {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+
+  /** Aktivna je i podstranica: `/novosti/neka-vijest` osvjetljava „Novosti”. */
+  const isActive = (item: NavItem) =>
+    !item.external &&
+    item.href != null &&
+    item.href.startsWith("/") &&
+    (pathname === item.href || pathname.startsWith(`${item.href}/`));
 
   useEffect(() => {
     if (!open) return;
@@ -102,12 +112,18 @@ export default function MobileNav({ items }: { items: readonly NavItem[] }) {
                       key={item.label}
                       href={item.href}
                       onClick={() => setOpen(false)}
+                      aria-current={isActive(item) ? "page" : undefined}
                       className="group flex items-baseline gap-4"
                     >
                       <span className="text-[0.6rem] font-bold tabular-nums tracking-[0.3em] text-club-red">
                         0{i + 1}
                       </span>
-                      <span className="font-display text-4xl uppercase leading-none tracking-wide transition-colors group-hover:text-club-red">
+                      <span
+                        className={cn(
+                          "font-display text-4xl uppercase leading-none tracking-wide transition-colors group-hover:text-club-red",
+                          isActive(item) && "text-club-red",
+                        )}
+                      >
                         {item.label}
                       </span>
                     </Link>

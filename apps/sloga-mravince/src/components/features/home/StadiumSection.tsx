@@ -6,7 +6,7 @@ import { ParallaxImage } from "@/components/animations";
  */
 export default function StadiumSection() {
   return (
-    <section className="relative h-[72vh] min-h-120 overflow-hidden md:h-[85vh]">
+    <section className="relative h-[72dvh] min-h-120 overflow-hidden md:h-[85dvh]">
       <ParallaxImage
         src="/stadium.jpg"
         alt="Stadion Glavica, Mravince"
@@ -37,10 +37,7 @@ export default function StadiumSection() {
       <div className="absolute inset-x-0 bottom-0">
         <div className="mx-auto flex w-full max-w-6xl flex-wrap items-end px-6 pb-10 md:pb-14">
           <div>
-            <p className="text-[0.62rem] font-bold uppercase tracking-[0.3em] text-club-gold">
-              Naš dom
-            </p>
-            <h2 className="mt-2 font-display text-4xl uppercase leading-none tracking-wide text-white md:text-5xl">
+            <h2 className="font-display text-4xl uppercase leading-none tracking-wide text-white md:text-5xl">
               Stadion Glavica
             </h2>
             <p className="mt-2 text-xs font-semibold uppercase tracking-[0.28em] text-white/50">

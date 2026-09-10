@@ -153,7 +153,7 @@ function PlayerCard({
     return (
       <Link
         href={href}
-        aria-label={`Statistika — ${player.displayName}`}
+        aria-label={`Statistika: ${player.displayName}`}
         className={cardClass}
       >
         {body}
@@ -191,20 +191,20 @@ export function RosterCategorySections({
     <div className="space-y-20">
       {groups.map((group) => (
         <section key={group.position}>
-          <div className="flex flex-wrap items-end justify-between gap-5 border-b border-foreground/10 pb-6">
-            <div>
-              <p className="text-xs font-bold uppercase text-muted-foreground">
-                {String(group.players.length).padStart(2, "0")}{" "}
-                {pluralForm(group.players.length, {
-                  one: "član",
-                  few: "člana",
-                  many: "članova",
-                })}
-              </p>
-              <h2 className="mt-3 font-display text-5xl uppercase leading-none text-foreground sm:text-6xl">
-                {group.label}
-              </h2>
-            </div>
+          {/* `justify-between` je ovdje visio nad jednim djetetom i nije radio
+              ništa — zaglavlje je jedan stupac. */}
+          <div className="border-b border-foreground/10 pb-6">
+            <p className="text-xs font-bold uppercase text-muted-foreground">
+              {String(group.players.length).padStart(2, "0")}{" "}
+              {pluralForm(group.players.length, {
+                one: "član",
+                few: "člana",
+                many: "članova",
+              })}
+            </p>
+            <h2 className="mt-3 font-display text-5xl uppercase leading-none text-foreground sm:text-6xl">
+              {group.label}
+            </h2>
           </div>
 
           <div className="mt-10 flex snap-x snap-mandatory gap-5 overflow-x-auto pb-2 [scrollbar-width:none] sm:grid sm:grid-cols-2 sm:overflow-visible lg:grid-cols-4 [&::-webkit-scrollbar]:hidden">

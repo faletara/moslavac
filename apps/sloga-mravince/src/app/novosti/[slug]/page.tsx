@@ -1,3 +1,4 @@
+import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -137,7 +138,7 @@ export default async function NewsDetailPage({ params }: Props) {
   });
 
   return (
-    <article className="mx-auto max-w-3xl px-6 py-12 md:py-16">
+    <article>
       {jsonLd.map((schema) => (
         <script
           key={schema["@type"] as string}
@@ -146,41 +147,75 @@ export default async function NewsDetailPage({ params }: Props) {
         />
       ))}
 
-      <Link
-        href="/"
-        className="text-sm font-medium uppercase tracking-wide text-muted-foreground hover:text-foreground"
-      >
-        ← Naslovnica
-      </Link>
+      {/* Zaglavlje članka nosi isti kino-tretman kao udarna vijest na
+          naslovnici: fotografija puni širinu, scrim i zrno je spuštaju u ink,
+          naslov stoji na dnu u Antonu. Bez fotografije ostaje čisti ink blok
+          da se stranica ne raspadne na članku bez slike. */}
+      <header className="relative isolate overflow-hidden bg-ink-deep text-chalk">
+        <div aria-hidden className="absolute inset-x-0 top-0 h-1 bg-club-red" />
 
-      <p className="mt-8 text-sm uppercase tracking-widest text-club-red">
-        {formatDateLong(news.date)}
-      </p>
-      <h1 className="mt-3 text-3xl font-bold uppercase leading-tight tracking-tight md:text-5xl">
-        {news.title}
-      </h1>
-
-      {match && <MatchResultCard match={match} />}
-
-      {news.thumbnailPath && (
-        <div className="relative mt-8 aspect-[16/9] w-full overflow-hidden rounded-xl">
-          <Image
-            src={news.thumbnailPath}
-            alt={news.title}
-            fill
-            priority
-            sizes="(max-width: 768px) 100vw, 768px"
-            className="object-cover"
-          />
-        </div>
-      )}
-
-      {news.content && (
+        {news.thumbnailPath && (
+          <>
+            <Image
+              src={news.thumbnailPath}
+              alt=""
+              aria-hidden
+              fill
+              priority
+              sizes="100vw"
+              className="-z-20 object-cover"
+            />
+            <div
+              aria-hidden
+              className="absolute inset-0 -z-10 bg-linear-to-t from-ink-deep via-ink-deep/80 via-55% to-ink-deep/45"
+            />
+          </>
+        )}
         <div
-          className="mt-10 leading-relaxed [&_a]:text-club-red [&_a]:underline [&_h2]:mt-8 [&_h2]:text-2xl [&_h2]:font-bold [&_h3]:mt-6 [&_h3]:text-xl [&_h3]:font-semibold [&_img]:my-6 [&_img]:rounded-lg [&_li]:mt-1 [&_ol]:my-4 [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:my-4 [&_ul]:my-4 [&_ul]:list-disc [&_ul]:pl-6"
-          dangerouslySetInnerHTML={{ __html: news.content }}
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-grain opacity-[0.06] mix-blend-overlay"
         />
-      )}
+
+        <div className="mx-auto flex min-h-96 max-w-4xl flex-col justify-end px-6 pb-14 pt-10 sm:min-h-[30rem] lg:px-8">
+          {/* Nadređena ruta članka je popis vijesti, ne naslovnica — isto što
+              tvrdi i BreadcrumbList u JSON-LD-u iznad. */}
+          <Link
+            href="/novosti"
+            className="group inline-flex w-fit items-center gap-2.5 text-[0.68rem] font-black uppercase tracking-[0.2em] text-chalk/60 transition-colors hover:text-chalk"
+          >
+            <ArrowLeft className="size-4 transition-transform duration-300 group-hover:-translate-x-1" />
+            Sve vijesti
+          </Link>
+
+          <p className="mt-auto pt-12 text-[0.62rem] font-black uppercase tracking-[0.24em] text-club-red">
+            {formatDateLong(news.date)}
+          </p>
+          <h1 className="mt-4 max-w-3xl text-balance pt-[0.1em] font-display text-4xl uppercase leading-[1.14] text-chalk sm:text-5xl md:text-6xl">
+            {news.title}
+          </h1>
+        </div>
+      </header>
+
+      <div className="mx-auto max-w-3xl px-6 py-14 md:py-20">
+        {match && <MatchResultCard match={match} />}
+
+        {news.content && (
+          <div
+            className="leading-relaxed text-foreground/85 [&_a]:text-club-red [&_a]:underline [&_h2]:mt-10 [&_h2]:font-display [&_h2]:text-3xl [&_h2]:uppercase [&_h2]:text-foreground [&_h3]:mt-6 [&_h3]:text-xl [&_h3]:font-semibold [&_img]:my-6 [&_img]:clip-corner [&_li]:mt-1 [&_ol]:my-4 [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:my-4 [&_strong]:text-foreground [&_ul]:my-4 [&_ul]:list-disc [&_ul]:pl-6"
+            dangerouslySetInnerHTML={{ __html: news.content }}
+          />
+        )}
+
+        <div className="mt-14 border-t border-foreground/10 pt-8">
+          <Link
+            href="/novosti"
+            className="group inline-flex items-center gap-3 bg-ink-deep px-8 py-4 text-xs font-black uppercase tracking-[0.18em] text-chalk transition-colors duration-300 hover:bg-club-red"
+          >
+            <ArrowLeft className="size-4 transition-transform duration-300 group-hover:-translate-x-1" />
+            Sve vijesti
+          </Link>
+        </div>
+      </div>
     </article>
   );
 }

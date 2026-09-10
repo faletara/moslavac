@@ -157,7 +157,7 @@ function buildRows(match: Match, events: MatchEvent[]): Row[] {
         minute: event.displayMinute?.trim() || `${event.minute ?? 0}'`,
         eventKind: kind,
         player:
-          event.player?.name?.trim() || event.teamOfficial?.name?.trim() || "—",
+          event.player?.name?.trim() || event.teamOfficial?.name?.trim() || "-",
         detail:
           kind === "sub" && event.secondaryPlayer?.name
             ? `Izlazi ${event.secondaryPlayer.name}`

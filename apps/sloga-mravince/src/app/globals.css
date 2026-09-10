@@ -164,11 +164,22 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
   }
   html {
     font-size: 16px;
     overflow-x: clip;
+    /* Sidrni linkovi (#tablica, #utakmice) — klizno, ne skokom. */
+    scroll-behavior: auto;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+  /* Sekcija na koju vodi sidro mora proći ispod ljepljivog headera (5rem). */
+  :target {
+    scroll-margin-top: 7rem;
   }
   body {
     color: var(--foreground);
@@ -176,6 +187,14 @@
     font-size: 1rem;
     line-height: 1.6;
     overflow-x: clip;
+  }
+
+  /* Fokus prsten za tipkovnicu. Dvostruk namjerno: bijeli obris nosi vidljivost
+     na ink i crvenim sekcijama, crveni halo na chalk papiru. */
+  :where(a, button, summary, input, select, textarea, [tabindex]:not([tabindex="-1"])):focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px var(--club-red);
   }
   ::selection {
     background: var(--club);

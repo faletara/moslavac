@@ -36,7 +36,7 @@ function FormChips({ form }: { form: MatchOutcome[] }) {
 }
 
 function TeamRow({ row }: { row: TeamRanking }) {
-  const name = row.team?.name ?? "—";
+  const name = row.team?.name ?? "-";
 
   return (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-3 border-b border-foreground/10 py-5 first:border-t">
@@ -52,7 +52,7 @@ function TeamRow({ row }: { row: TeamRanking }) {
           {name}
         </p>
         <p className="mt-0.5 text-[0.62rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">
-          {row.position != null ? `${row.position}. mjesto` : "—"} ·{" "}
+          {row.position != null ? `${row.position}. mjesto` : "-"} ·{" "}
           <span className="tabular-nums">{row.points}</span>{" "}
           {pluralForm(row.points, {
             one: "bod",

@@ -23,7 +23,7 @@ function PlayerRow({ player }: { player: LineupPlayer }) {
   return (
     <li className="flex items-center gap-3.5 border-b border-foreground/10 py-3">
       <span className="w-6 shrink-0 text-right font-display text-base leading-none tabular-nums text-foreground/35">
-        {player.shirtNumber ?? "–"}
+        {player.shirtNumber ?? "-"}
       </span>
 
       <span className="min-w-0 flex-1 truncate text-sm font-semibold uppercase">
@@ -78,7 +78,7 @@ function SideLineup({
           className="size-9 rounded-full bg-white p-0.5 ring-1 ring-black/5"
         />
         <h3 className="min-w-0 flex-1 truncate font-display text-xl uppercase leading-tight tracking-wide sm:text-2xl">
-          {team?.name ?? "—"}
+          {team?.name ?? "-"}
         </h3>
         {lineup?.formation && (
           <span className="shrink-0 bg-ink-deep px-2.5 py-1.5 font-display text-sm leading-none tabular-nums text-chalk">

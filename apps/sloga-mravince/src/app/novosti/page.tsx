@@ -218,20 +218,15 @@ export default async function NewsPage({ searchParams }: Props) {
 
   return (
     <div className="bg-background">
-      <InkPageHero title="Novosti" watermark="Novosti">
+      <InkPageHero title="Novosti">
         {lead && <LeadStory item={lead} crestSrc={crestSrc} />}
       </InkPageHero>
 
       <section className="mx-auto max-w-6xl px-6 py-16 md:py-24 lg:px-8">
         <div className="flex flex-wrap items-end justify-between gap-5 border-b border-foreground/10 pb-6">
-          <div>
-            <p className="text-xs font-bold uppercase text-muted-foreground">
-              Arhiva objava
-            </p>
-            <h2 className="mt-3 font-display text-5xl uppercase leading-none text-foreground sm:text-6xl">
-              Sve vijesti
-            </h2>
-          </div>
+          <h2 className="font-display text-5xl uppercase leading-none text-foreground sm:text-6xl">
+            Sve vijesti
+          </h2>
           {result.totalPages > 1 && (
             <span className="text-xs font-bold uppercase text-muted-foreground tabular-nums">
               Stranica {String(page).padStart(2, "0")} /{" "}

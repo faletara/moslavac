@@ -47,8 +47,22 @@ export default async function RootLayout({
       fontVariables={`${archivo.variable} ${anton.variable}`}
       baseUrl={BASE_URL}
     >
+      {/* Tipkovnicom se glavni sadržaj dohvaća bez prolaska kroz cijelu
+          navigaciju. Vidljiv je tek kad primi fokus. */}
+      <a
+        href="#glavni-sadrzaj"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-100 focus:bg-club-red focus:px-5 focus:py-3 focus:text-xs focus:font-black focus:uppercase focus:tracking-[0.18em] focus:text-white"
+      >
+        Preskoči na sadržaj
+      </a>
       <Header tenant={tenant} />
-      <main className="flex-1 overflow-x-clip">{children}</main>
+      <main
+        id="glavni-sadrzaj"
+        tabIndex={-1}
+        className="flex-1 overflow-x-clip"
+      >
+        {children}
+      </main>
       <Footer tenant={tenant} clubDetails={clubDetails} />
     </ClubRootShell>
   );

@@ -35,7 +35,7 @@ export async function generateMetadata({
   const playerName = player?.name ?? null;
   const competitionName = competition?.name ?? null;
 
-  const title = playerName ? `${playerName} — Statistika` : "Statistika igrača";
+  const title = playerName ? `${playerName}: statistika` : "Statistika igrača";
   const description = playerName
     ? `Profil i statistika igrača ${playerName}${
         competitionName ? ` u natjecanju ${competitionName}` : ""

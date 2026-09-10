@@ -2,7 +2,12 @@ import type { ReactNode } from "react";
 
 interface InkPageHeroProps {
   title: string | string[];
-  watermark: string;
+  /**
+   * Obrisana riječ iza naslova. Izborna i namjerno rijetka: kad ponavlja
+   * naslov, ista riječ stoji dvaput na istom ekranu i ne dodaje ništa.
+   * Stavi je samo kad kaže nešto što naslov ne kaže (npr. godina osnutka).
+   */
+  watermark?: string;
   children?: ReactNode;
 }
 
@@ -14,12 +19,14 @@ export function InkPageHero({ title, watermark, children }: InkPageHeroProps) {
     <section className="relative isolate overflow-hidden bg-ink-deep text-chalk">
       <div aria-hidden className="absolute inset-x-0 top-0 h-1 bg-club-red" />
       <div aria-hidden className="absolute inset-0 bg-grain opacity-[0.06]" />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -right-10 top-8 -z-10 select-none font-display text-9xl uppercase leading-none text-white/[0.035] sm:text-[12rem] lg:text-[17rem]"
-      >
-        {watermark}
-      </div>
+      {watermark && (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-10 top-8 -z-10 select-none font-display text-9xl uppercase leading-none text-white/[0.035] sm:text-[12rem] lg:text-[17rem]"
+        >
+          {watermark}
+        </div>
+      )}
 
       <div
         className={`mx-auto grid min-h-[28rem] max-w-6xl content-center items-center gap-10 px-6 py-14 sm:min-h-[30rem] sm:py-16 lg:px-8 ${

@@ -111,7 +111,7 @@ function PlayerCard({ player }: { player: CarouselPlayer }) {
     return (
       <Link
         href={player.href}
-        aria-label={`Statistika — ${player.displayName}`}
+        aria-label={`Statistika: ${player.displayName}`}
         className={cardClass}
       >
         {body}

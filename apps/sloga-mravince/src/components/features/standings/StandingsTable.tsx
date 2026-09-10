@@ -62,7 +62,7 @@ export default function StandingsTable({
         </thead>
         <tbody>
           {rows.map((row) => {
-            const name = row.team?.name ?? "—";
+            const name = row.team?.name ?? "-";
             const gd = goalDiff(row);
             const mine = Boolean(row.highlight);
             const ring = !mine && row.team?.id != null && ringed.has(row.team.id);
@@ -94,7 +94,7 @@ export default function StandingsTable({
                   >
                     {row.position != null
                       ? String(row.position).padStart(2, "0")
-                      : "–"}
+                      : "-"}
                   </span>
                 </td>
 
@@ -120,22 +120,22 @@ export default function StandingsTable({
 
                 {/* Statistika */}
                 <td className={cn(STAT_CELL, muted, rowBorder)}>
-                  {row.played ?? "–"}
+                  {row.played ?? "-"}
                 </td>
                 <td
                   className={cn(STAT_CELL, muted, "hidden sm:table-cell", rowBorder)}
                 >
-                  {row.wins ?? "–"}
+                  {row.wins ?? "-"}
                 </td>
                 <td
                   className={cn(STAT_CELL, muted, "hidden sm:table-cell", rowBorder)}
                 >
-                  {row.draws ?? "–"}
+                  {row.draws ?? "-"}
                 </td>
                 <td
                   className={cn(STAT_CELL, muted, "hidden sm:table-cell", rowBorder)}
                 >
-                  {row.losses ?? "–"}
+                  {row.losses ?? "-"}
                 </td>
                 <td
                   className={cn(STAT_CELL, muted, "hidden md:table-cell", rowBorder)}

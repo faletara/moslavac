@@ -40,7 +40,7 @@ function TeamBlock({
           winner ? "text-white" : "text-white/60",
         )}
       >
-        {name ?? "—"}
+        {name ?? "-"}
       </span>
     </div>
   );
@@ -103,7 +103,7 @@ export default function NextMatchBar({ slots }: { slots: MatchSlots }) {
 
       <div className="mx-auto max-w-6xl px-6">
         <SectionRow
-          eyebrow={isNext ? "Matchday" : "Posljednji rezultat"}
+          title={isNext ? "Sljedeća utakmica" : "Posljednji rezultat"}
           meta={meta}
         />
 
@@ -137,7 +137,7 @@ export default function NextMatchBar({ slots }: { slots: MatchSlots }) {
                 <Countdown target={kickoff} />
               ) : (
                 <span className="font-display text-6xl sm:text-8xl">
-                  {match.teamResult ?? "–"}
+                  {match.teamResult ?? "-"}
                 </span>
               )}
             </div>
@@ -183,23 +183,25 @@ export default function NextMatchBar({ slots }: { slots: MatchSlots }) {
   );
 }
 
-/** Gornji editorial red sekcije na tamnoj podlozi. */
+/**
+ * Zaglavlje matchday sekcije. Naslov je Anton u punoj veličini, ne mikro
+ * oznaka: ispod njega stoji najveći element stranice (scoreboard), pa bi ga
+ * oznaka od 0.62rem ostavila bez težine. Natjecanje i kolo idu u red ispod.
+ */
 function SectionRow({
-  eyebrow,
+  title,
   meta,
 }: {
-  eyebrow: string;
+  title: string;
   meta: string;
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-      <h2 className="text-[0.62rem] font-bold uppercase tracking-[0.3em] text-white">
-        {eyebrow}
+    <div>
+      <h2 className="font-display text-4xl uppercase leading-none tracking-wide text-white md:text-5xl">
+        {title}
       </h2>
       {meta && (
-        <span className="hidden text-[0.62rem] font-semibold uppercase tracking-[0.3em] text-white/40 sm:inline">
-          · {meta}
-        </span>
+        <p className="mt-3 text-sm font-semibold text-white/45">{meta}</p>
       )}
     </div>
   );

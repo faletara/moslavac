@@ -42,7 +42,7 @@ export default function Countdown({ target, className }: CountdownProps) {
           )}
           <div className="flex flex-col items-center">
             <span className="min-w-13 bg-white/6 px-1.5 py-2.5 text-center font-display text-3xl leading-none tabular-nums text-white ring-1 ring-white/12 clip-corner sm:min-w-20 sm:px-2 sm:py-3 sm:text-6xl">
-              {state ? String(state[key]).padStart(2, "0") : "––"}
+              {state ? String(state[key]).padStart(2, "0") : "--"}
             </span>
             <span className="mt-2 text-[0.58rem] font-bold uppercase tracking-[0.28em] text-white/45">
               {pluralForm(state ? state[key] : 0, forms)}

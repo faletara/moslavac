@@ -39,7 +39,7 @@ function matchTitle(match: Match): string {
 
   return homeScore != null && awayScore != null
     ? `${home} ${homeScore}:${awayScore} ${away}`
-    : `${home} – ${away}`;
+    : `${home} - ${away}`;
 }
 
 export async function generateStaticParams() {
@@ -189,7 +189,7 @@ function buildJsonLd({
           name: "Raspored i rezultati",
           item: `${BASE_URL}/raspored-i-rezultati`,
         },
-        { "@type": "ListItem", position: 3, name: `${home} – ${away}`, item: url },
+        { "@type": "ListItem", position: 3, name: `${home} - ${away}`, item: url },
       ],
     },
   ];
@@ -211,7 +211,7 @@ function buildJsonLd({
   const event: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "SportsEvent",
-    name: `${home} – ${away}`,
+    name: `${home} - ${away}`,
     url,
     sport: "Football",
     startDate: start.toISOString(),

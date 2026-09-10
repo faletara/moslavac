@@ -39,7 +39,7 @@ function TeamBlock({
           dimmed ? "text-white/60" : "text-white",
         )}
       >
-        {name ?? "—"}
+        {name ?? "-"}
       </span>
     </div>
   );
@@ -186,7 +186,7 @@ export default function MatchHero({ match }: { match: Match }) {
                 <Countdown target={kickoff} />
               ) : (
                 <span className="font-display text-6xl leading-none text-white/35 sm:text-8xl">
-                  –
+                  -
                 </span>
               )}
             </div>

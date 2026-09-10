@@ -68,17 +68,16 @@ export default async function ContactPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
       />
 
-      <InkPageHero title={["Kontakt"]} watermark="Kontakt" />
+      <InkPageHero title={["Kontakt"]} />
 
       <section className="mx-auto max-w-6xl px-6 py-16 md:py-24 lg:px-8">
         <div className="grid gap-14 lg:grid-cols-[1fr_1.1fr] lg:gap-20">
           {/* Kontakt podaci */}
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.3em] text-club-red">
-              Javi nam se
-            </p>
-            <h2 className="mt-4 font-display text-4xl uppercase leading-tight text-foreground sm:text-5xl">
-              Kontakt
+            {/* Naslov stranice već kaže „Kontakt”; ovaj blok imenuje ono
+                što stvarno stoji ispod njega. */}
+            <h2 className="font-display text-4xl uppercase leading-tight text-foreground sm:text-5xl">
+              Podaci
             </h2>
 
             <dl className="mt-10 space-y-7">
@@ -158,7 +157,7 @@ export default async function ContactPage() {
           {mapQuery && (
             <div className="min-h-72 overflow-hidden border border-foreground/10 clip-corner">
               <iframe
-                title={`Lokacija — ${name}`}
+                title={`Lokacija: ${name}`}
                 src={`https://www.google.com/maps?q=${mapQuery}&output=embed`}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
@@ -172,16 +171,13 @@ export default async function ContactPage() {
       {/* Postani član */}
       <section className="bg-ink-deep py-16 text-chalk md:py-24">
         <div className="mx-auto max-w-4xl px-6 lg:px-8">
-          <p className="text-xs font-bold uppercase tracking-[0.3em] text-club-red">
-            Podrži klub
-          </p>
-          <h2 className="mt-4 font-display text-4xl uppercase leading-tight sm:text-5xl">
+          <h2 className="font-display text-4xl uppercase leading-tight sm:text-5xl">
             Postani član
           </h2>
           <p className="mt-8 max-w-2xl text-base leading-relaxed text-chalk/70">
             Jedan klub, jedna strast. Podrži nas s tribina i budi dio svake
-            pobjede. Za sve o učlanjenju javi nam se{email ? " e-mailom" : ""} —
-            rado ćemo ti odgovoriti.
+            pobjede. Za sve o učlanjenju javi nam se{email ? " e-mailom" : ""}.
+            Rado ćemo ti odgovoriti.
           </p>
 
           {membershipHref && (

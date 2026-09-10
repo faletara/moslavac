@@ -8,8 +8,6 @@ import type { FrontendTenant } from "@/lib/payload/types";
  * masivnim Anton naslovom preko dva reda i tvrdim (uglatim) CTA gumbima.
  */
 export default function CtaSection({ tenant }: { tenant: FrontendTenant }) {
-  const clubName = tenant.branding?.shortName ?? tenant.displayName;
-  const founded = tenant.branding?.founded ?? null;
   const phone = tenant.contact?.phone ?? null;
 
   return (
@@ -36,16 +34,17 @@ export default function CtaSection({ tenant }: { tenant: FrontendTenant }) {
 
       <div className="mx-auto flex min-h-140 max-w-6xl items-center px-6 py-24 md:min-h-170 md:py-36">
         <FadeInView className="max-w-3xl text-white">
-          <p className="flex items-center gap-3 text-[0.62rem] font-black uppercase tracking-[0.34em] text-club-gold">
-            <span aria-hidden className="h-4 w-1 bg-club-red" />
-            {founded ? `${clubName} · od ${founded}.` : clubName}
-          </p>
-
-          <h2 className="mt-7 flex flex-col gap-3 font-display uppercase leading-[1.12] tracking-normal drop-shadow-[0_4px_30px_rgba(0,0,0,0.6)] sm:gap-4">
+          <h2 className="font-display uppercase leading-[1.12] tracking-normal drop-shadow-[0_4px_30px_rgba(0,0,0,0.6)]">
             <span className="block pt-[0.12em] text-6xl sm:text-7xl md:text-8xl">
               Postani dio
             </span>
-            <span className="[--text-stroke-color:#ffffff] block pt-[0.18em] text-6xl text-stroke-thick sm:text-7xl md:text-8xl">
+            {/* Crvena greda umjesto obrisanog reda: isti kontrast dvaju
+                redaka, ali naslov ostaje čitljiv preko fotografije. */}
+            <span
+              aria-hidden
+              className="my-4 block h-1.5 w-24 bg-club-red sm:my-5 sm:w-32"
+            />
+            <span className="block pt-[0.12em] text-6xl sm:text-7xl md:text-8xl">
               naše priče
             </span>
           </h2>

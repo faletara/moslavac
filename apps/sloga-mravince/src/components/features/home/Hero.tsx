@@ -136,40 +136,6 @@ function HeroSlider({
         className="pointer-events-none absolute inset-0 bg-grain opacity-[0.07] mix-blend-overlay"
       />
 
-      {/* Vertikalna heritage traka — lijevi rub */}
-      {/* <div
-        aria-hidden
-        className="pointer-events-none absolute inset-y-0 left-0 hidden w-14 items-center justify-center border-r border-white/10 lg:flex"
-      >
-        <span className="rotate-180 whitespace-nowrap text-[0.6rem] font-bold uppercase tracking-[0.5em] text-white/45 [writing-mode:vertical-rl]">
-          {clubName} · Od 1925 · Stadion Glavica
-        </span>
-      </div> */}
-
-      {/* Veliki redni broj slajda — gore desno
-      {count > 1 && (
-        <div
-          aria-hidden
-          className="pointer-events-none absolute right-6 top-6 hidden items-baseline font-display leading-none sm:flex md:right-14 md:top-10"
-        >
-          <AnimatePresence mode="popLayout" initial={false}>
-            <motion.span
-              key={index}
-              initial={reduced ? false : { y: 26, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={reduced ? undefined : { y: -26, opacity: 0 }}
-              transition={{ duration: 0.45, ease: EXPO_OUT }}
-              className="text-6xl text-white md:text-7xl"
-            >
-              {String(index + 1).padStart(2, "0")}
-            </motion.span>
-          </AnimatePresence>
-          <span className="ml-2 text-2xl text-white/35 md:text-3xl">
-            / {String(count).padStart(2, "0")}
-          </span>
-        </div>
-      )} */}
-
       {/* Sadržaj dolje-lijevo */}
       <div className="absolute inset-x-0 bottom-0 px-6 pb-24 md:px-14 md:pb-24 lg:pl-24">
         <div className="max-w-5xl">
@@ -415,7 +381,7 @@ function HeroFallback({ tenant }: { tenant: FrontendTenant }) {
   const founded = tenant.branding?.founded ?? null;
 
   return (
-    <section className="mx-auto flex min-h-[60vh] max-w-7xl flex-col items-center justify-center px-6 py-24 text-center">
+    <section className="mx-auto flex min-h-[60dvh] max-w-7xl flex-col items-center justify-center px-6 py-24 text-center">
       {founded && (
         <p className="text-xs uppercase tracking-widest text-muted-foreground">
           Osnovan {founded}.

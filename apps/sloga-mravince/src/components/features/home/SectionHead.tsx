@@ -3,8 +3,12 @@ import { RevealHeading } from "@/components/animations";
 import { cn } from "@/lib/utils";
 
 interface SectionHeadProps {
-  /** Mala uppercase najava sekcije. */
-  eyebrow: string;
+  /**
+   * Mala uppercase najava iznad naslova. Namjerno je izborna i namjerno rijetka:
+   * kad je nosi svaka sekcija, stranica dobije isti predložak od vrha do dna.
+   * Stavi je samo kad nosi podatak koji naslov ne nosi (npr. koje natjecanje).
+   */
+  eyebrow?: string;
   /** Veliki Anton naslov — niz renderira više reveal linija. */
   title: string | string[];
   /** Link desno u gornjem redu (npr. "Sve vijesti"). */
@@ -30,15 +34,22 @@ export default function SectionHead({
 
   return (
     <div className={cn(dark ? "text-white" : "text-foreground", className)}>
-      <div className="flex items-center justify-between gap-4">
-        <span
-          className={cn(
-            "text-[0.62rem] font-bold uppercase tracking-[0.3em]",
-            muted,
-          )}
-        >
-          {eyebrow}
-        </span>
+      <div
+        className={cn(
+          "flex items-center gap-4",
+          eyebrow ? "justify-between" : "justify-end",
+        )}
+      >
+        {eyebrow && (
+          <span
+            className={cn(
+              "text-[0.62rem] font-bold uppercase tracking-[0.3em]",
+              muted,
+            )}
+          >
+            {eyebrow}
+          </span>
+        )}
         {link && (
           <Link
             href={link.href}

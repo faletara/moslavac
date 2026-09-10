@@ -50,22 +50,8 @@ export default function HeritageSection() {
         aria-hidden
         className="pointer-events-none absolute inset-0 -z-10 bg-grain opacity-[0.06] mix-blend-overlay"
       />
-      {/* Outlined watermark godine u pozadini */}
-      <span
-        aria-hidden
-        className="[--text-stroke-color:rgba(255,255,255,0.05)] pointer-events-none absolute -bottom-8 left-0 -z-10 select-none font-display text-[26vw] leading-none tabular-nums text-stroke-thick md:text-[18vw]"
-      >
-        1925
-      </span>
-
       <div className="mx-auto max-w-6xl px-6">
-        <div className="flex items-center">
-          <span className="text-[0.62rem] font-bold uppercase tracking-[0.3em] text-white/45">
-            Naša povijest
-          </span>
-        </div>
-
-        <div className="mt-12 grid gap-16 md:grid-cols-2 md:items-center md:gap-20">
+        <div className="grid gap-16 md:grid-cols-2 md:items-center md:gap-20">
           <div>
             <h2 className="flex flex-col gap-1 font-display uppercase leading-[1.14] tracking-normal sm:gap-2">
               <span className="block pt-[0.12em] text-5xl text-white sm:text-6xl md:text-7xl">
@@ -108,7 +94,7 @@ export default function HeritageSection() {
               />
               <Image
                 src="/sloga-mravince-100.jpeg"
-                alt="HNK Sloga Mravince — 100 godina"
+                alt="HNK Sloga Mravince, 100 godina"
                 width={340}
                 height={340}
                 className="relative max-w-60 md:max-w-80"

@@ -143,7 +143,7 @@ function CompetitionSelector({
 function TeamName({ name }: { name: string | null | undefined }) {
   return (
     <span className="min-w-0 text-balance font-display text-xl uppercase leading-tight text-foreground sm:text-2xl">
-      {name ?? "—"}
+      {name ?? "-"}
     </span>
   );
 }
@@ -169,7 +169,7 @@ function TeamLine({
         className="size-9 shrink-0 rounded-full bg-white p-1 ring-1 ring-black/5"
       />
       <span className="min-w-0 flex-1 font-display text-lg uppercase leading-tight text-foreground">
-        {team?.name ?? "—"}
+        {team?.name ?? "-"}
       </span>
       {goals != null && (
         <span className="font-display text-2xl uppercase leading-none tabular-nums text-ink-deep">
@@ -248,7 +248,7 @@ function MatchCard({
             </span>
           ) : (
             <span className="bg-ink-deep px-3 py-2 font-display text-xl uppercase leading-none text-chalk">
-              {isUpcoming ? time : "–"}
+              {isUpcoming ? time : "-"}
             </span>
           )}
           <span className="mt-2 text-[0.56rem] font-black uppercase text-muted-foreground">
@@ -311,7 +311,7 @@ function MatchCard({
       {marker}
       <Link
         href={href}
-        aria-label={`${match.homeTeam?.name ?? "Domaćin"} – ${match.awayTeam?.name ?? "Gost"}, detalji utakmice`}
+        aria-label={`${match.homeTeam?.name ?? "Domaćin"} - ${match.awayTeam?.name ?? "Gost"}, detalji utakmice`}
         // Crvena traka koja izraste uz lijevi rub retka — poster jezik. Namjerno
         // bez podloge u sivom: puna siva ploha preko cijele širine izgledala je
         // kao greška, a ne kao hover.
@@ -370,7 +370,7 @@ export default async function ScheduleResultsPage({ searchParams }: Props) {
 
   return (
     <div className="bg-background">
-      <InkPageHero title={["Raspored", "Rezultati"]} watermark="Raspored" />
+      <InkPageHero title={["Raspored", "Rezultati"]} />
 
       <section className="mx-auto max-w-6xl px-6 py-16 md:py-24 lg:px-8">
         {!selectedCompetition?.id ? (
