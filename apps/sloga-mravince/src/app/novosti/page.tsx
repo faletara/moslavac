@@ -2,11 +2,11 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import NewsFallbackArt from "@/components/features/news/NewsFallbackArt";
 import { InkPageHero } from "@/components/layout/InkPageHero";
 import { formatDateShort } from "@/lib/helpers/date";
 import { fetchNewsPaginated } from "@/lib/payload/getNews";
 import { getTenant } from "@/lib/payload/getTenant";
-import type { PayloadMedia } from "@/lib/payload/types";
 import type { News } from "@/types/news";
 
 export const revalidate = 60;
@@ -26,20 +26,15 @@ function hasSlug(item: News): item is NewsWithSlug {
   return Boolean(item.slug);
 }
 
-function getCrestSrc(logo: string | PayloadMedia | null | undefined): string {
-  if (!logo) return "/crest.png";
-  return typeof logo === "string" ? logo : (logo.url ?? "/crest.png");
-}
-
 function NewsThumb({
   item,
-  crestSrc,
+  clubName,
   sizes,
   priority = false,
   className,
 }: {
   item: NewsWithSlug;
-  crestSrc: string;
+  clubName: string;
   sizes: string;
   priority?: boolean;
   className?: string;
@@ -56,18 +51,8 @@ function NewsThumb({
           className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
         />
       ) : (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,#ffffff_0%,#f2f3f5_65%,#e7e9ed_100%)]" />
-          <div className="relative aspect-square h-3/5 transition-transform duration-700 ease-out group-hover:scale-105">
-            <Image
-              src={crestSrc}
-              alt=""
-              fill
-              priority={priority}
-              sizes="220px"
-              className="object-contain drop-shadow-[0_12px_28px_rgba(0,0,0,0.16)]"
-            />
-          </div>
+        <div className="absolute inset-0 transition-transform duration-700 ease-out group-hover:scale-105">
+          <NewsFallbackArt clubName={clubName} size="card" />
         </div>
       )}
     </div>
@@ -76,16 +61,16 @@ function NewsThumb({
 
 function LeadStory({
   item,
-  crestSrc,
+  clubName,
 }: {
   item: NewsWithSlug;
-  crestSrc: string;
+  clubName: string;
 }) {
   return (
     <Link href={`/novosti/${item.slug}`} className="group relative block">
       <NewsThumb
         item={item}
-        crestSrc={crestSrc}
+        clubName={clubName}
         sizes="(max-width: 1024px) 100vw, 46vw"
         priority
         className="aspect-16/10 clip-corner"
@@ -107,16 +92,16 @@ function LeadStory({
 
 function NewsCard({
   item,
-  crestSrc,
+  clubName,
 }: {
   item: NewsWithSlug;
-  crestSrc: string;
+  clubName: string;
 }) {
   return (
     <Link href={`/novosti/${item.slug}`} className="group block">
       <NewsThumb
         item={item}
-        crestSrc={crestSrc}
+        clubName={clubName}
         sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
         className="aspect-16/10 clip-corner"
       />
@@ -210,7 +195,7 @@ export default async function NewsPage({ searchParams }: Props) {
     fetchNewsPaginated({ page, size: 13 }),
   ]);
 
-  const crestSrc = getCrestSrc(tenant.branding?.logo);
+  const clubName = tenant.branding?.shortName ?? tenant.displayName;
   const items = result.content.filter(hasSlug);
   const lead = items[0];
   const archiveItems = items;
@@ -219,7 +204,7 @@ export default async function NewsPage({ searchParams }: Props) {
   return (
     <div className="bg-background">
       <InkPageHero title="Novosti">
-        {lead && <LeadStory item={lead} crestSrc={crestSrc} />}
+        {lead && <LeadStory item={lead} clubName={clubName} />}
       </InkPageHero>
 
       <section className="mx-auto max-w-6xl px-6 py-16 md:py-24 lg:px-8">
@@ -243,7 +228,7 @@ export default async function NewsPage({ searchParams }: Props) {
           <div className="mt-10 grid gap-x-7 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
             {archiveItems.map((item) => (
               <article key={item.id}>
-                <NewsCard item={item} crestSrc={crestSrc} />
+                <NewsCard item={item} clubName={clubName} />
               </article>
             ))}
           </div>

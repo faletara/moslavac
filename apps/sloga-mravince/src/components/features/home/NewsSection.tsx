@@ -4,17 +4,20 @@ import { FadeInView } from "@/components/animations";
 import { formatDateLong } from "@/lib/helpers/date";
 import { cn } from "@/lib/utils";
 import type { News } from "@/types/news";
+import NewsFallbackArt from "@/components/features/news/NewsFallbackArt";
 import SectionHead from "./SectionHead";
 
-/** Slika vijesti ili grb-fallback na mekoj radijalnoj podlozi. */
+/** Slika vijesti ili tipografski plakat kad vijest nema naslovnu sliku. */
 function Thumb({
   item,
-  crestSrc,
+  clubName,
+  size,
   sizes,
   className,
 }: {
   item: News;
-  crestSrc: string;
+  clubName: string;
+  size: "card" | "row";
   sizes: string;
   className?: string;
 }) {
@@ -29,17 +32,8 @@ function Thumb({
           className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
         />
       ) : (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,#ffffff_0%,#f2f3f5_65%,#e7e9ed_100%)]" />
-          <div className="relative aspect-square h-3/5 transition-transform duration-700 ease-out group-hover:scale-105">
-            <Image
-              src={crestSrc}
-              alt=""
-              fill
-              sizes="220px"
-              className="object-contain drop-shadow-[0_12px_28px_rgba(0,0,0,0.16)]"
-            />
-          </div>
+        <div className="absolute inset-0 transition-transform duration-700 ease-out group-hover:scale-105">
+          <NewsFallbackArt clubName={clubName} size={size} />
         </div>
       )}
     </div>
@@ -47,12 +41,13 @@ function Thumb({
 }
 
 /** Velika udarna vijest — slika s ink scrimom i Anton naslovom preko dna. */
-function FeatureCard({ item, crestSrc }: { item: News; crestSrc: string }) {
+function FeatureCard({ item, clubName }: { item: News; clubName: string }) {
   return (
     <Link href={`/novosti/${item.slug}`} className="group relative block">
       <Thumb
         item={item}
-        crestSrc={crestSrc}
+        clubName={clubName}
+        size="card"
         sizes="(max-width: 1024px) 100vw, 58vw"
         className="aspect-16/11 clip-corner lg:aspect-auto lg:h-full lg:min-h-130"
       />
@@ -77,10 +72,10 @@ function FeatureCard({ item, crestSrc }: { item: News; crestSrc: string }) {
 /** Redak u bočnoj listi — mala slika + naslov + datum, hairline ispod. */
 function ListRow({
   item,
-  crestSrc,
+  clubName,
 }: {
   item: News;
-  crestSrc: string;
+  clubName: string;
 }) {
   return (
     <Link
@@ -89,7 +84,8 @@ function ListRow({
     >
       <Thumb
         item={item}
-        crestSrc={crestSrc}
+        clubName={clubName}
+        size="row"
         sizes="128px"
         className="aspect-4/3 w-28 shrink-0 clip-corner sm:w-32"
       />
@@ -111,10 +107,10 @@ function ListRow({
  */
 export default function NewsSection({
   news,
-  crestSrc,
+  clubName,
 }: {
   news: News[];
-  crestSrc: string;
+  clubName: string;
 }) {
   const items = news.filter((n) => n.slug).slice(0, 8);
   if (items.length === 0) return null;
@@ -132,12 +128,12 @@ export default function NewsSection({
       <FadeInView className="mt-12 md:mt-16">
         <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
           <div className="lg:col-span-7">
-            <FeatureCard item={feature} crestSrc={crestSrc} />
+            <FeatureCard item={feature} clubName={clubName} />
           </div>
           {side.length > 0 && (
             <div className="flex flex-col justify-center lg:col-span-5">
               {side.map((item) => (
-                <ListRow key={item.id} item={item} crestSrc={crestSrc} />
+                <ListRow key={item.id} item={item} clubName={clubName} />
               ))}
             </div>
           )}

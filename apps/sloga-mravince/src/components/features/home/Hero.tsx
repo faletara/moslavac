@@ -11,6 +11,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import NewsFallbackArt from "@/components/features/news/NewsFallbackArt";
 import { formatDateLong } from "@/lib/helpers/date";
 import type { FrontendTenant } from "@/lib/payload/types";
 import type { News } from "@/types/news";
@@ -18,7 +19,6 @@ import type { News } from "@/types/news";
 type HeroProps = {
   tenant: FrontendTenant;
   news: News[];
-  crestSrc: string;
 };
 
 const AUTOPLAY_MS = 6000;
@@ -30,7 +30,7 @@ const EXPO_OUT = [0.16, 1, 0.3, 1] as const;
  * slajda, vertikalna heritage traka lijevo, segmentirani crveni progress.
  * Ako nema vijesti, pada natrag na tekstualni prikaz kluba.
  */
-export default function Hero({ tenant, news, crestSrc }: HeroProps) {
+export default function Hero({ tenant, news }: HeroProps) {
   if (news.length === 0) {
     return <HeroFallback tenant={tenant} />;
   }
@@ -40,18 +40,16 @@ export default function Hero({ tenant, news, crestSrc }: HeroProps) {
       {/* Naslovnici h1 pripada klubu, ne naslovu vijesti koji se rotira svakih
           nekoliko sekundi. Vizualno vodeći ostaje naslov aktivne vijesti. */}
       <h1 className="sr-only">{tenant.displayName}</h1>
-      <HeroSlider news={news} crestSrc={crestSrc} clubName={clubName} />
+      <HeroSlider news={news} clubName={clubName} />
     </>
   );
 }
 
 function HeroSlider({
   news,
-  crestSrc,
   clubName,
 }: {
   news: News[];
-  crestSrc: string;
   clubName: string;
 }) {
   const reduced = useReducedMotion();
@@ -112,12 +110,7 @@ function HeroSlider({
                 priority={index === 0}
               />
             ) : (
-              <CrestBackdrop
-                crestSrc={crestSrc}
-                clubName={clubName}
-                priority={index === 0}
-                reduced={reduced ?? false}
-              />
+              <NewsFallbackArt clubName={clubName} size="hero" />
             )}
           </motion.div>
         </motion.div>
@@ -329,51 +322,6 @@ function HeroSlide({
   );
 }
 
-/**
- * Pozadina slajda kad vijest nema thumbnail — velik grb kluba na ink bazi s
- * ogromnim outlined watermarkom imena kluba i laganim lebdenjem grba (osim za
- * reduced-motion). Poster-tamni izgled koji se slaže s kino-tretmanom hero-a.
- */
-function CrestBackdrop({
-  crestSrc,
-  clubName,
-  priority,
-  reduced,
-}: {
-  crestSrc: string;
-  clubName: string;
-  priority: boolean;
-  reduced: boolean;
-}) {
-  return (
-    <div className="relative flex h-full w-full items-center justify-center overflow-hidden bg-ink-deep">
-      {/* Crveni sjaj iza grba */}
-      <div className="pointer-events-none absolute left-1/2 top-[42%] size-[36rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-club-red/25 blur-3xl" />
-      {/* Outlined watermark imena kluba */}
-      <span
-        aria-hidden
-        className="[--text-stroke-color:rgba(255,255,255,0.08)] pointer-events-none absolute top-[42%] -translate-y-1/2 select-none whitespace-nowrap font-display text-[24vw] uppercase leading-none text-stroke"
-      >
-        {clubName}
-      </span>
-      {/* Grb — velik, s mekom sjenom */}
-      <motion.div
-        animate={reduced ? undefined : { y: [0, -10, 0] }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-        className="relative aspect-square w-56 translate-y-[-6%] sm:w-72 md:w-104"
-      >
-        <Image
-          src={crestSrc}
-          alt=""
-          fill
-          sizes="(max-width: 768px) 70vw, 420px"
-          priority={priority}
-          className="object-contain drop-shadow-[0_25px_50px_rgba(0,0,0,0.55)]"
-        />
-      </motion.div>
-    </div>
-  );
-}
 
 function HeroFallback({ tenant }: { tenant: FrontendTenant }) {
   const { displayName } = tenant;

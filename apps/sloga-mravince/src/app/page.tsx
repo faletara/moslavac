@@ -107,12 +107,7 @@ export default async function HomePage() {
   const allNews = newsPage.content.filter((n) => n.slug);
   const heroNews = allNews.slice(0, 4);
 
-  const logo = tenant.branding?.logo;
-  const crestSrc = !logo
-    ? "/crest.png"
-    : typeof logo === "string"
-      ? logo
-      : logo.url;
+  const clubName = tenant.branding?.shortName ?? tenant.displayName;
 
   const marquee = getNextMatchMarquee(matchSlots, tenant.displayName);
   const webshopUrl = tenant.social?.webshop ?? null;
@@ -122,12 +117,12 @@ export default async function HomePage() {
       {/* Hero puni ekran (viewport minus 5rem header) */}
 
       <div className="flex h-[calc(100svh-5rem)] flex-col">
-        <Hero tenant={tenant} news={heroNews} crestSrc={crestSrc} />
+        <Hero tenant={tenant} news={heroNews} />
       </div>
       {marquee && (
         <MarqueeStrip items={marquee.items} ariaLabel={marquee.ariaLabel} />
       )}
-      <NewsSection news={allNews} crestSrc={crestSrc} />
+      <NewsSection news={allNews} clubName={clubName} />
 
       <NextMatchBar slots={matchSlots} />
 
