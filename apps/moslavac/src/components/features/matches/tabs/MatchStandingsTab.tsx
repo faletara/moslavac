@@ -189,7 +189,7 @@ function FormDot({ result }: { result: FormResult }) {
   return (
     <span
       className={cn(
-        "flex size-5 items-center justify-center rounded-full text-[0.55rem] font-bold uppercase",
+        "flex size-5 items-center justify-center rounded-full text-[0.6rem] font-bold uppercase",
         styles[result],
       )}
     >

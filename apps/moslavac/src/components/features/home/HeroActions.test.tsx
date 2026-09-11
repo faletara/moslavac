@@ -20,7 +20,7 @@ describe("HeroActions", () => {
     const html = renderToStaticMarkup(<HeroActions hasNextMatch={false} />);
 
     expect(html).toContain('href="/utakmice"');
-    expect(html).toContain("Pogledaj raspored");
+    expect(html).toContain("Raspored utakmica");
     expect(html).not.toContain('href="#sljedeca-utakmica"');
     expect(html.match(/<a /g)).toHaveLength(1);
     expect(html).not.toContain('href="/prva-momcad"');

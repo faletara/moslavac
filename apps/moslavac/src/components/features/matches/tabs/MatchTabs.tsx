@@ -37,7 +37,6 @@ interface MatchTabsProps {
   events: MatchEvent[] | undefined;
   lineups: Lineups | undefined;
   refereeData: MatchInfo | undefined;
-  refereesLoading: boolean;
   standings: TeamRanking[];
   competitionMatches: Match[];
   scorers: CompetitionPlayerStat[];
@@ -48,7 +47,6 @@ export default function MatchTabs({
   events,
   lineups,
   refereeData,
-  refereesLoading,
   standings,
   competitionMatches,
   scorers,
@@ -103,7 +101,6 @@ export default function MatchTabs({
           events={events}
           lineups={lineups}
           refereeData={refereeData}
-          refereesLoading={refereesLoading}
           competitionMatches={competitionMatches}
           standings={standings}
         />

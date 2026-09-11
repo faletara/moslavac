@@ -173,7 +173,7 @@ export default function Footer({ tenant }: FooterProps) {
             )}
             <div className="space-y-3 text-sm leading-relaxed">
               {motto && (
-                <p className="font-serif italic text-muted-foreground">
+                <p className="italic text-muted-foreground">
                   &ldquo;{motto}&rdquo;
                 </p>
               )}

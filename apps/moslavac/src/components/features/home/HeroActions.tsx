@@ -11,7 +11,7 @@ export function HeroActions({ hasNextMatch }: HeroActionsProps) {
         href: "#sljedeca-utakmica",
         label: "Pogledaj sljedeću utakmicu",
       }
-    : { href: "/utakmice", label: "Pogledaj raspored" };
+    : { href: "/utakmice", label: "Raspored utakmica" };
 
   return (
     <Link

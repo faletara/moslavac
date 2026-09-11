@@ -14,7 +14,9 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
-  --font-display: var(--font-geist-sans);
+  /* Naslovi imaju vlastito pismo — prije je ovo bio alias za `--font-sans`,
+     pa `font-display` nije radio ništa. Vidi `layout.tsx`. */
+  --font-display: var(--font-archivo);
   --color-club: var(--club);
   --color-club-red: var(--club-red);
   --color-navy: var(--navy);
@@ -152,17 +154,35 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
   }
   html {
     font-size: 16px;
     overflow-x: clip;
+    scroll-behavior: auto;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      /* Sidra (#utakmice) klize umjesto da skaču. */
+      scroll-behavior: smooth;
+    }
+  }
+  /* Odredište sidra mora proći ispod ljepljivog headera. */
+  :target {
+    scroll-margin-top: 6rem;
   }
   body {
     color: var(--foreground);
     font-size: 1rem;
     line-height: 1.6;
     overflow-x: clip;
+  }
+
+  /* Fokus prsten za tipkovnicu. `--ring` se pod `.dark` sam prebaci na svjetliju
+     plavu, pa isto pravilo radi i na navy sekcijama usred svijetle stranice. */
+  :where(a, button, summary, input, select, textarea, [tabindex]:not([tabindex="-1"])):focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
   }
   ::selection {
     background: var(--club);

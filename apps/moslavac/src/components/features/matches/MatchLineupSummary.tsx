@@ -223,12 +223,12 @@ function PlayerRow({
           {playerName}
         </span>
         {player.position && (
-          <span className="shrink-0 rounded-sm border border-foreground/20 px-1 text-[0.5rem] font-bold uppercase leading-tight tracking-[0.1em] text-foreground/50">
+          <span className="shrink-0 rounded-sm border border-foreground/20 px-1 text-[0.6rem] font-bold uppercase leading-tight tracking-[0.1em] text-foreground/50">
             {player.position}
           </span>
         )}
         {player.captain && (
-          <span className="shrink-0 rounded-sm border border-primary/60 px-1 text-[0.5rem] font-bold uppercase leading-tight tracking-[0.15em] text-primary">
+          <span className="shrink-0 rounded-sm border border-primary/60 px-1 text-[0.6rem] font-bold uppercase leading-tight tracking-[0.15em] text-primary">
             K
           </span>
         )}

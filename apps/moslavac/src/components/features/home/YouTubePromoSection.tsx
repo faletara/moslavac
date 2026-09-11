@@ -63,7 +63,7 @@ function ChannelStat({
           />
         )}
       </span>
-      <span className="text-[0.55rem] font-medium uppercase tracking-[0.25em] text-muted-foreground sm:text-[0.65rem]">
+      <span className="text-[0.6rem] font-medium uppercase tracking-[0.25em] text-muted-foreground sm:text-[0.65rem]">
         {label}
       </span>
     </div>
@@ -86,10 +86,8 @@ export function YouTubePromoContent({
 
   return (
     <div className="mx-auto flex max-w-4xl flex-col items-center gap-8 text-center sm:gap-10">
-      <p className="flex items-center gap-2.5 text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
-        <span className="relative flex size-1.5">
-          <span className="relative inline-flex size-1.5 rounded-full bg-club-red" />
-        </span>
+      <p className="flex items-center gap-3 text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
+        <span aria-hidden className="h-px w-8 bg-primary" />
         {hasChannel ? "Službeni YouTube kanal" : "YouTube kanal"}
       </p>
 

@@ -71,7 +71,7 @@ function CountdownCell({
       <span className="font-black tabular-nums leading-none text-3xl sm:text-5xl">
         {String(value).padStart(2, "0")}
       </span>
-      <span className="text-[0.55rem] font-medium uppercase tracking-[0.25em] text-muted-foreground sm:text-[0.6rem] sm:tracking-[0.3em]">
+      <span className="text-[0.6rem] font-medium uppercase tracking-[0.25em] text-muted-foreground sm:text-[0.6rem] sm:tracking-[0.3em]">
         {pluralForm(value, forms)}
       </span>
     </div>

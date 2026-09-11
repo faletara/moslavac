@@ -146,7 +146,7 @@ export default function MatchEventBar({
                 {/* Hover tooltip (desktop) */}
                 <span
                   className={cn(
-                    "pointer-events-none absolute left-1/2 z-20 hidden -translate-x-1/2 whitespace-nowrap rounded-full border border-foreground/15 bg-navy-deep px-2.5 py-1 text-[0.55rem] font-bold uppercase tracking-[0.15em] text-foreground opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 sm:block",
+                    "pointer-events-none absolute left-1/2 z-20 hidden -translate-x-1/2 whitespace-nowrap rounded-full border border-foreground/15 bg-navy-deep px-2.5 py-1 text-[0.6rem] font-bold uppercase tracking-[0.15em] text-foreground opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 sm:block",
                     isHome ? "bottom-full mb-2" : "top-full mt-2",
                   )}
                 >

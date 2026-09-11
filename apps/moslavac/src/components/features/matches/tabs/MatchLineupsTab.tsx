@@ -123,7 +123,7 @@ function LineupColumn({
           size={36}
           className="size-9 shrink-0"
         />
-        <h3 className="line-clamp-1 text-sm font-black uppercase tracking-tight">
+        <h3 className="line-clamp-1 font-display text-sm font-black uppercase tracking-tight">
           {teamName}
         </h3>
       </div>
@@ -196,7 +196,7 @@ function PlayerRow({
       />
       <span className={muted ? "" : "font-medium"}>{playerName}</span>
       {player.captain && (
-        <span className="ml-auto rounded border border-border px-1.5 py-px text-[0.55rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+        <span className="ml-auto rounded border border-border px-1.5 py-px text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
           K
         </span>
       )}

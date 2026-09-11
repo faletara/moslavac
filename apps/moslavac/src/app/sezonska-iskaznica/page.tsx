@@ -88,7 +88,7 @@ export default async function SeasonTicketPage() {
             </p>
 
             <div className="flex flex-col gap-3 border-t border-border/60 pt-6">
-              <span className="text-[0.55rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.65rem] sm:tracking-[0.4em]">
+              <span className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.65rem] sm:tracking-[0.4em]">
                 Vrijedi za
               </span>
               <p className="text-sm leading-relaxed text-foreground">
@@ -108,10 +108,10 @@ export default async function SeasonTicketPage() {
                 key={row.label}
                 className="grid grid-cols-[auto_1fr] items-baseline gap-x-6 py-5 sm:gap-x-10"
               >
-                <dt className="text-[0.55rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.65rem] sm:tracking-[0.4em]">
+                <dt className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.65rem] sm:tracking-[0.4em]">
                   {row.label}
                 </dt>
-                <dd className="wrap-break-word text-right font-mono text-sm tracking-tight text-foreground sm:text-base">
+                <dd className="wrap-break-word text-right text-sm tabular-nums tracking-tight text-foreground sm:text-base">
                   {row.value || "-"}
                 </dd>
               </div>
@@ -128,7 +128,7 @@ export default async function SeasonTicketPage() {
                 className="object-contain"
               />
             </div>
-            <figcaption className="text-[0.55rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.65rem] sm:tracking-[0.4em]">
+            <figcaption className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.65rem] sm:tracking-[0.4em]">
               Primjer ispunjene uplatnice
             </figcaption>
           </figure>

@@ -110,7 +110,7 @@ function MatchRow({ match }: { match: Match }) {
 	);
 }
 
-function MatchSection({
+function MatchGroup({
 	label,
 	matches,
 }: {
@@ -154,8 +154,8 @@ export default function MatchesList({
 
 	return (
 		<div className="space-y-12 sm:space-y-16">
-			<MatchSection label="Odigrane" matches={played} />
-			<MatchSection label="Sljedeće" matches={upcoming} />
+			<MatchGroup label="Odigrane" matches={played} />
+			<MatchGroup label="Sljedeće" matches={upcoming} />
 		</div>
 	);
 }

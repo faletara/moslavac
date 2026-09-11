@@ -41,7 +41,7 @@ export default function ComeToMatchSection() {
 						href="/utakmice"
 						className="group mt-2 inline-flex items-center gap-3 rounded-full bg-chalk px-8 py-3.5 text-[0.65rem] font-bold uppercase tracking-[0.3em] text-navy-deep transition-colors duration-300 hover:bg-club hover:text-chalk sm:text-xs"
 					>
-						Pogledaj raspored
+						Raspored utakmica
 						<ArrowRight
 							className="size-3.5 transition-transform duration-300 group-hover:translate-x-1"
 							strokeWidth={2.5}

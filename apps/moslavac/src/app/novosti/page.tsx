@@ -46,7 +46,7 @@ export default async function NewsPage({ searchParams }: Props) {
         baseUrl={BASE_URL}
         trail={[{ name: "Vijesti", path: "/novosti" }]}
       />
-      <PageHero eyebrow="Novosti kluba" title="Vijesti" />
+      <PageHero title="Vijesti" />
 
       <div className="mx-auto mt-16 max-w-4xl sm:mt-20">
         {content.length === 0 ? (

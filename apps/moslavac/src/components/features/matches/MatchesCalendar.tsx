@@ -214,7 +214,7 @@ function Toolbar({
 				</button>
 			</div>
 
-			<h2 className="text-2xl font-black uppercase leading-none tracking-tighter sm:text-3xl">
+			<h2 className="font-display text-2xl font-black uppercase leading-none tracking-tighter sm:text-3xl">
 				{label}
 			</h2>
 
@@ -406,7 +406,7 @@ function WeekView({ cursor, events, onDayClick, onEventClick }: WeekViewProps) {
 							</span>
 							<span
 								className={cn(
-									"text-2xl font-black uppercase leading-none tracking-tighter tabular-nums",
+									"font-display text-2xl font-black uppercase leading-none tracking-tighter tabular-nums",
 									today && "underline decoration-2 underline-offset-4",
 								)}
 							>
@@ -433,7 +433,7 @@ function WeekView({ cursor, events, onDayClick, onEventClick }: WeekViewProps) {
 										<div className="flex items-center gap-2">
 											<span
 												className={cn(
-													"inline-flex items-center rounded-full px-1.5 py-0.5 text-[0.55rem] font-bold uppercase tracking-[0.15em]",
+													"inline-flex items-center rounded-full px-1.5 py-0.5 text-[0.6rem] font-bold uppercase tracking-[0.15em]",
 													getCategoryChipClass(ev.category),
 												)}
 											>
@@ -495,7 +495,7 @@ function DayView({ cursor, events, onEventClick }: DayViewProps) {
 								onClick={() => onEventClick(ev.slug)}
 								className="grid w-full grid-cols-[auto_1fr] items-center gap-6 px-2 py-6 text-left transition-opacity hover:opacity-60 sm:gap-10 sm:px-4"
 							>
-								<span className="text-2xl font-black uppercase leading-none tracking-tighter tabular-nums sm:text-3xl">
+								<span className="font-display text-2xl font-black uppercase leading-none tracking-tighter tabular-nums sm:text-3xl">
 									{format(ev.date, "HH:mm")}
 								</span>
 								<div className="flex flex-col gap-2">

@@ -13,6 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
 import BreadcrumbJsonLd from "@/lib/app-shell/seo/BreadcrumbJsonLd";
 import { FirstTeamHero } from "@/components/features/first-team/FirstTeamHero";
 import { BASE_URL } from "@/lib/siteUrl";
+import { seasonLabel } from "@/lib/season";
 import {
 	PlayerGrid,
 	PlayerGridItem,
@@ -106,6 +107,7 @@ export default async function FirstTeamPage() {
 				totalPlayers={totalPlayers}
 				clubName={tenant.displayName}
 				founded={tenant.branding?.founded ?? null}
+				seasonLabel={seasonLabel()}
 			/>
 
 			{populatedGroups.map((pos) => {
@@ -138,7 +140,7 @@ export default async function FirstTeamPage() {
 function SectionHeader({ title, count }: { title: string; count: number }) {
 	return (
 		<div className="flex items-baseline justify-between gap-6 border-b border-border/60 pb-6">
-			<h2 className="font-black uppercase leading-[0.85] tracking-tighter text-3xl sm:text-5xl md:text-6xl">
+			<h2 className="font-display font-black uppercase leading-[0.85] tracking-tighter text-3xl sm:text-5xl md:text-6xl">
 				{title}
 			</h2>
 		</div>
@@ -179,14 +181,14 @@ function PlayerCard({
 					/>
 				) : (
 					<div className="flex size-full items-center justify-center">
-						<span className="select-none font-black uppercase leading-none tracking-tighter text-6xl text-foreground/15">
+						<span className="select-none font-display font-black uppercase leading-none tracking-tighter text-6xl text-foreground/15">
 							{initials}
 						</span>
 					</div>
 				)}
 
 				{entry.captain && (
-					<span className="absolute left-3 top-3 inline-flex items-center bg-foreground px-2 py-1 text-[0.5rem] font-bold uppercase tracking-[0.25em] text-background sm:text-[0.55rem]">
+					<span className="absolute left-3 top-3 inline-flex items-center bg-foreground px-2 py-1 text-[0.6rem] font-bold uppercase tracking-[0.25em] text-background sm:text-[0.6rem]">
 						Kapetan
 					</span>
 				)}
@@ -196,7 +198,7 @@ function PlayerCard({
 				{entry.jerseyNumber != null && (
 					<span
 						aria-hidden
-						className="select-none font-black tabular-nums leading-none tracking-tighter text-5xl text-foreground sm:text-6xl lg:text-7xl"
+						className="select-none font-display font-black tabular-nums leading-none tracking-tighter text-5xl text-foreground sm:text-6xl lg:text-7xl"
 					>
 						{String(entry.jerseyNumber).padStart(2, "0")}
 					</span>
@@ -209,11 +211,11 @@ function PlayerCard({
 								linkable ? "w-6 group-hover:w-12" : "w-6",
 							)}
 						/>
-						<span className="text-[0.55rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.6rem]">
+						<span className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.6rem]">
 							{positionSingular[entry.position]}
 						</span>
 					</div>
-					<h3 className="line-clamp-2 text-balance font-black uppercase leading-[0.95] tracking-tighter text-lg sm:text-xl">
+					<h3 className="line-clamp-2 text-balance font-display font-black uppercase leading-[0.95] tracking-tighter text-lg sm:text-xl">
 						{entry.displayName}
 					</h3>
 				</div>

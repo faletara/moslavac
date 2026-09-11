@@ -55,7 +55,13 @@ export default function EventsTimeline({ match, events }: EventsTimelineProps) {
       return (a.orderNumber ?? 0) - (b.orderNumber ?? 0);
     });
 
-  if (visible.length === 0) return null;
+  if (visible.length === 0) {
+    return (
+      <p className="py-12 text-center text-sm text-muted-foreground">
+        Za ovu utakmicu nema zabilježenih događaja.
+      </p>
+    );
+  }
 
   const competitionId = match.competition?.id ?? null;
   const homeIsMoslavac =
@@ -274,7 +280,7 @@ function EventRow({
         )}
       >
         <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <h3 className="min-w-0 wrap-break-word text-base font-black uppercase leading-tight tracking-tight sm:text-lg">
+          <h3 className="min-w-0 wrap-break-word font-display text-base font-black uppercase leading-tight tracking-tight sm:text-lg">
             {isLinkable && playerName ? (
               <Link
                 href={`/statistika/${buildPlayerSlug({ personId, name: playerName })}/${competitionId}`}

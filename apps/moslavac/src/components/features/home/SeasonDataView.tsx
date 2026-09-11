@@ -202,7 +202,7 @@ function ScorerRow({
 						{playerName}
 					</span>
 					{teamName && (
-						<span className="line-clamp-1 text-[0.55rem] font-medium uppercase tracking-[0.25em] text-muted-foreground sm:text-[0.6rem]">
+						<span className="line-clamp-1 text-[0.6rem] font-medium uppercase tracking-[0.25em] text-muted-foreground sm:text-[0.6rem]">
 							{teamName}
 						</span>
 					)}
@@ -298,7 +298,7 @@ export default function SeasonDataView({
 						<div className="space-y-8">
 							<ColumnTitle>Tablica</ColumnTitle>
 							<div>
-								<div className="grid grid-cols-[2.5rem_1fr_auto] gap-3 border-b border-foreground/10 px-3 pb-3 text-[0.55rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:grid-cols-[3rem_1fr_3.5rem_4.5rem_3.5rem] sm:gap-5">
+								<div className="grid grid-cols-[2.5rem_1fr_auto] gap-3 border-b border-foreground/10 px-3 pb-3 text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:grid-cols-[3rem_1fr_3.5rem_4.5rem_3.5rem] sm:gap-5">
 									<span>#</span>
 									<span>Klub</span>
 									<span className="hidden text-center sm:block">Ut</span>
@@ -332,7 +332,7 @@ export default function SeasonDataView({
 						<div className="space-y-8">
 							<ColumnTitle>Strijelci</ColumnTitle>
 							<div>
-								<div className="grid grid-cols-[2.5rem_1fr_auto] gap-3 border-b border-foreground/10 px-3 pb-3 text-[0.55rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:gap-5">
+								<div className="grid grid-cols-[2.5rem_1fr_auto] gap-3 border-b border-foreground/10 px-3 pb-3 text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:gap-5">
 									<span>#</span>
 									<span>Igrač</span>
 									<span className="text-right">Golovi</span>

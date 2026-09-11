@@ -140,7 +140,7 @@ function TeamHeaders({
   return (
     <div className="grid grid-cols-[1fr_auto_1fr] items-start gap-2 sm:gap-4">
       <TeamHeader name={homeName} picture={homePicture} />
-      <span className="self-center text-center text-[0.55rem] font-medium uppercase tracking-[0.3em] text-muted-foreground/70 sm:text-[0.6rem]">
+      <span className="self-center text-center text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground/70 sm:text-[0.6rem]">
         vs
       </span>
       <TeamHeader name={awayName} picture={awayPicture} />
@@ -215,7 +215,7 @@ function StatRow({ stat }: { stat: ComparisonStat }) {
       </span>
 
       <div className="flex flex-col items-center gap-1.5">
-        <span className="text-[0.55rem] font-medium uppercase tracking-[0.25em] text-muted-foreground sm:text-[0.6rem] sm:tracking-[0.3em]">
+        <span className="text-[0.6rem] font-medium uppercase tracking-[0.25em] text-muted-foreground sm:text-[0.6rem] sm:tracking-[0.3em]">
           {stat.label}
         </span>
         <div className="flex h-1.5 w-full items-stretch gap-0.5">
@@ -264,7 +264,7 @@ function FormRow({
   return (
     <div className="mt-10 grid grid-cols-[1fr_auto_1fr] items-center gap-3 border-t border-border/40 pt-8 sm:gap-6">
       <FormStrip form={homeForm} align="right" />
-      <span className="text-[0.55rem] font-medium uppercase tracking-[0.3em] text-muted-foreground/70 sm:text-[0.6rem]">
+      <span className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground/70 sm:text-[0.6rem]">
         Forma
       </span>
       <FormStrip form={awayForm} align="left" />
@@ -283,7 +283,7 @@ function FormStrip({
     return (
       <span
         className={cn(
-          "text-[0.55rem] font-medium uppercase tracking-[0.2em] text-muted-foreground/60",
+          "text-[0.6rem] font-medium uppercase tracking-[0.2em] text-muted-foreground/60",
           align === "right" ? "text-right" : "text-left",
         )}
       >

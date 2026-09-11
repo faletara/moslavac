@@ -9,88 +9,47 @@ interface MatchSectionProps {
   /** Display-font section title. */
   title: string;
   children: React.ReactNode;
-  /** Hollow display word set behind the heading (homepage signature). */
-  watermark?: string;
-  /** "dark" renders a full-bleed navy-deep canvas with club glows. */
-  tone?: "light" | "dark";
   className?: string;
   /** Overrides the default content wrapper (`mx-auto mt-12 max-w-3xl`). */
   contentClassName?: string;
 }
 
 /**
- * Editorial section header for the match overview — the club's signature
- * AnimatedLine + accented eyebrow + oversized display heading, plus a hollow
- * watermark and an optional dark full-bleed canvas so each block carries the
- * homepage's depth and light/dark rhythm rather than reading as flat text.
+ * Editorial section header for the match overview: the club's signature
+ * AnimatedLine, accented eyebrow and oversized display heading, so the block
+ * carries the homepage's typographic language instead of reading as flat text.
+ *
+ * Held deliberately thin. A `tone="dark"` full-bleed canvas and a hollow
+ * watermark used to live here, but no caller ever passed them; the navy
+ * scoreboard sections build that treatment themselves. Add a branch back only
+ * when a second call site actually needs it.
  */
 export function MatchSection({
   eyebrow,
   title,
   children,
-  watermark,
-  tone = "light",
   className,
   contentClassName,
 }: MatchSectionProps) {
-  const dark = tone === "dark";
-
   return (
-    <section
-      className={cn(
-        "relative isolate",
-        // Full-bleed breakout: span the viewport even inside a max-w container.
-        dark &&
-          "dark left-1/2 right-1/2 -mx-[50vw] w-screen overflow-hidden bg-navy-deep py-20 text-foreground sm:py-28",
-        className,
-      )}
-    >
-      {dark && (
-        <>
-          <div
-            aria-hidden
-            className="absolute -top-[calc(14vw+120px)] left-[calc(10%-120px)] -z-20 size-[calc(44vw+240px)] opacity-20 glow-club"
-          />
-          <div
-            aria-hidden
-            className="absolute -bottom-[calc(14vw+100px)] right-[calc(8%-100px)] -z-20 size-[calc(36vw+200px)] opacity-[0.12] glow-club"
-          />
-        </>
-      )}
+    <section className={cn("relative isolate", className)}>
+      <FadeInView>
+        <div className="flex flex-col items-center gap-5 text-center">
+          <AnimatedLine className="mx-auto" />
+          <p className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
+            {eyebrow}
+          </p>
+          <h2 className="select-none font-display font-black uppercase leading-[0.85] tracking-tighter text-[14vw] sm:text-6xl md:text-7xl">
+            {title}
+          </h2>
+        </div>
+      </FadeInView>
 
-      {watermark && (
-        <span
-          aria-hidden
-          className={cn(
-            "pointer-events-none absolute left-1/2 top-6 -z-10 -translate-x-1/2 select-none whitespace-nowrap font-display font-black uppercase leading-none tracking-[-0.04em] text-[30vw] sm:text-[19vw]",
-            dark ? "text-foreground/[0.06]" : "text-foreground/[0.045]",
-          )}
-        >
-          {watermark}
-        </span>
-      )}
-
-      <div className={cn(dark && "mx-auto max-w-4xl px-4 sm:px-6")}>
-        <FadeInView>
-          <div className="flex flex-col items-center gap-5 text-center">
-            <AnimatedLine
-              className={cn("mx-auto", dark && "bg-primary")}
-            />
-            <p className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
-              {eyebrow}
-            </p>
-            <h2 className="select-none font-display font-black uppercase leading-[0.85] tracking-tighter text-[14vw] sm:text-6xl md:text-7xl">
-              {title}
-            </h2>
-          </div>
-        </FadeInView>
-
-        <FadeInView delay={0.1}>
-          <div className={cn("mx-auto mt-12 max-w-3xl", contentClassName)}>
-            {children}
-          </div>
-        </FadeInView>
-      </div>
+      <FadeInView delay={0.1}>
+        <div className={cn("mx-auto mt-12 max-w-3xl", contentClassName)}>
+          {children}
+        </div>
+      </FadeInView>
     </section>
   );
 }

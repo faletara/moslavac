@@ -5,6 +5,7 @@ import { BASE_URL } from "@/lib/siteUrl";
 import MatchesCalendar from "@/components/features/matches/MatchesCalendar";
 import { PageHero } from "@/components/layout/PageHero";
 import { fetchAllMatches } from "@/lib/hns/matches";
+import { seasonLabel, seasonTag } from "@/lib/season";
 
 export const metadata: Metadata = {
   title: "Raspored utakmica",
@@ -24,9 +25,9 @@ export default async function MatchesPage() {
         trail={[{ name: "Utakmice", path: "/utakmice" }]}
       />
       <PageHero
-        eyebrow="Sezona 2025/26"
+        eyebrow={seasonLabel()}
         title="Utakmice"
-        watermark="25/26"
+        watermark={seasonTag()}
         lineClassName="text-[15vw] sm:text-6xl md:text-7xl lg:text-8xl"
       />
       <FadeInView delay={0.1}>

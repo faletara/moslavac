@@ -5,10 +5,13 @@ import { buildCompetitionSlug } from "@/lib/helpers/slug";
 export default function SeasonLayoutClient({
   competitionId,
   competitionName,
+  seasonTag,
   children,
 }: {
   competitionId: number;
   competitionName: string | null;
+  /** Npr. „26/27" — računa ga layout, vidi `@/lib/season`. */
+  seasonTag: string;
   children: React.ReactNode;
 }) {
   const competitionSlug = competitionName
@@ -20,7 +23,7 @@ export default function SeasonLayoutClient({
       <PageHero
         eyebrow={competitionName?.trim() || "Prvenstvo"}
         title="Sezona"
-        watermark="25/26"
+        watermark={seasonTag}
         lineClassName="text-[15vw] sm:text-6xl md:text-7xl lg:text-8xl"
       />
 

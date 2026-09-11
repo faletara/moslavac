@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useMotionValueEvent, useReducedMotion, useScroll } from "framer-motion";
 import { ChevronDown, Menu } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -71,13 +71,21 @@ export default function Header({ tenant, competitions }: HeaderProps) {
 			pathname.startsWith("/statistika/") ||
 			pathname.startsWith("/novosti/"));
 
-	// Mirror open-state into a ref so the scroll listener can read it without
-	// being rebound on every open/close. Radix dropdowns lock body scroll when
-	// opening, which fires a synthetic scroll event; without this guard the
-	// header would hide itself just as the user clicks the trigger, moving the
-	// anchored menu off-screen.
-	const menuOpenRef = useRef(false);
-	menuOpenRef.current = sheetOpen || desktopSeasonOpen || mobileSeasonOpen;
+	// Radix dropdowns lock body scroll when opening, which fires a synthetic
+	// scroll event. Without this guard the header would hide itself just as the
+	// user clicks the trigger, moving the anchored menu off-screen. The listener
+	// below is re-created on every render, so it reads this state directly; the
+	// old mirroring ref (written during render) is no longer needed.
+	const menuOpen = sheetOpen || desktopSeasonOpen || mobileSeasonOpen;
+
+	const { scrollY } = useScroll();
+
+	// Anchor for direction detection. Only moved once travel clears the deadzone,
+	// so Lenis' sub-pixel jitter can't flip direction frame to frame (the cause
+	// of the header flicker). `useMotionValueEvent` is batched by Motion's own
+	// frame loop, so no window scroll listener and no rAF plumbing here.
+	const anchorY = useRef(0);
+	const DELTA = 8;
 
 	useEffect(() => {
 		// Reloads should start at the top, not at the browser's restored scroll
@@ -86,51 +94,35 @@ export default function Header({ tenant, competitions }: HeaderProps) {
 		if ("scrollRestoration" in window.history) {
 			window.history.scrollRestoration = "manual";
 		}
+		// The motion value only emits on change, so seed the state from the real
+		// position. Read it a frame later: the browser may still be restoring the
+		// scroll offset while this effect runs.
+		const frame = requestAnimationFrame(() => {
+			const y = scrollY.get();
+			setAtTop(y <= 80);
+			anchorY.current = y;
+		});
+		return () => cancelAnimationFrame(frame);
+	}, [scrollY]);
 
-		// Anchor for direction detection. Only updated once a move clears the
-		// deadzone, so Lenis' sub-pixel jitter can't flip the direction frame to
-		// frame (the cause of the header flicker).
-		let anchorY = window.scrollY;
-		let ticking = false;
-		// Minimum travel before we react to a direction change.
-		const DELTA = 8;
+	useMotionValueEvent(scrollY, "change", (currentY) => {
+		setAtTop(currentY <= 80);
 
-		const update = () => {
-			const currentY = window.scrollY;
-			setAtTop(currentY <= 80);
-
-			if (!menuOpenRef.current) {
-				if (currentY <= 80) {
-					setHidden(false);
-					anchorY = currentY;
-				} else if (currentY > anchorY + DELTA) {
-					setHidden(true);
-					anchorY = currentY;
-				} else if (currentY < anchorY - DELTA) {
-					setHidden(false);
-					anchorY = currentY;
-				}
-			} else {
-				anchorY = currentY;
-			}
-
-			ticking = false;
-		};
-
-		const onScroll = () => {
-			if (!ticking) {
-				window.requestAnimationFrame(update);
-				ticking = true;
-			}
-		};
-
-		// Sync state to the real scroll position on mount; the listener alone
-		// won't fire until the user scrolls, leaving the initial state stale.
-		update();
-
-		window.addEventListener("scroll", onScroll, { passive: true });
-		return () => window.removeEventListener("scroll", onScroll);
-	}, []);
+		if (menuOpen) {
+			anchorY.current = currentY;
+			return;
+		}
+		if (currentY <= 80) {
+			setHidden(false);
+			anchorY.current = currentY;
+		} else if (currentY > anchorY.current + DELTA) {
+			setHidden(true);
+			anchorY.current = currentY;
+		} else if (currentY < anchorY.current - DELTA) {
+			setHidden(false);
+			anchorY.current = currentY;
+		}
+	});
 
 	const competitionGroups = groupByCompetitionCategory(
 		competitions,

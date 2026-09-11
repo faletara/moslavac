@@ -192,7 +192,7 @@ function PlayerPoster({ player }: { player: FirstLineupPlayer }) {
 				)}
 
 				{player.captain && (
-					<span className="absolute left-3 top-3 inline-flex items-center bg-primary px-2 py-1 text-[0.5rem] font-bold uppercase tracking-[0.25em] text-primary-foreground sm:text-[0.55rem]">
+					<span className="absolute left-3 top-3 inline-flex items-center bg-primary px-2 py-1 text-[0.6rem] font-bold uppercase tracking-[0.25em] text-primary-foreground sm:text-[0.6rem]">
 						Kapetan
 					</span>
 				)}
@@ -204,7 +204,7 @@ function PlayerPoster({ player }: { player: FirstLineupPlayer }) {
 							aria-hidden
 							className="h-px w-5 bg-primary transition-all duration-300 group-hover:w-9"
 						/>
-						<span className="text-[0.55rem] font-medium uppercase tracking-[0.3em] text-chalk/70 sm:text-[0.6rem]">
+						<span className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-chalk/70 sm:text-[0.6rem]">
 							{positionSingular[player.position]}
 						</span>
 					</div>

@@ -46,7 +46,16 @@ export default function HeadToHead({
     (m) => m.id !== currentMatchId,
   );
 
-  if (h2h.length === 0) return null;
+  if (h2h.length === 0) {
+    return (
+      <section className="mt-12 sm:mt-16">
+        <MatchTabHeading eyebrow="Ranije" title="Susreti" />
+        <p className="mx-auto mt-12 max-w-2xl text-center text-sm text-muted-foreground">
+          {homeTeamName} i {awayTeamName} još se nisu sastali u ovom natjecanju.
+        </p>
+      </section>
+    );
+  }
 
   return (
     <section className="mt-12 sm:mt-16">

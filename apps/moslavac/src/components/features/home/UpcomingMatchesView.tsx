@@ -14,12 +14,7 @@ import {
 import { formatDateParts } from "@/lib/helpers/date";
 import { buildMatchSlug } from "@/lib/helpers/slug";
 import type { Match } from "@/types/hns";
-
-const OUR_TEAM_KEYWORD = "moslavac";
-
-function isOurTeam(name: string | null | undefined): boolean {
-  return !!name && name.toLowerCase().includes(OUR_TEAM_KEYWORD);
-}
+import { useOurTeamId } from "@/components/providers/TenantProvider";
 
 function TeamRow({
   name,
@@ -137,6 +132,10 @@ export default function UpcomingMatchesView({
 }: {
   matches: Match[];
 }) {
+  // Isti izvor po kojem se naš tim prepoznaje u tablici, strijelcima i
+  // postavama. Prije je ovdje stajao `name.includes("moslavac")`.
+  const ourTeamId = useOurTeamId();
+
   return (
     <section className="mx-auto w-full max-w-7xl space-y-12 px-4 py-20 sm:py-28">
       <SectionTitle />
@@ -149,8 +148,10 @@ export default function UpcomingMatchesView({
             const category = getCompetitionCategory(match.competition?.name);
             const categoryLabel = getCategoryShortLabel(category);
             const chipClass = getCategoryChipClass(category);
-            const homeIsUs = isOurTeam(match.homeTeam?.name);
-            const awayIsUs = isOurTeam(match.awayTeam?.name);
+            const homeIsUs =
+              ourTeamId != null && match.homeTeam?.id === ourTeamId;
+            const awayIsUs =
+              ourTeamId != null && match.awayTeam?.id === ourTeamId;
             const venueIndicator = homeIsUs ? "D" : awayIsUs ? "G" : null;
 
             return (

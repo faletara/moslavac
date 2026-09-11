@@ -149,7 +149,6 @@ export default async function MatchInfoPage({ params }: Props) {
           events={events ?? undefined}
           lineups={lineups ?? undefined}
           refereeData={refereeData ?? undefined}
-          refereesLoading={false}
           standings={standings}
           competitionMatches={competitionMatches}
           scorers={scorers}

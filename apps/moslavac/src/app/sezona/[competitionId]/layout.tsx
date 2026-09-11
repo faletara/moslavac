@@ -5,6 +5,7 @@ import {
 } from "@/lib/hns/competitions";
 import { BASE_URL } from "@/lib/siteUrl";
 import { buildCompetitionSlug, parseTrailingId } from "@/lib/helpers/slug";
+import { seasonTag } from "@/lib/season";
 import SeasonLayoutClient from "./SeasonLayoutClient";
 
 interface Params {
@@ -55,7 +56,11 @@ export default async function SeasonLayout({
   const id = parseTrailingId(competitionId);
   const info = await fetchCompetitionInfo({ competitionId: id });
   return (
-    <SeasonLayoutClient competitionId={id} competitionName={info?.name ?? null}>
+    <SeasonLayoutClient
+      competitionId={id}
+      competitionName={info?.name ?? null}
+      seasonTag={seasonTag()}
+    >
       {children}
     </SeasonLayoutClient>
   );

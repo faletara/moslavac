@@ -1,9 +1,9 @@
-import { Mail, MapPin, Navigation, Phone } from "lucide-react";
+import { ExternalLink, Mail, MapPin, Navigation, Phone } from "lucide-react";
 import type { Metadata } from "next";
+import Image from "next/image";
 import { RevealHeading } from "@/components/animations";
 import BreadcrumbJsonLd from "@/lib/app-shell/seo/BreadcrumbJsonLd";
 import { BASE_URL } from "@/lib/siteUrl";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { getCometImageUrl } from "@/lib/hns/imageUrl";
 import { fetchTeamDetails } from "@/lib/hns/team";
@@ -92,12 +92,27 @@ function Hero({
 }) {
   return (
     <header className="flex flex-col items-center gap-8 text-center">
-      <Avatar className="size-32 sm:size-40">
-        {logoUrl && <AvatarImage src={logoUrl} alt={displayName} />}
-        <AvatarFallback className="text-xl font-semibold uppercase tracking-[0.2em]">
+      {/* Grb, ne avatar. `Avatar` je `rounded-full` + `aspect-square`, pa je
+          grbu odrezao vrhove štita — jedina slika na stranici koja se ne smije
+          rezati. `object-contain` ga prikazuje cijelog, kao i `HnsCrest`
+          drugdje u aplikaciji. */}
+      {logoUrl ? (
+        <Image
+          src={logoUrl}
+          alt={displayName}
+          width={160}
+          height={160}
+          className="size-32 object-contain sm:size-40"
+          priority
+        />
+      ) : (
+        <span
+          aria-label={displayName}
+          className="flex size-32 items-center justify-center bg-muted text-xl font-semibold uppercase tracking-[0.2em] text-muted-foreground sm:size-40"
+        >
           {shortName.slice(0, 2).toUpperCase()}
-        </AvatarFallback>
-      </Avatar>
+        </span>
+      )}
 
       <span className="h-px w-12 bg-primary" />
       {founded != null && (
@@ -139,7 +154,7 @@ function InfoList({
           key={row.label}
           className="grid grid-cols-[auto_1fr] items-baseline gap-x-6 py-5 sm:gap-x-10"
         >
-          <dt className="text-[0.55rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.65rem] sm:tracking-[0.4em]">
+          <dt className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.65rem] sm:tracking-[0.4em]">
             {row.label}
           </dt>
           <dd className="wrap-break-word text-right text-sm text-foreground sm:text-base">
@@ -199,7 +214,10 @@ function ContactGrid({
   }
 
   return (
-    <dl className="flex flex-col divide-y divide-border/60 border-y border-border/60">
+    // Deliberately NOT the InfoList hairline-row layout: two sections on one
+    // page must not share a layout family. Contact rows are links, so they get
+    // tappable cards instead of a definition list.
+    <ul className="grid gap-px bg-border/60 sm:grid-cols-2">
       {links.map((link) => {
         const isExternal = link.href.startsWith("http");
         const Icon =
@@ -207,30 +225,27 @@ function ContactGrid({
             ? Mail
             : link.label === "Telefon"
               ? Phone
-              : null;
+              : ExternalLink;
         return (
-          <div
-            key={link.label}
-            className="grid grid-cols-[auto_1fr] items-baseline gap-x-6 py-5 sm:gap-x-10"
-          >
-            <dt className="flex items-center gap-2 text-[0.55rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.65rem] sm:tracking-[0.4em]">
-              {Icon && <Icon className="size-3" aria-hidden />}
-              {link.label}
-            </dt>
-            <dd className="text-right text-sm text-foreground sm:text-base">
-              <a
-                href={link.href}
-                target={isExternal ? "_blank" : undefined}
-                rel={isExternal ? "noopener noreferrer" : undefined}
-                className="wrap-break-word transition-colors hover:text-muted-foreground"
-              >
+          <li key={link.label} className="bg-background">
+            <a
+              href={link.href}
+              target={isExternal ? "_blank" : undefined}
+              rel={isExternal ? "noopener noreferrer" : undefined}
+              className="group flex h-full flex-col gap-3 p-6 transition-colors hover:bg-muted/40 sm:p-8"
+            >
+              <span className="flex items-center gap-2 text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:tracking-[0.4em]">
+                <Icon className="size-3 shrink-0" aria-hidden />
+                {link.label}
+              </span>
+              <span className="wrap-break-word text-sm text-foreground transition-colors group-hover:text-primary sm:text-base">
                 {link.value}
-              </a>
-            </dd>
-          </div>
+              </span>
+            </a>
+          </li>
         );
       })}
-    </dl>
+    </ul>
   );
 }
 

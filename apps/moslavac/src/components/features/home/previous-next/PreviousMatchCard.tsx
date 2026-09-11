@@ -10,6 +10,7 @@ import type { FormResult } from "@/lib/helpers/form";
 import { pluralForm } from "@/lib/helpers/plural";
 import { buildMatchSlug } from "@/lib/helpers/slug";
 import type { Match } from "@/types/hns";
+import { useOurTeamId } from "@/components/providers/TenantProvider";
 import { TeamCrest } from "./TeamCrest";
 
 interface PreviousMatchCardProps {
@@ -28,19 +29,24 @@ const OUTCOME_CHIP: Record<FormResult, string> = {
   L: "border-club-red/70 text-foreground/60",
 };
 
-function isMoslavac(name: string | null | undefined): boolean {
-  return !!name && /moslavac/i.test(name);
-}
-
-function getOutcomeFromMoslavacPerspective(
+/**
+ * Ishod iz perspektive našeg kluba; `null` kad ne igramo ili nema rezultata.
+ *
+ * Tim se prepoznaje po HNS id-u, ne po imenu. Regex `/moslavac/i` koji je ovdje
+ * stajao proglasio bi našim timom i protivnika iz istog kraja s „Moslavac" u
+ * imenu — i onda bi naslovnica poraz prikazala kao pobjedu.
+ */
+function getOutcomeForOurTeam(
   match: Match,
+  ourTeamId: number | null,
 ): FormResult | null {
   const home = match.score.home?.current;
   const away = match.score.away?.current;
   if (home == null || away == null) return null;
+  if (ourTeamId == null) return null;
 
-  const homeIsUs = isMoslavac(match.homeTeam?.name);
-  const awayIsUs = isMoslavac(match.awayTeam?.name);
+  const homeIsUs = match.homeTeam?.id === ourTeamId;
+  const awayIsUs = match.awayTeam?.id === ourTeamId;
   if (!homeIsUs && !awayIsUs) return null;
 
   const goalsFor = homeIsUs ? home : away;
@@ -92,6 +98,7 @@ function MetaLine({
 
 export function PreviousMatchCard({ match }: PreviousMatchCardProps) {
   const reduced = useReducedMotion();
+  const ourTeamId = useOurTeamId();
   const { date, time } = formatDateTime(match.kickoffAtUtcMs ?? 0);
   const venue = match.facility?.place ?? match.facility?.name ?? null;
   const competition = match.competition?.name ?? null;
@@ -100,7 +107,7 @@ export function PreviousMatchCard({ match }: PreviousMatchCardProps) {
   const home = match.score.home?.current;
   const away = match.score.away?.current;
   const hasResult = home != null && away != null;
-  const outcome = getOutcomeFromMoslavacPerspective(match);
+  const outcome = getOutcomeForOurTeam(match, ourTeamId);
   const outcomeLabel = outcome ? OUTCOME_LABEL[outcome] : null;
 
   const subInfo = [competition, round].filter(

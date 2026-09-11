@@ -155,7 +155,7 @@ export default async function PlayerStatsPage({ params }: Props) {
       {playerStats && maxMinutes > 0 && (
         <div className="space-y-6">
           <div className="flex items-end justify-between gap-4 border-b border-border/60 pb-4">
-            <span className="text-[0.55rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.65rem]">
+            <span className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.65rem]">
               Odigrane minute
             </span>
             <span className="font-display font-black tabular-nums leading-none tracking-tighter text-foreground">
@@ -204,7 +204,7 @@ function StatCell({
       >
         {value}
       </span>
-      <span className="text-[0.55rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.65rem]">
+      <span className="text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-[0.65rem]">
         {label}
       </span>
     </div>

@@ -34,7 +34,7 @@ const TILE_DIGIT: Record<CountdownSize, string> = {
 };
 
 const TILE_LABEL: Record<CountdownSize, string> = {
-  compact: "mt-2 text-[0.5rem] tracking-[0.3em] sm:text-[0.55rem] opacity-50",
+  compact: "mt-2 text-[0.6rem] tracking-[0.3em] opacity-50",
   hero: "mt-3 text-[0.6rem] tracking-[0.4em] sm:text-xs text-primary",
 };
 
@@ -47,11 +47,6 @@ const LIVE_BADGE: Record<CountdownSize, string> = {
 const TILE_GAP: Record<CountdownSize, string> = {
   compact: "gap-2 sm:gap-3",
   hero: "gap-2 sm:gap-3 md:gap-4",
-};
-
-const TILE_RADIUS: Record<CountdownSize, string> = {
-  compact: "rounded-lg",
-  hero: "rounded-xl",
 };
 
 /** Fixed-width digit so the scoreboard never jitters as seconds tick. */
@@ -70,7 +65,6 @@ function Tile({ value, label, delay, size }: TileProps) {
       transition={{ duration: 0.5, delay, ease: EASE }}
       className={cn(
         "flex flex-col items-center justify-center",
-        TILE_RADIUS[size],
         TILE_BOX[size],
       )}
     >
@@ -106,7 +100,7 @@ export function CountdownTiles({
         viewport={{ once: true, margin: "-80px" }}
         transition={{ duration: 0.5, delay: 0.3, ease: EASE }}
         className={cn(
-          "inline-block rounded-xl font-display font-black uppercase tracking-[0.3em]",
+          "inline-block font-display font-black uppercase tracking-[0.3em]",
           LIVE_BADGE[size],
           className,
         )}

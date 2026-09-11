@@ -18,7 +18,6 @@ interface MatchOverviewTabProps {
   events: MatchEvent[] | undefined;
   lineups: Lineups | undefined;
   refereeData: MatchInfo | undefined;
-  refereesLoading: boolean;
   competitionMatches: Match[];
   standings: TeamRanking[];
 }

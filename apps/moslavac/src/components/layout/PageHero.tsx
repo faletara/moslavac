@@ -2,8 +2,12 @@ import { FadeInView, RevealHeading } from "@/components/animations";
 import { cn } from "@/lib/utils";
 
 interface PageHeroProps {
-  /** Small uppercase label above the title, with a primary accent line. */
-  eyebrow: string;
+  /**
+   * Small uppercase label above the title, with a primary accent line.
+   * Optional on purpose: when it only restates the title in another word
+   * ("Novosti kluba" over "Vijesti") it adds nothing, so leave it out.
+   */
+  eyebrow?: string;
   /** Title text; pass an array to render multiple reveal lines. */
   title: string | string[];
   /** Description, meta line, or CTA rendered below the title. */
@@ -54,17 +58,19 @@ export function PageHero({
         </span>
       )}
 
-      <FadeInView delay={0.05}>
-        <p
-          className={cn(
-            "flex items-center gap-3 text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]",
-            centered && "justify-center",
-          )}
-        >
-          <span aria-hidden className="h-px w-8 bg-primary" />
-          {eyebrow}
-        </p>
-      </FadeInView>
+      {eyebrow && (
+        <FadeInView delay={0.05}>
+          <p
+            className={cn(
+              "flex items-center gap-3 text-[0.6rem] font-medium uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]",
+              centered && "justify-center",
+            )}
+          >
+            <span aria-hidden className="h-px w-8 bg-primary" />
+            {eyebrow}
+          </p>
+        </FadeInView>
+      )}
 
       <RevealHeading
         as="h1"

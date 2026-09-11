@@ -5,16 +5,19 @@ interface FirstTeamHeroProps {
   totalPlayers: number;
   clubName: string;
   founded: number | null;
+  /** Npr. „Sezona 2026/27" — računa ga stranica, vidi `@/lib/season`. */
+  seasonLabel: string;
 }
 
 export function FirstTeamHero({
   totalPlayers,
   clubName,
   founded,
+  seasonLabel,
 }: FirstTeamHeroProps) {
   return (
     <PageHero
-      eyebrow="Sezona 2025/26"
+      eyebrow={seasonLabel}
       title="Momčad"
       ariaLabel={`Momčad ${clubName}`}
       lineClassName="text-[16vw] sm:text-6xl md:text-7xl lg:text-8xl"
