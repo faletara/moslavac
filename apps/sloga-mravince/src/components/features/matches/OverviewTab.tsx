@@ -26,7 +26,7 @@ export default function OverviewTab({
 }: OverviewTabProps) {
   return (
     <div className="space-y-16 md:space-y-20">
-      {started && (
+      {(started || events.length > 0) && (
         <section>
           <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">
             Tijek utakmice
