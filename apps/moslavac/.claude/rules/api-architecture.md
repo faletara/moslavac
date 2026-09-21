@@ -32,6 +32,27 @@ cannot be fetched from the browser. Build its URL with `getCometImageUrl` from
 `@/lib/hns/imageUrl` — that module is deliberately free of `server-only` so
 client components can use it too.
 
+## The CMS-to-app path: cache revalidation
+
+`app/api/revalidate` is an **inbound** webhook, not a round-trip: the CMS calls
+it, this app never calls itself.
+
+```
+Payload afterChange ──► apps/cms/src/lib/revalidateFrontend
+                          ──► POST <tenant.siteUrl>/api/revalidate
+                                ──► revalidateTag / revalidatePath
+```
+
+- Without it, content refreshes only when its TTL expires, and Next serves the
+  stale page until then — a published article stayed invisible until somebody
+  hard-refreshed.
+- The route handler is three lines; the logic is **one** shared factory
+  (`packages/app-shell/src/cache/revalidateRoute.ts`).
+- Tag names come from `collectionCacheTag`
+  (`packages/payload/src/cacheTags.ts`) — the same module the CMS calls — so the
+  two sides cannot drift apart silently.
+- `REVALIDATE_SECRET` must match the CMS. An unset secret closes the route.
+
 ## Adding a fetch
 
 1. Add or extend a fetcher in `packages/payload/src/*` or `packages/hns/src/*`.

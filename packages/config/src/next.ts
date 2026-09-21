@@ -73,6 +73,12 @@ export function clubNextConfig(
     turbopack: {
       root: repoRoot,
     },
+    // Koliko dugo CDN smije servirati staru (stale) verziju ISR stranice dok se
+    // nova gradi u pozadini. Next default je godina dana, pa je prvi posjetitelj
+    // nakon isteka `revalidate` uvijek dobivao stari sadržaj i tek okidao obnovu
+    // — zbog toga se nova novost nije vidjela do hard refresha. 120 s je iznad
+    // najkraćeg `revalidate` u aplikacijama (30 s), pa SWR i dalje radi, kratko.
+    expireTime: 120,
     ...(redirects.length > 0
       ? { redirects: async () => redirects }
       : {}),

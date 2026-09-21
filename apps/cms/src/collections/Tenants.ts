@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 import { CLUB_FEATURE_OPTIONS } from '@/lib/payload/clubFeatures'
 import { isSuperAdmin, superAdminOnly, superAdminUI } from '../access/roles'
 import { mediaField } from '../fields/media'
+import { revalidateFrontend } from '../lib/revalidateFrontend'
 
 /** UI-uvjet: prikaži samo Moslavcu (ili super-adminu) — druge klubove ne zanima. */
 const moslavacOnlyUI = (
@@ -27,6 +28,21 @@ export const Tenants: CollectionConfig = {
     update: ({ req: { user } }) => Boolean(user),
     delete: superAdminOnly,
   },
+  // Tenants ne prolazi kroz `createCollection` (ima vlastiti access), pa
+  // revalidaciju dobiva ovdje: promjena grba, naziva ili rubrika inače ostaje
+  // nevidljiva na stranici do isteka cachea.
+  hooks: {
+    afterChange: [
+      async ({ doc, req }) => {
+        await revalidateFrontend({
+          payload: req.payload,
+          collectionSlug: 'tenants',
+          tenant: doc.id,
+        })
+        return doc
+      },
+    ],
+  },
   fields: [
     {
       name: 'displayName',
@@ -44,6 +60,16 @@ export const Tenants: CollectionConfig = {
       admin: {
         condition: superAdminUI,
         description: 'Tehnički identifikator kluba — ne mijenjati (razbija stranicu).',
+      },
+    },
+    {
+      name: 'siteUrl',
+      label: 'URL stranice kluba',
+      type: 'text',
+      admin: {
+        condition: superAdminUI,
+        description:
+          'Npr. https://www.hnkslogamravince.com — na ovu adresu CMS javi da je sadržaj promijenjen, da se novost odmah vidi. Prazno = klub čeka istek cachea.',
       },
     },
     {

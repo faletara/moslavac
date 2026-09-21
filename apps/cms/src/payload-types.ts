@@ -146,6 +146,10 @@ export interface Tenant {
    * Tehnički identifikator kluba — ne mijenjati (razbija stranicu).
    */
   slug?: string | null;
+  /**
+   * Npr. https://www.hnkslogamravince.com — na ovu adresu CMS javi da je sadržaj promijenjen, da se novost odmah vidi. Prazno = klub čeka istek cachea.
+   */
+  siteUrl?: string | null;
   active?: boolean | null;
   /**
    * Rubrike koje klub koristi — određuje vidljivost kolekcija u adminu.
@@ -693,6 +697,7 @@ export interface PayloadMigration {
 export interface TenantsSelect<T extends boolean = true> {
   displayName?: T;
   slug?: T;
+  siteUrl?: T;
   active?: T;
   features?: T;
   hns?:
