@@ -1,3 +1,4 @@
+import { createHmac } from 'node:crypto'
 import type { Payload } from 'payload'
 import { collectionCacheTag } from '@/lib/payload/cacheTags'
 import { tenantRefInfo } from '../access/tenantRef'
@@ -15,6 +16,10 @@ import { parseClubOrigin } from './clubOrigin'
  * Poziv ide samo na https origin čiji je host u `REVALIDATE_ALLOWED_HOSTS`
  * (zarezom odvojen popis), uvijek na `/api/revalidate` i bez praćenja
  * preusmjeravanja. Bez popisa se ništa ne šalje.
+ *
+ * Svaki klub dobiva vlastitu tajnu, izvedenu iz `REVALIDATE_SECRET` CMS-a i
+ * sluga Tenanta (`clubRevalidateSecret`). Klupska stranica drži samo svoju, pa
+ * tajna koja procuri s jednog kluba ne otvara revalidaciju drugog.
  */
 
 /** Dio Payloada koji revalidacija koristi: dohvat tenanta i log. */
@@ -27,6 +32,14 @@ export type TenantRelation = number | string | { id?: number | string } | null |
 
 const tenantIdOf = (ref: TenantRelation): number | string | null =>
   tenantRefInfo.parse(ref).id
+
+/**
+ * Tajna s kojom klub `slug` prima revalidaciju: HMAC-SHA256(REVALIDATE_SECRET, slug)
+ * u hexu. Istu vrijednost daje
+ * `printf %s <slug> | openssl dgst -sha256 -hmac "$REVALIDATE_SECRET"` (docs/NEW-CLUB.md).
+ */
+const clubRevalidateSecret = (cmsSecret: string, tenantSlug: string): string =>
+  createHmac('sha256', cmsSecret).update(tenantSlug).digest('hex')
 
 const allowedClubHosts = (): string[] =>
   (process.env.REVALIDATE_ALLOWED_HOSTS ?? '').split(',').flatMap((host) => {
@@ -79,7 +92,7 @@ export async function revalidateFrontend(args: {
       redirect: 'manual',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${secret}`,
+        Authorization: `Bearer ${clubRevalidateSecret(secret, doc.slug)}`,
       },
       body: JSON.stringify({ tags: [collectionCacheTag(collectionSlug, doc.slug)] }),
       // Spremanje u adminu čeka ovaj poziv; nedostupna klupska stranica ga ne

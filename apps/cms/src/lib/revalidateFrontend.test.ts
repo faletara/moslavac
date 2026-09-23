@@ -3,6 +3,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Tenant } from '../payload-types'
 import { type RevalidatePayload, revalidateFrontend } from './revalidateFrontend'
 
+/**
+ * Tajna kluba `club-a` uz glavnu tajnu `dummy-master`, izračunata izvan koda:
+ * `printf %s club-a | openssl dgst -sha256 -hmac dummy-master`
+ */
+const CLUB_A_SECRET = 'a7b646824599f1f14793c8deb7546f1f4086e6789b1f3fbe8024722ae6cd0897'
+
 type SentRequest = { url: string; init: RequestInit | undefined }
 
 let sent: SentRequest[] = []
@@ -32,7 +38,7 @@ const revalidate = (siteUrl: string | null) =>
 
 beforeEach(() => {
   sent = []
-  vi.stubEnv('REVALIDATE_SECRET', 'dummy-secret')
+  vi.stubEnv('REVALIDATE_SECRET', 'dummy-master')
   vi.stubEnv('REVALIDATE_ALLOWED_HOSTS', 'club-a.example, www.club-b.example')
   vi.stubGlobal('fetch', async (url: string | URL, init?: RequestInit) => {
     sent.push({ url: String(url), init })
@@ -55,6 +61,14 @@ describe('revalidateFrontend', () => {
     expect(sent[0].init?.method).toBe('POST')
     expect(sent[0].init?.redirect).toBe('manual')
     expect(sent[0].init?.body).toBe(JSON.stringify({ tags: ['news-club-a'] }))
+  })
+
+  it("sends the club's own secret, not the CMS secret", async () => {
+    await revalidate('https://club-a.example')
+
+    expect(new Headers(sent[0].init?.headers).get('authorization')).toBe(
+      `Bearer ${CLUB_A_SECRET}`,
+    )
   })
 
   it('accepts a trailing slash on the stored origin', async () => {

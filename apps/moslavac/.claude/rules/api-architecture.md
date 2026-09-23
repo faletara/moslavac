@@ -51,7 +51,11 @@ Payload afterChange ──► apps/cms/src/lib/revalidateFrontend
 - Tag names come from `collectionCacheTag`
   (`packages/payload/src/cacheTags.ts`) — the same module the CMS calls — so the
   two sides cannot drift apart silently.
-- `REVALIDATE_SECRET` must match the CMS. An unset secret closes the route.
+- `REVALIDATE_SECRET` is this club's own secret, not the CMS's: the CMS derives
+  it as HMAC-SHA256(its `REVALIDATE_SECRET`, tenant slug) and sends it as the
+  bearer. The route compares it in constant time. A credential issued to
+  another club gets 401, and an unset secret closes the route. How to compute
+  it: `docs/NEW-CLUB.md`.
 - The CMS only calls an https origin whose host is in its
   `REVALIDATE_ALLOWED_HOSTS`, always at `/api/revalidate`, and does not follow
   redirects. A club missing from that list is skipped.

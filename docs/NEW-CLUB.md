@@ -57,6 +57,18 @@ U Payload adminu (`http://localhost:43102/admin` → **Tenants → Create**):
 | `PAYLOAD_API_KEY` | API-key korisnik iz Payloada (za autenticirane pozive) |
 | `HNS_API_BASE` | HNS endpoint (default `https://api-hns.analyticom.de`) |
 | `NEXT_PUBLIC_SITE_URL` | Bazni URL (prod domena; lokalno `http://localhost:<port>`) |
+| `REVALIDATE_SECRET` | Tajna samo ovog kluba za `/api/revalidate` (vidi dolje). Bez nje je ruta zatvorena i sadržaj čeka istek cachea |
+
+**`REVALIDATE_SECRET` kluba** nije ista vrijednost kao na CMS-u. CMS je za svaki
+klub izvodi iz svoje tajne i sluga Tenanta, pa tajna jednog kluba ne otvara
+revalidaciju drugog. Izračunaj je ondje gdje imaš CMS-ov `REVALIDATE_SECRET`:
+
+```bash
+printf %s <slug> | openssl dgst -sha256 -hmac "$REVALIDATE_SECRET" | awk '{print $NF}'
+```
+
+Promjena CMS-ove tajne mijenja tajne svih klubova: nakon rotacije ponovno
+izračunaj i upiši vrijednost u svaki klupski projekt.
 
 ## 4. Install + dev
 
@@ -104,7 +116,8 @@ sadržaj (vijesti, oprema, roster, utakmice) dolazi iz CMS-a i HNS-a po tenantu.
 
 - Novi projekt, **Root Directory** = `apps/<slug>`.
 - Env vars: `PAYLOAD_TENANT_SLUG`, `PAYLOAD_API_URL`, `PAYLOAD_API_KEY`,
-  `HNS_API_BASE`, `NEXT_PUBLIC_SITE_URL` (= prava domena).
+  `HNS_API_BASE`, `NEXT_PUBLIC_SITE_URL` (= prava domena), `REVALIDATE_SECRET`
+  (tajna kluba iz koraka 3).
 - Ako su mijenjana CMS polja: pokreni postgres migraciju prije/uz deploy CMS-a.
 - CMS: dodaj domenu kluba (samo host, npr. `www.nk-primjer.hr`) u
   `REVALIDATE_ALLOWED_HOSTS` (zarezom odvojen popis) i redeployaj CMS. Bez toga
