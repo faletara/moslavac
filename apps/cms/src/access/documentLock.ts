@@ -1,4 +1,9 @@
-import { type CollectionSlug, docAccessOperation, type PayloadRequest } from 'payload'
+import {
+  canAccessAdmin,
+  type CollectionSlug,
+  docAccessOperation,
+  type PayloadRequest,
+} from 'payload'
 import { z } from 'zod'
 
 type LockTarget = {
@@ -40,6 +45,18 @@ export async function canLockDocument({ req, ...args }: LockTarget): Promise<boo
     // Odbijeni update Payload briše iz rezultata; dopušten je `true` ili
     // `{ permission: true, where }` kad je access vratio upit koji dokument zadovoljava.
     return Boolean(permissions.update)
+  } catch (err) {
+    req.payload.logger.error({ err }, 'Provjera prava za zaključavanje dokumenta nije uspjela')
+
+    return false
+  }
+}
+
+const hasAdminAccess = async (req: PayloadRequest): Promise<boolean> => {
+  try {
+    await canAccessAdmin({ req })
+
+    return true
   } catch {
     return false
   }
@@ -53,14 +70,22 @@ type FormStateArgs = LockTarget & {
 /**
  * Omotava Payloadov `form-state` handler: kad korisnik ne smije uređivati
  * dokument, form state se i dalje gradi (pregled radi), ali bez stvaranja ili
- * obnavljanja zaključavanja. Globale ovdje ne provjeravamo jer ih CMS nema, pa
- * se za njih zaključavanje uvijek preskače.
+ * obnavljanja zaključavanja.
+ *
+ * Pozivatelj bez pristupa adminu ide ravno u handler, koji ga sam odbije s
+ * Unauthorized, pa za njega ne radimo nikakav upit nad dokumentom.
+ *
+ * Globali uvijek gube zaključavanje: `canLockDocument` provjerava samo
+ * kolekcije, a CMS globala nema. Tko doda global, mora doraditi ovaj guard
+ * (update access globala), inače mu admin neće zaključavati taj global.
  */
 export function guardFormStateLocking<TArgs extends FormStateArgs, TResult>(
   handler: (args: TArgs) => Promise<TResult>,
 ): (args: TArgs) => Promise<TResult> {
   return async (args) => {
-    if (!args.returnLockStatus || (await canLockDocument(args))) return handler(args)
+    if (!args.returnLockStatus || !(await hasAdminAccess(args.req))) return handler(args)
+
+    if (await canLockDocument(args)) return handler(args)
 
     return handler({ ...args, returnLockStatus: false, updateLastEdited: false })
   }

@@ -2,14 +2,24 @@ import type { PayloadRequest } from 'payload'
 import { describe, expect, it } from 'vitest'
 import { canLockDocument, guardFormStateLocking } from './documentLock'
 
-type FakeUser = { id: number; tenantIds: number[] }
+type FakeUser = { id: number; collection: string; tenantIds: number[] }
+
+type TenantWhere = { tenant?: { in: number[] } }
+
+type LogEntry = { err: Error }
 
 // Vijest kluba B (tenant 2). Update access vraća tenant upit, kao multi-tenant plugin.
 const clubBNews = { id: 7, tenant: 2 }
 
-type TenantWhere = { tenant?: { in: number[] } }
+/**
+ * Lažni Payload za jednu kolekciju bez polja. Uz `req` vraća i što je
+ * provjera dotaknula: dohvaćene dokumente i zapisane greške.
+ */
+const fakePayload = (user: FakeUser) => {
+  const lookups: number[] = []
 
-const fakeReq = (user: FakeUser): PayloadRequest => {
+  const loggedErrors: LogEntry[] = []
+
   const news = {
     config: {
       slug: 'news',
@@ -22,16 +32,21 @@ const fakeReq = (user: FakeUser): PayloadRequest => {
     },
   }
 
-  // SAFETY: lažni req nosi samo ono što `docAccessOperation` čita za kolekciju
-  // bez polja: korisnika, kolekciju, `findByID` i `db.count`. Pravi
-  // `PayloadRequest` traži inicijaliziran Payload s bazom, a test namjerno
-  // pušta pravi `docAccessOperation` da evaluira tenant upit.
+  // SAFETY: lažni req nosi samo ono što `canAccessAdmin` i `docAccessOperation`
+  // čitaju za kolekciju bez polja: korisnika, admin kolekciju, kolekciju,
+  // `findByID`, `db.count` i logger. Pravi `PayloadRequest` traži inicijaliziran
+  // Payload s bazom, a test namjerno pušta pravi `docAccessOperation` da
+  // evaluira tenant upit.
   // oxlint-disable-next-line anti-slop/no-chained-type-assertions -- vidi SAFETY
-  return {
+  const req = {
     user,
     payload: {
+      config: { admin: { user: 'users' } },
       collections: { news },
+      logger: { error: (entry: LogEntry, _msg: string) => loggedErrors.push(entry) },
       findByID: async ({ id }: { id: number }) => {
+        lookups.push(id)
+
         if (id !== clubBNews.id) throw new Error('Not Found')
 
         return clubBNews
@@ -46,33 +61,40 @@ const fakeReq = (user: FakeUser): PayloadRequest => {
       },
     },
   } as unknown as PayloadRequest
+
+  return { req, lookups, loggedErrors }
 }
 
-const adminA: FakeUser = { id: 2, tenantIds: [1] }
+const adminA: FakeUser = { id: 2, collection: 'users', tenantIds: [1] }
 
-const adminB: FakeUser = { id: 3, tenantIds: [2] }
+const adminB: FakeUser = { id: 3, collection: 'users', tenantIds: [2] }
+
+// Korisnik iz kolekcije koja nije admin kolekcija; `canAccessAdmin` ga odbija.
+const outsider: FakeUser = { id: 4, collection: 'members', tenantIds: [2] }
 
 describe('canLockDocument', () => {
   it("denies a tenant-admin a lock on another club's document", async () => {
-    const req = fakeReq(adminA)
+    const { req } = fakePayload(adminA)
 
     expect(await canLockDocument({ collectionSlug: 'news', id: clubBNews.id, req })).toBe(false)
   })
 
   it("allows the club's own tenant-admin to lock its document", async () => {
-    const req = fakeReq(adminB)
+    const { req } = fakePayload(adminB)
 
     expect(await canLockDocument({ collectionSlug: 'news', id: clubBNews.id, req })).toBe(true)
   })
 
-  it('denies a lock on a document that does not exist', async () => {
-    const req = fakeReq(adminB)
+  it('denies and logs a lock on a document that does not exist', async () => {
+    const { req, loggedErrors } = fakePayload(adminB)
 
     expect(await canLockDocument({ collectionSlug: 'news', id: 999, req })).toBe(false)
+
+    expect(loggedErrors).toHaveLength(1)
   })
 
   it('denies a lock on a collection that does not exist', async () => {
-    const req = fakeReq(adminB)
+    const { req } = fakePayload(adminB)
 
     expect(await canLockDocument({ collectionSlug: 'constructor', id: clubBNews.id, req })).toBe(
       false,
@@ -81,7 +103,7 @@ describe('canLockDocument', () => {
 })
 
 describe('guardFormStateLocking', () => {
-  const lockRequest = (req: PayloadRequest) => ({
+  const formStateArgs = (req: PayloadRequest) => ({
     collectionSlug: 'news',
     id: clubBNews.id,
     operation: 'update',
@@ -92,9 +114,9 @@ describe('guardFormStateLocking', () => {
 
   /** Payloadov handler u malom: bilježi argumente s kojima ga je omotač pozvao. */
   const recordingHandler = () => {
-    const calls: Array<ReturnType<typeof lockRequest>> = []
+    const calls: Array<ReturnType<typeof formStateArgs>> = []
 
-    const handler = async (args: ReturnType<typeof lockRequest>) => {
+    const handler = async (args: ReturnType<typeof formStateArgs>) => {
       calls.push(args)
 
       return 'state'
@@ -106,7 +128,7 @@ describe('guardFormStateLocking', () => {
   it("builds another club's form state without creating or renewing a lock", async () => {
     const { calls, handler } = recordingHandler()
 
-    const args = lockRequest(fakeReq(adminA))
+    const args = formStateArgs(fakePayload(adminA).req)
 
     expect(await guardFormStateLocking(handler)(args)).toBe('state')
 
@@ -116,9 +138,23 @@ describe('guardFormStateLocking', () => {
   it('leaves locking on for a user who may edit the document', async () => {
     const { calls, handler } = recordingHandler()
 
-    const args = lockRequest(fakeReq(adminB))
+    const args = formStateArgs(fakePayload(adminB).req)
 
     await guardFormStateLocking(handler)(args)
+
+    expect(calls).toEqual([args])
+  })
+
+  it('leaves a caller without admin access to the handler without reading the document', async () => {
+    const { calls, handler } = recordingHandler()
+
+    const { req, lookups } = fakePayload(outsider)
+
+    const args = formStateArgs(req)
+
+    await guardFormStateLocking(handler)(args)
+
+    expect(lookups).toEqual([])
 
     expect(calls).toEqual([args])
   })
