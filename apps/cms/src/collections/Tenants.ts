@@ -3,6 +3,7 @@ import { CLUB_FEATURE_OPTIONS } from '@/lib/payload/clubFeatures'
 import { isSuperAdmin, superAdminOnly, superAdminOnlyField, superAdminUI } from '../access/roles'
 import { mediaField } from '../fields/media'
 import type { Tenant } from '../payload-types'
+import { parseClubOrigin } from '../lib/clubOrigin'
 import { revalidateFrontend } from '../lib/revalidateFrontend'
 
 /** UI-uvjet: prikaži samo Moslavcu (ili super-adminu) — druge klubove ne zanima. */
@@ -67,10 +68,17 @@ export const Tenants: CollectionConfig = {
       label: 'URL stranice kluba',
       type: 'text',
       access: { update: superAdminOnlyField },
+      validate: (value: string | null | undefined) => {
+        if (!value) return true
+
+        const origin = parseClubOrigin(value)
+
+        return origin.ok ? true : origin.reason
+      },
       admin: {
         condition: superAdminUI,
         description:
-          'Npr. https://www.hnkslogamravince.com — na ovu adresu CMS javi da je sadržaj promijenjen, da se novost odmah vidi. Prazno = klub čeka istek cachea.',
+          'Npr. https://www.hnkslogamravince.com — na ovu adresu CMS javi da je sadržaj promijenjen, da se novost odmah vidi. Domena mora biti i u REVALIDATE_ALLOWED_HOSTS na CMS-u. Prazno = klub čeka istek cachea.',
       },
     },
     {

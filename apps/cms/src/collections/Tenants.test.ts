@@ -136,3 +136,31 @@ describe('Tenants hns.matchPagePath', () => {
     expect(validate('hns.matchPagePath', value)).toEqual(expect.any(String))
   })
 })
+
+describe('Tenants siteUrl', () => {
+  it.each(['https://www.klub.hr', 'https://klub.hr/'])('accepts the https origin %s', (value) => {
+    expect(validate('siteUrl', value)).toBe(true)
+  })
+
+  it('accepts a missing value, which leaves the club on cache expiry', () => {
+    expect(validate('siteUrl', null)).toBe(true)
+    expect(validate('siteUrl', '')).toBe(true)
+  })
+
+  it.each([
+    'http://www.klub.hr',
+    'https://www.klub.hr/api',
+    'https://www.klub.hr?x=1',
+    'https://www.klub.hr/?',
+    'https://www.klub.hr#',
+    'https://user:pass@www.klub.hr',
+    'https://www.klub.hr:8443',
+    'https://localhost',
+    'https://127.0.0.1',
+    'https://[::1]',
+    'https://intranet',
+    'www.klub.hr',
+  ])('rejects %s', (value) => {
+    expect(validate('siteUrl', value)).toEqual(expect.any(String))
+  })
+})

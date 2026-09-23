@@ -1,6 +1,7 @@
 import type { Payload } from 'payload'
 import { collectionCacheTag } from '@/lib/payload/cacheTags'
 import { tenantRefInfo } from '../access/tenantRef'
+import { parseClubOrigin } from './clubOrigin'
 
 /**
  * Javi klupskoj stranici da je sadržaj promijenjen.
@@ -10,15 +11,32 @@ import { tenantRefInfo } from '../access/tenantRef'
  *
  * URL stranice stoji na tenantu (`Tenants.siteUrl`), ne u env varijabli, pa novi
  * klub ne traži redeploy CMS-a. Klub bez upisanog URL-a se tiho preskače.
+ *
+ * Poziv ide samo na https origin čiji je host u `REVALIDATE_ALLOWED_HOSTS`
+ * (zarezom odvojen popis), uvijek na `/api/revalidate` i bez praćenja
+ * preusmjeravanja. Bez popisa se ništa ne šalje.
  */
+
+/** Dio Payloada koji revalidacija koristi: dohvat tenanta i log. */
+export type RevalidatePayload = {
+  findByID: Payload['findByID']
+  logger: Pick<Payload['logger'], 'error' | 'warn'>
+}
 
 export type TenantRelation = number | string | { id?: number | string } | null | undefined
 
 const tenantIdOf = (ref: TenantRelation): number | string | null =>
   tenantRefInfo.parse(ref).id
 
+const allowedClubHosts = (): string[] =>
+  (process.env.REVALIDATE_ALLOWED_HOSTS ?? '').split(',').flatMap((host) => {
+    const trimmed = host.trim().toLowerCase()
+
+    return trimmed ? [trimmed] : []
+  })
+
 export async function revalidateFrontend(args: {
-  payload: Payload
+  payload: RevalidatePayload
   collectionSlug: string
   tenant: TenantRelation
 }): Promise<void> {
@@ -41,12 +59,24 @@ export async function revalidateFrontend(args: {
       depth: 0,
     })
 
-    const siteUrl = doc.siteUrl?.trim().replace(/\/+$/, '')
+    if (!doc.siteUrl || !doc.slug) return
 
-    if (!siteUrl || !doc.slug) return
+    const origin = parseClubOrigin(doc.siteUrl)
 
-    const response = await fetch(`${siteUrl}/api/revalidate`, {
+    if (!origin.ok || !allowedClubHosts().includes(origin.url.hostname)) {
+      payload.logger.warn(
+        `Revalidacija preskočena: ${doc.siteUrl} nije dozvoljena adresa kluba ${doc.slug}`,
+      )
+
+      return
+    }
+
+    const siteUrl = origin.url.origin
+
+    const response = await fetch(new URL('/api/revalidate', siteUrl), {
       method: 'POST',
+      // Preusmjeravanje bi poslalo isti POST na adresu koju CMS nije provjerio.
+      redirect: 'manual',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${secret}`,

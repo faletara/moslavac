@@ -52,6 +52,9 @@ Payload afterChange ──► apps/cms/src/lib/revalidateFrontend
   (`packages/payload/src/cacheTags.ts`) — the same module the CMS calls — so the
   two sides cannot drift apart silently.
 - `REVALIDATE_SECRET` must match the CMS. An unset secret closes the route.
+- The CMS only calls an https origin whose host is in its
+  `REVALIDATE_ALLOWED_HOSTS`, always at `/api/revalidate`, and does not follow
+  redirects. A club missing from that list is skipped.
 
 ## Adding a fetch
 

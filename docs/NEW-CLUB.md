@@ -31,6 +31,7 @@ U Payload adminu (`http://localhost:43102/admin` → **Tenants → Create**):
 | `slug` | ✅ | = `PAYLOAD_TENANT_SLUG` (npr. `nk-primjer`) |
 | `displayName` | ✅ | Puni naziv (npr. `NK Primjer`) |
 | `active` | — | Uključeno (default) |
+| `siteUrl` | — | Produkcijski https origin (npr. `https://www.nk-primjer.hr`), bez putanje. Na njega CMS šalje revalidaciju; domena mora biti i u `REVALIDATE_ALLOWED_HOSTS` CMS-a (korak 7) |
 | `features` | — | Klupske rubrike: `pages`, `documents`, `board`, `school`, `gallery` (uključi samo što klub koristi — gate-a vidljivost tih kolekcija u adminu) |
 | `hns.apiKey` | ✅ | HNS API ključ |
 | `hns.teamId` | ✅ | HNS ID kluba (highlight vlastitog tima, roster, rezultati) |
@@ -105,6 +106,9 @@ sadržaj (vijesti, oprema, roster, utakmice) dolazi iz CMS-a i HNS-a po tenantu.
 - Env vars: `PAYLOAD_TENANT_SLUG`, `PAYLOAD_API_URL`, `PAYLOAD_API_KEY`,
   `HNS_API_BASE`, `NEXT_PUBLIC_SITE_URL` (= prava domena).
 - Ako su mijenjana CMS polja: pokreni postgres migraciju prije/uz deploy CMS-a.
+- CMS: dodaj domenu kluba (samo host, npr. `www.nk-primjer.hr`) u
+  `REVALIDATE_ALLOWED_HOSTS` (zarezom odvojen popis) i redeployaj CMS. Bez toga
+  CMS ne šalje revalidaciju na `siteUrl` i sadržaj čeka istek cachea.
 
 ---
 
