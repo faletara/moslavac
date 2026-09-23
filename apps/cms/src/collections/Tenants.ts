@@ -1,10 +1,23 @@
-import type { CollectionConfig, Condition } from 'payload'
+import type { CollectionConfig, Condition, TextFieldSingleValidation } from 'payload'
 import { CLUB_FEATURE_OPTIONS } from '@/lib/payload/clubFeatures'
 import { isSuperAdmin, superAdminOnly, superAdminOnlyField, superAdminUI } from '../access/roles'
 import { mediaField } from '../fields/media'
 import type { Tenant } from '../payload-types'
 import { parseClubOrigin } from '../lib/clubOrigin'
 import { revalidateFrontend } from '../lib/revalidateFrontend'
+
+/**
+ * `siteUrl` mora biti https origin kluba (vidi `lib/clubOrigin`). Validacija ide
+ * na svako spremanje Tenanta, i vlasnikovo, pa zatečena neispravna adresa ne
+ * blokira spremanje polja koje on ne vidi; slanje je svejedno preskače.
+ */
+const validateSiteUrl: TextFieldSingleValidation = (value, { previousValue }) => {
+  if (!value || value === previousValue) return true
+
+  const parsed = parseClubOrigin(value)
+
+  return parsed.ok ? true : parsed.reason
+}
 
 /** UI-uvjet: prikaži samo Moslavcu (ili super-adminu) — druge klubove ne zanima. */
 const moslavacOnlyUI: Condition<Tenant> = (data, _sibling, { user }) =>
@@ -68,13 +81,7 @@ export const Tenants: CollectionConfig = {
       label: 'URL stranice kluba',
       type: 'text',
       access: { update: superAdminOnlyField },
-      validate: (value: string | null | undefined) => {
-        if (!value) return true
-
-        const origin = parseClubOrigin(value)
-
-        return origin.ok ? true : origin.reason
-      },
+      validate: validateSiteUrl,
       admin: {
         condition: superAdminUI,
         description:

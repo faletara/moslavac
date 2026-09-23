@@ -61,9 +61,9 @@ export async function revalidateFrontend(args: {
 
     if (!doc.siteUrl || !doc.slug) return
 
-    const origin = parseClubOrigin(doc.siteUrl)
+    const parsed = parseClubOrigin(doc.siteUrl)
 
-    if (!origin.ok || !allowedClubHosts().includes(origin.url.hostname)) {
+    if (!parsed.ok || !allowedClubHosts().includes(parsed.url.hostname)) {
       payload.logger.warn(
         `Revalidacija preskočena: ${doc.siteUrl} nije dozvoljena adresa kluba ${doc.slug}`,
       )
@@ -71,7 +71,7 @@ export async function revalidateFrontend(args: {
       return
     }
 
-    const siteUrl = origin.url.origin
+    const siteUrl = parsed.url.origin
 
     const response = await fetch(new URL('/api/revalidate', siteUrl), {
       method: 'POST',

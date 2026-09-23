@@ -13,8 +13,12 @@ export type ClubOrigin = { ok: true; url: URL } | { ok: false; reason: string }
 const isIpLiteral = (hostname: string): boolean =>
   hostname.startsWith('[') || /^[\d.]+$/.test(hostname)
 
+// Završna točka (`localhost.`) je isti host kao bez nje, a klupska domena je nema.
 const isLocalName = (hostname: string): boolean =>
-  hostname === 'localhost' || hostname.endsWith('.localhost') || !hostname.includes('.')
+  hostname === 'localhost' ||
+  hostname.endsWith('.localhost') ||
+  hostname.endsWith('.') ||
+  !hostname.includes('.')
 
 export function parseClubOrigin(value: string): ClubOrigin {
   let url: URL

@@ -68,6 +68,7 @@ describe('revalidateFrontend', () => {
   it.each([
     ['loopback', 'http://127.0.0.1:8080'],
     ['loopback over https', 'https://localhost'],
+    ['loopback with a trailing dot', 'https://localhost.'],
     ['a host outside the allowlist', 'https://attacker.example'],
     ['plain http', 'http://club-a.example'],
     ['a path', 'https://club-a.example/direct'],

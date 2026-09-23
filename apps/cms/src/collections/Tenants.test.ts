@@ -98,15 +98,21 @@ describe('Tenants platform fields', () => {
   })
 })
 
-const validate = (path: string, value: string | null): true | string => {
+const validate = (
+  path: string,
+  value: string | null,
+  previousValue: string | null = null,
+): true | string => {
   const field = fieldAt(path)
 
   if (field.type !== 'text' || field.hasMany || !field.validate) {
     throw new Error(`${path} nema validator tekstualnog polja`)
   }
 
-  // SAFETY: validatori Tenanta ne čitaju opcije (req, data, operation).
-  const result = field.validate(value, {} as Parameters<TextFieldSingleValidation>[1])
+  // SAFETY: validatori Tenanta od opcija čitaju samo `previousValue`.
+  const result = field.validate(value, {
+    previousValue,
+  } as Parameters<TextFieldSingleValidation>[1])
 
   if (result instanceof Promise) throw new Error(`${path} validator je async`)
 
@@ -147,6 +153,13 @@ describe('Tenants siteUrl', () => {
     expect(validate('siteUrl', '')).toBe(true)
   })
 
+  it('does not block a save that leaves a stored invalid address unchanged', () => {
+    expect(validate('siteUrl', 'http://www.klub.hr', 'http://www.klub.hr')).toBe(true)
+    expect(validate('siteUrl', 'http://www.klub.hr', 'https://www.klub.hr')).toEqual(
+      expect.any(String),
+    )
+  })
+
   it.each([
     'http://www.klub.hr',
     'https://www.klub.hr/api',
@@ -156,6 +169,8 @@ describe('Tenants siteUrl', () => {
     'https://user:pass@www.klub.hr',
     'https://www.klub.hr:8443',
     'https://localhost',
+    'https://localhost.',
+    'https://www.klub.hr.',
     'https://127.0.0.1',
     'https://[::1]',
     'https://intranet',
