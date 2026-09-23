@@ -86,6 +86,7 @@ export const Users: CollectionConfig = {
     {
       name: 'apiKey',
       type: 'text',
+      label: 'API ključ',
       access: {
         create: superAdminOnlyField,
         update: superAdminOnlyField,
