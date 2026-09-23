@@ -41,6 +41,9 @@
       "@/lib/helpers/*": [
         "../../packages/lib/src/helpers/*"
       ],
+      "@/lib/app-shell/seo/JsonLdScript": [
+        "../../packages/app-shell/src/seo/JsonLdScript.tsx"
+      ],
       "@/*": [
         "./src/*"
       ],

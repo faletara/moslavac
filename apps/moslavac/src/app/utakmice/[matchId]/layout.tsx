@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import JsonLdScript from "@/lib/app-shell/seo/JsonLdScript";
 import { getCometImageUrl } from "@/lib/hns/imageUrl";
 import {
   fetchAllCompetitionMatches,
@@ -205,16 +206,8 @@ export default async function MatchLayout({
 
   return (
     <>
-      {jsonLd && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-      )}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
+      {jsonLd && <JsonLdScript data={jsonLd} />}
+      <JsonLdScript data={breadcrumbJsonLd} />
       {children}
     </>
   );

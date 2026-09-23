@@ -1,3 +1,4 @@
+import JsonLdScript from '@/lib/app-shell/seo/JsonLdScript'
 import { BRAND, LEGAL, PRICING } from '@/marketing/config'
 import { FAQ } from '@/marketing/data/faq'
 import { Clubs } from '@/marketing/sections/Clubs'
@@ -51,10 +52,7 @@ const jsonLd = {
 export default function HomePage() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLdScript data={jsonLd} />
       <Hero />
       <Features />
       <HowItWorks />

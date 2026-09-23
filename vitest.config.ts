@@ -18,6 +18,7 @@ export default defineConfig({
             "packages/**/*.test.ts",
             "apps/*/src/**/*.test.ts",
             "apps/*/src/**/*.test.tsx",
+            "tools/oxlint/moslavac/**/*.test.ts",
           ],
           exclude: ["**/node_modules/**", "**/*.rsc.test.ts"],
         },

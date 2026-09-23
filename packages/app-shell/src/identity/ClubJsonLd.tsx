@@ -1,5 +1,6 @@
 import type { FrontendTenant } from "@/lib/payload/types";
 import type { Facility } from "@/types/hns";
+import JsonLdScript from "../seo/JsonLdScript";
 import { buildClubJsonLd } from "./clubIdentity";
 
 /**
@@ -24,14 +25,8 @@ export default function ClubJsonLd({
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(organization) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(website) }}
-      />
+      <JsonLdScript data={organization} />
+      <JsonLdScript data={website} />
     </>
   );
 }
