@@ -7,7 +7,7 @@ import {
   superAdminOnlyField,
   superAdminUI,
 } from '../access/roles'
-import { isProduction } from '../lib/adminOrigin'
+import { isProduction } from '../lib/isProduction'
 
 export const Users: CollectionConfig = {
   slug: 'users',

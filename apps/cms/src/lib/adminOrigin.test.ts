@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { isProduction, resolveAdminOrigins } from './adminOrigin'
+import { resolveAdminOrigins } from './adminOrigin'
 
 const DEV = { serverURL: 'http://localhost:43102', csrf: ['http://localhost:43102'] }
 
@@ -90,13 +90,5 @@ describe('resolveAdminOrigins', () => {
     expect(() =>
       resolveAdminOrigins({ PAYLOAD_SERVER_URL: 'cms.example.hr' }),
     ).toThrow(/PAYLOAD_SERVER_URL/)
-  })
-})
-
-describe('isProduction', () => {
-  it('prati NODE_ENV', () => {
-    expect(isProduction({ NODE_ENV: 'production' })).toBe(true)
-    expect(isProduction({ NODE_ENV: 'development' })).toBe(false)
-    expect(isProduction({})).toBe(false)
   })
 })
