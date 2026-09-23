@@ -158,7 +158,7 @@ Svjesno prihvaćeno: korisnici ne vide tuđa zaključavanja. Svaki klub danas im
 
 **Blocked by:** None (can start immediately)
 
-**Status:** resolved
+**Status:** ready-for-human
 
 Fingerprint: `payloadcms-ui-handleFormStateLocking-db-create-no-document-access-check`
 
@@ -169,7 +169,7 @@ Fingerprint: `payloadcms-ui-handleFormStateLocking-db-create-no-document-access-
 
 ## Answer
 
-Riješeno. `form-state` je omotan u `layout.tsx` (`formStateLockGuard`). Zaključavanje nastaje samo ako korisnik može uređivati dokument, a provjeru dijeli s ticketom 06 (`canEditDocument`).
+Kod je riješen i spojen. Otvoren je samo ljudski korak (upstream prijava), zato je ticket `ready-for-human`. `form-state` je omotan u `layout.tsx` (`formStateLockGuard`). Zaključavanje nastaje samo ako korisnik može uređivati dokument, a provjeru dijeli s ticketom 06 (`canEditDocument`).
 
 Ljudski korak: prijaviti problem Payloadu kroz njihov privatni kanal za ranjivosti. Nacrt je u `~/security-audit-skill/moslavac/run-1/payload-upstream-report-draft.md`. Ovdje zabilježiti link.
 
