@@ -6,9 +6,11 @@ import { mediaRef } from "./schemas";
 
 export const rosterSchema = z.object({
   id: z.number(),
-  displayName: z.string(),
-  personId: z.number(),
-  position: z.enum(["vratar", "obrambeni", "vezni", "napadac", "trener"]),
+  displayName: z.string().nullish().transform((text) => text ?? ""),
+  personId: z.number().nullish().transform((n) => n ?? 0),
+  position: z
+    .enum(["vratar", "obrambeni", "vezni", "napadac", "trener"])
+    .catch("vezni"),
   displayOrder: z.number().nullish().default(null),
   jerseyNumber: z.number().nullish().default(null),
   captain: z.boolean().nullish().default(null),

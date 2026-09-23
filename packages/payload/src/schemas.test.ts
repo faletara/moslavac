@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { z } from "zod";
 import { mediaRef, payloadPage, tenantRef } from "./schemas";
 
 describe("mediaRef", () => {
@@ -26,6 +27,31 @@ describe("mediaRef", () => {
       height: null,
     });
   });
+  it("prazne varijante veličina ne ruše raščlanjivanje", () => {
+    // Payload vraća ovakav oblik za varijante koje nije izrezao. Stroža shema
+    // je 2026-09-23 srušila build na `/raspored-i-rezultati/[slug]`.
+    expect(
+      mediaRef.parse({
+        id: 4,
+        url: "/grb.png",
+        alt: null,
+        sizes: {
+          thumbnail: { url: null, width: null, height: null },
+          card: { url: null, width: null, height: null },
+          hero: { url: null, width: null, height: null },
+        },
+      }),
+    ).toEqual({
+      id: 4,
+      url: "/grb.png",
+      cardUrl: "/grb.png",
+      heroUrl: "/grb.png",
+      alt: "",
+      width: null,
+      height: null,
+    });
+  });
+
   it("bare id / string / null / undefined → null", () => {
     expect(mediaRef.parse(7)).toBeNull();
     expect(mediaRef.parse("7")).toBeNull();
@@ -44,6 +70,18 @@ describe("tenantRef", () => {
 });
 
 describe("payloadPage", () => {
+  it("preskače dokument koji ne odgovara shemi, ostale zadrži", () => {
+    const page = payloadPage(z.object({ id: z.number() })).parse({
+      docs: [{ id: 1 }, { id: "ne-broj" }, { id: 3 }],
+      totalDocs: 3,
+      totalPages: 1,
+      page: 1,
+      limit: 10,
+    });
+
+    expect(page.docs).toEqual([{ id: 1 }, { id: 3 }]);
+  });
+
   it("parses the envelope", () => {
     const page = payloadPage(mediaRef).parse({
       docs: [{ id: 1, url: "/a.jpg", alt: "A" }],

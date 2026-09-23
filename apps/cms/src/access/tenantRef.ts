@@ -86,6 +86,9 @@ export const tenantRefInfo = z
   ])
   .nullish()
   .transform((info) => info ?? EMPTY)
+  // Neočekivan oblik relacije ne smije srušiti admin ekran; prazna vrijednost
+  // znači isto što je značila i prije: nema tenanta za prikaz.
+  .catch(EMPTY)
 
 /** ID iz tenant relacije, bez obzira je li populirana. `null` ako ga nema. */
 export const tenantRefId = (ref: TenantRef): number | string | null =>

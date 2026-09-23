@@ -8,10 +8,10 @@ import { resolveTenantSlug } from "./tenant";
 
 export const newsSchema = z.object({
   id: z.number(),
-  title: z.string(),
+  title: z.string().nullish().transform((text) => text ?? ""),
   slug: z.string().nullish().default(null),
   content: z.object({ root: z.unknown() }).nullish().default(null),
-  publishedAt: z.string(),
+  publishedAt: z.string().nullish().transform((text) => text ?? ""),
   excerpt: z.string().nullish().default(null),
   thumbnail: mediaRef,
   gallery: z
@@ -20,8 +20,8 @@ export const newsSchema = z.object({
     .default(null),
   tenant: tenantRef,
   sourceMatchId: z.union([z.number(), z.string()]).nullish().default(null),
-  createdAt: z.string(),
-  updatedAt: z.string(),
+  createdAt: z.string().nullish().transform((text) => text ?? ""),
+  updatedAt: z.string().nullish().transform((text) => text ?? ""),
 });
 
 type PayloadNews = z.output<typeof newsSchema>;

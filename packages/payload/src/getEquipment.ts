@@ -7,17 +7,19 @@ import { resolveTenantSlug } from "./tenant";
 
 export const equipmentSchema = z.object({
   id: z.number(),
-  displayName: z.string(),
-  category: z.enum(["paketi", "dresovi", "trenirke", "jakne", "dodaci"]),
-  price: z.number(),
+  displayName: z.string().nullish().transform((text) => text ?? ""),
+  category: z
+    .enum(["paketi", "dresovi", "trenirke", "jakne", "dodaci"])
+    .catch("dodaci"),
+  price: z.number().nullish().transform((n) => n ?? 0),
   image: mediaRef,
-  externalUrl: z.string(),
+  externalUrl: z.string().nullish().transform((text) => text ?? ""),
   displayOrder: z.number().nullish().default(null),
   featured: z.boolean().nullish().default(null),
   active: z.boolean().nullish().default(null),
   tenant: tenantRef,
-  createdAt: z.string(),
-  updatedAt: z.string(),
+  createdAt: z.string().nullish().transform((text) => text ?? ""),
+  updatedAt: z.string().nullish().transform((text) => text ?? ""),
 });
 
 type PayloadEquipment = z.output<typeof equipmentSchema>;

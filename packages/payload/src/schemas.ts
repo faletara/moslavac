@@ -22,13 +22,20 @@ export interface MediaImage {
   height: number | null;
 }
 
+// Payload popunjava tek one varijante koje je stvarno izrezao; ostale vraća
+// kao `{ url: null, width: null, height: null }`. Shema zato ne smije tražiti
+// nijedno polje — strožom shemom pada cijeli dohvat kolekcije.
 const sizeSchema = z
-  .object({ url: z.string(), width: z.number(), height: z.number() })
+  .object({
+    url: z.string().nullish(),
+    width: z.number().nullish(),
+    height: z.number().nullish(),
+  })
   .nullish();
 
 const populatedMedia = z.object({
   id: z.number(),
-  url: z.string(),
+  url: z.string().nullish(),
   alt: z.string().nullish(),
   width: z.number().nullish(),
   height: z.number().nullish(),
@@ -48,17 +55,19 @@ const populatedMedia = z.object({
  */
 export const mediaRef = z
   .union([
-    populatedMedia.transform(
-      (media): MediaImage => ({
+    populatedMedia.transform((media): MediaImage => {
+      const url = media.url ?? "";
+
+      return {
         id: media.id,
-        url: media.url,
-        cardUrl: media.sizes?.card?.url ?? media.url,
-        heroUrl: media.sizes?.hero?.url ?? media.url,
+        url,
+        cardUrl: media.sizes?.card?.url ?? url,
+        heroUrl: media.sizes?.hero?.url ?? url,
         alt: media.alt ?? "",
         width: media.width ?? null,
         height: media.height ?? null,
-      }),
-    ),
+      };
+    }),
     z.union([z.number(), z.string()]).transform((): MediaImage | null => null),
   ])
   .nullish()
@@ -67,20 +76,49 @@ export const mediaRef = z
 /** Relacija na tenanta: populirani objekt sa slugom ili goli id. */
 export const tenantRef = z
   .union([
-    z.object({ id: z.number(), slug: z.string() }),
+    z.object({ id: z.number(), slug: z.string().nullish().default(null) }),
     z.union([z.number(), z.string()]).transform(() => null),
   ])
   .nullish()
   .transform((tenant) => tenant ?? null);
 
-/** Ovojnica Payloadove liste; ista je za svaku kolekciju. */
+/**
+ * Ovojnica Payloadove liste; ista je za svaku kolekciju.
+ *
+ * Dokumenti se raščlanjuju pojedinačno: jedan zapis neočekivanog oblika ispada
+ * iz liste umjesto da sruši cijeli dohvat. Prije zoda takav je zapis prolazio
+ * neprovjeren, pa bi stroža ovojnica bila korak unatrag — stranica bi ostala
+ * prazna zbog jednog retka.
+ */
 export const payloadPage = <Doc extends z.ZodType>(doc: Doc) =>
   z.object({
-    docs: z.array(doc),
-    totalDocs: z.number(),
-    totalPages: z.number(),
-    page: z.number(),
-    limit: z.number(),
+    docs: z
+      .array(z.unknown())
+      .nullish()
+      .transform((rows): z.output<Doc>[] =>
+        (rows ?? []).flatMap((row) => {
+          const parsed = doc.safeParse(row);
+
+          if (parsed.success) {
+            // SAFETY: `safeParse` vraća izlaz upravo te sheme; TS to ne zaključi
+            // kroz generik `Doc`, ali runtime vrijednost je već raščlanjena.
+            return [parsed.data as z.output<Doc>];
+          }
+
+          console.error(
+            "payload: dokument ne odgovara shemi, preskačem",
+            parsed.error.issues,
+          );
+
+          return [];
+        }),
+      ),
+    // Brojači se koriste samo za straničenje; ako ih Payload ikad izostavi,
+    // bolje je prikazati jednu stranicu nego srušiti dohvat.
+    totalDocs: z.number().nullish().transform((count) => count ?? 0),
+    totalPages: z.number().nullish().transform((count) => count ?? 1),
+    page: z.number().nullish().transform((page) => page ?? 1),
+    limit: z.number().nullish().transform((limit) => limit ?? 0),
     // Zastavice stranicačenja nitko ne čita; tražiti ih značilo bi pasti na
     // odgovoru koji je za nas potpun.
     hasNextPage: z.boolean().nullish().transform((flag) => flag ?? false),
@@ -126,13 +164,20 @@ export const pageKeySchema = z.enum([
 export const tenantSchema = z.object({
   id: z.number(),
   slug: z.string(),
-  displayName: z.string(),
-  active: z.boolean(),
-  hns: z.object({
-    apiKey: z.string(),
-    teamId: z.string(),
-    seniorCompetitionFilter: z.string().nullish().default(null),
-  }),
+  displayName: z.string().nullish().transform((name) => name ?? ""),
+  active: z.boolean().nullish().transform((active) => active ?? true),
+  // Nepotpun `hns` blok daje prazne vrijednosti umjesto iznimke: HNS dohvat
+  // tada zakaže sam za sebe, a ostatak stranice se i dalje prikaže.
+  hns: z
+    .object({
+      apiKey: z.string().nullish().transform((key) => key ?? ""),
+      teamId: z.string().nullish().transform((id) => id ?? ""),
+      seniorCompetitionFilter: z.string().nullish().default(null),
+    })
+    .nullish()
+    .transform(
+      (hns) => hns ?? { apiKey: "", teamId: "", seniorCompetitionFilter: null },
+    ),
   branding: z
     .object({
       shortName: z.string().nullish().default(null),

@@ -7,7 +7,7 @@ import { mediaRef } from "./schemas";
 
 export const schoolProgramSchema = z.object({
   id: z.number(),
-  name: z.string(),
+  name: z.string().nullish().transform((text) => text ?? ""),
   ageRange: z.string().nullish().default(null),
   coach: z.string().nullish().default(null),
   schedule: z.string().nullish().default(null),

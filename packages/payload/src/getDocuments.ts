@@ -7,8 +7,8 @@ import { documentCategorySchema } from "./schemas";
 
 export const documentSchema = z.object({
   id: z.number(),
-  title: z.string(),
-  category: documentCategorySchema,
+  title: z.string().nullish().transform((text) => text ?? ""),
+  category: documentCategorySchema.catch("ostalo"),
   url: z.string().nullish().default(null),
   filename: z.string().nullish().default(null),
   displayOrder: z.number().nullish().default(null),

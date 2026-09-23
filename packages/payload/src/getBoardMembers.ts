@@ -7,14 +7,11 @@ import { mediaRef } from "./schemas";
 
 export const boardMemberSchema = z.object({
   id: z.number(),
-  name: z.string(),
-  role: z.string(),
-  roleGroup: z.enum([
-    "predsjednistvo",
-    "nadzorni-odbor",
-    "strucni-stozer",
-    "ostalo",
-  ]),
+  name: z.string().nullish().transform((text) => text ?? ""),
+  role: z.string().nullish().transform((text) => text ?? ""),
+  roleGroup: z
+    .enum(["predsjednistvo", "nadzorni-odbor", "strucni-stozer", "ostalo"])
+    .catch("ostalo"),
   photo: mediaRef,
   email: z.string().nullish().default(null),
   phone: z.string().nullish().default(null),

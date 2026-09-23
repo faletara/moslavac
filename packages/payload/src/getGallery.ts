@@ -7,7 +7,7 @@ import { mediaRef } from "./schemas";
 
 export const albumSchema = z.object({
   id: z.number(),
-  title: z.string(),
+  title: z.string().nullish().transform((text) => text ?? ""),
   slug: z.string().nullish().default(null),
   date: z.string().nullish().default(null),
   coverImage: mediaRef,

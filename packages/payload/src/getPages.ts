@@ -9,7 +9,7 @@ import { mediaRef, pageKeySchema } from "./schemas";
 export const pageSchema = z.object({
   id: z.number(),
   key: pageKeySchema,
-  title: z.string(),
+  title: z.string().nullish().transform((text) => text ?? ""),
   eyebrow: z.string().nullish().default(null),
   heroImage: mediaRef,
   content: z.object({ root: z.unknown() }).nullish().default(null),
