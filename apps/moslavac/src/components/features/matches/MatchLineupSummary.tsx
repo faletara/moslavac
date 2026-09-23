@@ -43,6 +43,7 @@ export default function MatchLineupSummary({
 
   const homeName = match.homeTeam?.name ?? "Domaći";
   const awayName = match.awayTeam?.name ?? "Gosti";
+
   const awayIsMoslavac =
     moslavacTeamId != null && match.awayTeam?.id === moslavacTeamId;
 
@@ -52,10 +53,12 @@ export default function MatchLineupSummary({
 
   const active = side === "home" ? home : away;
   const activeName = side === "home" ? homeName : awayName;
+
   const activePicture =
     side === "home"
       ? match.homeTeam?.picture ?? null
       : match.awayTeam?.picture ?? null;
+
   const activeTeamId = side === "home" ? match.homeTeam?.id : match.awayTeam?.id;
   const isMoslavac = moslavacTeamId != null && activeTeamId === moslavacTeamId;
 
@@ -192,6 +195,7 @@ function PlayerRow({
   compact?: boolean;
 }) {
   const playerName = player.name ?? "";
+
   const isLinkable =
     isMoslavac &&
     player.personId != null &&
@@ -267,6 +271,7 @@ function PlayerEvents({
       isRedCardEvent(e) ||
       isSubstitutionEvent(e),
   );
+
   if (items.length === 0) return null;
 
   return (
@@ -274,6 +279,7 @@ function PlayerEvents({
       {items.slice(0, 3).map((e, i) => {
         const minute = e.minute ?? 0;
         const sub = isSubstitutionEvent(e);
+
         return (
           <span
             key={`${e.id ?? i}`}

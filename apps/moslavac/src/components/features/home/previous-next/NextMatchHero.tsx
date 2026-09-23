@@ -11,6 +11,7 @@ import { buildMatchSlug } from "@/lib/helpers/slug";
 import type { Match } from "@/types/hns";
 import { CountdownTiles } from "./CountdownTiles";
 import { TeamCrest } from "./TeamCrest";
+import { isPresent } from "@/lib/helpers/present";
 
 interface NextMatchHeroProps {
   match: Match;
@@ -19,7 +20,9 @@ interface NextMatchHeroProps {
 function formatRound(round: string | null | undefined): string | null {
   if (!round) return null;
   const trimmed = round.trim();
+
   if (!trimmed) return null;
+
   return /^\d+$/.test(trimmed) ? `Kolo ${trimmed}` : trimmed;
 }
 
@@ -52,12 +55,9 @@ export function NextMatchHero({ match }: NextMatchHeroProps) {
   const round = formatRound(match.round);
   const venue = getMatchVenue(match);
 
-  const subEyebrow = [competition, round].filter(
-    (p): p is string => typeof p === "string" && p.length > 0,
-  );
-  const metaChips = [date, time, venue].filter(
-    (p): p is string => typeof p === "string" && p.length > 0,
-  );
+  const subEyebrow = [competition, round].filter(isPresent);
+
+  const metaChips = [date, time, venue].filter(isPresent);
 
   const inner = (
     <article className="flex flex-col items-center gap-10 md:gap-14">

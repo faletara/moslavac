@@ -35,7 +35,9 @@ const positionSingular: Record<RosterPosition, string> = {
 
 function splitDisplayNameLines(name: string): [string, string | null] {
 	const parts = name.trim().split(/\s+/).filter(Boolean);
+
 	if (parts.length <= 1) return [parts[0] ?? name, null];
+
 	return [parts[0]!, parts.slice(1).join(" ")];
 }
 
@@ -133,6 +135,7 @@ export default function FirstTeamCarousel({
 function PlayerPoster({ player }: { player: FirstLineupPlayer }) {
 	const reduced = useReducedMotion();
 	const [nameLineOne, nameLineTwo] = splitDisplayNameLines(player.displayName);
+
 	const initials = player.displayName
 		.split(/\s+/)
 		.map((p) => p[0] ?? "")

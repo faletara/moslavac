@@ -1,5 +1,6 @@
 import type { FieldHook } from 'payload'
 import { createCollection } from '../factories/createCollection'
+import { rawText, trimmedText } from '../lib/hookValues'
 
 /**
  * Auto-alt: ako editor ne upiše alt tekst, izvedi ga iz naziva datoteke
@@ -7,10 +8,12 @@ import { createCollection } from '../factories/createCollection'
  * pri uploadu — editor može prepisati vrijednost.
  */
 const altFromFilename: FieldHook = ({ value, data }) => {
-  if (typeof value === 'string' && value.trim().length > 0) return value
-  const filename = typeof data?.filename === 'string' ? data.filename : ''
-  if (!filename) return value
-  return filename
+  if (trimmedText.safeParse(value).success) return value
+  const filename = rawText.safeParse(data?.filename)
+
+  if (!filename.success) return value
+
+  return filename.data
     .replace(/\.[^.]+$/, '')
     .replace(/[-_]+/g, ' ')
     .trim()

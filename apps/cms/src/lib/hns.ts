@@ -1,6 +1,23 @@
 import type { HnsTeamPlayer, PlayerSearchResult } from '@/types/hns'
 import { adaptPlayerSearchResult } from '@/lib/hns/adapters'
+import { z } from 'zod'
 import { hnsDispatcher } from './hnsDispatcher'
+
+/**
+ * Node-ov `fetch` (undici ispod haube) prima `dispatcher`, ali ga standardni
+ * `RequestInit` ne opisuje. Imenovani ugovor je ovdje umjesto `as object`.
+ */
+interface UndiciRequestInit extends RequestInit {
+  dispatcher?: typeof hnsDispatcher
+}
+
+/** Straničena ovojnica HNS-ove pretrage; stavke ostaju neraščlanjene. */
+const searchEnvelope = z.object({
+  result: z
+    .array(z.unknown())
+    .nullish()
+    .transform((rows) => rows ?? []),
+})
 
 const HNS_API_BASE = process.env.HNS_API_BASE ?? 'https://api-hns.analyticom.de'
 
@@ -17,6 +34,7 @@ export async function searchHnsPlayers(args: {
 }): Promise<PlayerSearchResult[]> {
   const { apiKey, teamId, keyword, pageSize = 20 } = args
   const trimmed = keyword.trim()
+
   if (!trimmed) return []
 
   const url =
@@ -25,17 +43,17 @@ export async function searchHnsPlayers(args: {
     `&page=0&pageSize=${pageSize}` +
     `&teamIdFilter=${encodeURIComponent(teamId)}`
 
-  const response = await fetch(url, {
+  const init: UndiciRequestInit = {
     headers: {
       API_KEY: apiKey,
       'Accept-Language': 'hr',
       Accept: 'application/json',
       'User-Agent': 'moslavac-cms/1.0',
     },
-    // dispatcher is supported by Node's native fetch (undici under the hood)
-    // but missing from RequestInit types
-    ...({ dispatcher: hnsDispatcher } as object),
-  })
+    dispatcher: hnsDispatcher,
+  }
+
+  const response = await fetch(url, init)
 
   if (!response.ok) {
     throw new Error(
@@ -43,9 +61,15 @@ export async function searchHnsPlayers(args: {
     )
   }
 
-  const data = (await response.json()) as HnsPaginated<HnsTeamPlayer>
+  // Ovojnica je jedino o čemu ovaj kod odlučuje; oblik igrača propisuje
+  // HNS-ova OpenAPI specifikacija iz koje je generiran `hns.openapi.ts`.
+  const body = searchEnvelope.parse(await response.json())
 
-  return (data.result ?? [])
-    .map((player) => adaptPlayerSearchResult(player))
-    .filter((player): player is PlayerSearchResult => player !== null)
+  return body.result.flatMap((player) => {
+    // SAFETY: redak dolazi iz HNS-ove `player/search` rute, čiji oblik opisuje
+    // `HnsTeamPlayer` u generiranoj specifikaciji.
+    const adapted = adaptPlayerSearchResult(player as HnsTeamPlayer)
+
+    return adapted === null ? [] : [adapted]
+  })
 }

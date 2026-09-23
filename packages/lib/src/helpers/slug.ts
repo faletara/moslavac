@@ -9,18 +9,18 @@ import type { Match } from "@/types/hns";
  * back out. Bare numeric ids keep working, so old URLs never break.
  */
 
-const CRO: Record<string, string> = {
-  č: "c",
-  ć: "c",
-  đ: "d",
-  š: "s",
-  ž: "z",
-};
+const CRO = new Map([
+  ["č", "c"],
+  ["ć", "c"],
+  ["đ", "d"],
+  ["š", "s"],
+  ["ž", "z"],
+]);
 
 export function slugify(input: string): string {
   return input
     .toLowerCase()
-    .replace(/[čćđšž]/g, (c) => CRO[c])
+    .replace(/[čćđšž]/g, (c) => CRO.get(c) ?? c)
     .normalize("NFD")
     .replace(/[̀-ͯ]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
@@ -30,6 +30,7 @@ export function slugify(input: string): string {
 /** Extracts the trailing run of digits as the entity id. */
 export function parseTrailingId(slug: string): number {
   const m = slug.match(/(\d+)$/);
+
   return m ? Number(m[1]) : NaN;
 }
 
@@ -37,10 +38,12 @@ export function buildMatchSlug(m: Match): string {
   const home = slugify(m.homeTeam?.name ?? "domacin");
   const away = slugify(m.awayTeam?.name ?? "gost");
   let date = "";
+
   if (m.kickoffAtUtcMs) {
     const d = new Date(m.kickoffAtUtcMs);
     date = `${d.getUTCDate()}-${d.getUTCMonth() + 1}-${d.getUTCFullYear()}`;
   }
+
   return [home, away, date, m.id].filter(Boolean).join("-");
 }
 

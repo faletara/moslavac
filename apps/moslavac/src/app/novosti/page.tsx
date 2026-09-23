@@ -31,12 +31,7 @@ export default async function NewsPage({ searchParams }: Props) {
     getTenant(),
   ]);
 
-  const logo = tenant.branding?.logo;
-  const fallback = !logo
-    ? ""
-    : typeof logo === "string"
-      ? logo
-      : (logo.url ?? "");
+  const fallback = tenant.branding?.logo?.url ?? "";
 
   const { content, totalPages } = result;
 
@@ -60,6 +55,7 @@ export default async function NewsPage({ searchParams }: Props) {
           >
             {content.map((item) => {
               const thumbnailUrl = item.thumbnailPath;
+
               return (
                 <StaggerItem key={item.id}>
                   <Link

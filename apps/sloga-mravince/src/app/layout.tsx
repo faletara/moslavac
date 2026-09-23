@@ -26,6 +26,7 @@ async function getClubDetailsForLayout() {
     return await fetchClubDetails();
   } catch (error) {
     console.error("Failed to fetch HNS club details for layout", error);
+
     return null;
   }
 }

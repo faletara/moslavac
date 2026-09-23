@@ -41,17 +41,22 @@ function getNextMatchMarquee(
   if (!isRealMatch(slots.next)) return null;
 
   const match = slots.next;
+
   const { weekdayShort, day, monthShort, time } = formatDateParts(
     match.kickoffAtUtcMs,
   );
+
   const teams =
     [match.homeTeam?.name, match.awayTeam?.name].filter(Boolean).join(" - ") ||
     clubName;
+
   const kickoff = `${weekdayShort} ${day}. ${monthShort} · ${time}`;
   const venue = match.facility?.name ?? match.facility?.place;
+
   const competition = [match.competition?.name, match.round]
     .filter(Boolean)
     .join(" · ");
+
   const items = [
     "Sljedeća utakmica",
     teams,

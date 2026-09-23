@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import type OpenAI from "openai";
 import type { MatchFacts } from "./facts";
 import { openAiWriter, splitParagraphs, DEFAULT_MODEL } from "./openai";
 
@@ -29,7 +30,13 @@ const facts: MatchFacts = {
 
 const fakeClient = (output_text: string) => {
   const create = vi.fn().mockResolvedValue({ output_text });
-  return { client: { responses: { create } } as never, create };
+
+  return {
+    // SAFETY: dvojnik izlaže samo `responses.create`, jedino što
+    // `openAiWriter` poziva na klijentu.
+    client: { responses: { create } } as Pick<OpenAI, "responses">,
+    create,
+  };
 };
 
 describe("splitParagraphs", () => {
@@ -88,6 +95,8 @@ describe("openAiWriter", () => {
 
     await openAiWriter({ apiKey: "sk-test", client })(facts);
 
+    // SAFETY: `create.mock.calls` je netipiziran, a ovaj test sam gradi ulaz
+    // koji je proslijeđen, pa zna da je string.
     const input = create.mock.calls[0][0].input as string;
     expect(input).not.toContain("matchId");
     expect(input).not.toContain("matchSlug");
@@ -108,6 +117,8 @@ describe("openAiWriter", () => {
       ],
     });
 
+    // SAFETY: `create.mock.calls` je netipiziran, a ovaj test sam gradi ulaz
+    // koji je proslijeđen, pa zna da je string.
     const input = JSON.parse(create.mock.calls[0][0].input as string);
     expect(input.yellowCards).toEqual({ ukupno: 3, domacin: 2, gosti: 1 });
     expect(create.mock.calls[0][0].input).not.toContain("Prvi");
@@ -133,7 +144,9 @@ describe("openAiWriter", () => {
 
   it("greška iz API-ja se propušta dalje, hvata je withFallback", async () => {
     const create = vi.fn().mockRejectedValue(new Error("429 rate limit"));
-    const client = { responses: { create } } as never;
+    // SAFETY: dvojnik izlaže samo `responses.create`, jedino što
+    // `openAiWriter` poziva na klijentu.
+    const client = { responses: { create } } as Pick<OpenAI, "responses">;
 
     await expect(
       openAiWriter({ apiKey: "sk-test", client })(facts),

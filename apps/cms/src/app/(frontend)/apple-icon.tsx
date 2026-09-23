@@ -1,6 +1,7 @@
 import { ImageResponse } from 'next/og'
 
 export const size = { width: 180, height: 180 }
+
 export const contentType = 'image/png'
 
 /** Isti znak za iOS početni zaslon; iOS sam zaobljuje rubove. */

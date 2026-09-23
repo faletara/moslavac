@@ -1,4 +1,5 @@
 "use client";
+
 import { track } from "@vercel/analytics";
 import { useEffect } from "react";
 
@@ -13,5 +14,6 @@ export function TrackEvent({
     track(event, props);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   return null;
 }

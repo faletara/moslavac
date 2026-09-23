@@ -27,6 +27,7 @@ export function payloadNewsStore(
         },
         overrideAccess: true,
       })
+
       return totalDocs > 0
     },
 

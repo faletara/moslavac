@@ -38,6 +38,7 @@ function hasDate(match: Match): match is MatchWithDate {
 
 function parseCompetitionId(value: string | undefined): number | null {
   const id = Number(value);
+
   return Number.isInteger(id) && id > 0 ? id : null;
 }
 
@@ -56,11 +57,13 @@ function selectCompetition({
 }): Competition | null {
   const valid = competitions.filter((competition) => competition.id != null);
   const fromUrl = valid.find((competition) => competition.id === competitionId);
+
   if (fromUrl) return fromUrl;
 
   const senior = seniorFilter
     ? valid.find((competition) => competition.name?.includes(seniorFilter))
     : null;
+
   return senior ?? valid[0] ?? null;
 }
 
@@ -74,6 +77,7 @@ function buildSchedule(matches: Match[]) {
   const schedule = matches
     .filter(hasDate)
     .sort((a, b) => a.kickoffAtUtcMs - b.kickoffAtUtcMs);
+
   const nextMatch = schedule.find((match) => !isFinished(match)) ?? null;
 
   return { schedule, nextMatch };
@@ -82,7 +86,9 @@ function buildSchedule(matches: Match[]) {
 function scoreOf(match: Match): string | null {
   const home = match.score.home?.current;
   const away = match.score.away?.current;
+
   if (home != null && away != null) return `${home}:${away}`;
+
   return match.teamResult || null;
 }
 
@@ -111,6 +117,7 @@ function CompetitionSelector({
     (competition): competition is Competition & { id: number } =>
       competition.id != null,
   );
+
   if (items.length === 0) return null;
 
   return (
@@ -183,6 +190,7 @@ function TeamLine({
 /** HNS can withhold a match detail; without an id there is nothing to link to. */
 function detailHref(match: Match): string | null {
   if (match.id == null || !match.allowDetail) return null;
+
   return `/raspored-i-rezultati/${buildMatchSlug(match)}`;
 }
 
@@ -199,6 +207,7 @@ function MatchCard({
   const { weekdayShort, day, monthShort, time } = formatDateParts(
     match.kickoffAtUtcMs,
   );
+
   const score = scoreOf(match);
   const venue = match.facility?.name ?? match.facility?.place;
   const meta = matchMeta(match);
@@ -351,19 +360,24 @@ export default async function ScheduleResultsPage({ searchParams }: Props) {
       fetchCurrentSeasonCompetitionsResult(),
       getSeniorCompetitionFilter(),
     ]);
+
   const selectedCompetition = selectCompetition({
     competitions,
     seniorFilter,
     competitionId,
   });
 
+  const empty: [Match[], TeamRanking[]] = [[], []];
+
   const [matches, standings] = selectedCompetition?.id
     ? await Promise.all([
         fetchAllCompetitionMatches({ competitionId: selectedCompetition.id }),
         fetchTeamStandings({ competitionId: selectedCompetition.id }),
       ])
-    : ([[], []] as [Match[], TeamRanking[]]);
+    : empty;
+
   const { schedule, nextMatch } = buildSchedule(matches);
+
   const selectedName = selectedCompetition
     ? competitionLabel(selectedCompetition)
     : null;

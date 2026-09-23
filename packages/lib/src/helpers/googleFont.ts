@@ -27,6 +27,7 @@ export async function loadGoogleFont(
     }).then((res) => res.text());
 
     const fontUrl = css.match(/src:\s*url\((https:\/\/[^)]+)\)/)?.[1];
+
     if (!fontUrl) return null;
 
     return await fetch(fontUrl).then((res) => res.arrayBuffer());

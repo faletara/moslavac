@@ -40,8 +40,10 @@ describe("adaptBoardMember", () => {
 describe("fetchBoardMembers", () => {
   it("queries /board-members sorted by displayOrder, limit 100, tag board-<slug>", async () => {
     const calls: { path: string; tags?: string[] }[] = [];
+
     const transport: PayloadTransport = async (path, opts) => {
       calls.push({ path, tags: opts?.next?.tags });
+
       return {
         docs: [raw()],
         totalDocs: 1,

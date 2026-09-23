@@ -25,10 +25,13 @@ const ZONED_PARTS = new Intl.DateTimeFormat("en-US", {
  */
 function zonedDate(dateTime: number | string): Date {
   const parts = ZONED_PARTS.formatToParts(new Date(dateTime));
+
   const get = (type: Intl.DateTimeFormatPartTypes) =>
     Number(parts.find((p) => p.type === type)?.value ?? 0);
+
   // Ponoć Intl ispisuje kao "24", što `new Date(...)` tumači kao idući dan.
   const hour = get("hour") % 24;
+
   return new Date(
     get("year"),
     get("month") - 1,
@@ -41,6 +44,7 @@ function zonedDate(dateTime: number | string): Date {
 
 export const formatDateTime = (dateTime: number | string) => {
   const date = zonedDate(dateTime);
+
   return {
     date: format(date, "dd.MM.yyyy.", { locale: hr }),
     time: format(date, "HH:mm"),
@@ -49,16 +53,19 @@ export const formatDateTime = (dateTime: number | string) => {
 
 export const formatDateLong = (dateTime: number | string) => {
   const date = zonedDate(dateTime);
+
   return format(date, "d. MMMM yyyy.", { locale: hr });
 };
 
 export const formatDateShort = (dateTime: number | string) => {
   const date = zonedDate(dateTime);
+
   return format(date, "dd.MM.yyyy.", { locale: hr });
 };
 
 export const formatDateParts = (dateTime: number | string) => {
   const date = zonedDate(dateTime);
+
   return {
     day: format(date, "d", { locale: hr }),
     monthShort: format(date, "LLL", { locale: hr })

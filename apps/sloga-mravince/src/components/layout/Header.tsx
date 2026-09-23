@@ -29,12 +29,12 @@ const NAV_ITEMS: readonly NavItem[] = [
  */
 export default function Header({ tenant }: HeaderProps) {
   const logo =
-    tenant.branding?.logo && typeof tenant.branding.logo === "object"
-      ? (tenant.branding.logo as PayloadMedia)
-      : null;
+    tenant.branding?.logo ?? null;
+
   const wordmark = tenant.branding?.shortName ?? tenant.displayName;
   const founded = tenant.branding?.founded;
   const webshopUrl = tenant.social?.webshop;
+
   // Webshop je tuđi (JAKO) i vidi se samo kad je link upisan u CMS-u.
   const navItems: readonly NavItem[] = webshopUrl
     ? [...NAV_ITEMS, { label: "Webshop", href: webshopUrl, external: true }]

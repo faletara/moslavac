@@ -24,6 +24,7 @@ export function NumberTicker({ value, startValue = 0, delay = 0, className }: Nu
   useEffect(() => {
     if (!inView) return
     const timer = setTimeout(() => motionValue.set(value), delay * 1000)
+
     return () => clearTimeout(timer)
   }, [inView, delay, value, motionValue])
 

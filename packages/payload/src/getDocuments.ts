@@ -1,16 +1,20 @@
 import "server-only";
+import { z } from "zod";
 import type { ClubDocument, DocumentCategory } from "@/types/document";
 import { clubFeatureQuery } from "./clubFeatures";
 import { fetchList } from "./fetchCollection";
+import { documentCategorySchema } from "./schemas";
 
-interface PayloadDocument {
-  id: number;
-  title: string;
-  category: DocumentCategory;
-  url: string | null;
-  filename: string | null;
-  displayOrder: number;
-}
+export const documentSchema = z.object({
+  id: z.number(),
+  title: z.string(),
+  category: documentCategorySchema,
+  url: z.string().nullish().default(null),
+  filename: z.string().nullish().default(null),
+  displayOrder: z.number().nullish().default(null),
+});
+
+type PayloadDocument = z.output<typeof documentSchema>;
 
 export function adaptDocument(doc: PayloadDocument): ClubDocument {
   return {
@@ -30,6 +34,7 @@ export const fetchDocuments = (params?: {
 }): Promise<ClubDocument[]> =>
   fetchList<PayloadDocument, ClubDocument>({
     ...documentsFeature,
+    schema: documentSchema,
     where: params?.category
       ? { "where[category][equals]": params.category }
       : undefined,

@@ -15,10 +15,9 @@ interface FooterProps {
  */
 export default function Footer({ tenant }: FooterProps) {
   const year = new Date().getFullYear();
+
   const logo =
-    tenant.branding?.logo && typeof tenant.branding.logo === "object"
-      ? (tenant.branding.logo as PayloadMedia)
-      : null;
+    tenant.branding?.logo ?? null;
 
   const { email, phone, address, city } = tenant.contact ?? {};
   const { facebook, youtube } = tenant.social ?? {};
@@ -38,6 +37,8 @@ export default function Footer({ tenant }: FooterProps) {
         aria-hidden
         className="halftone pointer-events-none absolute -right-16 -top-16 hidden h-105 w-105 rotate-18 opacity-15 md:block"
         style={
+          // SAFETY: `--*` je CSS custom property; Reactov `CSSProperties` popisuje samo
+          // standardna svojstva, pa ga inline stil ovdje mora proširiti.
           {
             "--halftone-size": "15px",
             "--halftone-color": "rgba(255,255,255,0.6)",

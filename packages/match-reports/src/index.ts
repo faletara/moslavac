@@ -17,10 +17,15 @@ import {
 } from "./template";
 
 export type { MatchFacts, FactEvent, NextMatchFact } from "./facts";
+
 export type { MatchReportWriter } from "./template";
+
 export { templateWriter, templateTitle } from "./template";
+
 export { openAiWriter, DEFAULT_MODEL } from "./openai";
+
 export { withFallback, type FallbackEvent } from "./fallback";
+
 export { verifyReport, type VerifyResult } from "./verify";
 
 /** Novost spremna za spremanje. Sadržaj su odlomci, ne gotov Lexical. */
@@ -67,6 +72,7 @@ export interface PublishOptions {
  */
 function hasUsableEvents(facts: MatchFacts): boolean {
   const scored = facts.homeGoals + facts.awayGoals > 0;
+
   return !scored || facts.goals.length + facts.ownGoals.length > 0;
 }
 
@@ -79,13 +85,16 @@ async function fetchNextMatch(
   clubSide: "home" | "away" | null,
 ): Promise<NextMatchFact | null> {
   const upcoming = await fetchUpcomingMatches();
+
   const next = upcoming.find(
     (m) => m.kickoffAtUtcMs != null && m.kickoffAtUtcMs > (match.kickoffAtUtcMs ?? 0),
   );
+
   if (!next?.kickoffAtUtcMs) return null;
 
   const atHome = next.teamSide === "home";
   const opponent = (atHome ? next.awayTeam?.name : next.homeTeam?.name)?.trim();
+
   if (!opponent || next.teamSide == null) return null;
   void clubSide;
 
@@ -98,6 +107,7 @@ async function fetchNextMatch(
 }
 
 const DAY_MS = 86_400_000;
+
 const DEFAULT_WINDOW_DAYS = 7;
 
 /**
@@ -108,15 +118,19 @@ const DEFAULT_WINDOW_DAYS = 7;
 function isSeniorMatch(match: Match): boolean {
   const name = match.competition?.name ?? "";
   const filter = getActiveHnsContext()?.seniorCompetitionFilter?.trim();
+
   if (filter) return name.toLowerCase().includes(filter.toLowerCase());
+
   return getCompetitionCategory(name) === "seniors";
 }
 
 /** Utakmica je kandidat ako je seniorska, odigrana, i pala u prozor. */
 function isCandidate(match: Match, fromMs: number, toMs: number): boolean {
   if (!isFinished(match)) return false;
+
   if (!isSeniorMatch(match)) return false;
   const kickoff = match.kickoffAtUtcMs;
+
   return kickoff != null && kickoff >= fromMs && kickoff <= toMs;
 }
 
@@ -134,12 +148,14 @@ export async function publishMatchReports(
   const fromMs = nowMs - (opts.windowDays ?? DEFAULT_WINDOW_DAYS) * DAY_MS;
 
   const summary: PublishSummary = { published: [], skipped: [], failed: [] };
+
   const matches = (await fetchAllMatches()).filter((m) =>
     isCandidate(m, fromMs, nowMs),
   );
 
   for (const match of matches) {
     const matchId = match.id;
+
     if (matchId == null) continue;
 
     try {
@@ -153,7 +169,9 @@ export async function publishMatchReports(
         fetchMatchInfo({ matchId }),
         fetchMatchEvents({ matchId }),
       ]);
+
       const base = toMatchFacts(detail ?? match, events);
+
       if (!base || !hasUsableEvents(base)) {
         summary.skipped.push(matchId);
         continue;
@@ -163,6 +181,7 @@ export async function publishMatchReports(
       // svejedno izlazi, samo bez tog konteksta.
       const nextMatch = await fetchNextMatch(detail ?? match, base.clubSide)
         .catch(() => null);
+
       const facts: MatchFacts = { ...base, nextMatch };
 
       // Zadnji odlomak nije model — vidi `aftermathParagraph`.

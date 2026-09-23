@@ -4,16 +4,31 @@ import { tenantScopedAdmin } from '../access/tenantScopedAdmin'
 import { createCollection } from './createCollection'
 
 type CollectionAdmin = NonNullable<CollectionConfig['admin']>
+
 type AdminHidden = NonNullable<CollectionAdmin['hidden']>
-type AdminHiddenFunction = Extract<AdminHidden, (args: never) => unknown>
+
+type AdminHiddenFunction = Extract<AdminHidden, (args: never) => boolean>
+
 type AdminHiddenArgs = Parameters<AdminHiddenFunction>[0]
 
 type ClubFeatureCollectionInput = Omit<CollectionConfig, 'slug' | 'admin'> & {
   admin?: CollectionConfig['admin']
 }
 
+/**
+ * `anti-slop/no-runtime-typeof` prijavljuje provjeru ispod. Payload tipizira
+ * `admin.hidden` kao `((args) => boolean) | boolean` i ne nudi diskriminator, pa
+ * se grane razlikuju jedino po tome je li vrijednost funkcija.
+ */
 const asHidden = (hidden: CollectionAdmin['hidden']): AdminHiddenFunction => {
-  if (typeof hidden === 'function') return hidden as AdminHiddenFunction
+  if (typeof hidden === 'function') {
+    // SAFETY: `admin.hidden` je `((args) => boolean) | boolean`; u ovoj grani je
+    // već funkcija traženog potpisa, `Extract` je samo ne sužava sam.
+    return hidden as AdminHiddenFunction
+  }
+
+  // SAFETY: preostaje boolean; omotan u funkciju koja ga vraća, što je točno
+  // potpis koji `admin.hidden` prihvaća.
   return (() => Boolean(hidden)) as AdminHiddenFunction
 }
 

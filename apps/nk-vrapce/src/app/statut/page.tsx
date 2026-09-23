@@ -8,6 +8,7 @@ import type { ClubDocument, DocumentCategory } from "@/types/document";
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await fetchPageByKey({ key: "statut" });
+
   return {
     title: page?.title ?? "Statut kluba",
     description:
@@ -39,14 +40,15 @@ export default async function StatutPage() {
     fetchDocuments(),
   ]);
 
-  const grouped = categoryOrder
-    .map((category) => ({
-      category,
-      docs: documents
-        .filter((d) => d.category === category)
-        .sort((a, b) => a.displayOrder - b.displayOrder),
-    }))
-    .filter((section) => section.docs.length > 0);
+  const grouped = categoryOrder.flatMap((category) => {
+    const docs = documents
+      .filter((d) => d.category === category)
+      .sort((a, b) => a.displayOrder - b.displayOrder);
+
+    if (docs.length === 0) return [];
+
+    return [{ category, docs }];
+  });
 
   return (
     <>
@@ -100,6 +102,7 @@ export default async function StatutPage() {
 
 function DocumentRow({ doc }: { doc: ClubDocument }) {
   if (!doc.url) return null;
+
   return (
     <FadeInView>
       <a

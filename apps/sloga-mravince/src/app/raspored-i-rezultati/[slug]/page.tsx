@@ -22,6 +22,11 @@ import { getTenant } from "@/lib/payload/getTenant";
 import { BASE_URL } from "@/lib/siteUrl";
 import { buildMatchSlug, parseTrailingId } from "@/lib/helpers/slug";
 import type { Match } from "@/types/hns";
+import type {
+  JsonLdNode,
+  PostalAddressJsonLd,
+  SportsEventJsonLd,
+} from "@/types/jsonld";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -44,6 +49,7 @@ function matchTitle(match: Match): string {
 
 export async function generateStaticParams() {
   const competitions = await fetchCurrentSeasonCompetitions();
+
   const withId = competitions.filter(
     (competition): competition is typeof competition & { id: number } =>
       competition.id != null,
@@ -57,8 +63,10 @@ export async function generateStaticParams() {
   );
 
   const slugs = new Set<string>();
+
   for (const result of results) {
     if (result.status !== "fulfilled") continue;
+
     for (const match of result.value) {
       if (match.id != null && match.allowDetail) slugs.add(buildMatchSlug(match));
     }
@@ -70,9 +78,11 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const match = await fetchMatchInfo({ matchId: parseTrailingId(slug) });
+
   if (!match) return {};
 
   const title = matchTitle(match);
+
   const { date } = match.kickoffAtUtcMs
     ? formatDateTime(match.kickoffAtUtcMs)
     : { date: "" };
@@ -116,6 +126,7 @@ export default async function MatchPage({ params }: Props) {
   // Keyed off the match's own competition, so it can only start once the match
   // resolves. Cup ties have no table — an empty list simply hides the tab.
   const competitionId = match.competition?.id ?? null;
+
   const standings =
     competitionId != null ? await fetchTeamStandings({ competitionId }) : [];
 
@@ -128,7 +139,7 @@ export default async function MatchPage({ params }: Props) {
     <div className="bg-background">
       {jsonLd.map((schema) => (
         <script
-          key={schema["@type"] as string}
+          key={schema["@type"]}
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
         />
@@ -166,13 +177,13 @@ function buildJsonLd({
 }: {
   match: Match;
   tenantName: string;
-}): Record<string, unknown>[] {
+}): JsonLdNode[] {
   const home = match.homeTeam?.name ?? "Domaćin";
   const away = match.awayTeam?.name ?? "Gost";
   const slug = buildMatchSlug(match);
   const url = `${BASE_URL}/raspored-i-rezultati/${slug}`;
 
-  const schemas: Record<string, unknown>[] = [
+  const schemas: JsonLdNode[] = [
     {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
@@ -195,6 +206,7 @@ function buildJsonLd({
   ];
 
   const facility = match.facility;
+
   if (match.kickoffAtUtcMs == null || !facility?.name) return schemas;
 
   const start = new Date(match.kickoffAtUtcMs);
@@ -208,7 +220,16 @@ function buildJsonLd({
         ? "https://schema.org/EventPostponed"
         : "https://schema.org/EventScheduled";
 
-  const event: Record<string, unknown> = {
+  const address: PostalAddressJsonLd = {
+    "@type": "PostalAddress",
+    addressCountry: "HR",
+  };
+
+  if (facility.address) address.streetAddress = facility.address;
+
+  if (facility.place) address.addressLocality = facility.place;
+
+  const event: SportsEventJsonLd = {
     "@context": "https://schema.org",
     "@type": "SportsEvent",
     name: `${home} - ${away}`,
@@ -221,12 +242,7 @@ function buildJsonLd({
     location: {
       "@type": "Place",
       name: facility.name,
-      address: {
-        "@type": "PostalAddress",
-        ...(facility.address ? { streetAddress: facility.address } : {}),
-        ...(facility.place ? { addressLocality: facility.place } : {}),
-        addressCountry: "HR",
-      },
+      address,
     },
     homeTeam: { "@type": "SportsTeam", name: home },
     awayTeam: { "@type": "SportsTeam", name: away },
@@ -246,11 +262,13 @@ function buildJsonLd({
 
   const homeScore = match.score.home?.current;
   const awayScore = match.score.away?.current;
+
   if (homeScore != null && awayScore != null) {
     event.homeScore = { "@type": "QuantitativeValue", value: homeScore };
     event.awayScore = { "@type": "QuantitativeValue", value: awayScore };
   }
 
   schemas.push(event);
+
   return schemas;
 }

@@ -60,6 +60,7 @@ function ScrollableRow({ children }: { children: React.ReactNode }) {
 
   const updateScrollState = useCallback(() => {
     const el = scrollRef.current;
+
     if (!el) return;
     const { scrollLeft, scrollWidth, clientWidth } = el;
     setCanScrollLeft(scrollLeft > 1);
@@ -69,11 +70,13 @@ function ScrollableRow({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const el = scrollRef.current;
+
     if (!el) return;
     updateScrollState();
     el.addEventListener("scroll", updateScrollState, { passive: true });
     const resizeObserver = new ResizeObserver(updateScrollState);
     resizeObserver.observe(el);
+
     return () => {
       el.removeEventListener("scroll", updateScrollState);
       resizeObserver.disconnect();
@@ -82,6 +85,7 @@ function ScrollableRow({ children }: { children: React.ReactNode }) {
 
   const scrollBy = (direction: 1 | -1) => {
     const el = scrollRef.current;
+
     if (!el) return;
     el.scrollBy({
       left: direction * el.clientWidth * 0.8,
@@ -145,13 +149,17 @@ export default function UpcomingMatchesView({
             const { day, monthShort, weekdayShort, time } = formatDateParts(
               match.kickoffAtUtcMs ?? 0,
             );
+
             const category = getCompetitionCategory(match.competition?.name);
             const categoryLabel = getCategoryShortLabel(category);
             const chipClass = getCategoryChipClass(category);
+
             const homeIsUs =
               ourTeamId != null && match.homeTeam?.id === ourTeamId;
+
             const awayIsUs =
               ourTeamId != null && match.awayTeam?.id === ourTeamId;
+
             const venueIndicator = homeIsUs ? "D" : awayIsUs ? "G" : null;
 
             return (

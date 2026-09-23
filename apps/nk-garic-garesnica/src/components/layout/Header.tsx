@@ -12,9 +12,7 @@ interface HeaderProps {
  */
 export default function Header({ tenant }: HeaderProps) {
   const logo =
-    tenant.branding?.logo && typeof tenant.branding.logo === "object"
-      ? (tenant.branding.logo as PayloadMedia)
-      : null;
+    tenant.branding?.logo ?? null;
 
   return (
     <header className="sticky top-0 z-50 h-16 border-b border-border bg-background/92 backdrop-blur-md">

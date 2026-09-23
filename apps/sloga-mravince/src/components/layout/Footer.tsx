@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { FrontendTenant, PayloadMedia } from "@/lib/payload/types";
 import type { Team } from "@/types/hns";
+import { isPresent } from "@/lib/helpers/present";
 
 interface FooterProps {
   tenant: FrontendTenant;
@@ -20,6 +21,7 @@ const CLUB_ITEMS = [
 
 function textOrNull(value: string | null | undefined): string | null {
   const trimmed = value?.trim();
+
   return trimmed ? trimmed : null;
 }
 
@@ -31,39 +33,43 @@ function textOrNull(value: string | null | undefined): string | null {
  */
 export default function Footer({ tenant, clubDetails }: FooterProps) {
   const year = new Date().getFullYear();
+
   const logo =
-    tenant.branding?.logo && typeof tenant.branding.logo === "object"
-      ? (tenant.branding.logo as PayloadMedia)
-      : null;
+    tenant.branding?.logo ?? null;
 
   const wordmark = tenant.branding?.shortName ?? tenant.displayName;
   const { contact, social, branding } = tenant;
   const clubName = clubDetails?.name ?? tenant.displayName;
   const email = textOrNull(clubDetails?.email) ?? textOrNull(contact?.email);
+
   const phone =
     textOrNull(clubDetails?.phone) ??
     textOrNull(clubDetails?.mobilePhone) ??
     textOrNull(contact?.phone);
+
   const tenantLocation = [contact?.address, contact?.city]
     .filter(Boolean)
     .join(", ");
+
   const address =
     textOrNull(clubDetails?.address) ?? textOrNull(tenantLocation);
+
   const stadium = textOrNull(clubDetails?.facility?.name);
   const place = textOrNull(clubDetails?.place) ?? textOrNull(contact?.city);
   const identityLocation = address;
+
   const infoItems = [
     { label: "Puni naziv", value: clubName },
     stadium && { label: "Stadion", value: stadium },
     address && { label: "Adresa", value: address },
     place && !address?.includes(place) && { label: "Mjesto", value: place },
-  ].filter(Boolean) as { label: string; value: string }[];
+  ].filter(isPresent);
 
   const socials = [
     social?.facebook && { label: "Facebook", href: social.facebook },
     social?.youtube && { label: "YouTube", href: social.youtube },
     social?.webshop && { label: "Web trgovina", href: social.webshop },
-  ].filter(Boolean) as { label: string; href: string }[];
+  ].filter(isPresent);
 
   return (
     <footer className="relative overflow-hidden bg-ink-deep text-chalk">

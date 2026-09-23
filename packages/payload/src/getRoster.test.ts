@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { runWithPayloadContext } from "./context";
 import type { PayloadFetchOptions, PayloadTransport } from "./context";
-import { adaptRoster, fetchRoster } from "./getRoster";
+import { z } from "zod";
+import { adaptRoster, fetchRoster, rosterSchema } from "./getRoster";
 
-type RawRoster = Parameters<typeof adaptRoster>[0];
+/** Dokument kakav Payload vraća po žici, prije raščlanjivanja. */
+type WireRoster = z.input<typeof rosterSchema>;
 
-const raw = (over: Partial<RawRoster> = {}): RawRoster => ({
+const raw = (over: Partial<WireRoster> = {}): WireRoster => ({
   id: 1,
   displayName: "Ivan Horvat",
   personId: 99,
@@ -16,6 +18,8 @@ const raw = (over: Partial<RawRoster> = {}): RawRoster => ({
   photo: { id: 7, url: "/ivan.jpg", alt: "" },
   ...over,
 });
+
+const parsed = (over: Partial<WireRoster> = {}) => rosterSchema.parse(raw(over));
 
 function pageOf(docs: unknown[]) {
   return {
@@ -34,8 +38,9 @@ function pageOf(docs: unknown[]) {
 describe("adaptRoster", () => {
   it("normalises an unpopulated (numeric) photo relation to null", () => {
     const entry = adaptRoster(
-      raw({ photo: 7, jerseyNumber: null, captain: null, displayOrder: null }),
+      parsed({ photo: 7, jerseyNumber: null, captain: null, displayOrder: null }),
     );
+
     expect(entry.photo).toBeNull();
     expect(entry.jerseyNumber).toBeNull();
     expect(entry.captain).toBe(false);
@@ -43,15 +48,25 @@ describe("adaptRoster", () => {
   });
 
   it("keeps a populated photo object", () => {
-    expect(adaptRoster(raw()).photo).toEqual({ id: 7, url: "/ivan.jpg", alt: "" });
+    expect(adaptRoster(parsed()).photo).toEqual({
+      id: 7,
+      url: "/ivan.jpg",
+      cardUrl: "/ivan.jpg",
+      heroUrl: "/ivan.jpg",
+      alt: "",
+      width: null,
+      height: null,
+    });
   });
 });
 
 describe("fetchRoster", () => {
   it("is authenticated, revalidates at 300, tags roster-<slug>", async () => {
     const calls: { path: string; opts?: PayloadFetchOptions }[] = [];
+
     const transport: PayloadTransport = async (path, opts) => {
       calls.push({ path, opts });
+
       return pageOf([raw()]);
     };
 

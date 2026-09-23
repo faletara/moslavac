@@ -53,7 +53,9 @@ const roster: RosterSeed[] = [
 ]
 
 console.log('seed-roster-garic: starting')
+
 const payloadConfig = await config
+
 const payload = await getPayload({ config: payloadConfig })
 
 const tenants = await payload.find({
@@ -63,13 +65,16 @@ const tenants = await payload.find({
 })
 
 const tenant = tenants.docs[0]
+
 if (!tenant) {
   console.error(`Tenant with slug "${TENANT_SLUG}" not found`)
   process.exit(1)
 }
+
 console.log(`seed-roster-garic: tenant "${tenant.slug}" (id=${tenant.id})`)
 
 let created = 0
+
 let skipped = 0
 
 for (const player of roster) {

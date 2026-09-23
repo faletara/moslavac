@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { z } from "zod";
 import { runWithPayloadContext } from "./context";
 import type { PayloadFetchOptions, PayloadTransport } from "./context";
 import { fetchList, fetchOne } from "./fetchCollection";
@@ -19,12 +20,26 @@ function page<T>(docs: T[]) {
   };
 }
 
-function recorder(docs: unknown[]): { transport: PayloadTransport; calls: Call[] } {
+/** Shema testne kolekcije `widgets`. */
+const widgetSchema = z.object({ id: z.number(), name: z.string() });
+
+/** Shema kada testu treba samo id dokumenta. */
+const idSchema = z.object({ id: z.number() });
+
+interface Recorder {
+  transport: PayloadTransport;
+  calls: Call[];
+}
+
+function recorder(docs: unknown[]): Recorder {
   const calls: Call[] = [];
+
   const transport: PayloadTransport = async (path, opts) => {
     calls.push({ path, opts });
+
     return page(docs);
   };
+
   return { transport, calls };
 }
 
@@ -35,8 +50,9 @@ describe("fetchList", () => {
     const result = await runWithPayloadContext(
       { transport, tenantSlug: "test-club" },
       () =>
-        fetchList<{ id: number; name: string }, { id: number; name: string }>({
+        fetchList({
           collection: "widgets",
+          schema: widgetSchema,
           sort: "displayOrder",
           limit: 50,
           adapt: (d) => ({ id: d.id, name: d.name.toUpperCase() }),
@@ -59,7 +75,12 @@ describe("fetchList", () => {
   it("uses tagPrefix when the cache tag differs from the collection name", async () => {
     const { transport, calls } = recorder([]);
     await runWithPayloadContext({ transport, tenantSlug: "moslavac" }, () =>
-      fetchList({ collection: "board-members", tagPrefix: "board", adapt: (d: unknown) => d }),
+      fetchList({
+        collection: "board-members",
+        schema: widgetSchema,
+        tagPrefix: "board",
+        adapt: (d) => d,
+      }),
     );
     expect(calls[0]!.opts?.next?.tags).toEqual(["board-moslavac"]);
   });
@@ -68,10 +89,11 @@ describe("fetchList", () => {
     const transport: PayloadTransport = async () => {
       throw new Error("boom");
     };
+
     const spy = vi.spyOn(console, "error").mockImplementation(() => {});
 
     const result = await runWithPayloadContext({ transport, tenantSlug: "t" }, () =>
-      fetchList({ collection: "news", adapt: (d: unknown) => d }),
+      fetchList({ collection: "news", schema: widgetSchema, adapt: (d) => d }),
     );
 
     expect(result).toEqual([]);
@@ -83,9 +105,15 @@ describe("fetchList", () => {
     const transport: PayloadTransport = async () => {
       throw new Error("boom");
     };
+
     await expect(
       runWithPayloadContext({ transport, tenantSlug: "t" }, () =>
-        fetchList({ collection: "news", adapt: (d: unknown) => d, throwOnError: true }),
+        fetchList({
+          collection: "news",
+          schema: widgetSchema,
+          adapt: (d) => d,
+          throwOnError: true,
+        }),
       ),
     ).rejects.toThrow("boom");
   });
@@ -94,13 +122,16 @@ describe("fetchList", () => {
 describe("fetchOne", () => {
   it("returns the first mapped doc", async () => {
     const { transport, calls } = recorder([{ id: 7 }, { id: 8 }]);
+
     const result = await runWithPayloadContext({ transport, tenantSlug: "t" }, () =>
-      fetchOne<{ id: number }, number>({
+      fetchOne({
         collection: "news",
+        schema: idSchema,
         where: { "where[slug][equals]": "x" },
         adapt: (d) => d.id,
       }),
     );
+
     expect(result).toBe(7);
     // limit is forced to 1 for single fetches
     expect(decodeURIComponent(calls[0]!.path)).toContain("limit=1");
@@ -108,13 +139,16 @@ describe("fetchOne", () => {
 
   it("returns null when no docs match", async () => {
     const { transport } = recorder([]);
+
     const result = await runWithPayloadContext({ transport, tenantSlug: "t" }, () =>
-      fetchOne<{ id: number }, number>({
+      fetchOne({
         collection: "news",
+        schema: idSchema,
         where: {},
         adapt: (d) => d.id,
       }),
     );
+
     expect(result).toBeNull();
   });
 });

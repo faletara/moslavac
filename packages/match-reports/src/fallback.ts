@@ -22,18 +22,23 @@ export const withFallback = (
       onFallback?.({ matchId: facts.matchId, reason, problems });
 
     let paragraphs: string[];
+
     try {
       paragraphs = await primary(facts);
     } catch (error) {
       report("greška", [error instanceof Error ? error.message : String(error)]);
+
       return fallback(facts);
     }
 
     const verdict = verifyReport(paragraphs, facts);
+
     if (!verdict.ok) {
       report("provjera", verdict.problems);
+
       return fallback(facts);
     }
+
     return paragraphs;
   };
 };

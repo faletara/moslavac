@@ -33,6 +33,7 @@ describe("htmlToMarkdown", () => {
     const md = htmlToMarkdown(page('<a href="/novosti">Vijesti</a>'), {
       baseUrl: "https://klub.example",
     });
+
     expect(md).toContain("[Vijesti](https://klub.example/novosti)");
   });
 
@@ -40,6 +41,7 @@ describe("htmlToMarkdown", () => {
     const md = htmlToMarkdown(page('<img src="/grb.png" alt="Grb kluba">'), {
       baseUrl: "https://klub.example",
     });
+
     expect(md).toContain("![Grb kluba](https://klub.example/grb.png)");
   });
 
@@ -66,6 +68,7 @@ describe("htmlToMarkdown", () => {
     const md = htmlToMarkdown(
       page('<div class="x"><p>Tekst <span>u rasponu</span></p></div>'),
     );
+
     expect(md).not.toMatch(/<[a-z]/i);
   });
 
@@ -78,6 +81,7 @@ describe("htmlToMarkdown", () => {
     const md = htmlToMarkdown(
       "<html><head><title>T</title></head><body><p>Sadržaj</p></body></html>",
     );
+
     expect(md).toContain("Sadržaj");
   });
 });

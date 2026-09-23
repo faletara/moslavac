@@ -56,11 +56,13 @@ export default function StandingsTable({
 						const teamName = row.team?.name ?? "";
 						const isClub = teamName.includes(shortName);
 						const picture = row.team?.picture ?? "";
+
 						// Na istaknutom retku (bg-muted) muted tekst pada ispod WCAG AA,
 						// zato brojčane ćelije kluba idu u punom foreground tonu.
 						const statCellClass = isClub
 							? "text-foreground"
 							: "text-muted-foreground";
+
 						return (
 							<tr
 								key={`${row.team?.id ?? teamName}-${i}`}

@@ -2,20 +2,27 @@
 
 import { FieldLabel, useField, useForm } from '@payloadcms/ui'
 import { useEffect, useId, useRef, useState } from 'react'
+import { z } from 'zod'
 
-interface HnsResult {
-  personId: number
-  name: string
-  shortName: string | null
-  position: string | null
-  shirtNumber: number | null
-}
+/** Redak koji `/api/hns-players/search` vraća kada uspije. */
+const hnsResult = z.object({
+  personId: z.number(),
+  name: z.string(),
+  shortName: z.string().nullish().default(null),
+  position: z.string().nullish().default(null),
+  shirtNumber: z.number().nullish().default(null),
+})
 
-interface ApiError {
-  error: string
-}
+/** Ista ruta na grešci vraća `{ error }` umjesto niza. */
+const searchResponse = z.union([
+  z.array(hnsResult),
+  z.object({ error: z.string() }),
+])
+
+type HnsResult = z.output<typeof hnsResult>
 
 const SEARCH_DEBOUNCE_MS = 300
+
 const MIN_KEYWORD_LENGTH = 2
 
 export function PlayerSearchField() {
@@ -34,24 +41,31 @@ export function PlayerSearchField() {
     if (keyword.trim().length < MIN_KEYWORD_LENGTH) {
       setResults([])
       setError(null)
+
       return
     }
 
     let cancelled = false
+
     const timer = setTimeout(async () => {
       setLoading(true)
       setError(null)
+
       try {
         const res = await fetch(
           `/api/hns-players/search?keyword=${encodeURIComponent(keyword.trim())}`,
           { credentials: 'include' },
         )
-        const data = (await res.json()) as HnsResult[] | ApiError
+
+        const data = searchResponse.parse(await res.json())
+
         if (cancelled) return
+
         if (!res.ok || !Array.isArray(data)) {
           const message = !Array.isArray(data) && data.error
             ? data.error
             : `Greška ${res.status}`
+
           setError(message)
           setResults([])
         } else {
@@ -74,6 +88,8 @@ export function PlayerSearchField() {
 
   useEffect(() => {
     function onClickOutside(event: MouseEvent) {
+      // SAFETY: `MouseEvent.target` je `EventTarget`; za klik u dokumentu je to
+      // uvijek čvor, što `Node.contains` i traži.
       if (
         containerRef.current &&
         !containerRef.current.contains(event.target as Node)
@@ -81,7 +97,9 @@ export function PlayerSearchField() {
         setOpen(false)
       }
     }
+
     document.addEventListener('mousedown', onClickOutside)
+
     return () => document.removeEventListener('mousedown', onClickOutside)
   }, [])
 

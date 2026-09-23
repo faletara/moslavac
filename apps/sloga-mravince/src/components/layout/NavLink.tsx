@@ -27,6 +27,7 @@ export default function NavLink({
   className,
 }: NavLinkProps) {
   const pathname = usePathname();
+
   const isActive =
     !external &&
     href != null &&

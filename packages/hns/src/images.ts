@@ -7,6 +7,7 @@ interface HnsImagePayload {
 }
 
 const WHITE_BACKGROUND_MIN = 220;
+
 const WHITE_BACKGROUND_DELTA = 35;
 
 export async function fetchHnsImageBytes(uuid: string): Promise<Buffer | null> {
@@ -15,7 +16,9 @@ export async function fetchHnsImageBytes(uuid: string): Promise<Buffer | null> {
     tag: `image-${uuid}`,
     revalidate: 86_400,
   });
+
   if (!result?.value) return null;
+
   return Buffer.from(result.value, "base64");
 }
 
@@ -45,12 +48,14 @@ function isEdgeBackgroundPixel(data: Buffer, pixelIndex: number): boolean {
  */
 export async function removeEdgeWhiteBackground(bytes: Buffer): Promise<Buffer> {
   const sharp = (await import("sharp")).default;
+
   const { data, info } = await sharp(bytes)
     .ensureAlpha()
     .raw()
     .toBuffer({ resolveWithObject: true });
 
   const { width, height, channels } = info;
+
   if (channels !== 4) return bytes;
 
   const seen = new Uint8Array(width * height);
@@ -59,6 +64,7 @@ export async function removeEdgeWhiteBackground(bytes: Buffer): Promise<Buffer> 
   const push = (x: number, y: number) => {
     if (x < 0 || x >= width || y < 0 || y >= height) return;
     const pixelIndex = y * width + x;
+
     if (seen[pixelIndex] || !isEdgeBackgroundPixel(data, pixelIndex)) return;
     seen[pixelIndex] = 1;
     queue.push(pixelIndex);
@@ -68,6 +74,7 @@ export async function removeEdgeWhiteBackground(bytes: Buffer): Promise<Buffer> 
     push(x, 0);
     push(x, height - 1);
   }
+
   for (let y = 0; y < height; y += 1) {
     push(0, y);
     push(width - 1, y);
@@ -105,10 +112,13 @@ export async function fetchHnsCrestDataUri(
   uuid: string | null | undefined,
 ): Promise<string | null> {
   if (!uuid) return null;
+
   try {
     const bytes = await fetchHnsImageBytes(uuid);
+
     if (!bytes) return null;
     const transparent = await removeEdgeWhiteBackground(bytes);
+
     return `data:image/png;base64,${transparent.toString("base64")}`;
   } catch {
     return null;

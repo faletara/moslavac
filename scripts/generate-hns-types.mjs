@@ -17,6 +17,7 @@ import openapiTS, { astToString } from "openapi-typescript";
 import { writeFile } from "node:fs/promises";
 
 const SPEC_URL = "https://api-hns.analyticom.de/v3/api-docs/live";
+
 const OUT = new URL("../packages/types/src/hns.openapi.ts", import.meta.url);
 
 const KNOWN_SPEC_BUGS = [
@@ -34,20 +35,24 @@ const KNOWN_SPEC_BUGS = [
 const res = await fetch(SPEC_URL, {
   headers: { "User-Agent": "moslavac-codegen", Accept: "application/json" },
 });
+
 if (!res.ok) {
   throw new Error(`HNS spec fetch failed: ${res.status} ${res.statusText}`);
 }
+
 const spec = await res.json();
 
 for (const { path, patch } of KNOWN_SPEC_BUGS) {
   const parent = path.slice(0, -1).reduce((o, k) => o?.[k], spec);
   const key = path.at(-1);
+
   if (parent == null || !(key in parent)) {
     throw new Error(
       `Spec-bug patch target no longer exists: ${path.join(".")}. ` +
         `The upstream spec changed — re-verify against the live API and update KNOWN_SPEC_BUGS.`,
     );
   }
+
   parent[key] = patch(parent[key]);
 }
 
@@ -59,5 +64,7 @@ const ast = await openapiTS(spec, {
   rootTypes: true,
   rootTypesNoSchemaPrefix: true,
 });
+
 await writeFile(OUT, astToString(ast));
+
 console.log(`Wrote ${OUT.pathname} (${KNOWN_SPEC_BUGS.length} spec-bug patch(es) applied)`);

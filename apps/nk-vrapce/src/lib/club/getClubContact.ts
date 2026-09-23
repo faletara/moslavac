@@ -20,6 +20,7 @@ export interface ClubContact {
 
 function clean(value: string | null | undefined): string | null {
 	const trimmed = value?.trim();
+
 	return trimmed ? trimmed : null;
 }
 
@@ -29,6 +30,7 @@ function mapFromCoords(
 	lng: number | null | undefined,
 ): string | null {
 	if (lat == null || lng == null) return null;
+
 	return `https://www.google.com/maps?q=${lat},${lng}&z=16&output=embed`;
 }
 
@@ -41,6 +43,7 @@ export async function getClubContact(): Promise<ClubContact> {
 	const c = tenant.contact;
 
 	const facility = details?.facility;
+
 	const stadium: ClubStadium | null = facility?.name
 		? {
 				name: facility.name,

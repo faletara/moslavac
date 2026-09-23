@@ -12,6 +12,7 @@ import { useRef } from "react";
 import type { FrontendTenant } from "@/lib/payload/types";
 
 const EXPO_OUT = [0.16, 1, 0.3, 1] as const;
+
 const EASE = [0.25, 0.1, 0.25, 1] as const;
 
 /**
@@ -22,10 +23,13 @@ const HERO_IMAGE = "/stadion.png";
 
 function splitDisplayName(displayName: string): string[] {
 	const trimmed = displayName.trim();
+
 	if (!trimmed) return [displayName];
 	const parts = trimmed.split(/\s+/);
+
 	if (parts.length <= 1) return parts;
 	const [first, ...rest] = parts;
+
 	return first ? [first, rest.join(" ")] : parts;
 }
 
@@ -39,6 +43,7 @@ export default function Hero({ tenant }: { tenant: FrontendTenant }) {
 		target: sectionRef,
 		offset: ["start start", "end start"],
 	});
+
 	// Suptilni parallax na fotki + blago tonjenje sadržaja pri scrollu.
 	const photoY = useTransform(scrollYProgress, [0, 1], ["0%", "6%"]);
 	const contentY = useTransform(scrollYProgress, [0, 1], ["0%", "-40%"]);

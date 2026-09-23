@@ -1,5 +1,6 @@
 import "server-only";
 import { AsyncLocalStorage } from "node:async_hooks";
+import type { JsonValue } from "@/types/json";
 
 // Explicit Payload data-layer context. The frontend resolves its tenant + HTTP
 // transport from env (see client.ts / tenant.ts); tests and server-to-server
@@ -15,7 +16,7 @@ export interface PayloadFetchOptions {
 export type PayloadTransport = (
   path: string,
   opts?: PayloadFetchOptions,
-) => Promise<unknown>;
+) => Promise<JsonValue>;
 
 export interface PayloadContext {
   transport?: PayloadTransport;

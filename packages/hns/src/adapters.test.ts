@@ -23,6 +23,8 @@ import {
 
 describe("HNS adapters", () => {
   it("maps a raw match to the public match domain shape", () => {
+    // SAFETY: fixture nosi samo polja koja adapter čita; ostatak HNS-ove OpenAPI
+    // strukture ovaj test ne dira.
     const match = adaptMatch({
       id: 99,
       dateTimeUTC: 1_710_000_000_000,
@@ -69,6 +71,8 @@ describe("HNS adapters", () => {
   });
 
   it("maps standings rows and collapses m1-m5 into form", () => {
+    // SAFETY: fixture nosi samo polja koja adapter čita; ostatak HNS-ove OpenAPI
+    // strukture ovaj test ne dira.
     const ranking = adaptTeamRanking(
       {
         team: { id: 42, name: "NK Moslavac", allowDetail: true },
@@ -107,6 +111,8 @@ describe("HNS adapters", () => {
   });
 
   it("maps players, player profile stats, leaderboard stats, and search rows", () => {
+    // SAFETY: fixture nosi samo polja koja adapter čita; ostatak HNS-ove OpenAPI
+    // strukture ovaj test ne dira.
     const rawPlayer = {
       roleId: 1,
       personId: 123,
@@ -131,6 +137,8 @@ describe("HNS adapters", () => {
       hideProfile: false,
     });
 
+    // SAFETY: fixture nosi samo polja koja adapter čita; ostatak HNS-ove OpenAPI
+    // strukture ovaj test ne dira.
     expect(adaptPlayerCompetitionStats({
       minutesPlayed: 270,
       matchesPlayed: 3,
@@ -148,6 +156,8 @@ describe("HNS adapters", () => {
       allowDetail: true,
     });
 
+    // SAFETY: fixture nosi samo polja koja adapter čita; ostatak HNS-ove OpenAPI
+    // strukture ovaj test ne dira.
     expect(adaptCompetitionPlayerStat({
       player: rawPlayer,
       team: { id: 42, name: "NK Moslavac", allowDetail: true },
@@ -169,6 +179,8 @@ describe("HNS adapters", () => {
   });
 
   it("maps match events to stable domain event fields", () => {
+    // SAFETY: fixture nosi samo polja koja adapter čita; ostatak HNS-ove OpenAPI
+    // strukture ovaj test ne dira.
     const event = adaptMatchEvent({
       eventId: 55,
       eventType: { eventTypeId: 1, name: "Pogodak", fcdName: "GOAL" },
@@ -205,6 +217,8 @@ describe("HNS adapters", () => {
   });
 
   it("maps lineups, lineup player events, officials, and match info officials", () => {
+    // SAFETY: fixture nosi samo polja koja adapter čita; ostatak HNS-ove OpenAPI
+    // strukture ovaj test ne dira.
     const lineups = adaptLineups({
       home: {
         formation: "4-3-3",
@@ -246,6 +260,8 @@ describe("HNS adapters", () => {
       away: { players: [], officials: [] },
     });
 
+    // SAFETY: fixture nosi samo polja koja adapter čita; ostatak HNS-ove OpenAPI
+    // strukture ovaj test ne dira.
     expect(adaptMatchInfo({
       refereeKit: " kit ",
       matchOfficials: [{ personId: 13, name: "Sudac", role: "Referee" }],

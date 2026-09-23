@@ -37,7 +37,9 @@ function isPlayed(m: Match): boolean {
 function roundLabel(m: Match): string {
   if (m.matchDay != null) return `${m.matchDay}. kolo`;
   const round = m.round?.trim();
+
   if (!round) return "";
+
   return /^\d+$/.test(round) ? `${round}. kolo` : round;
 }
 
@@ -167,12 +169,15 @@ function ResultCard({ match }: { match: Match }) {
   const ag = goals(match.score.away);
   const opponent = match.teamSide === "home" ? match.awayTeam : match.homeTeam;
   const venue = match.teamSide === "home" ? "Doma" : "Gosti";
+
   const date = match.kickoffAtUtcMs
     ? formatDateShort(match.kickoffAtUtcMs)
     : "";
+
   const accentCls = match.teamResult
     ? OUTCOME_ACCENT[match.teamResult]
     : "bg-border";
+
   const ourScoreCls =
     match.teamResult === "W"
       ? "text-club"
@@ -257,9 +262,11 @@ function TeamCrest({ team, ours }: { team: Team | null; ours: boolean }) {
  */
 function FixtureCard({ match }: { match: Match }) {
   const opponent = match.teamSide === "home" ? match.awayTeam : match.homeTeam;
+
   const parts = match.kickoffAtUtcMs
     ? formatDateParts(match.kickoffAtUtcMs)
     : null;
+
   const venue = match.teamSide === "home" ? "Doma" : "Gosti";
 
   return (
@@ -327,12 +334,15 @@ function FixtureCard({ match }: { match: Match }) {
  */
 function FeaturedPoster({ match, isNext }: { match: Match; isNext: boolean }) {
   const played = isPlayed(match);
+
   const parts = match.kickoffAtUtcMs
     ? formatDateParts(match.kickoffAtUtcMs)
     : null;
+
   const dateShort = match.kickoffAtUtcMs
     ? formatDateShort(match.kickoffAtUtcMs)
     : "";
+
   const venue = match.facility?.name ?? null;
   const hg = goals(match.score.home);
   const ag = goals(match.score.away);
@@ -349,6 +359,8 @@ function FeaturedPoster({ match, isNext }: { match: Match; isNext: boolean }) {
         <span
           aria-hidden
           className="halftone halftone-fade-b pointer-events-none absolute inset-x-0 top-0 -z-10 h-32 opacity-20"
+          // SAFETY: `--*` je CSS custom property; Reactov `CSSProperties` popisuje samo
+          // standardna svojstva, pa ga inline stil ovdje mora proširiti.
           style={
             { "--halftone-color": "rgba(255,255,255,0.65)" } as React.CSSProperties
           }
@@ -388,6 +400,8 @@ function FeaturedPoster({ match, isNext }: { match: Match; isNext: boolean }) {
 
           <p
             className="text-stroke line-clamp-2 pt-[0.2em] font-display uppercase leading-[0.87] tracking-tight text-[clamp(1.7rem,3.8vw,2.75rem)]"
+            // SAFETY: `--*` je CSS custom property; Reactov `CSSProperties` popisuje samo
+            // standardna svojstva, pa ga inline stil ovdje mora proširiti.
             style={{ "--text-stroke-color": "#ffffff" } as React.CSSProperties}
           >
             {match.awayTeam?.name ?? "-"}

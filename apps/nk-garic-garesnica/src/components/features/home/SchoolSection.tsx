@@ -51,6 +51,8 @@ export default function SchoolSection({
                 aria-hidden
                 className="halftone halftone-fade-b pointer-events-none absolute inset-x-0 top-0 -z-10 h-32 opacity-25"
                 style={
+                  // SAFETY: `--*` je CSS custom property; Reactov `CSSProperties` popisuje samo
+                  // standardna svojstva, pa ga inline stil ovdje mora proširiti.
                   {
                     "--halftone-color": "rgba(255,255,255,0.65)",
                   } as React.CSSProperties

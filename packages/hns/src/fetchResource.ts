@@ -1,6 +1,8 @@
 import "server-only";
-import { getHnsTeamId, resolveTransport } from "./client";
 import { tenantSlug } from "@/lib/payload/getTenant";
+import { getHnsTeamId, resolveTransport } from "./client";
+import { anyList, bareList, pagedList } from "./schemas";
+import type { JsonValue } from "@/types/json";
 
 // The deep HNS data-fetch module. Every fetcher is a thin declaration over
 // `hnsList` / `hnsResource`; the shared shape (teamId lookup → teamIdFilter
@@ -28,18 +30,25 @@ async function runHnsQuery<T>(
 ): Promise<{ data: T | null; ok: boolean }> {
   const teamId = await getHnsTeamId();
   let endpoint = spec.path(teamId);
+
   if (spec.teamFilter !== false) {
     endpoint += (endpoint.includes("?") ? "&" : "?") + `teamIdFilter=${teamId}`;
   }
+
   const tags = spec.tag ? [`hns-${tenantSlug}-${spec.tag}`] : undefined;
+
   try {
     const raw = await resolveTransport()(endpoint, {
       revalidate: spec.revalidate,
       tags,
     });
+
+    // SAFETY: oblik stavke propisuje HNS-ova OpenAPI specifikacija, iz koje je
+    // generiran `hns.openapi.ts`; ovdje se raščlanjuje samo ovojnica.
     return { data: raw as T, ok: true };
   } catch (err) {
     console.error(`hnsFetch failed: ${endpoint}`, err);
+
     return { data: null, ok: false };
   }
 }
@@ -48,12 +57,27 @@ async function hnsQuery<T>(spec: HnsSpec): Promise<T | null> {
   return (await runHnsQuery<T>(spec)).data;
 }
 
-function unwrapList<T>(
-  data: T[] | { result?: T[] } | null,
-  paginated?: boolean,
-): T[] {
-  if (!data) return [];
-  return paginated ? ((data as { result?: T[] }).result ?? []) : (data as T[]);
+/**
+ * Raščlani tijelo u niz stavki. `paginated` bira očekivanu ovojnicu; kada je
+ * izostavljen, prihvaćaju se obje.
+ */
+function unwrapList<T>(data: JsonValue, paginated?: boolean): T[] {
+  if (data === null || data === undefined) return [];
+
+  const schema =
+    paginated === true ? pagedList : paginated === false ? bareList : anyList;
+
+  const parsed = schema.safeParse(data);
+
+  if (!parsed.success) {
+    console.error("hns: neočekivan oblik liste", parsed.error.issues);
+
+    return [];
+  }
+
+  // SAFETY: oblik stavke propisuje HNS-ova OpenAPI specifikacija, iz koje je
+  // generiran `hns.openapi.ts`; ovdje se raščlanjuje samo ovojnica.
+  return parsed.data as T[];
 }
 
 /** Fetch a single HNS resource. Resilient: returns null on error. */
@@ -69,7 +93,8 @@ export function hnsResource<T>(spec: HnsSpec): Promise<T | null> {
 export async function hnsList<T>(
   spec: HnsSpec & { paginated?: boolean },
 ): Promise<T[]> {
-  const raw = await hnsQuery<T[] | { result?: T[] }>(spec);
+  const raw = await hnsQuery<JsonValue>(spec);
+
   return unwrapList<T>(raw, spec.paginated);
 }
 
@@ -80,6 +105,7 @@ export async function hnsList<T>(
 export async function hnsListResult<T>(
   spec: HnsSpec & { paginated?: boolean },
 ): Promise<{ data: T[]; ok: boolean }> {
-  const { data, ok } = await runHnsQuery<T[] | { result?: T[] }>(spec);
+  const { data, ok } = await runHnsQuery<JsonValue>(spec);
+
   return { data: unwrapList<T>(data, spec.paginated), ok };
 }

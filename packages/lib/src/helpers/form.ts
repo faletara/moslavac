@@ -29,12 +29,16 @@ export function getTeamPlayedMatches(
     .sort((a, b) => (b.kickoffAtUtcMs ?? 0) - (a.kickoffAtUtcMs ?? 0))
     .map((match) => {
       const isHome = match.homeTeam?.id === teamId;
+
       const goalsFor =
         (isHome ? match.score.home.current : match.score.away.current) ?? 0;
+
       const goalsAgainst =
         (isHome ? match.score.away.current : match.score.home.current) ?? 0;
+
       const result: FormResult =
         goalsFor > goalsAgainst ? "W" : goalsFor < goalsAgainst ? "L" : "D";
+
       return { match, result, goalsFor, goalsAgainst, isHome };
     });
 }
@@ -54,13 +58,17 @@ export function getMatchOutcome(
   if (!match || !isPlayed(match) || !involvesTeam(match, ourTeamId)) return null;
 
   const isHome = match.homeTeam?.id === ourTeamId;
+
   const goalsFor =
     (isHome ? match.score.home.current : match.score.away.current) ?? 0;
+
   const goalsAgainst =
     (isHome ? match.score.away.current : match.score.home.current) ?? 0;
 
   if (goalsFor > goalsAgainst) return "W";
+
   if (goalsFor < goalsAgainst) return "L";
+
   return "D";
 }
 

@@ -99,6 +99,7 @@ function StandingsRow({
 
   const teamName = row.team?.name ?? "-";
   const teamId = row.team?.id;
+
   const cellContent = (
     <div className="flex items-center gap-2">
       <HnsCrest
@@ -170,6 +171,7 @@ function FormStrip({ form }: { form: FormResult[] }) {
   if (form.length === 0) {
     return <span className="text-[0.6rem] text-muted-foreground/60">-</span>;
   }
+
   return (
     <div className="flex justify-center gap-1">
       {form.map((result, i) => (
@@ -185,7 +187,9 @@ function FormDot({ result }: { result: FormResult }) {
     D: "bg-muted text-muted-foreground",
     L: "bg-rose-500 text-white",
   };
+
   const label = result === "W" ? "P" : result === "D" ? "N" : "I";
+
   return (
     <span
       className={cn(

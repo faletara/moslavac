@@ -1,21 +1,23 @@
 import "server-only";
+import { z } from "zod";
 import type { SchoolProgram } from "@/types/school";
 import { clubFeatureQuery } from "./clubFeatures";
 import { fetchList, fetchOne } from "./fetchCollection";
-import { mediaObject } from "./media";
-import type { PayloadMedia } from "./types";
+import { mediaRef } from "./schemas";
 
-interface PayloadSchoolProgram {
-  id: number;
-  name: string;
-  ageRange: string | null;
-  coach: string | null;
-  schedule: string | null;
-  description: string | null;
-  photo: PayloadMedia | number | null;
-  displayOrder: number;
-  active: boolean;
-}
+export const schoolProgramSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  ageRange: z.string().nullish().default(null),
+  coach: z.string().nullish().default(null),
+  schedule: z.string().nullish().default(null),
+  description: z.string().nullish().default(null),
+  photo: mediaRef,
+  displayOrder: z.number().nullish().default(null),
+  active: z.boolean().nullish().default(null),
+});
+
+type PayloadSchoolProgram = z.output<typeof schoolProgramSchema>;
 
 export function adaptProgram(doc: PayloadSchoolProgram): SchoolProgram {
   return {
@@ -25,7 +27,7 @@ export function adaptProgram(doc: PayloadSchoolProgram): SchoolProgram {
     coach: doc.coach ?? null,
     schedule: doc.schedule ?? null,
     description: doc.description ?? null,
-    photo: mediaObject(doc.photo),
+    photo: doc.photo,
     displayOrder: doc.displayOrder ?? 0,
   };
 }
@@ -35,6 +37,7 @@ const schoolFeature = clubFeatureQuery("school");
 export const fetchSchoolPrograms = (): Promise<SchoolProgram[]> =>
   fetchList<PayloadSchoolProgram, SchoolProgram>({
     ...schoolFeature,
+    schema: schoolProgramSchema,
     where: { "where[active][equals]": "true" },
     sort: "displayOrder",
     limit: 100,
@@ -46,6 +49,7 @@ export const fetchSchoolProgramById = (params: {
 }): Promise<SchoolProgram | null> =>
   fetchOne<PayloadSchoolProgram, SchoolProgram>({
     ...schoolFeature,
+    schema: schoolProgramSchema,
     where: {
       "where[id][equals]": params.id,
       "where[active][equals]": "true",

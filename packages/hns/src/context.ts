@@ -1,5 +1,6 @@
 import "server-only";
 import { AsyncLocalStorage } from "node:async_hooks";
+import type { JsonValue } from "@/types/json";
 
 export interface HnsFetchOptions {
   revalidate?: number;
@@ -10,7 +11,7 @@ export interface HnsFetchOptions {
 export type HnsTransport = (
   endpoint: string,
   opts?: HnsFetchOptions,
-) => Promise<unknown>;
+) => Promise<JsonValue>;
 
 // Explicit HNS tenant context. The frontend resolves tenant config from the
 // `PAYLOAD_TENANT_SLUG` env var via getTenant(); server-to-server callers (the

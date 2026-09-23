@@ -88,7 +88,13 @@ export const HERO_SHOTS = [
  *
  * Dok je `embedUrl` prazan, stranica prikazuje kontakt e-poštom.
  */
-export const DEMO_FORM: { embedUrl: string; height: number } = {
+/** Ugrađeni obrazac za demo; prazan `embedUrl` znači „prikaži e-poštu”. */
+export interface DemoForm {
+  embedUrl: string
+  height: number
+}
+
+export const DEMO_FORM: DemoForm = {
   embedUrl: '',
   height: 620,
 }
@@ -103,15 +109,18 @@ export const DEMO_ANCHOR = '/#demo'
 export function demoFormUrl(email?: string): string {
   if (DEMO_FORM.embedUrl) {
     const separator = DEMO_FORM.embedUrl.includes('?') ? '&' : '?'
+
     return email
       ? `${DEMO_FORM.embedUrl}${separator}email=${encodeURIComponent(email)}`
       : DEMO_FORM.embedUrl
   }
 
   const subject = encodeURIComponent('Demo stranica za klub')
+
   const body = encodeURIComponent(
     ['Naziv kluba:', 'Liga:', 'Kontakt osoba:', 'Telefon:', '', 'Poruka:'].join('\n'),
   )
+
   return `mailto:${LEGAL.email}?subject=${subject}&body=${body}`
 }
 

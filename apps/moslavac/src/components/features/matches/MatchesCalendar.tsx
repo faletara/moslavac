@@ -49,6 +49,7 @@ interface MatchesCalendarProps {
 }
 
 const WEEKDAY_LABELS = ["pon", "uto", "sri", "čet", "pet", "sub", "ned"];
+
 const WEEKDAY_LABELS_LONG = [
 	"Ponedjeljak",
 	"Utorak",
@@ -58,6 +59,7 @@ const WEEKDAY_LABELS_LONG = [
 	"Subota",
 	"Nedjelja",
 ];
+
 const MONTH_VIEW_MAX_EVENTS = 3;
 
 export default function MatchesCalendar({ matches }: MatchesCalendarProps) {
@@ -76,16 +78,24 @@ export default function MatchesCalendar({ matches }: MatchesCalendarProps) {
 	const events = useMemo<CalendarEvent[]>(
 		() =>
 			matches
-				.filter((m) => m.id != null && m.kickoffAtUtcMs != null)
-				.map((m) => ({
-					id: m.id as number,
-					slug: buildMatchSlug(m),
-					date: new Date(m.kickoffAtUtcMs as number),
-					home: m.homeTeam?.name ?? "N/A",
-					away: m.awayTeam?.name ?? "N/A",
-					competition: m.competition?.name ?? "",
-					category: getCompetitionCategory(m.competition?.name),
-				}))
+				.flatMap((m) => {
+					const id = m.id;
+					const kickoff = m.kickoffAtUtcMs;
+
+					if (id == null || kickoff == null) return [];
+
+					return [
+						{
+							id,
+							slug: buildMatchSlug(m),
+							date: new Date(kickoff),
+							home: m.homeTeam?.name ?? "N/A",
+							away: m.awayTeam?.name ?? "N/A",
+							competition: m.competition?.name ?? "",
+							category: getCompetitionCategory(m.competition?.name),
+						},
+					];
+				})
 				.sort((a, b) => a.date.getTime() - b.date.getTime()),
 		[matches],
 	);
@@ -106,14 +116,17 @@ export default function MatchesCalendar({ matches }: MatchesCalendarProps) {
 
 	const headerLabel = useMemo(() => {
 		if (view === "month") return format(cursor, "LLLL yyyy.", { locale: hr });
+
 		if (view === "week") {
 			const start = startOfWeek(cursor, { weekStartsOn: 1 });
 			const end = endOfWeek(cursor, { weekStartsOn: 1 });
 			const sameMonth = isSameMonth(start, end);
+
 			return sameMonth
 				? `${format(start, "d.", { locale: hr })}-${format(end, "d. LLLL yyyy.", { locale: hr })}`
 				: `${format(start, "d. LLL", { locale: hr })} - ${format(end, "d. LLL yyyy.", { locale: hr })}`;
 		}
+
 		return format(cursor, "EEEE, d. LLLL yyyy.", { locale: hr });
 	}, [cursor, view]);
 
@@ -256,21 +269,25 @@ function MonthView({ cursor, events, onDayClick, onEventClick }: MonthViewProps)
 		const end = endOfWeek(endOfMonth(cursor), { weekStartsOn: 1 });
 		const result: Date[] = [];
 		let d = start;
+
 		while (d <= end) {
 			result.push(d);
 			d = addDays(d, 1);
 		}
+
 		return result;
 	}, [cursor]);
 
 	const eventsByDay = useMemo(() => {
 		const map = new Map<string, CalendarEvent[]>();
+
 		for (const ev of events) {
 			const key = format(startOfDay(ev.date), "yyyy-MM-dd");
 			const list = map.get(key) ?? [];
 			list.push(ev);
 			map.set(key, list);
 		}
+
 		return map;
 	}, [events]);
 
@@ -371,17 +388,20 @@ interface WeekViewProps {
 function WeekView({ cursor, events, onDayClick, onEventClick }: WeekViewProps) {
 	const days = useMemo(() => {
 		const start = startOfWeek(cursor, { weekStartsOn: 1 });
+
 		return Array.from({ length: 7 }, (_, i) => addDays(start, i));
 	}, [cursor]);
 
 	const eventsByDay = useMemo(() => {
 		const map = new Map<string, CalendarEvent[]>();
+
 		for (const ev of events) {
 			const key = format(startOfDay(ev.date), "yyyy-MM-dd");
 			const list = map.get(key) ?? [];
 			list.push(ev);
 			map.set(key, list);
 		}
+
 		return map;
 	}, [events]);
 
@@ -391,6 +411,7 @@ function WeekView({ cursor, events, onDayClick, onEventClick }: WeekViewProps) {
 				const today = isToday(day);
 				const key = format(day, "yyyy-MM-dd");
 				const dayEvents = eventsByDay.get(key) ?? [];
+
 				return (
 					<div
 						key={key}

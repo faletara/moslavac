@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import type { FrontendTenant, PayloadMedia } from "@/lib/payload/types";
+import type { FrontendTenant, MediaImage } from "@/lib/payload/types";
 
 const TenantContext = createContext<FrontendTenant | null>(null);
 
@@ -19,9 +19,11 @@ export function TenantProvider({
 
 export function useTenant(): FrontendTenant {
   const tenant = useContext(TenantContext);
+
   if (!tenant) {
     throw new Error("useTenant must be used inside <TenantProvider>");
   }
+
   return tenant;
 }
 
@@ -33,17 +35,10 @@ export function useTenant(): FrontendTenant {
 export function useOurTeamId(): number | null {
   const tenant = useTenant();
   const id = Number(tenant.hns.teamId);
+
   return Number.isFinite(id) ? id : null;
 }
 
-export function useTenantLogo(): PayloadMedia | null {
-  const tenant = useTenant();
-  if (
-    tenant.branding?.logo &&
-    typeof tenant.branding.logo === "object" &&
-    "url" in tenant.branding.logo
-  ) {
-    return tenant.branding.logo;
-  }
-  return null;
+export function useTenantLogo(): MediaImage | null {
+  return useTenant().branding?.logo ?? null;
 }

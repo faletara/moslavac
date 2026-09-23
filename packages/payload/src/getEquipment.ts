@@ -1,46 +1,39 @@
 import "server-only";
+import { z } from "zod";
 import type { Equipment } from "@/types/equipment";
 import { fetchList } from "./fetchCollection";
-import { mediaCardImage } from "./media";
+import { mediaRef, tenantRef } from "./schemas";
 import { resolveTenantSlug } from "./tenant";
-import type { PayloadMedia } from "./types";
 
-type PayloadEquipmentCategory =
-  | "paketi"
-  | "dresovi"
-  | "trenirke"
-  | "jakne"
-  | "dodaci";
+export const equipmentSchema = z.object({
+  id: z.number(),
+  displayName: z.string(),
+  category: z.enum(["paketi", "dresovi", "trenirke", "jakne", "dodaci"]),
+  price: z.number(),
+  image: mediaRef,
+  externalUrl: z.string(),
+  displayOrder: z.number().nullish().default(null),
+  featured: z.boolean().nullish().default(null),
+  active: z.boolean().nullish().default(null),
+  tenant: tenantRef,
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
 
-interface PayloadEquipment {
-  id: number;
-  displayName: string;
-  category: PayloadEquipmentCategory;
-  price: number;
-  image: PayloadMedia | number | null;
-  externalUrl: string;
-  displayOrder: number | null;
-  featured: boolean | null;
-  active: boolean | null;
-  tenant: number | { id: number; slug: string } | null;
-  createdAt: string;
-  updatedAt: string;
-}
+type PayloadEquipment = z.output<typeof equipmentSchema>;
 
 function tenantSlugOf(tenant: PayloadEquipment["tenant"]): string {
-  if (tenant && typeof tenant === "object") return tenant.slug;
-  return resolveTenantSlug();
+  return tenant?.slug ?? resolveTenantSlug();
 }
 
 export function adaptEquipment(doc: PayloadEquipment): Equipment {
-  const { url, alt } = mediaCardImage(doc.image);
   return {
     id: doc.id,
     displayName: doc.displayName,
     category: doc.category,
     price: doc.price,
-    imagePath: url,
-    imageAlt: alt || doc.displayName,
+    imagePath: doc.image?.cardUrl ?? "",
+    imageAlt: doc.image?.alt || doc.displayName,
     externalUrl: doc.externalUrl,
     displayOrder: doc.displayOrder ?? 0,
     featured: doc.featured ?? false,
@@ -51,6 +44,7 @@ export function adaptEquipment(doc: PayloadEquipment): Equipment {
 export const fetchEquipment = (): Promise<Equipment[]> =>
   fetchList<PayloadEquipment, Equipment>({
     collection: "equipment",
+    schema: equipmentSchema,
     where: { "where[active][equals]": "true" },
     sort: "displayOrder",
     limit: 100,
@@ -60,6 +54,7 @@ export const fetchEquipment = (): Promise<Equipment[]> =>
 export const fetchFeaturedEquipment = (): Promise<Equipment[]> =>
   fetchList<PayloadEquipment, Equipment>({
     collection: "equipment",
+    schema: equipmentSchema,
     where: {
       "where[active][equals]": "true",
       "where[featured][equals]": "true",

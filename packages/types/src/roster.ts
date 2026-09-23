@@ -1,4 +1,4 @@
-import type { PayloadMedia } from "@/lib/payload/types";
+import type { MediaImage } from "@/lib/payload/schemas";
 
 export type RosterPosition =
   | "vratar"
@@ -15,5 +15,5 @@ export interface RosterEntry {
   displayOrder: number;
   jerseyNumber: number | null;
   captain: boolean;
-  photo: PayloadMedia | null;
+  photo: MediaImage | null;
 }

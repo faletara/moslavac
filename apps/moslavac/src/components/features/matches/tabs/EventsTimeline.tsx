@@ -48,10 +48,13 @@ export default function EventsTimeline({ match, events }: EventsTimelineProps) {
     .sort((a, b) => {
       const am = a.minute ?? 0;
       const bm = b.minute ?? 0;
+
       if (am !== bm) return am - bm;
       const as = a.stoppageTime ?? 0;
       const bs = b.stoppageTime ?? 0;
+
       if (as !== bs) return as - bs;
+
       return (a.orderNumber ?? 0) - (b.orderNumber ?? 0);
     });
 
@@ -64,30 +67,38 @@ export default function EventsTimeline({ match, events }: EventsTimelineProps) {
   }
 
   const competitionId = match.competition?.id ?? null;
+
   const homeIsMoslavac =
     moslavacTeamId != null && match.homeTeam?.id === moslavacTeamId;
+
   const homeTeam = {
     picture: match.homeTeam?.picture ?? null,
     name: match.homeTeam?.name ?? "Domaći",
   };
+
   const awayTeam = {
     picture: match.awayTeam?.picture ?? null,
     name: match.awayTeam?.name ?? "Gosti",
   };
 
   const scoreMap = buildScoreProgression(events);
+
   const hasResult =
     match.score.home.current != null && match.score.away.current != null;
+
   const halfHome = match.score.home.half;
   const halfAway = match.score.away.half;
+
   const halfScore =
     halfHome != null && halfAway != null ? `${halfHome}:${halfAway}` : null;
+
   const finalScore = `${match.score.home.current ?? 0}:${match.score.away.current ?? 0}`;
 
   const firstHalf = visible.filter((e) => (e.minute ?? 0) <= 45);
   const secondHalf = visible.filter((e) => (e.minute ?? 0) > 45);
 
   let step = 0;
+
   const rows = (list: MatchEvent[], prefix: string) =>
     list.map((event, i) => (
       <EventRow
@@ -230,6 +241,7 @@ function EventRow({
   const eventIsMoslavac =
     (event.side === "home" && homeIsMoslavac) ||
     (event.side === "away" && !homeIsMoslavac);
+
   const isLinkable =
     eventIsMoslavac &&
     personId != null &&

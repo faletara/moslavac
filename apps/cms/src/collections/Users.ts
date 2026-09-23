@@ -36,7 +36,9 @@ export const Users: CollectionConfig = {
     // Multi-tenant plugin dodatno sužava rezultat na korisnikov tenant.
     update: ({ req: { user } }) => {
       if (!user) return false
+
       if (isSuperAdmin(user)) return true
+
       return { id: { equals: user.id } }
     },
   },

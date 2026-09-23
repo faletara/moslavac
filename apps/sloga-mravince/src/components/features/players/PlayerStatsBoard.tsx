@@ -118,6 +118,7 @@ export default function PlayerStatsBoard({
   }
 
   const maxMinutes = stats.appearances * 90;
+
   const minutesPct =
     maxMinutes > 0
       ? Math.min(100, Math.max(0, (stats.minutesPlayed / maxMinutes) * 100))
@@ -127,6 +128,7 @@ export default function PlayerStatsBoard({
     stats.appearances > 0
       ? (stats.goals / stats.appearances).toFixed(2).replace(".", ",")
       : "0";
+
   const avgMinutes =
     stats.appearances > 0
       ? Math.round(stats.minutesPlayed / stats.appearances)

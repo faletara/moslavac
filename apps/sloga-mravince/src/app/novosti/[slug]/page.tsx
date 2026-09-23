@@ -11,6 +11,11 @@ import { fetchNewsBySlug } from "@/lib/payload/getNews";
 import { getTenant } from "@/lib/payload/getTenant";
 import { BASE_URL } from "@/lib/siteUrl";
 import type { News } from "@/types/news";
+import type {
+  JsonLdNode,
+  NewsArticleJsonLd,
+  OrganizationJsonLd,
+} from "@/types/jsonld";
 
 export const revalidate = 60;
 
@@ -20,10 +25,12 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
+
   const [news, tenant] = await Promise.all([
     fetchNewsBySlug({ slug }),
     getTenant(),
   ]);
+
   if (!news) return {};
 
   // Fall back to a plain-text lead derived from the body so every article emits
@@ -31,31 +38,37 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const description =
     news.excerpt ??
     (news.content ? htmlToMetaDescription(news.content) || undefined : undefined);
+
   const canonical = `/novosti/${news.slug ?? slug}`;
+
+  const openGraph: Metadata["openGraph"] = {
+    type: "article",
+    title: news.title,
+    description,
+    publishedTime: news.date,
+    modifiedTime: news.updatedAt ?? news.date,
+    authors: [tenant.displayName],
+    section: "Vijesti",
+  };
+
+  const twitter: Metadata["twitter"] = {
+    card: "summary_large_image",
+    title: news.title,
+    description,
+  };
+
+  if (news.thumbnailPath) {
+    openGraph.images = [{ url: news.thumbnailPath, alt: news.title }];
+    twitter.images = [news.thumbnailPath];
+  }
 
   return {
     title: news.title,
     description,
     alternates: { canonical },
     authors: [{ name: tenant.displayName }],
-    openGraph: {
-      type: "article",
-      title: news.title,
-      description,
-      publishedTime: news.date,
-      modifiedTime: news.updatedAt ?? news.date,
-      authors: [tenant.displayName],
-      section: "Vijesti",
-      ...(news.thumbnailPath
-        ? { images: [{ url: news.thumbnailPath, alt: news.title }] }
-        : {}),
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: news.title,
-      description,
-      ...(news.thumbnailPath ? { images: [news.thumbnailPath] } : {}),
-    },
+    openGraph,
+    twitter,
   };
 }
 
@@ -74,14 +87,32 @@ function buildNewsJsonLd({
   slug: string;
   tenantName: string;
   logoUrl: string | null;
-}): Record<string, unknown>[] {
+}): JsonLdNode[] {
   const url = `${BASE_URL}/novosti/${news.slug ?? slug}`;
-  const publisher = {
+
+  const publisher: OrganizationJsonLd = {
     "@type": "SportsOrganization",
     name: tenantName,
     url: BASE_URL,
-    ...(logoUrl ? { logo: { "@type": "ImageObject", url: logoUrl } } : {}),
   };
+
+  if (logoUrl) publisher.logo = { "@type": "ImageObject", url: logoUrl };
+
+  const article: NewsArticleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    headline: news.title,
+    datePublished: news.date,
+    dateModified: news.updatedAt ?? news.date,
+    author: publisher,
+    publisher,
+    mainEntityOfPage: { "@type": "WebPage", "@id": url },
+    url,
+  };
+
+  if (news.excerpt) article.description = news.excerpt;
+
+  if (news.thumbnailPath) article.image = [news.thumbnailPath];
 
   return [
     {
@@ -98,28 +129,18 @@ function buildNewsJsonLd({
         { "@type": "ListItem", position: 3, name: news.title, item: url },
       ],
     },
-    {
-      "@context": "https://schema.org",
-      "@type": "NewsArticle",
-      headline: news.title,
-      ...(news.excerpt ? { description: news.excerpt } : {}),
-      datePublished: news.date,
-      dateModified: news.updatedAt ?? news.date,
-      ...(news.thumbnailPath ? { image: [news.thumbnailPath] } : {}),
-      author: publisher,
-      publisher,
-      mainEntityOfPage: { "@type": "WebPage", "@id": url },
-      url,
-    },
+    article,
   ];
 }
 
 export default async function NewsDetailPage({ params }: Props) {
   const { slug } = await params;
+
   const [news, tenant] = await Promise.all([
     fetchNewsBySlug({ slug }),
     getTenant(),
   ]);
+
   if (!news) notFound();
 
   // Automatski izvještaj nosi `sourceMatchId`; ručno pisana novost ga nema i
@@ -128,8 +149,9 @@ export default async function NewsDetailPage({ params }: Props) {
   const match = news.sourceMatchId
     ? await fetchMatchInfo({ matchId: news.sourceMatchId })
     : null;
-  const logo = tenant.branding?.logo;
-  const logoUrl = !logo ? null : typeof logo === "string" ? logo : logo.url;
+
+  const logoUrl = tenant.branding?.logo?.url ?? null;
+
   const jsonLd = buildNewsJsonLd({
     news,
     slug,
@@ -141,7 +163,7 @@ export default async function NewsDetailPage({ params }: Props) {
     <article>
       {jsonLd.map((schema) => (
         <script
-          key={schema["@type"] as string}
+          key={schema["@type"]}
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
         />

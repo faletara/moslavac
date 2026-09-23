@@ -24,6 +24,9 @@ const ctx = (transport: HnsTransport) => ({
 describe("HNS fetchers", () => {
   it("keeps raw match payloads inside match fetchers", async () => {
     const calls: string[] = [];
+
+    // SAFETY: fixture nosi samo polja koja fetcher i adapter čitaju; ostatak
+    // HNS-ove OpenAPI strukture ovaj test ne dira.
     const rawMatch = {
       id: 99,
       dateTimeUTC: 1_710_000_000_000,
@@ -35,6 +38,9 @@ describe("HNS fetchers", () => {
       team: "H",
       allowDetail: true,
     } as HnsMatch;
+
+    // SAFETY: fixture nosi samo polja koja fetcher i adapter čitaju; ostatak
+    // HNS-ove OpenAPI strukture ovaj test ne dira.
     const rawEvent = {
       eventId: 5,
       eventType: { name: "Pogodak", fcdName: "GOAL" },
@@ -42,6 +48,9 @@ describe("HNS fetchers", () => {
       minuteFull: 18,
       player: { personId: 11, name: "Strijelac" },
     } as HnsMatchEvent;
+
+    // SAFETY: fixture nosi samo polja koja fetcher i adapter čitaju; ostatak
+    // HNS-ove OpenAPI strukture ovaj test ne dira.
     const rawLineups = {
       home: {
         players: [
@@ -54,15 +63,22 @@ describe("HNS fetchers", () => {
         officials: [{ personId: 12, name: "Trener", role: "Coach" }],
       },
     } as HnsLineups;
+
+    // SAFETY: fixture nosi samo polja koja fetcher i adapter čitaju; ostatak
+    // HNS-ove OpenAPI strukture ovaj test ne dira.
     const rawInfo = {
       matchOfficials: [{ personId: 13, name: "Sudac", role: "Referee" }],
     } as HnsMatchInfo;
 
     const transport: HnsTransport = async (endpoint) => {
       calls.push(endpoint);
+
       if (endpoint.startsWith("/api/live/match/99/events")) return [rawEvent];
+
       if (endpoint.startsWith("/api/live/match/99/lineups")) return rawLineups;
+
       if (endpoint.startsWith("/api/live/match/99/info")) return rawInfo;
+
       if (endpoint.startsWith("/api/live/match/99?")) return rawMatch;
       throw new Error(`unexpected endpoint ${endpoint}`);
     };
@@ -107,6 +123,8 @@ describe("HNS fetchers", () => {
   it("keeps raw standings and leaderboard payloads inside standings fetchers", async () => {
     const transport: HnsTransport = async (endpoint) => {
       if (endpoint.includes("/standings/official")) {
+        // SAFETY: fixture nosi samo polja koja fetcher i adapter čitaju; ostatak
+        // HNS-ove OpenAPI strukture ovaj test ne dira.
         return [
           {
             team: { id: 42, name: "NK Moslavac", allowDetail: true },
@@ -119,7 +137,10 @@ describe("HNS fetchers", () => {
           } as HnsTeamRanking,
         ];
       }
+
       if (endpoint.includes("/stats/goals/42")) {
+        // SAFETY: fixture nosi samo polja koja fetcher i adapter čitaju; ostatak
+        // HNS-ove OpenAPI strukture ovaj test ne dira.
         return [
           {
             player: { personId: 21, name: "Strijelac" },
@@ -128,6 +149,7 @@ describe("HNS fetchers", () => {
           } as HnsPlayerStats,
         ];
       }
+
       throw new Error(`unexpected endpoint ${endpoint}`);
     };
 
@@ -152,6 +174,8 @@ describe("HNS fetchers", () => {
   });
 
   it("keeps raw player payloads inside player fetchers", async () => {
+    // SAFETY: fixture nosi samo polja koja fetcher i adapter čitaju; ostatak
+    // HNS-ove OpenAPI strukture ovaj test ne dira.
     const rawPlayer = {
       personId: 33,
       name: "Igrac",
@@ -163,9 +187,14 @@ describe("HNS fetchers", () => {
 
     const transport: HnsTransport = async (endpoint) => {
       if (endpoint.startsWith("/api/live/player/search")) {
+        // SAFETY: fixture nosi samo polja koja fetcher i adapter čitaju; ostatak
+        // HNS-ove OpenAPI strukture ovaj test ne dira.
         return { result: [rawPlayer, { name: "No id" } as HnsTeamPlayer] };
       }
+
       if (endpoint.startsWith("/api/live/player/33/stats/42")) {
+        // SAFETY: fixture nosi samo polja koja fetcher i adapter čitaju; ostatak
+        // HNS-ove OpenAPI strukture ovaj test ne dira.
         return [
           {
             competition: { id: 8, name: "Liga" },
@@ -174,6 +203,7 @@ describe("HNS fetchers", () => {
           } as HnsPlayerCompetitionStats,
         ];
       }
+
       if (endpoint.startsWith("/api/live/player/33?")) return rawPlayer;
       throw new Error(`unexpected endpoint ${endpoint}`);
     };

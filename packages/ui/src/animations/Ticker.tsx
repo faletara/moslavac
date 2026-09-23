@@ -61,6 +61,8 @@ export function Ticker({
     <div
       className={cn("flex overflow-hidden", className)}
       style={
+        // SAFETY: `--*` je CSS custom property; Reactov `CSSProperties` popisuje samo
+        // standardna svojstva, pa ga inline stil ovdje mora proširiti.
         {
           "--marquee-duration": `${duration}s`,
         } as React.CSSProperties

@@ -12,6 +12,7 @@ import { buildMatchSlug } from "@/lib/helpers/slug";
 import type { Match } from "@/types/hns";
 import { useOurTeamId } from "@/components/providers/TenantProvider";
 import { TeamCrest } from "./TeamCrest";
+import { isPresent } from "@/lib/helpers/present";
 
 interface PreviousMatchCardProps {
   match: Match;
@@ -42,35 +43,45 @@ function getOutcomeForOurTeam(
 ): FormResult | null {
   const home = match.score.home?.current;
   const away = match.score.away?.current;
+
   if (home == null || away == null) return null;
+
   if (ourTeamId == null) return null;
 
   const homeIsUs = match.homeTeam?.id === ourTeamId;
   const awayIsUs = match.awayTeam?.id === ourTeamId;
+
   if (!homeIsUs && !awayIsUs) return null;
 
   const goalsFor = homeIsUs ? home : away;
   const goalsAgainst = homeIsUs ? away : home;
+
   if (goalsFor > goalsAgainst) return "W";
+
   if (goalsFor < goalsAgainst) return "L";
+
   return "D";
 }
 
 function formatRound(round: string | null | undefined): string | null {
   if (!round) return null;
   const trimmed = round.trim();
+
   if (!trimmed) return null;
+
   return /^\d+$/.test(trimmed) ? `Kolo ${trimmed}` : trimmed;
 }
 
 function formatAttendance(value: number | null | undefined): string | null {
   if (value == null || value <= 0) return null;
+
   // Oblik se bira po sirovom broju: formatirani niz nosi tisućicu („1.021”).
   const noun = pluralForm(value, {
     one: "gledatelj",
     few: "gledatelja",
     many: "gledatelja",
   });
+
   return `${new Intl.NumberFormat("hr-HR").format(value)} ${noun}`;
 }
 
@@ -110,12 +121,9 @@ export function PreviousMatchCard({ match }: PreviousMatchCardProps) {
   const outcome = getOutcomeForOurTeam(match, ourTeamId);
   const outcomeLabel = outcome ? OUTCOME_LABEL[outcome] : null;
 
-  const subInfo = [competition, round].filter(
-    (p): p is string => typeof p === "string" && p.length > 0,
-  );
-  const metaParts = [date, time, venue, attendance].filter(
-    (p): p is string => typeof p === "string" && p.length > 0,
-  );
+  const subInfo = [competition, round].filter(isPresent);
+
+  const metaParts = [date, time, venue, attendance].filter(isPresent);
 
   const halfTime =
     match.score.home?.half != null && match.score.away?.half != null

@@ -39,21 +39,24 @@ export default async function HomePage() {
   ]);
 
   const logo = tenant.branding?.logo;
+
   const crestUrl =
-    logo && typeof logo === "object"
-      ? ((logo as PayloadMedia).url ?? null)
-      : null;
+    (logo?.url ?? null);
 
   // Senior natjecanje se rješava po IMENU (tenant filter), ne po season-tagu —
   // radi i na prijelazu sezone i generički (kad se upiše pravi Garićev teamId,
   // sve i dalje radi bez promjena u kodu).
   const seniorFilter = tenant.hns.seniorCompetitionFilter ?? "";
+
   const seniorMatches = seniorFilter
     ? allMatches.filter((m) => m.competition?.name?.includes(seniorFilter))
     : [];
+
   const competitionId =
     seniorMatches.find((m) => m.competition?.id)?.competition?.id ?? null;
+
   const competitionName = seniorMatches[0]?.competition?.name ?? null;
+
   const [liveStandings, playerPhotos] = await Promise.all([
     competitionId ? fetchTeamStandings({ competitionId }) : [],
     fetchPlayerPhotos({ personIds: players.map((p) => p.personId) }),
@@ -63,6 +66,7 @@ export default async function HomePage() {
     a: (typeof seniorMatches)[number],
     b: (typeof seniorMatches)[number],
   ) => (a.kickoffAtUtcMs ?? 0) - (b.kickoffAtUtcMs ?? 0);
+
   const finished = seniorMatches.filter(isFinished).sort(byKickoff);
   // "Nadolazeće" = još neodigrane (HNS future upit ionako vraća samo buduće).
   const upcoming = seniorMatches.filter((m) => !isFinished(m)).sort(byKickoff);

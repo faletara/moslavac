@@ -28,15 +28,16 @@ export default function Hero({ tenant }: HeroProps) {
     target: sectionRef,
     offset: ["start start", "end start"],
   });
+
   const typeY = useTransform(scrollYProgress, [0, 1], [0, 36]);
   // Grb se pomiče sporije od tipografije — dubina, ne pokret.
   const crestY = useTransform(scrollYProgress, [0, 1], [0, 12]);
 
   const founded = tenant.branding?.founded ?? 1923;
+
   const crest =
-    tenant.branding?.logo && typeof tenant.branding.logo === "object"
-      ? (tenant.branding.logo as PayloadMedia)
-      : null;
+    tenant.branding?.logo ?? null;
+
   const [first, ...rest] = tenant.displayName.replace(/^NK\s+/i, "").split(" ");
   const wordLeft = first ?? "Garić";
   const wordRight = rest.join(" ") || "Garešnica";
@@ -85,6 +86,8 @@ export default function Hero({ tenant }: HeroProps) {
         aria-hidden
         className="halftone pointer-events-none absolute -right-16 -top-16 hidden h-105 w-105 rotate-18 opacity-30 md:block"
         style={
+          // SAFETY: `--*` je CSS custom property; Reactov `CSSProperties` popisuje samo
+          // standardna svojstva, pa ga inline stil ovdje mora proširiti.
           {
             "--halftone-size": "15px",
             "--halftone-color": "rgba(255,255,255,0.7)",
@@ -132,6 +135,8 @@ export default function Hero({ tenant }: HeroProps) {
           <motion.span
             {...anim(0.22, { x: -36 })}
             className="text-stroke mt-4 block text-[clamp(2.9rem,10.5vw,8.5rem)] tracking-tight sm:mt-5 md:mt-6"
+            // SAFETY: `--*` je CSS custom property; Reactov `CSSProperties` popisuje samo
+            // standardna svojstva, pa ga inline stil ovdje mora proširiti.
             style={{ "--text-stroke-color": "#ffffff" } as React.CSSProperties}
           >
             {wordRight}
@@ -145,6 +150,8 @@ export default function Hero({ tenant }: HeroProps) {
           </span>
           <span
             className="text-stroke mt-1 block font-display text-6xl leading-none tracking-tight sm:-mt-1 sm:text-7xl md:-mt-2 md:text-8xl"
+            // SAFETY: `--*` je CSS custom property; Reactov `CSSProperties` popisuje samo
+            // standardna svojstva, pa ga inline stil ovdje mora proširiti.
             style={{ "--text-stroke-color": "#ffffff" } as React.CSSProperties}
           >
             {founded}

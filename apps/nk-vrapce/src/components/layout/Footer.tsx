@@ -48,6 +48,7 @@ export default function Footer({
 	const hasContact = Boolean(
 		contact.address || contact.email || contact.phone,
 	);
+
 	const hasSocial = Boolean(
 		social?.facebook || social?.youtube || social?.webshop,
 	);

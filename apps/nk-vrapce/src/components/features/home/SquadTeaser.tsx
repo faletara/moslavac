@@ -60,11 +60,13 @@ const POSITION_LABEL: Record<RosterEntry["position"], string> = {
 };
 
 function SquadCard({ player }: { player: RosterEntry }) {
-	const photoUrl = player.photo?.sizes?.card?.url ?? player.photo?.url ?? null;
+	const photoUrl = player.photo?.cardUrl ?? null;
+
 	const ghostMark =
 		player.jerseyNumber != null
 			? String(player.jerseyNumber)
 			: player.displayName.charAt(0);
+
 	const positionLabel = POSITION_LABEL[player.position];
 
 	return (

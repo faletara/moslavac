@@ -1,7 +1,7 @@
-import type { PayloadMedia } from "@/lib/payload/types";
+import type { MediaImage } from "@/lib/payload/schemas";
 
 export interface GalleryPhoto {
-  image: PayloadMedia;
+  image: MediaImage;
   caption: string | null;
 }
 
@@ -10,7 +10,7 @@ export interface GalleryAlbum {
   title: string;
   slug: string | null;
   date: string | null;
-  coverImage: PayloadMedia | null;
+  coverImage: MediaImage | null;
   description: string | null;
   photos: GalleryPhoto[];
 }

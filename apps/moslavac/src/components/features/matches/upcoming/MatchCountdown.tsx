@@ -21,13 +21,16 @@ interface TimeParts {
 
 function diffParts(target: number, now: number): TimeParts {
   const diff = target - now;
+
   if (diff <= 0) {
     return { days: 0, hours: 0, minutes: 0, seconds: 0, isPast: true };
   }
+
   const seconds = Math.floor(diff / 1000) % 60;
   const minutes = Math.floor(diff / (1000 * 60)) % 60;
   const hours = Math.floor(diff / (1000 * 60 * 60)) % 24;
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
   return { days, hours, minutes, seconds, isPast: false };
 }
 
@@ -38,6 +41,7 @@ export default function MatchCountdown({ kickoffAtUtcMs }: MatchCountdownProps) 
     const update = () => setParts(diffParts(kickoffAtUtcMs, Date.now()));
     update();
     const id = setInterval(update, 1000);
+
     return () => clearInterval(id);
   }, [kickoffAtUtcMs]);
 

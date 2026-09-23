@@ -3,6 +3,7 @@ import { getTenant } from "@/lib/payload/getTenant";
 
 export async function generateMetadata(): Promise<Metadata> {
   const tenant = await getTenant();
+
   return {
     title: "Vijesti",
     description: `Sve vijesti, novosti i obavijesti kluba ${tenant.displayName}.`,

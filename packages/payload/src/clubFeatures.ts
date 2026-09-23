@@ -8,7 +8,9 @@ export const CLUB_FEATURES = [
 ] as const;
 
 export type ClubFeatureRegistration = (typeof CLUB_FEATURES)[number];
+
 export type ClubFeature = ClubFeatureRegistration["feature"];
+
 export type ClubFeatureCollectionSlug = ClubFeatureRegistration["slug"];
 
 export const CLUB_FEATURE_OPTIONS: { label: string; value: ClubFeature }[] =
@@ -16,16 +18,21 @@ export const CLUB_FEATURE_OPTIONS: { label: string; value: ClubFeature }[] =
 
 export function getClubFeature(feature: ClubFeature): ClubFeatureRegistration {
   const registration = CLUB_FEATURES.find((item) => item.feature === feature);
+
   if (!registration) {
     throw new Error(`Unknown club feature "${feature}"`);
   }
+
   return registration;
 }
 
-export function clubFeatureQuery(feature: ClubFeature): {
+/** Kolekcija i cache-tag prefiks jedne klupske značajke. */
+export interface ClubFeatureQuery {
   collection: ClubFeatureCollectionSlug;
   tagPrefix: ClubFeature;
-} {
+}
+
+export function clubFeatureQuery(feature: ClubFeature): ClubFeatureQuery {
   return {
     collection: getClubFeature(feature).slug,
     tagPrefix: feature,

@@ -8,11 +8,14 @@
  */
 import { getPayload } from 'payload'
 import config from '@payload-config'
+import { tenantRefInfo } from '../src/access/tenantRef'
 
 const payload = await getPayload({ config })
 
 let pass = 0
+
 let fail = 0
+
 const check = (name: string, ok: boolean, detail?: string) => {
   if (ok) {
     pass++
@@ -58,6 +61,7 @@ try {
     data: { roles: ['super-admin'] },
     ...asUser,
   })
+
   check(
     'tenant-admin NE može sebi postaviti super-admin',
     JSON.stringify(r1.roles) === JSON.stringify(['tenant-admin']),
@@ -74,9 +78,11 @@ try {
         ...asUser,
       })
       .catch(() => null)
-    const tenantIds = (r2?.tenants ?? []).map((t) =>
-      typeof t.tenant === 'object' ? t.tenant?.id : t.tenant,
+
+    const tenantIds = (r2?.tenants ?? []).map(
+      (t) => tenantRefInfo.parse(t.tenant).id,
     )
+
     check(
       'tenant-admin NE može sebi dodati tuđi tenant',
       !tenantIds.includes(otherTenant.id),
@@ -93,6 +99,7 @@ try {
     })
     .then(() => false)
     .catch(() => true)
+
   check('tenant-admin NE može kreirati usere', r3)
 
   // 4. Kreiranje tenanta
@@ -104,6 +111,7 @@ try {
     })
     .then(() => false)
     .catch(() => true)
+
   check('tenant-admin NE može kreirati tenante', r4)
 
   // 5. Brisanje (vlastitog) tenanta
@@ -111,6 +119,7 @@ try {
     .delete({ collection: 'tenants', id: testTenant.id, ...asUser })
     .then(() => false)
     .catch(() => true)
+
   check('tenant-admin NE može brisati tenante', r5)
 
   // 6. Update vlastitog tenanta (mora i dalje raditi)
@@ -123,6 +132,7 @@ try {
     })
     .then((d) => d.displayName === 'TEST security tmp 2')
     .catch(() => false)
+
   check('tenant-admin MOŽE uređivati vlastiti tenant', r6)
 
   // 7. Update tuđeg tenanta (ista vrijednost — bezopasno ako prođe)
@@ -136,6 +146,7 @@ try {
       })
       .then(() => false)
       .catch(() => true)
+
     check('tenant-admin NE može uređivati tuđi tenant', r7)
   }
 
@@ -145,6 +156,7 @@ try {
       .findByID({ collection: 'tenants', id: otherTenant.id, ...asUser })
       .then(() => false)
       .catch(() => true)
+
     check('tenant-admin NE može čitati tuđi tenant', r8)
   }
 
@@ -155,6 +167,7 @@ try {
       id: otherTenant.id,
       overrideAccess: false,
     })
+
     check('anonimni read ne vraća hns.apiKey', r9.hns?.apiKey === undefined, `apiKey=${String(r9.hns?.apiKey)}`)
   }
 } finally {
@@ -164,4 +177,5 @@ try {
 }
 
 console.log(`\n${pass} PASS / ${fail} FAIL`)
+
 process.exit(fail > 0 ? 1 : 0)

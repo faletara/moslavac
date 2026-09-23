@@ -15,11 +15,14 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { competitionId } = await params;
+
   const info = await fetchCompetitionInfo({
     competitionId: parseTrailingId(competitionId),
   });
+
   const slug = info ? buildCompetitionSlug(info) : competitionId;
   const name = info?.name ?? "Sezona";
+
   return {
     title: `Kartoni - ${name}`,
     description: `Žuti i crveni kartoni za natjecanje ${name}.`,
@@ -30,17 +33,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function CompetitionCardsPage({ params }: Props) {
   const { competitionId } = await params;
   const cid = parseTrailingId(competitionId);
+
   const [info, yellowCards, redCards] = await Promise.all([
     fetchCompetitionInfo({ competitionId: cid }),
     fetchAllCompetitionYellowCards({ competitionId: cid }),
     fetchAllCompetitionRedCards({ competitionId: cid }),
   ]);
+
   if (info) {
     redirectToCanonical(
       `/sezona/${competitionId}/kartoni`,
       `/sezona/${buildCompetitionSlug(info)}/kartoni`,
     );
   }
+
   return (
     <CardsTable
       yellowCards={yellowCards}

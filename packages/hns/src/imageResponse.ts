@@ -6,6 +6,7 @@ export const runtime = "nodejs";
 
 const CACHE_CONTROL =
   "public, max-age=86400, s-maxage=604800, stale-while-revalidate=86400";
+
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -19,9 +20,11 @@ function detectContentType(bytes: Buffer): string {
   ) {
     return "image/png";
   }
+
   if (bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8) {
     return "image/jpeg";
   }
+
   return "application/octet-stream";
 }
 
@@ -34,6 +37,7 @@ export async function createHnsImageResponse(
   }
 
   const bytes = await fetchHnsImageBytes(uuid);
+
   if (!bytes) {
     return new Response("Image not found", { status: 404 });
   }
@@ -42,6 +46,7 @@ export async function createHnsImageResponse(
 
   if (transparent) {
     const transparentBytes = await removeEdgeWhiteBackground(bytes);
+
     return new Response(new Uint8Array(transparentBytes), {
       status: 200,
       headers: {

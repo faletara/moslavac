@@ -21,6 +21,8 @@ function CrestFallback({ crestUrl }: { crestUrl: string | null }) {
       <span
         aria-hidden
         className="halftone halftone-fade-t absolute inset-0 opacity-60"
+        // SAFETY: `--*` je CSS custom property; Reactov `CSSProperties` popisuje samo
+        // standardna svojstva, pa ga inline stil ovdje mora proširiti.
         style={
           { "--halftone-color": "rgba(255,255,255,0.4)" } as React.CSSProperties
         }

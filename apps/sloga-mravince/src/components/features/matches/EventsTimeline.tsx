@@ -37,13 +37,17 @@ function boundaryRoles(events: MatchEvent[]): Map<MatchEvent, "start" | "end"> {
   }
 
   const roles = new Map<MatchEvent, "start" | "end">();
+
   for (const list of byPhase.values()) {
     const ordered = [...list].sort(
       (a, b) => (a.orderNumber ?? 0) - (b.orderNumber ?? 0),
     );
+
     const first = ordered[0];
     const last = ordered[ordered.length - 1];
+
     if (first) roles.set(first, "start");
+
     if (last && last !== first) roles.set(last, "end");
   }
 
@@ -89,12 +93,15 @@ function buildRows(match: Match, events: MatchEvent[]): Row[] {
   // Phases ranked by first appearance — no hardcoded list, so extra time and
   // penalties fall into place behind the two halves without being named here.
   const phaseRank = new Map<string, number>();
+
   for (const event of events) {
     const phase = event.phase?.code ?? event.phase?.name ?? "";
+
     if (!phaseRank.has(phase)) phaseRank.set(phase, phaseRank.size);
   }
 
   const endBoundaries = events.filter((e) => roles.get(e) === "end");
+
   const lastEnd = endBoundaries.reduce<MatchEvent | null>(
     (latest, event) =>
       latest == null || (event.orderNumber ?? 0) > (latest.orderNumber ?? 0)
@@ -112,6 +119,7 @@ function buildRows(match: Match, events: MatchEvent[]): Row[] {
 
     if (isBoundary(event)) {
       const role = roles.get(event);
+
       if (!role) continue;
 
       // Only the very first whistle is announced. A "start of the second half"
@@ -119,6 +127,7 @@ function buildRows(match: Match, events: MatchEvent[]): Row[] {
       if (role === "start" && phase !== 0) continue;
 
       const isFinal = role === "end" && event === lastEnd;
+
       const label =
         role === "start"
           ? "Početak"
@@ -146,6 +155,7 @@ function buildRows(match: Match, events: MatchEvent[]): Row[] {
     }
 
     const kind = event.kind;
+
     if (!SHOWN.includes(kind)) continue;
 
     const team = event.side === "home" ? match.homeTeam : match.awayTeam;

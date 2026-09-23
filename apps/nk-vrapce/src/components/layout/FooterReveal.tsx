@@ -11,9 +11,11 @@ import { useEffect } from "react";
 export default function FooterReveal() {
   useEffect(() => {
     const footer = document.getElementById("site-footer");
+
     if (!footer) return;
 
     const root = document.documentElement;
+
     const apply = () => {
       root.style.setProperty("--footer-h", `${footer.offsetHeight}px`);
     };
@@ -22,14 +24,17 @@ export default function FooterReveal() {
     // skrivamo (opacity) da rubber-band overscroll na vrhu ne otkrije fiksni
     // footer iza sadržaja. Reveal animacija pri dnu ostaje netaknuta.
     let ticking = false;
+
     const updateVisibility = () => {
       const fromBottom =
         document.documentElement.scrollHeight -
         (window.scrollY + window.innerHeight);
+
       const near = fromBottom <= footer.offsetHeight + 80;
       footer.style.opacity = near ? "1" : "0";
       ticking = false;
     };
+
     const onScroll = () => {
       if (!ticking) {
         window.requestAnimationFrame(updateVisibility);
@@ -45,6 +50,7 @@ export default function FooterReveal() {
       apply();
       updateVisibility();
     });
+
     ro.observe(footer);
     window.addEventListener("resize", apply);
     window.addEventListener("scroll", onScroll, { passive: true });

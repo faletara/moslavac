@@ -23,6 +23,7 @@ import { getTenant } from "@/lib/payload/getTenant";
 async function loadFacility() {
   try {
     const team = await fetchClubDetails();
+
     return team?.facility ?? null;
   } catch {
     return null;

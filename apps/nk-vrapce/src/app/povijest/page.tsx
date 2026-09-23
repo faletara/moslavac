@@ -4,6 +4,7 @@ import { fetchPageByKey } from "@/lib/payload/getPages";
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await fetchPageByKey({ key: "povijest" });
+
   return {
     title: page?.title ?? "Povijest kluba",
     description:
@@ -15,6 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function PovijestPage() {
   const page = await fetchPageByKey({ key: "povijest" });
+
   return (
     <RichTextPage
       page={page}

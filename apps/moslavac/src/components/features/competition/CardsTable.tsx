@@ -48,9 +48,12 @@ function mergeCards(
     value: number,
   ): void => {
     const personId = s.player?.personId ?? null;
+
     const key =
       personId != null ? `p:${personId}` : `n:${s.player?.name ?? ""}`;
+
     const existing = map.get(key);
+
     if (existing) {
       existing[field] += value;
     } else {
@@ -73,6 +76,7 @@ function mergeCards(
 
   return Array.from(map.values()).sort((a, b) => {
     if (b.red !== a.red) return b.red - a.red;
+
     return b.yellow - a.yellow;
   });
 }
@@ -134,8 +138,10 @@ export default function CardsTable({
           {rows.map((row, i) => {
             const highlight =
               row.teamId != null && highlightSet.has(row.teamId);
+
             const isMoslavac =
               moslavacTeamId != null && row.teamId === moslavacTeamId;
+
             return (
               <CardRow
                 key={

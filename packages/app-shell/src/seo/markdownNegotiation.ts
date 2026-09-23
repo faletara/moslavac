@@ -17,11 +17,14 @@ export function wantsMarkdown(accept: string | null): boolean {
     .map((part) => part.trim().toLowerCase())
     .some((part) => {
       const [type, ...params] = part.split(";").map((p) => p.trim());
+
       if (!MARKDOWN_TYPES.includes(type)) return false;
+
       // `q=0` znači izričito odbijanje tog oblika.
       const quality = params
         .find((p) => p.startsWith("q="))
         ?.slice(2);
+
       return quality === undefined || Number.parseFloat(quality) > 0;
     });
 }

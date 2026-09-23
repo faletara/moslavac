@@ -12,6 +12,7 @@ function goalDiff(row: TeamRanking): number {
 
 function teamLogo(row: TeamRanking): string | null {
   const pic = row.team?.picture;
+
   return pic ? `/api/images/${pic}` : null;
 }
 
@@ -74,6 +75,7 @@ export function StandingsTable({ rows }: StandingsTableProps) {
                 const name = row.team?.name ?? "—";
                 const gd = goalDiff(row);
                 const mine = Boolean(row.highlight);
+
                 return (
                   <tr
                     key={row.team?.id ?? row.position ?? name}

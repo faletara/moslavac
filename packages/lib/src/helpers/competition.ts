@@ -15,12 +15,18 @@ export function getCompetitionCategory(
   const n = name.toLowerCase();
 
   if (n.includes("prsti")) return "prstici";
+
   if (n.includes("limač") || n.includes("limac")) return "limaci";
+
   if (n.includes("stariji pionir")) return "older-pioneers";
+
   if (n.includes("mlađi pionir") || n.includes("mladji pionir"))
     return "younger-pioneers";
+
   if (n.includes("pionir")) return "older-pioneers";
+
   if (n.includes("kadet")) return "cadets";
+
   if (n.includes("junior")) return "juniors";
 
   return "seniors";
@@ -75,20 +81,24 @@ export function groupByCompetitionCategory<T>(
   getName: (item: T) => string | null | undefined,
 ): CompetitionCategoryGroup<T>[] {
   const buckets = new Map<CompetitionCategory, T[]>();
+
   for (const item of items) {
     const category = getCompetitionCategory(getName(item));
     const bucket = buckets.get(category);
+
     if (bucket) bucket.push(item);
     else buckets.set(category, [item]);
   }
 
-  return CATEGORY_ORDER.filter((category) => buckets.has(category)).map(
-    (category) => ({
-      category,
-      label: getCategoryShortLabel(category),
-      items: buckets.get(category) ?? [],
-    }),
-  );
+  return CATEGORY_ORDER.flatMap((category) => {
+    const bucket = buckets.get(category);
+
+    if (!bucket) return [];
+
+    return [
+      { category, label: getCategoryShortLabel(category), items: bucket },
+    ];
+  });
 }
 
 /** Football acronyms that must stay uppercase when prettifying names. */
@@ -107,18 +117,22 @@ const COMPETITION_ACRONYMS = new Set([
 
 function capitalizeCompetitionWord(word: string): string {
   if (!word) return word;
+
   // Keep anything with digits intact: "2.", "1", scores, etc.
   if (/\d/.test(word)) return word;
 
   const letters = word.replace(/[^\p{L}]/gu, "");
+
   // Acronyms (NL, NS, HNLŽM…) stay uppercase.
   if (letters && COMPETITION_ACRONYMS.has(letters.toLocaleUpperCase("hr"))) {
     return word.toLocaleUpperCase("hr");
   }
+
   // Single letters are group markers ("A", "B") — keep them uppercase.
   if (letters.length === 1) return word.toLocaleUpperCase("hr");
 
   const lower = word.toLocaleLowerCase("hr");
+
   return lower.replace(/\p{L}/u, (c) => c.toLocaleUpperCase("hr"));
 }
 
@@ -132,6 +146,7 @@ export function toReadableCompetitionName(
   name: string | null | undefined,
 ): string {
   if (!name) return "";
+
   return name
     .replace(/\b\d{2}\/\d{2}\b/g, " ")
     .split(/\s+/)

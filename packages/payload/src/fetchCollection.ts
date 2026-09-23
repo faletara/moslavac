@@ -1,9 +1,11 @@
 import "server-only";
+import type { z } from "zod";
 import { resolveTransport } from "./client";
 import type { PayloadFetchOptions } from "./context";
-import { buildQuery, tenantWhere } from "./query";
+import { appendWhere, tenantWhere } from "./query";
+import { payloadPage } from "./schemas";
+import type { PayloadPageOf } from "./schemas";
 import { resolveTenantSlug } from "./tenant";
-import type { PayloadPaginated } from "./types";
 
 // The deep data-fetch module. Every club-content fetcher is a thin declaration
 // over one of `fetchList` / `fetchOne` / `fetchPage`; the shared shape
@@ -34,17 +36,20 @@ interface QueryOptions {
 
 async function queryCollection<Raw>(
   o: QueryOptions,
-): Promise<PayloadPaginated<Raw>> {
+  schema: z.ZodType<Raw>,
+): Promise<PayloadPageOf<Raw>> {
   const slug = resolveTenantSlug();
 
-  const params: Record<string, string | number> = {
-    ...tenantWhere(slug),
-    ...(o.where ?? {}),
-    depth: o.depth ?? 2,
-  };
-  if (o.sort) params.sort = o.sort;
-  if (o.limit != null) params.limit = o.limit;
-  if (o.page != null) params.page = o.page;
+  const params = new URLSearchParams(tenantWhere(slug));
+
+  appendWhere(params, o.where);
+  params.set("depth", String(o.depth ?? 2));
+
+  if (o.sort) params.set("sort", o.sort);
+
+  if (o.limit != null) params.set("limit", String(o.limit));
+
+  if (o.page != null) params.set("page", String(o.page));
 
   const opts: PayloadFetchOptions = {
     authenticated: o.authenticated,
@@ -54,8 +59,12 @@ async function queryCollection<Raw>(
     },
   };
 
-  const raw = await resolveTransport()(`/${o.collection}?${buildQuery(params)}`, opts);
-  return raw as PayloadPaginated<Raw>;
+  const raw = await resolveTransport()(
+    `/${o.collection}?${params.toString()}`,
+    opts,
+  );
+
+  return payloadPage(schema).parse(raw);
 }
 
 interface BaseSpec<Raw, Domain> {
@@ -63,6 +72,8 @@ interface BaseSpec<Raw, Domain> {
   where?: Record<string, string | number>;
   depth?: number;
   authenticated?: boolean;
+  /** Shema dokumenta; raščlanjuje Payloadov JSON prije nego ga `adapt` vidi. */
+  schema: z.ZodType<Raw>;
   adapt: (doc: Raw) => Domain;
   revalidate?: number;
   tags?: string[];
@@ -102,11 +113,13 @@ export async function fetchList<Raw, Domain>(
       revalidate: spec.revalidate,
       tags: spec.tags,
       tagPrefix: spec.tagPrefix,
-    });
+    }, spec.schema);
+
     return result.docs.map(spec.adapt);
   } catch (err) {
     if (spec.throwOnError) throw err;
     console.error(`fetchList(${spec.collection}) failed:`, err);
+
     return [];
   }
 }
@@ -125,12 +138,15 @@ export async function fetchOne<Raw, Domain>(
       revalidate: spec.revalidate,
       tags: spec.tags,
       tagPrefix: spec.tagPrefix,
-    });
+    }, spec.schema);
+
     const doc = result.docs[0];
+
     return doc ? spec.adapt(doc) : null;
   } catch (err) {
     if (spec.throwOnError) throw err;
     console.error(`fetchOne(${spec.collection}) failed:`, err);
+
     return null;
   }
 }
@@ -151,7 +167,8 @@ export async function fetchPage<Raw, Domain>(
       revalidate: spec.revalidate,
       tags: spec.tags,
       tagPrefix: spec.tagPrefix,
-    });
+    }, spec.schema);
+
     return {
       content: result.docs.map(spec.adapt),
       totalElements: result.totalDocs,
@@ -162,6 +179,7 @@ export async function fetchPage<Raw, Domain>(
   } catch (err) {
     if (spec.throwOnError) throw err;
     console.error(`fetchPage(${spec.collection}) failed:`, err);
+
     return { content: [], totalElements: 0, totalPages: 0, number: spec.page - 1, size: spec.size };
   }
 }

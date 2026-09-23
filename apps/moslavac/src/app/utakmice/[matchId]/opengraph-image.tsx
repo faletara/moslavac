@@ -6,17 +6,22 @@ import { fetchMatchInfo } from "@/lib/hns/matches";
 import { parseTrailingId } from "@/lib/helpers/slug";
 
 export const size = { width: 1200, height: 630 };
+
 export const contentType = "image/png";
+
 export const alt = "Utakmica";
 
 // Iz `globals.css` (--navy-deep, --club, --club-red) — ImageResponse ne vidi
 // CSS varijable, pa su tokeni ovdje razriješeni u hex.
 const NAVY_DEEP = "#020718";
+
 const CLUB = "#114cbf";
+
 const CLUB_RED = "#d01d21";
 
 function Crest({ src }: { src: string | null }) {
   if (!src) return <div style={{ display: "flex", width: 170, height: 170 }} />;
+
   return (
     <img
       src={src}
@@ -109,6 +114,10 @@ export default async function MatchOgImage({
   // nad vrijednošću tog ključa zove `.split(",")`, pa eksplicitni `undefined`
   // sruši render — i to tijekom streamanja, gdje ga nijedan try/catch ne vidi.
   const displayFont = fonts.length > 0 ? { fontFamily: "Geist" } : {};
+
+  const options: ConstructorParameters<typeof ImageResponse>[1] = { ...size };
+
+  if (fonts.length > 0) options.fonts = fonts;
 
   const home = match.homeTeam?.name ?? "Domaćin";
   const away = match.awayTeam?.name ?? "Gost";
@@ -226,6 +235,6 @@ export default async function MatchOgImage({
         )}
       </div>
     ),
-    { ...size, ...(fonts.length > 0 ? { fonts } : {}) },
+    options,
   );
 }

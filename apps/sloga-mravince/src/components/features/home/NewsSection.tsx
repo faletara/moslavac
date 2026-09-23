@@ -113,6 +113,7 @@ export default function NewsSection({
   clubName: string;
 }) {
   const items = news.filter((n) => n.slug).slice(0, 8);
+
   if (items.length === 0) return null;
 
   const [feature, ...rest] = items;

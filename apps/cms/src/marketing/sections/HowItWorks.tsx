@@ -60,9 +60,12 @@ export function HowItWorks() {
   useEffect(() => {
     if (reduced) {
       setActive(STEPS.length - 1)
+
       return
     }
+
     const id = setInterval(() => setActive((i) => (i + 1) % STEPS.length), STEP_MS)
+
     return () => clearInterval(id)
   }, [reduced])
 
@@ -154,6 +157,8 @@ function TimelineLine({
             'animate-[timeline-fill-y_var(--fill-duration)_linear_forwards] xl:animate-[timeline-fill-x_var(--fill-duration)_linear_forwards]',
           !running && (filled ? 'scale-100' : 'scale-y-0 xl:scale-x-0 xl:scale-y-100'),
         )}
+        // SAFETY: `--*` je CSS custom property; Reactov `CSSProperties` popisuje samo
+        // standardna svojstva, pa ga inline stil ovdje mora proširiti.
         style={{ '--fill-duration': `${duration}ms` } as React.CSSProperties}
       />
     </span>
@@ -180,13 +185,18 @@ function ProgressBar({
   useEffect(() => {
     if (past || reduced) {
       value.set(target)
+
       return
     }
+
     if (!active) {
       value.set(0)
+
       return
     }
+
     const controls = animate(value, target, { duration: 2, ease: [0.33, 1, 0.68, 1] })
+
     return () => controls.stop()
   }, [active, past, reduced, target, value])
 

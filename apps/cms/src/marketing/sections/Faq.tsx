@@ -38,6 +38,7 @@ export function Faq() {
         <ul className="border-t border-white/10">
           {FAQ.map((item, index) => {
             const isOpen = open === index
+
             return (
               <li key={item.question} className="border-b border-white/10">
                 <button

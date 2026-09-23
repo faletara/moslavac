@@ -12,10 +12,9 @@ interface FooterProps {
  */
 export default function Footer({ tenant }: FooterProps) {
   const year = new Date().getFullYear();
+
   const logo =
-    tenant.branding?.logo && typeof tenant.branding.logo === "object"
-      ? (tenant.branding.logo as PayloadMedia)
-      : null;
+    tenant.branding?.logo ?? null;
 
   return (
     <footer className="mt-24 border-t border-border/60">

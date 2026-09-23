@@ -9,11 +9,13 @@ import type { FactEvent, MatchFacts } from "./facts";
 export type MatchReportWriter = (facts: MatchFacts) => Promise<string[]>;
 
 const VIEWERS = { one: "gledatelj", few: "gledatelja", many: "gledatelja" };
+
 const YELLOW_COUNT = {
   one: "žuti karton",
   few: "žuta kartona",
   many: "žutih kartona",
 };
+
 const RED = { one: "Crveni karton", few: "Crvene kartone", many: "Crvene kartone" };
 
 /**
@@ -28,15 +30,15 @@ const SIDE_NOUN = {
   away: { from: "iz gostujuće momčadi", forTeam: "Za gostujuću momčad" },
 } as const;
 
-const WEEKDAY: Record<string, string> = {
-  Sun: "u nedjelju",
-  Mon: "u ponedjeljak",
-  Tue: "u utorak",
-  Wed: "u srijedu",
-  Thu: "u četvrtak",
-  Fri: "u petak",
-  Sat: "u subotu",
-};
+const WEEKDAY = new Map([
+  ["Sun", "u nedjelju"],
+  ["Mon", "u ponedjeljak"],
+  ["Tue", "u utorak"],
+  ["Wed", "u srijedu"],
+  ["Thu", "u četvrtak"],
+  ["Fri", "u petak"],
+  ["Sat", "u subotu"],
+]);
 
 /**
  * Dan u tjednu po zagrebačkom zidnom satu. Vercel radi u UTC-u, pa bi utakmica
@@ -50,17 +52,24 @@ const ZAGREB_WEEKDAY = new Intl.DateTimeFormat("en-US", {
 /** Nabraja imena s minutama: „A (16'), B (47') i C (58')”. */
 function joinNames(events: FactEvent[]): string {
   const parts = events.map((e) => `${e.player} (${e.display})`);
+
   if (parts.length <= 1) return parts.join("");
+
   return `${parts.slice(0, -1).join(", ")} i ${parts[parts.length - 1]}`;
 }
 
 /** Isto, ali razdvojeno po momčadima: „A (16') iz gostujuće momčadi te B …”. */
 function joinBySide(events: FactEvent[]): string {
-  const groups = (["home", "away"] as const)
-    .map((side) => ({ side, list: events.filter((e) => e.side === side) }))
-    .filter((g) => g.list.length > 0);
+  const groups = (["home", "away"] as const).flatMap((side) => {
+    const list = events.filter((e) => e.side === side);
+
+    if (list.length === 0) return [];
+
+    return [{ side, list }];
+  });
 
   if (groups.length === 1) return joinNames(groups[0].list);
+
   return groups
     .map((g) => `${joinNames(g.list)} ${SIDE_NOUN[g.side].from}`)
     .join(" te ");
@@ -72,8 +81,11 @@ function joinBySide(events: FactEvent[]): string {
  */
 function roundInLocative(round: string | null): string | null {
   const value = round?.trim();
+
   if (!value) return null;
+
   if (/^\d+\.?$/.test(value)) return `${value.replace(/\.$/, "")}. kolu`;
+
   return value.replace(/\bkolo\b/i, "kolu");
 }
 
@@ -81,40 +93,52 @@ function opening(facts: MatchFacts): string {
   const score = `${facts.homeGoals}:${facts.awayGoals}`;
   const round = roundInLocative(facts.round);
   const where = round ? `u ${round}` : "";
+
   const competition = facts.competition
     ? `${where ? " " : ""}natjecanja ${facts.competition}`
     : "";
 
   const context = where || competition ? ` ${where}${competition}` : "";
+
   return `${facts.homeTeam} i ${facts.awayTeam} odigrali su ${score}${context}.`;
 }
 
 function occasion(facts: MatchFacts): string {
-  const weekday = WEEKDAY[ZAGREB_WEEKDAY.format(facts.kickoffAtUtcMs)];
+  // `Intl` s `weekday: "short"` uvijek vrati jedan od sedam ključeva; `?? ""`
+  // postoji da rečenica ostane čitljiva i ako se format ikad promijeni.
+  const weekday = WEEKDAY.get(ZAGREB_WEEKDAY.format(facts.kickoffAtUtcMs)) ?? "";
+
   const parts = [
-    `Utakmica je odigrana ${weekday}, ${formatDateLong(facts.kickoffAtUtcMs)} u ${facts.time}`,
+    `Utakmica je odigrana ${weekday ? `${weekday}, ` : ""}${formatDateLong(facts.kickoffAtUtcMs)} u ${facts.time}`,
   ];
+
   if (facts.venue) parts.push(` na igralištu ${facts.venue}`);
+
   // HNS zna poslati 0 kad broj nije upisan; „pred 0 gledatelja” nije podatak.
   if (facts.attendance != null && facts.attendance > 0) {
     parts.push(`, pred ${pluralize(facts.attendance, VIEWERS)}`);
   }
+
   return `${parts.join("")}.`;
 }
 
 function goals(facts: MatchFacts): string {
   const all = [...facts.goals, ...facts.ownGoals];
+
   if (all.length === 0) {
     const goallessHalf =
       facts.homeHalfTimeGoals === 0 && facts.awayHalfTimeGoals === 0;
+
     return goallessHalf
       ? "Golova nije bilo ni u prvom ni u drugom poluvremenu."
       : "Golova nije bilo.";
   }
 
   const sentences: string[] = [];
+
   for (const side of ["home", "away"] as const) {
     const scored = facts.goals.filter((e) => e.side === side);
+
     if (scored.length > 0) {
       // „preko Ivan Marić” bi tražilo genitiv imena. Ovako je ime subjekt i
       // ostaje u nominativu, a jedina sklonjena riječ je fiksna („momčad”).
@@ -124,12 +148,15 @@ function goals(facts: MatchFacts): string {
       );
     }
   }
+
   if (facts.ownGoals.length > 0) {
     const own = facts.ownGoals.length === 1
       ? "Autogol je zabio"
       : "Autogole su zabili";
+
     sentences.push(`${own} ${joinBySide(facts.ownGoals)}.`);
   }
+
   return sentences.join(" ");
 }
 
@@ -139,11 +166,14 @@ function cards(facts: MatchFacts): string {
   // Žuti kartoni idu brojem, ne popisom imena: sedam imena s minutama je
   // zapisnik, a ne vijest. Crveni ostaju poimence — oni mijenjaju utakmicu.
   const yellow = facts.yellowCards.length;
+
   if (yellow > 0) {
     const home = facts.yellowCards.filter((e) => e.side === "home").length;
     const away = yellow - home;
+
     const split =
       home > 0 && away > 0 ? `, ${home} domaćinu i ${away} gostima` : "";
+
     sentences.push(
       `Sudac je podijelio ${pluralize(yellow, YELLOW_COUNT)}${split}.`,
     );
@@ -188,7 +218,9 @@ export function aftermathParagraph(facts: MatchFacts): string {
 export const templateWriter: MatchReportWriter = async (facts) => {
   const paragraphs = [`${opening(facts)} ${occasion(facts)}`, goals(facts)];
   const cardsText = cards(facts);
+
   if (cardsText) paragraphs.push(cardsText);
+
   return paragraphs;
 };
 

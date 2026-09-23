@@ -1,3 +1,4 @@
+import { z } from "zod";
 import type {
   Competition,
   CompetitionPlayerStat,
@@ -46,11 +47,17 @@ function text(value: string | null | undefined): string {
 
 function nullableText(value: string | null | undefined): string | null {
   const trimmed = value?.trim();
+
   return trimmed ? trimmed : null;
 }
 
+const finiteNumber = z.number().finite();
+
+/** Konačan broj ili `null`; HNS zna poslati `NaN`, `Infinity` i izostanak. */
 function nullableNumber(value: number | null | undefined): number | null {
-  return typeof value === "number" && Number.isFinite(value) ? value : null;
+  const parsed = finiteNumber.safeParse(value);
+
+  return parsed.success ? parsed.data : null;
 }
 
 function numberOrZero(value: number | null | undefined): number {
@@ -65,34 +72,46 @@ export function adaptMatchOutcome(
   value: string | null | undefined,
 ): MatchOutcome | null {
   const s = value?.trim().toUpperCase();
+
   if (!s) return null;
 
   if (s.startsWith("WIN") || s.startsWith("POB")) return "W";
+
   if (s.startsWith("LOS") || s.startsWith("POR")) return "L";
+
   if (s.startsWith("DRAW") || s.startsWith("TIE") || s.startsWith("NER"))
     return "D";
 
   const first = s[0];
+
   if (first === "W" || first === "P") return "W";
+
   if (first === "L" || first === "I") return "L";
+
   if (first === "D" || first === "N" || first === "T") return "D";
+
   return null;
 }
 
 function adaptMatchSide(value: HnsMatch["team"]): MatchSide | null {
   if (value === "H") return "home";
+
   if (value === "A") return "away";
+
   return null;
 }
 
 function adaptEventSide(value: boolean | null | undefined): MatchSide | null {
   if (value === true) return "home";
+
   if (value === false) return "away";
+
   return null;
 }
 
 export function adaptFacility(raw: HnsFacility | null | undefined): Facility | null {
   if (!raw) return null;
+
   return {
     id: nullableNumber(raw.id),
     fifaId: nullableText(raw.fifaId),
@@ -115,6 +134,7 @@ export function adaptTeam(
   parentDepth = 0,
 ): Team | null {
   if (!raw) return null;
+
   return {
     id: nullableNumber(raw.id),
     fifaId: nullableText(raw.fifaId),
@@ -146,6 +166,7 @@ export function adaptCompetition(
   raw: HnsCompetition | null | undefined,
 ): Competition | null {
   if (!raw) return null;
+
   return {
     id: nullableNumber(raw.id),
     name: text(raw.name),
@@ -167,6 +188,7 @@ function adaptMatchPhase(
   raw: HnsMatchPhase | null | undefined,
 ): MatchPhase | null {
   if (!raw) return null;
+
   return {
     id: nullableNumber(raw.phaseTypeId),
     name: text(raw.name),
@@ -236,6 +258,7 @@ export function adaptTeamRanking(
   ownTeamId?: number | null,
 ): TeamRanking {
   const team = adaptTeam(raw.team);
+
   return {
     team,
     played: numberOrZero(raw.played),
@@ -254,9 +277,11 @@ export function adaptTeamRanking(
     highlight:
       raw.highlight === true ||
       (ownTeamId != null && team?.id != null && team.id === ownTeamId),
-    form: [raw.m1, raw.m2, raw.m3, raw.m4, raw.m5]
-      .map(adaptPastMatch)
-      .filter(isPresent),
+    form: [raw.m1, raw.m2, raw.m3, raw.m4, raw.m5].flatMap((pastMatch) => {
+      const outcome = adaptPastMatch(pastMatch);
+
+      return outcome === null ? [] : [outcome];
+    }),
   };
 }
 
@@ -264,6 +289,7 @@ export function adaptMatchOfficial(
   raw: HnsMatchAndTeamOfficial | null | undefined,
 ): MatchOfficial | null {
   if (!raw) return null;
+
   return {
     roleId: nullableNumber(raw.roleId),
     personId: nullableNumber(raw.personId),
@@ -296,6 +322,7 @@ export function adaptPlayer(
   options: AdaptPlayerOptions = {},
 ): Player | null {
   if (!raw) return null;
+
   return {
     roleId: nullableNumber(raw.roleId),
     personId: nullableNumber(raw.personId),
@@ -334,7 +361,9 @@ export function adaptPlayerSearchResult(
   raw: HnsTeamPlayer | null | undefined,
 ): PlayerSearchResult | null {
   const name = text(raw?.name);
+
   if (!raw || raw.personId == null || !name) return null;
+
   return {
     personId: raw.personId,
     name,
@@ -347,6 +376,7 @@ export function adaptPlayerSearchResult(
 
 export function adaptMatchEvent(raw: HnsMatchEvent): MatchEvent {
   const type = adaptMatchEventType(raw.eventType);
+
   return {
     id: nullableNumber(raw.eventId),
     type,
@@ -372,6 +402,7 @@ export function adaptTeamLineup(
   raw: HnsTeamLineup | null | undefined,
 ): TeamLineup | null {
   if (!raw) return null;
+
   return {
     formation: nullableText(raw.formation),
     playerKitColor: nullableText(raw.playerKitColor),
@@ -389,6 +420,7 @@ export function adaptTeamLineup(
 
 export function adaptLineups(raw: HnsLineups | null | undefined): Lineups | null {
   if (!raw) return null;
+
   return {
     home: adaptTeamLineup(raw.home),
     away: adaptTeamLineup(raw.away),
@@ -399,6 +431,7 @@ export function adaptMatchInfo(
   raw: HnsMatchInfo | null | undefined,
 ): MatchInfo | null {
   if (!raw) return null;
+
   return {
     refereeKit: nullableText(raw.refereeKit),
     refereeKitPng: nullableText(raw.refereeKitPng),

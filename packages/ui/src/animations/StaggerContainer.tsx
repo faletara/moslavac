@@ -2,6 +2,9 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 
+/** Standardni CSS `ease-in-out` kao Bézier kontrolne točke. */
+const EASE_IN_OUT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
+
 interface StaggerContainerProps {
   children: React.ReactNode;
   className?: string;
@@ -15,7 +18,7 @@ export const staggerItem = {
   show: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] },
+    transition: { duration: 0.5, ease: EASE_IN_OUT },
   },
 };
 

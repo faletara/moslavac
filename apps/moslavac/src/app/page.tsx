@@ -36,10 +36,12 @@ export default async function HomePage() {
     getTenant(),
     fetchMatchSlots(),
   ]);
+
   const homepageMatchSlots = {
     ...matchSlots,
     next: getPromotableNextMatch(matchSlots.next),
   };
+
   const youtubeStats = await getYouTubeChannelStats(tenant.social?.youtube);
 
   return (

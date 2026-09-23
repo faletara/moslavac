@@ -10,6 +10,7 @@ import { getTenant } from "@/lib/payload/getTenant";
 import { BASE_URL } from "@/lib/siteUrl";
 import { buildMatchSlug, parseTrailingId } from "@/lib/helpers/slug";
 import type { Match } from "@/types/hns";
+import type { PostalAddressJsonLd, SportsEventJsonLd } from "@/types/jsonld";
 
 interface Params {
   matchId: string;
@@ -18,6 +19,7 @@ interface Params {
 /** Absolute image URL for a match: home-team logo, falling back to the club OG image. */
 function matchImageUrl(match: Match): string {
   const picture = match.homeTeam?.picture ?? match.awayTeam?.picture;
+
   return picture
     ? `${BASE_URL}${getCometImageUrl(picture)}`
     : `${BASE_URL}/naslovna.jpg`;
@@ -25,6 +27,7 @@ function matchImageUrl(match: Match): string {
 
 export async function generateStaticParams() {
   const competitions = await fetchCurrentSeasonCompetitions();
+
   const validComps = competitions.filter(
     (c): c is typeof c & { id: number } => c.id != null,
   );
@@ -34,6 +37,7 @@ export async function generateStaticParams() {
   );
 
   const slugs = new Set<string>();
+
   for (const result of matchResults) {
     if (result.status === "fulfilled") {
       for (const match of result.value) {
@@ -68,11 +72,13 @@ export async function generateMetadata({
     : `${home} - ${away}`;
 
   const { date } = formatDateTime(match.kickoffAtUtcMs ?? 0);
+
   const parts = [
     match.competition?.name,
     date,
     match.facility?.place,
   ].filter(Boolean);
+
   const description = parts.join(", ");
 
   // As in `page.tsx`, no `images`: the generated per-match poster wins by file
@@ -100,6 +106,7 @@ export default async function MatchLayout({
   params: Promise<Params>;
 }) {
   const { matchId } = await params;
+
   // fetch is deduplicated with generateMetadata's call (same URL + cache key)
   const [match, tenant] = await Promise.all([
     fetchMatchInfo({ matchId: parseTrailingId(matchId) }),
@@ -117,16 +124,27 @@ export default async function MatchLayout({
   // SportsEvent when both are present, so we never produce an invalid item.
   const facility = match.facility;
 
-  let jsonLd: Record<string, unknown> | null = null;
+  let jsonLd: SportsEventJsonLd | null = null;
+
   if (match.kickoffAtUtcMs != null && facility?.name) {
     const start = new Date(match.kickoffAtUtcMs);
     // Football matches run ~105 min (2×45 + half-time); a reasonable endDate.
     const end = new Date(start.getTime() + 105 * 60 * 1000);
 
     const { date } = formatDateTime(match.kickoffAtUtcMs);
+
     const description = [match.competition?.name, date, facility.place]
       .filter(Boolean)
       .join(", ");
+
+    const address: PostalAddressJsonLd = {
+      "@type": "PostalAddress",
+      addressCountry: "HR",
+    };
+
+    if (facility.address) address.streetAddress = facility.address;
+
+    if (facility.place) address.addressLocality = facility.place;
 
     jsonLd = {
       "@context": "https://schema.org",
@@ -136,17 +154,11 @@ export default async function MatchLayout({
       startDate: start.toISOString(),
       endDate: end.toISOString(),
       eventStatus: "https://schema.org/EventScheduled",
-      ...(description ? { description } : {}),
       image: [matchImageUrl(match)],
       location: {
         "@type": "Place",
         name: facility.name ?? "Stadion",
-        address: {
-          "@type": "PostalAddress",
-          ...(facility.address ? { streetAddress: facility.address } : {}),
-          ...(facility.place ? { addressLocality: facility.place } : {}),
-          addressCountry: "HR",
-        },
+        address,
       },
       homeTeam: { "@type": "SportsTeam", name: home },
       awayTeam: { "@type": "SportsTeam", name: away },
@@ -161,12 +173,15 @@ export default async function MatchLayout({
       },
     };
 
+    if (description) jsonLd.description = description;
+
     if (match.competition?.name) {
       jsonLd.superEvent = {
         "@type": "SportsEvent",
         name: match.competition.name,
       };
     }
+
     if (homeScore != null && awayScore != null) {
       jsonLd.homeScore = { "@type": "QuantitativeValue", value: homeScore };
       jsonLd.awayScore = { "@type": "QuantitativeValue", value: awayScore };

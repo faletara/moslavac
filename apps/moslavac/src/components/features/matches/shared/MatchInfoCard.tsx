@@ -6,6 +6,7 @@ import { formatDateTime } from "@/lib/helpers/date";
 import { cn } from "@/lib/utils";
 import type { Match, MatchInfo } from "@/types/hns";
 import { MatchSection } from "./MatchSection";
+import { isPresent } from "@/lib/helpers/present";
 
 interface MatchInfoCardProps {
   match: Match;
@@ -24,12 +25,14 @@ export default function MatchInfoCard({
   refereeData,
 }: MatchInfoCardProps) {
   const facility = match.facility;
+
   const officials = (refereeData?.officials ?? []).filter(
     (o) => (o.name ?? "").trim() !== "",
   );
 
   const hasResult =
     match.score.home.current != null && match.score.away.current != null;
+
   const attendance = match.attendance ?? null;
 
   const { date, time } =
@@ -48,7 +51,7 @@ export default function MatchInfoCard({
     hasResult && attendance != null && attendance > 0
       ? { label: "Gledatelja", value: String(attendance) }
       : null,
-  ].filter(Boolean) as { label: string; value: string }[];
+  ].filter(isPresent);
 
   const venueName = facility?.name?.trim() ?? "";
   const venueAddress = facility?.address?.trim() ?? "";
@@ -64,14 +67,17 @@ export default function MatchInfoCard({
     : encodeURIComponent(
         [venueName, venueAddress, venuePlace].filter(Boolean).join(", "),
       );
+
   const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${query}`;
   const mapUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
 
   const lat = facility?.latitude ?? 0;
   const lon = facility?.longitude ?? 0;
+
   const bbox = hasCoords
     ? `${lon - 0.006},${lat - 0.003},${lon + 0.006},${lat + 0.003}`
     : null;
+
   const mapEmbedUrl = bbox
     ? `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lon}`
     : null;

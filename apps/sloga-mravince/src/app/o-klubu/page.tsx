@@ -8,6 +8,7 @@ import { BASE_URL } from "@/lib/siteUrl";
 export const revalidate = 3600;
 
 const PAGE_KEY = "povijest" as const;
+
 const FALLBACK_TITLE = "O klubu";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -15,7 +16,9 @@ export async function generateMetadata(): Promise<Metadata> {
     fetchPageByKey({ key: PAGE_KEY }),
     getTenant(),
   ]);
+
   const title = page?.title ?? FALLBACK_TITLE;
+
   const description =
     page?.seoDescription ??
     `Povijest i priča kluba ${tenant.displayName} — nogometni klub iz Mravinaca, osnovan 1925. godine.`;
@@ -32,7 +35,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function AboutPage() {
   const page = await fetchPageByKey({ key: PAGE_KEY });
   const title = page?.title ?? FALLBACK_TITLE;
-  const heroUrl = page?.heroImage?.sizes?.hero?.url ?? page?.heroImage?.url;
+  const heroUrl = page?.heroImage?.heroUrl;
 
   const breadcrumb = {
     "@context": "https://schema.org",
@@ -92,7 +95,7 @@ export default async function AboutPage() {
                 className="group relative aspect-square overflow-hidden bg-muted"
               >
                 <Image
-                  src={media.sizes?.card?.url ?? media.url}
+                  src={media.cardUrl}
                   alt={media.alt || title}
                   fill
                   sizes="(min-width: 640px) 384px, 100vw"

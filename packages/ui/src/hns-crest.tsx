@@ -11,6 +11,7 @@ interface HnsCrestProps {
 
 function fallbackInitials(name: string | null | undefined): string {
   if (!name) return "?";
+
   return name.slice(0, 2).toUpperCase();
 }
 

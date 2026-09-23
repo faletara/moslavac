@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { buildSitemap } from "./sitemap";
 
 const baseUrl = "https://klub.example";
+
 const now = new Date("2026-07-23T10:00:00.000Z");
 
 const urls = (entries: { url: string }[]) => entries.map((entry) => entry.url);

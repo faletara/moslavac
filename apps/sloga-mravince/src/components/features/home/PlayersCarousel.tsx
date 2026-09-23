@@ -22,16 +22,25 @@ const POSITION_LABEL: Record<Exclude<RosterPosition, "trener">, string> = {
   napadac: "Napad",
 };
 
-function splitName(name: string): { first: string; last: string } {
+/** Ime razdvojeno na dio ispred prezimena i samo prezime. */
+interface SplitName {
+  first: string;
+  last: string;
+}
+
+function splitName(name: string): SplitName {
   const parts = name.trim().split(/\s+/);
+
   if (parts.length === 1) return { first: "", last: parts[0] };
-  const last = parts.pop() as string;
+  const last = parts.pop() ?? name;
+
   return { first: parts.join(" "), last };
 }
 
 /** Ink kartica igrača — HNS portret (ili ghost broj kad slike nema), crveni detalji. */
 function PlayerCard({ player }: { player: CarouselPlayer }) {
   const { first, last } = splitName(player.displayName);
+
   const position =
     player.position !== "trener" ? POSITION_LABEL[player.position] : null;
 
@@ -132,6 +141,7 @@ export default function PlayersCarousel({
 
   const onScroll = useCallback(() => {
     const el = scrollerRef.current;
+
     if (!el) return;
     const max = el.scrollWidth - el.clientWidth;
     setProgress(max > 0 ? el.scrollLeft / max : 0);
@@ -139,6 +149,7 @@ export default function PlayersCarousel({
 
   const scrollNext = useCallback(() => {
     const el = scrollerRef.current;
+
     if (!el) return;
     const atEnd = el.scrollLeft >= el.scrollWidth - el.clientWidth - 8;
     el.scrollBy({

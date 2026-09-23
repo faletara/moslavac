@@ -18,6 +18,7 @@ export const revalidate = 120;
 
 export default async function MatchesPage() {
   const matches = await fetchAllMatches();
+
   return (
     <section className="mx-auto w-full max-w-7xl space-y-16 px-4 pt-16 pb-24 sm:space-y-20 sm:pt-24 lg:px-8">
       <BreadcrumbJsonLd

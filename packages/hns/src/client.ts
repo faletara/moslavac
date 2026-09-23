@@ -27,6 +27,7 @@ export const httpTransport: HnsTransport = async (
 		// Explicit-context callers (the CMS cron) want fresh data, have no
 		// per-request Next cache to tag, and may need a custom DNS dispatcher.
 		init.cache = "no-store";
+
 		if (ctx.dispatcher) init.dispatcher = ctx.dispatcher;
 	} else {
 		init.next = { revalidate, tags };
@@ -50,13 +51,17 @@ export function resolveTransport(): HnsTransport {
 
 export async function getHnsTeamId(): Promise<string> {
 	const ctx = getActiveHnsContext();
+
 	if (ctx) return ctx.teamId;
+
 	return (await getTenant()).hns.teamId;
 }
 
 export async function getSeniorCompetitionFilter(): Promise<string | null> {
 	const ctx = getActiveHnsContext();
+
 	if (ctx) return ctx.seniorCompetitionFilter ?? null;
+
 	return (await getTenant()).hns.seniorCompetitionFilter ?? null;
 }
 
@@ -66,5 +71,6 @@ export function currentSeasonTag(): string {
 	const month = now.getMonth() + 1;
 	const startYear = month >= 8 ? year : year - 1;
 	const pad = (n: number) => String(n % 100).padStart(2, "0");
+
 	return `${pad(startYear)}/${pad(startYear + 1)}`;
 }

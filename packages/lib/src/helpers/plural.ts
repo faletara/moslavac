@@ -22,8 +22,11 @@ export function pluralForm(count: number, forms: PluralForms): string {
   const lastTwo = n % 100;
 
   if (lastTwo >= 11 && lastTwo <= 14) return forms.many;
+
   if (lastDigit === 1) return forms.one;
+
   if (lastDigit >= 2 && lastDigit <= 4) return forms.few;
+
   return forms.many;
 }
 

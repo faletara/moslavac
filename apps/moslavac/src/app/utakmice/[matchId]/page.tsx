@@ -31,20 +31,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { matchId } = await params;
   const mid = parseTrailingId(matchId);
   const matchInfo = await fetchMatchInfo({ matchId: mid });
+
   if (!matchInfo) return {};
 
   const home = matchInfo.homeTeam?.name ?? "N/A";
   const away = matchInfo.awayTeam?.name ?? "N/A";
   const title = `${home} - ${away}`;
+
   const hasResult =
     matchInfo.score.home.current != null && matchInfo.score.away.current != null;
+
   const score = hasResult
     ? ` ${matchInfo.score.home?.current ?? 0}:${matchInfo.score.away?.current ?? 0}`
     : "";
+
   const competition = matchInfo.competition?.name?.trim();
+
   const description = `${home} protiv ${away}${score}${
     competition ? `, ${competition}` : ""
   }. Rezultat, tijek utakmice, postave i statistika.`;
+
   const canonical = `${BASE_URL}/utakmice/${buildMatchSlug(matchInfo)}`;
 
   // No `images` here on purpose: the per-match poster in `opengraph-image.tsx`
@@ -90,6 +96,7 @@ export default async function MatchInfoPage({ params }: Props) {
   // Keyed off the match's competition, so it can only start once matchInfo
   // resolves — the three requests then run in parallel.
   const competitionId = matchInfo.competition?.id ?? null;
+
   const [standings, competitionMatches, scorers] =
     competitionId != null
       ? await Promise.all([
@@ -100,8 +107,10 @@ export default async function MatchInfoPage({ params }: Props) {
       : [[], [], []];
 
   const { date, time } = formatDateTime(matchInfo.kickoffAtUtcMs ?? 0);
+
   const hasResult =
     matchInfo.score.home.current != null && matchInfo.score.away.current != null;
+
   const halfHome = matchInfo.score.home?.half;
   const halfAway = matchInfo.score.away?.half;
   const showHalfTime = hasResult && halfHome != null && halfAway != null;

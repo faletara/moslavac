@@ -7,6 +7,8 @@ import { toMatchFacts } from "./facts";
 const KICKOFF = Date.UTC(2026, 7, 29, 15, 0, 0);
 
 const slogaGosk = (overrides: Partial<HnsMatch> = {}) =>
+  // SAFETY: fixture nosi samo polja koja adapter čita; ostatak HNS-ove OpenAPI
+  // strukture ovaj test ne dira.
   adaptMatch({
     id: 12345,
     dateTimeUTC: KICKOFF,
@@ -26,6 +28,8 @@ const slogaGosk = (overrides: Partial<HnsMatch> = {}) =>
   } as HnsMatch);
 
 const event = (raw: Partial<HnsMatchEvent>) =>
+  // SAFETY: fixture nosi samo polja koja adapter čita; ostatak HNS-ove OpenAPI
+  // strukture ovaj test ne dira.
   adaptMatchEvent({
     eventId: 1,
     eventType: { fcdName: "YELLOW", name: "Žuti karton" },

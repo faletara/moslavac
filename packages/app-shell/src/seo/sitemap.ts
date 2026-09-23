@@ -38,6 +38,7 @@ export type SitemapManifest = {
 function absoluteUrl(baseUrl: string, path: string): string {
   const base = baseUrl.replace(/\/+$/, "");
   const suffix = path.startsWith("/") ? path : `/${path}`;
+
   return `${base}${suffix}`;
 }
 
@@ -47,6 +48,7 @@ function resolveLastModified(
 ): Date {
   if (value == null) return fallback;
   const date = value instanceof Date ? value : new Date(value);
+
   return Number.isNaN(date.getTime()) ? fallback : date;
 }
 
@@ -75,17 +77,22 @@ export async function buildSitemap({
   for (const entry of collected) {
     if (!entry.path.trim()) continue;
     const url = absoluteUrl(baseUrl, entry.path);
+
     if (seen.has(url)) continue;
     seen.add(url);
 
-    entries.push({
+    const sitemapEntry: MetadataRoute.Sitemap[number] = {
       url,
       lastModified: resolveLastModified(entry.lastModified, now),
-      ...(entry.changeFrequency
-        ? { changeFrequency: entry.changeFrequency }
-        : {}),
-      ...(entry.priority != null ? { priority: entry.priority } : {}),
-    });
+    };
+
+    if (entry.changeFrequency) {
+      sitemapEntry.changeFrequency = entry.changeFrequency;
+    }
+
+    if (entry.priority != null) sitemapEntry.priority = entry.priority;
+
+    entries.push(sitemapEntry);
   }
 
   return entries;

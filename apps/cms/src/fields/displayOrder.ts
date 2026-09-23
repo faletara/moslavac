@@ -1,4 +1,4 @@
-import type { Field } from 'payload'
+import type { Field, NumberField } from 'payload'
 
 interface DisplayOrderOptions {
   label?: string
@@ -8,13 +8,18 @@ interface DisplayOrderOptions {
 }
 
 /** `displayOrder` number polje (default 0). Koristi 6 kolekcija. */
-export const displayOrderField = (opts: DisplayOrderOptions = {}): Field => ({
-  name: 'displayOrder',
-  label: opts.label ?? 'Redoslijed',
-  type: 'number',
-  defaultValue: 0,
-  admin: {
-    ...(opts.sidebar === false ? {} : { position: 'sidebar' }),
+export const displayOrderField = (opts: DisplayOrderOptions = {}): Field => {
+  const admin: NumberField['admin'] = {
     description: opts.description ?? 'Redoslijed prikaza (manji broj prvi).',
-  },
-})
+  }
+
+  if (opts.sidebar !== false) admin.position = 'sidebar'
+
+  return {
+    name: 'displayOrder',
+    label: opts.label ?? 'Redoslijed',
+    type: 'number',
+    defaultValue: 0,
+    admin,
+  }
+}

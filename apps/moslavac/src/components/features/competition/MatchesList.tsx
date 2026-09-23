@@ -29,6 +29,7 @@ function TeamSide({
 	align: "left" | "right";
 }) {
 	const isRight = align === "right";
+
 	const text = (
 		<span
 			className={cn(
@@ -39,6 +40,7 @@ function TeamSide({
 			{name}
 		</span>
 	);
+
 	const crest = <TeamCrest name={name} picture={picture} />;
 
 	return (
@@ -118,6 +120,7 @@ function MatchGroup({
 	matches: Match[];
 }) {
 	if (matches.length === 0) return null;
+
 	return (
 		<section>
 			<h2 className="border-b border-border/60 pb-3 text-center text-[0.6rem] font-semibold uppercase tracking-[0.3em] text-muted-foreground sm:text-xs sm:tracking-[0.4em]">
@@ -148,6 +151,7 @@ export default function MatchesList({
 	const played = matches
 		.filter(isPlayed)
 		.sort((a, b) => (b.kickoffAtUtcMs ?? 0) - (a.kickoffAtUtcMs ?? 0));
+
 	const upcoming = matches
 		.filter((m) => !isPlayed(m))
 		.sort((a, b) => (a.kickoffAtUtcMs ?? 0) - (b.kickoffAtUtcMs ?? 0));

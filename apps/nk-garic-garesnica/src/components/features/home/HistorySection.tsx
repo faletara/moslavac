@@ -21,6 +21,7 @@ export default function HistorySection({
   imageSrc,
 }: HistorySectionProps) {
   const placeLocative = place.replace(/a$/, "i"); // Garešnica → Garešnici
+
   const stats = [
     { value: String(founded), label: "Godina osnutka" },
     { value: "100+", label: "Godina tradicije" },
@@ -63,6 +64,8 @@ export default function HistorySection({
             Više od{" "}
             <span
               className="text-stroke"
+              // SAFETY: `--*` je CSS custom property; Reactov `CSSProperties` popisuje samo
+              // standardna svojstva, pa ga inline stil ovdje mora proširiti.
               style={
                 { "--text-stroke-color": "#ffffff" } as React.CSSProperties
               }

@@ -20,6 +20,7 @@ export function AlbumGallery({ photos }: { photos: AlbumPhoto[] }) {
   const isOpen = openIndex !== null;
 
   const close = useCallback(() => setOpenIndex(null), []);
+
   const prev = useCallback(
     () =>
       setOpenIndex((i) =>
@@ -27,6 +28,7 @@ export function AlbumGallery({ photos }: { photos: AlbumPhoto[] }) {
       ),
     [photos.length],
   );
+
   const next = useCallback(
     () => setOpenIndex((i) => (i === null ? i : (i + 1) % photos.length)),
     [photos.length],
@@ -34,11 +36,15 @@ export function AlbumGallery({ photos }: { photos: AlbumPhoto[] }) {
 
   useEffect(() => {
     if (!isOpen) return;
+
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "ArrowLeft") prev();
+
       if (e.key === "ArrowRight") next();
     };
+
     window.addEventListener("keydown", onKey);
+
     return () => window.removeEventListener("keydown", onKey);
   }, [isOpen, prev, next]);
 

@@ -23,6 +23,7 @@ export const generateMetadata = ({ params, searchParams }: Args): Promise<Metada
 // nego Payload počne renderirati (vidi `admin/clubOwnerRedirect`).
 const Page = async ({ params, searchParams }: Args) => {
   await redirectClubOwnerToOwnTenant((await params).segments)
+
   return RootPage({ config, params, searchParams, importMap })
 }
 

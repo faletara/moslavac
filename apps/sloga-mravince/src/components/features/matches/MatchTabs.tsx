@@ -27,6 +27,7 @@ interface MatchTabsProps {
 /** Ima li ijedna strana objavljenu postavu. */
 export function hasLineups(lineups: Lineups | null): boolean {
   if (!lineups) return false;
+
   return (
     (lineups.home?.players.length ?? 0) > 0 ||
     (lineups.away?.players.length ?? 0) > 0
@@ -59,12 +60,15 @@ export default function MatchTabs({
   ];
 
   const requested = searchParams.get("tab");
-  const active = tabs.some((tab) => tab.value === requested)
-    ? (requested as string)
-    : DEFAULT_TAB;
+
+  const active =
+    requested !== null && tabs.some((tab) => tab.value === requested)
+      ? requested
+      : DEFAULT_TAB;
 
   const select = (value: string) => {
     const params = new URLSearchParams(searchParams.toString());
+
     if (value === DEFAULT_TAB) params.delete("tab");
     else params.set("tab", value);
     const query = params.toString();
@@ -80,6 +84,7 @@ export default function MatchTabs({
       >
         {tabs.map((tab) => {
           const selected = tab.value === active;
+
           return (
             <button
               key={tab.value}

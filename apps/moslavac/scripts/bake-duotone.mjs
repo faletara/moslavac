@@ -40,25 +40,31 @@ function setLum(rgb, target) {
   const l = lum(c);
   const min = Math.min(...c);
   const max = Math.max(...c);
+
   if (min < 0) {
     for (let i = 0; i < 3; i++) c[i] = l + ((c[i] - l) * l) / (l - min);
   }
+
   if (max > 255) {
     for (let i = 0; i < 3; i++)
       c[i] = l + ((c[i] - l) * (255 - l)) / (max - l);
   }
+
   return c;
 }
 
 /** 256-entry lookup: grayscale level → blended RGB. */
 function buildLut(alpha) {
   const lut = new Uint8Array(256 * 3);
+
   for (let v = 0; v < 256; v++) {
     const blended = setLum(CLUB, v);
+
     for (let i = 0; i < 3; i++) {
       lut[v * 3 + i] = Math.round(v * (1 - alpha) + blended[i] * alpha);
     }
   }
+
   return lut;
 }
 
@@ -70,6 +76,7 @@ for (const { src, out, alpha } of TARGETS) {
 
   const lut = buildLut(alpha);
   const rgb = Buffer.allocUnsafe(info.width * info.height * 3);
+
   for (let p = 0; p < info.width * info.height; p++) {
     const v = data[p * info.channels] * 3;
     rgb[p * 3] = lut[v];

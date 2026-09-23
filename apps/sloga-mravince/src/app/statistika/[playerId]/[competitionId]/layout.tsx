@@ -29,6 +29,7 @@ export async function generateMetadata({
 
   const player =
     playerResult.status === "fulfilled" ? playerResult.value : null;
+
   const competition =
     competitionResult.status === "fulfilled" ? competitionResult.value : null;
 
@@ -36,6 +37,7 @@ export async function generateMetadata({
   const competitionName = competition?.name ?? null;
 
   const title = playerName ? `${playerName}: statistika` : "Statistika igrača";
+
   const description = playerName
     ? `Profil i statistika igrača ${playerName}${
         competitionName ? ` u natjecanju ${competitionName}` : ""
@@ -45,6 +47,7 @@ export async function generateMetadata({
   const playerSlug = player
     ? buildPlayerSlug({ personId, name: player.name })
     : playerId;
+
   const competitionSlug = competition
     ? buildCompetitionSlug(competition)
     : competitionId;

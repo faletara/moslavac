@@ -16,7 +16,9 @@ function getTraditionYears(now = new Date()): number {
     FOUNDING_DATE.month - 1,
     FOUNDING_DATE.day,
   );
+
   const fullYears = now.getFullYear() - FOUNDING_DATE.year;
+
   return now < anniversaryThisYear ? fullYears - 1 : fullYears;
 }
 
@@ -26,6 +28,7 @@ function getTraditionYears(now = new Date()): number {
  */
 export default function HeritageSection() {
   const traditionYears = getTraditionYears();
+
   const stats = [
     // „Godina osnivanja” je godina, ne broj — ne sklanja se.
     { value: FOUNDING_DATE.year, label: "Godina osnivanja" },

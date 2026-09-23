@@ -12,6 +12,7 @@ import {
   parseTrailingId,
 } from "@/lib/helpers/slug";
 import { cn } from "@/lib/utils";
+import { isPresent } from "@/lib/helpers/present";
 
 interface Props {
   params: Promise<{ playerId: string; competitionId: string }>;
@@ -28,18 +29,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     fetchPlayerDetails({ personId }),
     fetchPlayerStats({ personId, competitionId: cid }),
   ]);
+
   if (!details) return {};
 
   const name = details.name ?? "Igrač";
   const competitionName = stats?.competition?.name;
+
   const description = competitionName
     ? `Statistika igrača ${name} u natjecanju ${competitionName}: nastupi, golovi, kartoni i minute.`
     : `Profil i statistika igrača ${name}.`;
 
   const playerSlug = buildPlayerSlug({ personId: Number(personId), name });
+
   const competitionSlug = stats?.competition
     ? buildCompetitionSlug(stats.competition)
     : competitionId;
+
   const canonical = `${BASE_URL}/statistika/${playerSlug}/${competitionSlug}`;
 
   return {
@@ -78,9 +83,11 @@ export default async function PlayerStatsPage({ params }: Props) {
     personId: Number(personId),
     name: playerDetails.name,
   });
+
   const competitionSlug = playerStats?.competition
     ? buildCompetitionSlug(playerStats.competition)
     : competitionId;
+
   redirectToCanonical(
     `/statistika/${playerId}/${competitionId}`,
     `/statistika/${playerSlug}/${competitionSlug}`,
@@ -109,12 +116,12 @@ export default async function PlayerStatsPage({ params }: Props) {
     shirtNumber != null ? `#${String(shirtNumber).padStart(2, "0")}` : null,
     position || null,
     isCaptain ? "Kapetan" : null,
-  ].filter(Boolean) as string[];
+  ].filter(isPresent);
 
   const subEyebrowParts = [
     age != null ? `Dob ${age}` : null,
     competitionName || null,
-  ].filter(Boolean) as string[];
+  ].filter(isPresent);
 
   return (
     <div className="pb-16 sm:pb-24">
@@ -187,6 +194,7 @@ function StatCell({
   tier: "primary" | "secondary";
 }) {
   const isPrimary = tier === "primary";
+
   return (
     <div
       className={cn(

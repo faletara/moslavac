@@ -1,19 +1,21 @@
 import "server-only";
-import type { RosterEntry, RosterPosition } from "@/types/roster";
+import { z } from "zod";
+import type { RosterEntry } from "@/types/roster";
 import { fetchList } from "./fetchCollection";
-import { mediaObject } from "./media";
-import type { PayloadMedia } from "./types";
+import { mediaRef } from "./schemas";
 
-interface PayloadRosterEntry {
-  id: number;
-  displayName: string;
-  personId: number;
-  position: RosterPosition;
-  displayOrder: number | null;
-  jerseyNumber: number | null;
-  captain: boolean | null;
-  photo: PayloadMedia | number | null;
-}
+export const rosterSchema = z.object({
+  id: z.number(),
+  displayName: z.string(),
+  personId: z.number(),
+  position: z.enum(["vratar", "obrambeni", "vezni", "napadac", "trener"]),
+  displayOrder: z.number().nullish().default(null),
+  jerseyNumber: z.number().nullish().default(null),
+  captain: z.boolean().nullish().default(null),
+  photo: mediaRef,
+});
+
+type PayloadRosterEntry = z.output<typeof rosterSchema>;
 
 export function adaptRoster(doc: PayloadRosterEntry): RosterEntry {
   return {
@@ -24,13 +26,14 @@ export function adaptRoster(doc: PayloadRosterEntry): RosterEntry {
     displayOrder: doc.displayOrder ?? 0,
     jerseyNumber: doc.jerseyNumber ?? null,
     captain: doc.captain ?? false,
-    photo: mediaObject(doc.photo),
+    photo: doc.photo,
   };
 }
 
 export const fetchRoster = (): Promise<RosterEntry[]> =>
   fetchList<PayloadRosterEntry, RosterEntry>({
     collection: "roster",
+    schema: rosterSchema,
     sort: "displayName",
     limit: 100,
     authenticated: true,

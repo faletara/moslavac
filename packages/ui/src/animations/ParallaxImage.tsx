@@ -37,10 +37,12 @@ export function ParallaxImage({
 }: ParallaxImageProps) {
   const reduced = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
+
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"],
   });
+
   const y = useTransform(
     scrollYProgress,
     [0, 1],

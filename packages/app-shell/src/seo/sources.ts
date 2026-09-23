@@ -27,12 +27,16 @@ function segmentPath(segment: string, slug: string): string {
 export function newsSource({
   segment,
   priority = 0.6,
+  fetchEntries = fetchNewsSitemapEntries,
 }: {
   segment: string;
   priority?: number;
+  /** Dohvat novosti; zamjenjiv u testu bez mockanja modula. */
+  fetchEntries?: typeof fetchNewsSitemapEntries;
 }): SitemapSource {
   return async () => {
-    const entries = await fetchNewsSitemapEntries();
+    const entries = await fetchEntries();
+
     return entries.map(
       (entry): SitemapEntry => ({
         path: segmentPath(segment, entry.slug),
@@ -53,12 +57,19 @@ export function newsSource({
 export function matchSource({
   segment,
   priority = 0.6,
+  fetchCompetitions = fetchCurrentSeasonCompetitions,
+  fetchMatches = fetchAllCompetitionMatches,
 }: {
   segment: string;
   priority?: number;
+  /** Dohvat natjecanja sezone; zamjenjiv u testu bez mockanja modula. */
+  fetchCompetitions?: typeof fetchCurrentSeasonCompetitions;
+  /** Dohvat utakmica natjecanja; zamjenjiv u testu bez mockanja modula. */
+  fetchMatches?: typeof fetchAllCompetitionMatches;
 }): SitemapSource {
   return async () => {
-    const competitions = await fetchCurrentSeasonCompetitions();
+    const competitions = await fetchCompetitions();
+
     const withId = competitions.filter(
       (competition): competition is typeof competition & { id: number } =>
         competition.id != null,
@@ -66,12 +77,13 @@ export function matchSource({
 
     const results = await Promise.allSettled(
       withId.map((competition) =>
-        fetchAllCompetitionMatches({ competitionId: competition.id }),
+        fetchMatches({ competitionId: competition.id }),
       ),
     );
 
     return results.flatMap((result): SitemapEntry[] => {
       if (result.status !== "fulfilled") return [];
+
       return result.value
         .filter((match) => match.id != null && match.allowDetail)
         .map((match) => ({
@@ -101,6 +113,7 @@ export function playerSource({
       fetchRoster(),
       fetchSeniorCompetition(),
     ]);
+
     if (senior?.id == null) return [];
     const competitionSlug = buildCompetitionSlug(senior);
 
@@ -111,6 +124,7 @@ export function playerSource({
           personId: entry.personId,
           name: entry.displayName,
         });
+
         return {
           path: segmentPath(segment, `${playerSlug}/${competitionSlug}`),
           changeFrequency: "weekly",

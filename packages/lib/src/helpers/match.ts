@@ -7,6 +7,7 @@ export const groupAndSortMatches = (matches: Match[]) => {
       const monthYear = `${date.getFullYear()}-${date.getMonth() + 1}`;
       acc[monthYear] = acc[monthYear] || [];
       acc[monthYear].push(match);
+
       return acc;
     },
     {}
@@ -21,6 +22,7 @@ export const groupAndSortMatches = (matches: Match[]) => {
   const sortedMonths = Object.keys(grouped).sort((a, b) => {
     const [yearA, monthA] = a.split("-").map(Number);
     const [yearB, monthB] = b.split("-").map(Number);
+
     return yearB - yearA || monthB - monthA;
   });
 

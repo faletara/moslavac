@@ -30,6 +30,7 @@ export async function fetchCurrentSeasonCompetitionsResult(): Promise<{
   });
 
   const seasonTag = currentSeasonTag();
+
   const competitions = data
     .map(adaptCompetition)
     .filter((competition): competition is Competition => competition !== null)
@@ -47,7 +48,9 @@ export async function fetchSeniorCompetition(): Promise<Competition | null> {
     fetchCurrentSeasonCompetitions(),
     getSeniorCompetitionFilter(),
   ]);
+
   if (!filter) return null;
+
   return competitions.find((c) => c.name.includes(filter)) ?? null;
 }
 
@@ -59,6 +62,7 @@ export async function fetchCompetitionInfo(params: {
     tag: `competition-${params.competitionId}`,
     revalidate: COMPETITIONS_TTL,
   });
+
   return adaptCompetition(competition);
 }
 
@@ -72,6 +76,7 @@ async function fetchPastCompetitionMatches(
     revalidate: COMPETITIONS_TTL,
     paginated: true,
   });
+
   return matches.map(adaptMatch);
 }
 
@@ -85,6 +90,7 @@ async function fetchFutureCompetitionMatches(
     revalidate: COMPETITIONS_TTL,
     paginated: true,
   });
+
   return matches.map(adaptMatch);
 }
 
@@ -95,12 +101,14 @@ export async function fetchCompetitionMatches(params: {
     fetchPastCompetitionMatches(params.competitionId),
     fetchFutureCompetitionMatches(params.competitionId),
   ]);
+
   return [...past, ...future];
 }
 
 // HNS rejects large page sizes (pageSize=300 returns an empty result), so we
 // page through with a proven-good size and stop once a short page comes back.
 const MATCHES_PAGE_SIZE = 75;
+
 const MATCHES_MAX_PAGES = 10;
 
 async function fetchAllMatchesPaged(
@@ -119,7 +127,9 @@ async function fetchAllMatchesPaged(
         paginated: true,
       })
     ).map(adaptMatch);
+
     all.push(...batch);
+
     if (batch.length < MATCHES_PAGE_SIZE) break;
   }
 
@@ -133,6 +143,7 @@ export async function fetchAllCompetitionMatches(params: {
     fetchAllMatchesPaged(params.competitionId, "past"),
     fetchAllMatchesPaged(params.competitionId, "future"),
   ]);
+
   return [...past, ...future];
 }
 
@@ -140,6 +151,7 @@ const MATCH_SLOT_TTL = 30;
 
 export async function fetchMatchSlots(): Promise<MatchSlots> {
   const senior = await fetchSeniorCompetition();
+
   if (!senior?.id) return { next: null, previous: null };
 
   const [past, future] = await Promise.all([
@@ -161,12 +173,14 @@ export async function fetchMatchSlots(): Promise<MatchSlots> {
 
   const adaptedPast = past.map(adaptMatch);
   const adaptedFuture = future.map(adaptMatch);
+
   const sortByDateDesc = (a: Match, b: Match) =>
     (b.kickoffAtUtcMs ?? 0) - (a.kickoffAtUtcMs ?? 0);
 
   const unfinishedPast = adaptedPast
     .filter((m) => !isFinished(m))
     .sort(sortByDateDesc);
+
   const finishedPast = adaptedPast.filter(isFinished).sort(sortByDateDesc);
 
   // The senior competition is season-scoped, so between seasons (old season
@@ -175,6 +189,7 @@ export async function fetchMatchSlots(): Promise<MatchSlots> {
   // (that query returns every age group) by matching the senior filter.
   const competitionNext = unfinishedPast[0] ?? adaptedFuture[0] ?? null;
   let next: Match | null = competitionNext;
+
   if (!next) {
     const filter = await getSeniorCompetitionFilter();
     const upcoming = await fetchUpcomingMatches();
@@ -183,6 +198,7 @@ export async function fetchMatchSlots(): Promise<MatchSlots> {
         filter ? m.competition?.name.includes(filter) : false,
       ) ?? null;
   }
+
   const previous = finishedPast[0] ?? null;
 
   return { next, previous };

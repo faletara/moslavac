@@ -1,4 +1,4 @@
-import type { PayloadMedia } from "@/lib/payload/types";
+import type { MediaImage } from "@/lib/payload/schemas";
 
 export type BoardRoleGroup =
   | "predsjednistvo"
@@ -11,7 +11,7 @@ export interface BoardMember {
   name: string;
   role: string;
   roleGroup: BoardRoleGroup;
-  photo: PayloadMedia | null;
+  photo: MediaImage | null;
   email: string | null;
   phone: string | null;
   displayOrder: number;

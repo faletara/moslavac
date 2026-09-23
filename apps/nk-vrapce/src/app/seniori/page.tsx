@@ -8,6 +8,7 @@ import type { RosterEntry, RosterPosition } from "@/types/roster";
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await fetchPageByKey({ key: "seniori-info" });
+
   return {
     title: page?.title ?? "Seniori",
     description:
@@ -38,14 +39,15 @@ export default async function SenioriPage() {
     fetchPageByKey({ key: "seniori-info" }),
   ]);
 
-  const sections = playerOrder
-    .map((position) => ({
-      position,
-      players: roster
-        .filter((p) => p.position === position)
-        .sort((a, b) => a.displayOrder - b.displayOrder),
-    }))
-    .filter((section) => section.players.length > 0);
+  const sections = playerOrder.flatMap((position) => {
+    const players = roster
+      .filter((p) => p.position === position)
+      .sort((a, b) => a.displayOrder - b.displayOrder);
+
+    if (players.length === 0) return [];
+
+    return [{ position, players }];
+  });
 
   const staff = roster
     .filter((p) => p.position === "trener")
@@ -138,8 +140,9 @@ function PlayerCard({
   player: RosterEntry;
   hideNumber: boolean;
 }) {
-  const photoUrl = player.photo?.sizes?.card?.url ?? player.photo?.url ?? null;
+  const photoUrl = player.photo?.cardUrl ?? null;
   const initial = player.displayName.charAt(0);
+
   const ghostMark =
     !hideNumber && player.jerseyNumber != null
       ? String(player.jerseyNumber)

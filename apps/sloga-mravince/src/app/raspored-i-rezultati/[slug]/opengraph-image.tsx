@@ -6,14 +6,18 @@ import { fetchMatchInfo } from "@/lib/hns/matches";
 import { parseTrailingId } from "@/lib/helpers/slug";
 
 export const size = { width: 1200, height: 630 };
+
 export const contentType = "image/png";
+
 export const alt = "Utakmica";
 
 const INK = "#1b1b20";
+
 const RED = "#de2025";
 
 function Crest({ src }: { src: string | null }) {
   if (!src) return <div style={{ display: "flex", width: 180, height: 180 }} />;
+
   return (
     <img
       src={src}
@@ -100,6 +104,14 @@ export default async function MatchOgImage({
   // the render — and it crashes while the response is being piped, where no
   // try/catch on the route can see it. Spread it in only when the font loaded.
   const displayFont = anton ? { fontFamily: "Anton" } : {};
+
+  const options: ConstructorParameters<typeof ImageResponse>[1] = { ...size };
+
+  if (anton) {
+    options.fonts = [
+      { name: "Anton", data: anton, style: "normal", weight: 400 },
+    ];
+  }
 
   return new ImageResponse(
     (
@@ -196,20 +208,6 @@ export default async function MatchOgImage({
         )}
       </div>
     ),
-    {
-      ...size,
-      ...(anton
-        ? {
-            fonts: [
-              {
-                name: "Anton",
-                data: anton,
-                style: "normal" as const,
-                weight: 400 as const,
-              },
-            ],
-          }
-        : {}),
-    },
+    options,
   );
 }

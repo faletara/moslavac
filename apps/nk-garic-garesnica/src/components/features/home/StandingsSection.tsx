@@ -14,7 +14,9 @@ const TOP_COUNT = 5;
     Ou i +/- se skrivaju ispod `sm` — `table-cell`, ne `block`, da ćelija ostane
     ćelija. */
 const COL_POS = "w-11 sm:w-12";
+
 const COL_NUM = "hidden w-18 text-center sm:table-cell";
+
 const COL_PTS = "w-18 text-right sm:w-22";
 
 /** Ista meka, slojevita sjena kao kod ostalih kartica na naslovnici. */
@@ -23,6 +25,7 @@ const CARD_SHADOW =
 
 function goalDiff(row: TeamRanking): string {
   const diff = row.goalsFor - row.goalsAgainst;
+
   return diff > 0 ? `+${diff}` : String(diff);
 }
 
@@ -107,6 +110,7 @@ export default function StandingsSection({
   const top = rows.slice(0, TOP_COUNT);
   const mine = rows.find((r) => r.highlight) ?? null;
   const mineIsInTop = top.some((r) => r.highlight);
+
   const hasGap =
     mine !== null && !mineIsInTop && (mine.position ?? 0) > TOP_COUNT + 1;
 

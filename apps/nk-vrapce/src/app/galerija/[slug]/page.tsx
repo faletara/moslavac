@@ -15,13 +15,16 @@ interface Props {
 
 export async function generateStaticParams() {
   const albums = await fetchAlbums();
+
   return albums.map((album) => ({ slug: album.slug ?? String(album.id) }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const album = await fetchAlbumBySlug({ slug });
+
   if (!album) return { title: "Album nije pronađen" };
+
   return {
     title: album.title,
     description: album.description ?? `Foto album: ${album.title}.`,
@@ -32,10 +35,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function AlbumPage({ params }: Props) {
   const { slug } = await params;
   const album = await fetchAlbumBySlug({ slug });
+
   if (!album) notFound();
 
   const photos: AlbumPhoto[] = album.photos.map((photo) => ({
-    url: photo.image.sizes?.card?.url ?? photo.image.url,
+    url: photo.image.cardUrl,
     alt: photo.image.alt || album.title,
     caption: photo.caption,
   }));

@@ -1,4 +1,5 @@
 import "server-only";
+import type { z } from "zod";
 import { getActivePayloadContext } from "./context";
 import type { PayloadFetchOptions, PayloadTransport } from "./context";
 
@@ -13,11 +14,14 @@ import type { PayloadFetchOptions, PayloadTransport } from "./context";
  */
 function normalizePayloadApiUrl(raw: string | undefined): string {
   const trimmed = (raw ?? "").trim().replace(/\/+$/, "");
+
   if (!trimmed) return "";
+
   return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
 }
 
 const PAYLOAD_API_URL = normalizePayloadApiUrl(process.env.PAYLOAD_API_URL);
+
 const PAYLOAD_API_KEY = process.env.PAYLOAD_API_KEY;
 
 /** Default production transport: the real HTTP call to Payload's REST API. */
@@ -28,9 +32,7 @@ export const httpTransport: PayloadTransport = async (path, opts = {}) => {
     throw new Error("PAYLOAD_API_URL env var is required");
   }
 
-  const headers: Record<string, string> = {
-    Accept: "application/json",
-  };
+  const headers = new Headers({ Accept: "application/json" });
 
   if (authenticated) {
     if (!PAYLOAD_API_KEY) {
@@ -38,7 +40,8 @@ export const httpTransport: PayloadTransport = async (path, opts = {}) => {
         "PAYLOAD_API_KEY env var is required for authenticated calls",
       );
     }
-    headers.Authorization = `users API-Key ${PAYLOAD_API_KEY}`;
+
+    headers.set("Authorization", `users API-Key ${PAYLOAD_API_KEY}`);
   }
 
   const response = await fetch(`${PAYLOAD_API_URL}${path}`, {
@@ -61,10 +64,14 @@ export function resolveTransport(): PayloadTransport {
   return getActivePayloadContext()?.transport ?? httpTransport;
 }
 
-/** Typed convenience over the active transport; used by getTenant and any direct caller. */
+/**
+ * Raščlanjuje odgovor aktivnog transporta zadanom shemom. Ovdje Payloadov
+ * JSON prestaje biti neraščlanjen i postaje domenska vrijednost.
+ */
 export async function payloadFetch<T>(
   path: string,
+  schema: z.ZodType<T>,
   opts?: PayloadFetchOptions,
 ): Promise<T> {
-  return resolveTransport()(path, opts) as Promise<T>;
+  return schema.parse(await resolveTransport()(path, opts));
 }

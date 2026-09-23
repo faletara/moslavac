@@ -15,8 +15,10 @@ export default async function PrivacyPolicyPage() {
   const email = tenant.contact?.email ?? "[email kluba]";
   const address = tenant.contact?.address ?? "[adresa kluba]";
   const oib = tenant.legal?.oib ?? "[OIB nije postavljen]";
+
   const registryNumber =
     tenant.legal?.registryNumber ?? "[broj nije postavljen]";
+
   const lastUpdated = "28. svibnja 2026.";
 
   return (

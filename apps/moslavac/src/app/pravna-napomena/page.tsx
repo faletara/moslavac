@@ -16,8 +16,10 @@ export default async function LegalNoticePage() {
   const phone = tenant.contact?.phone ?? null;
   const address = tenant.contact?.address ?? "[adresa kluba]";
   const oib = tenant.legal?.oib ?? "[OIB nije postavljen]";
+
   const registryNumber =
     tenant.legal?.registryNumber ?? "[broj nije postavljen]";
+
   const registryAuthority =
     tenant.legal?.registryAuthority ?? "Ured državne uprave (prema sjedištu)";
 

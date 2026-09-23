@@ -18,29 +18,29 @@ const BLOCK_ELEMENTS_TO_DROP = [
   "nav",
 ];
 
-const ENTITIES: Record<string, string> = {
-  amp: "&",
-  lt: "<",
-  gt: ">",
-  quot: '"',
-  apos: "'",
-  nbsp: " ",
-  hellip: "…",
-  mdash: "—",
-  ndash: "–",
-  laquo: "«",
-  raquo: "»",
-  bdquo: "„",
-  ldquo: "“",
-  rdquo: "”",
-  lsquo: "‘",
-  rsquo: "’",
-  bull: "•",
-  middot: "·",
-  eacute: "é",
-  scaron: "š",
-  ccaron: "č",
-};
+const ENTITIES = new Map([
+  ["amp", "&"],
+  ["lt", "<"],
+  ["gt", ">"],
+  ["quot", '"'],
+  ["apos", "'"],
+  ["nbsp", " "],
+  ["hellip", "…"],
+  ["mdash", "—"],
+  ["ndash", "–"],
+  ["laquo", "«"],
+  ["raquo", "»"],
+  ["bdquo", "„"],
+  ["ldquo", "“"],
+  ["rdquo", "”"],
+  ["lsquo", "‘"],
+  ["rsquo", "’"],
+  ["bull", "•"],
+  ["middot", "·"],
+  ["eacute", "é"],
+  ["scaron", "š"],
+  ["ccaron", "č"],
+]);
 
 function decodeEntities(text: string): string {
   return text
@@ -51,7 +51,8 @@ function decodeEntities(text: string): string {
       String.fromCodePoint(Number.parseInt(dec, 10)),
     )
     .replace(/&([a-z]+);/gi, (match, name: string) => {
-      const value = ENTITIES[name.toLowerCase()];
+      const value = ENTITIES.get(name.toLowerCase());
+
       return value ?? match;
     });
 }
@@ -62,6 +63,7 @@ function stripTags(html: string): string {
 
 function absolute(url: string, baseUrl?: string): string {
   if (!baseUrl) return url;
+
   try {
     return new URL(url, baseUrl).toString();
   } catch {
@@ -85,11 +87,13 @@ function mainContent(html: string): string {
   const main = /<main\b[^>]*>([\s\S]*?)<\/main>/i.exec(html)?.[1];
 
   if (main && stripTags(main).length >= MIN_MAIN_TEXT) return main;
+
   return body ?? main ?? html;
 }
 
 function documentTitle(html: string): string | null {
   const match = /<title\b[^>]*>([\s\S]*?)<\/title>/i.exec(html);
+
   return match ? stripTags(match[1]) || null : null;
 }
 
@@ -102,6 +106,7 @@ export function htmlToMarkdown(
 
   // 1. Cijele blokove koji ne nose sadržaj uklanjamo zajedno s unutrašnjošću.
   text = text.replace(/<!--[\s\S]*?-->/g, "");
+
   for (const tag of BLOCK_ELEMENTS_TO_DROP) {
     text = text.replace(
       new RegExp(`<${tag}\\b[^>]*>[\\s\\S]*?<\\/${tag}>`, "gi"),
@@ -122,8 +127,10 @@ export function htmlToMarkdown(
     /<img\b[^>]*>/gi,
     (tag: string) => {
       const src = /\bsrc\s*=\s*["']([^"']+)["']/i.exec(tag)?.[1];
+
       if (!src) return "";
       const alt = /\balt\s*=\s*["']([^"']*)["']/i.exec(tag)?.[1] ?? "";
+
       return ` ![${decodeEntities(alt)}](${absolute(src, baseUrl)}) `;
     },
   );
@@ -132,9 +139,12 @@ export function htmlToMarkdown(
     /<a\b([^>]*)>([\s\S]*?)<\/a>/gi,
     (whole: string, attrs: string, inner: string) => {
       const label = stripTags(inner);
+
       if (!label) return "";
       const href = /\bhref\s*=\s*["']([^"']+)["']/i.exec(attrs)?.[1];
+
       if (!href || href.startsWith("javascript:")) return label;
+
       return `[${label}](${absolute(href, baseUrl)})`;
     },
   );
@@ -144,6 +154,7 @@ export function htmlToMarkdown(
     /<(strong|b)\b[^>]*>([\s\S]*?)<\/\1>/gi,
     (_, __, inner: string) => {
       const label = stripTags(inner);
+
       return label ? `**${label}**` : "";
     },
   );
@@ -151,6 +162,7 @@ export function htmlToMarkdown(
     /<(em|i)\b[^>]*>([\s\S]*?)<\/\1>/gi,
     (_, __, inner: string) => {
       const label = stripTags(inner);
+
       return label ? `*${label}*` : "";
     },
   );
@@ -158,6 +170,7 @@ export function htmlToMarkdown(
     /<code\b[^>]*>([\s\S]*?)<\/code>/gi,
     (_, inner: string) => {
       const label = stripTags(inner);
+
       return label ? `\`${label}\`` : "";
     },
   );
@@ -167,6 +180,7 @@ export function htmlToMarkdown(
     /<h([1-6])\b[^>]*>([\s\S]*?)<\/h\1>/gi,
     (_, level: string, inner: string) => {
       const label = stripTags(inner);
+
       return label ? `\n\n${"#".repeat(Number(level))} ${label}\n\n` : "\n\n";
     },
   );

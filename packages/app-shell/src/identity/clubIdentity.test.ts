@@ -48,6 +48,8 @@ describe("buildClubMetadata", () => {
   });
 
   it("ni klupski logotip ne nadjačava generiranu karticu s grbom", () => {
+    // SAFETY: fixture nosi samo `branding.logo`, jedino polje koje ovaj test
+    // provjerava; ostatak tenanta `buildClubMetadata` ovdje ne čita.
     const meta = buildClubMetadata({
       tenant: tenant({
         branding: { logo: { url: "https://cdn.example/logo.png" } },

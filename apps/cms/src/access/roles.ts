@@ -1,6 +1,6 @@
-import type { Access, FieldAccess } from 'payload'
+import type { Access, ClientUser, Condition, FieldAccess } from 'payload'
 
-type MaybeUser = { roles?: string[] | null } | null | undefined
+type MaybeUser = ClientUser | { roles?: string[] | null } | null | undefined
 
 export const isSuperAdmin = (user: MaybeUser): boolean =>
   Boolean(user?.roles?.includes('super-admin'))
@@ -20,15 +20,15 @@ export const superAdminOnlyField: FieldAccess = ({ req: { user } }) =>
  * izvršava u browseru nad korisnikom iz `/api/users/me`, pa polja od kojih
  * ovisi admin (`roles`, `tenants`) moraju ostati u tom odgovoru.
  */
-export const superAdminUI = (
-  _data: unknown,
-  _sibling: unknown,
-  { user }: { user?: unknown },
-): boolean => isSuperAdmin(user as MaybeUser)
+export const superAdminUI: Condition = (_data, _sibling, { user }) =>
+  isSuperAdmin(user)
 
 /**
  * `admin.hidden` za kolekcije koje su posao platforme, ne kluba. Skriva samo
  * navigaciju — pristup je i dalje na `access`.
  */
-export const hiddenFromNonSuperAdmin = ({ user }: { user?: unknown }): boolean =>
-  !isSuperAdmin(user as MaybeUser)
+export const hiddenFromNonSuperAdmin = ({
+  user,
+}: {
+  user?: ClientUser | null
+}): boolean => !isSuperAdmin(user)

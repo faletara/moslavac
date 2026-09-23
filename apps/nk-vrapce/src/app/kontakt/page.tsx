@@ -6,6 +6,7 @@ import { FadeInView } from "@/components/animations";
 import { BrandedHero } from "@/components/features/BrandedHero";
 import { getClubContact } from "@/lib/club/getClubContact";
 import { getTenant } from "@/lib/payload/getTenant";
+import { isPresent } from "@/lib/helpers/present";
 
 export const metadata: Metadata = {
   title: "Lokacija i kontakt",
@@ -31,7 +32,7 @@ export default async function KontaktPage() {
       label: "YouTube",
       Icon: FaYoutube,
     },
-  ].filter(Boolean) as { href: string; label: string; Icon: IconType }[];
+  ].filter(isPresent);
 
   const clubData = [
     { label: "Puni naziv", value: tenant.displayName },
@@ -43,7 +44,7 @@ export default async function KontaktPage() {
     legal?.registryAuthority
       ? { label: "Tijelo upisa", value: legal.registryAuthority }
       : null,
-  ].filter(Boolean) as { label: string; value: string }[];
+  ].filter(isPresent);
 
   return (
     <>

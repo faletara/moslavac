@@ -61,6 +61,7 @@ describe("verifyReport", () => {
         },
       ],
     };
+
     const bad = [
       "HNK Sloga Mravince i NK Gošk Kaštela odigrali su 1:0.",
       "Sudac je podijelio dva žuta kartona.",
@@ -80,6 +81,7 @@ describe("verifyReport", () => {
       good[0],
       "Golova nije bilo. Sudac je podijelio pet žutih kartona, tri domaćinu i dva gostima.",
     ];
+
     const problems = verifyReport(bad, facts).problems;
 
     expect(problems).toContain("broj žutih kartona ne štima: nedostaje 1");
@@ -125,6 +127,7 @@ describe("verifyReport", () => {
         })),
       ],
     };
+
     const ok = [
       good[0],
       "Golova nije bilo. Sudac je podijelio sedam žutih kartona, četiri domaćinu i tri gostima.",
@@ -175,6 +178,7 @@ describe("withFallback", () => {
 
   it("pada na šablonu kad provjera padne, i kaže zašto", async () => {
     const events: FallbackEvent[] = [];
+
     const write = withFallback(
       modelWrote(["Sloga je pobijedila 3:0."]),
       templateWriter,
@@ -188,6 +192,7 @@ describe("withFallback", () => {
 
   it("pada na šablonu kad poziv modela baci grešku", async () => {
     const events: FallbackEvent[] = [];
+
     const write = withFallback(
       async () => {
         throw new Error("429 rate limit");
@@ -256,6 +261,7 @@ describe("imena igrača u živoj rečenici", () => {
         { side: "home", team: "A", player: "Matej Bašić", display: "70'" },
       ],
     };
+
     const text = [
       "HNK Sloga Mravince i NK Gošk Kaštela odigrali su 2:0.",
       "Bašić je zabio u 41. i u 70. minuti. Sudac je podijelio dva žuta kartona, jedan domaćinu i jedan gostima.",

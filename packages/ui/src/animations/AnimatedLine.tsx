@@ -3,6 +3,9 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
+/** Standardni CSS `ease-in-out` kao Bézier kontrolne točke. */
+const EASE_IN_OUT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
+
 interface AnimatedLineProps {
   className?: string;
   delay?: number;
@@ -21,7 +24,7 @@ export function AnimatedLine({
 
   const initial = reduced ? { scaleX: 1 } : { scaleX: 0 };
   const animate = { scaleX: 1 };
-  const transition = { duration, delay, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] };
+  const transition = { duration, delay, ease: EASE_IN_OUT };
 
   if (trigger === "load") {
     return (

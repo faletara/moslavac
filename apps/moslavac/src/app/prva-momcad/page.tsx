@@ -4,12 +4,14 @@ import Link from "next/link";
 
 export async function generateMetadata(): Promise<Metadata> {
 	const tenant = await getTenant();
+
 	return {
 		title: "Prva momčad",
 		description: `Igrači i stručni stožer prve momčadi ${tenant.displayName}.`,
 		alternates: { canonical: "/prva-momcad" },
 	};
 }
+
 import BreadcrumbJsonLd from "@/lib/app-shell/seo/BreadcrumbJsonLd";
 import { FirstTeamHero } from "@/components/features/first-team/FirstTeamHero";
 import { BASE_URL } from "@/lib/siteUrl";
@@ -65,6 +67,7 @@ export default async function FirstTeamPage() {
 			acc[pos] = roster
 				.filter((entry) => entry.position === pos)
 				.sort((a, b) => a.displayOrder - b.displayOrder);
+
 			return acc;
 		},
 		{
@@ -79,20 +82,25 @@ export default async function FirstTeamPage() {
 	const populatedGroups = positionOrder.filter(
 		(pos) => grouped[pos].length > 0,
 	);
+
 	const totalPlayers = roster.filter((e) => e.position !== "trener").length;
 
 	const cometNeeded = roster.filter(
 		(entry) => !entry.photo?.url && entry.personId != null,
 	);
+
 	const cometResults = await Promise.all(
 		cometNeeded.map(async (entry) => {
 			const details = await fetchPlayerDetails({
 				personId: String(entry.personId),
 			}).catch(() => null);
+
 			return [entry.personId, details?.picture ?? null] as const;
 		}),
 	);
+
 	const cometPictureByPersonId = new Map<number, string>();
+
 	for (const [personId, picture] of cometResults) {
 		if (picture) cometPictureByPersonId.set(personId, picture);
 	}
@@ -112,6 +120,7 @@ export default async function FirstTeamPage() {
 
 			{populatedGroups.map((pos) => {
 				const group = grouped[pos];
+
 				return (
 					<section key={pos} className="space-y-12 sm:space-y-16">
 						<FadeInView>
@@ -159,6 +168,7 @@ function PlayerCard({
 	const photoUrl =
 		entry.photo?.url ??
 		(cometPictureUuid ? getCometImageUrl(cometPictureUuid) : null);
+
 	const initials = entry.displayName
 		.split(/\s+/)
 		.map((p) => p[0] ?? "")

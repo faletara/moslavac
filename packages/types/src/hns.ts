@@ -23,26 +23,45 @@ import type {
 } from "./hns.openapi";
 
 export type HnsCompetition = OpenApiCompetition;
+
 export type HnsFacility = OpenApiFacility;
+
 export type HnsLineups = OpenApiLineups;
+
 export type HnsMatch = OpenApiMatch;
+
 export type HnsMatchAndTeamOfficial = OpenApiMatchAndTeamOfficial;
+
 export type HnsMatchEvent = OpenApiMatchEvent;
+
 export type HnsMatchEventType = OpenApiMatchEventType;
+
 export type HnsMatchInfo = OpenApiMatchInfo;
+
 export type HnsMatchPhase = OpenApiMatchPhase;
+
 export type HnsPaginatedResultsTeamPlayer = OpenApiPaginatedResultsTeamPlayer;
+
 export type HnsPastMatch = OpenApiPastMatch;
+
 export type HnsPlayerCompetitionStats = OpenApiPlayerCompetitionStats;
+
 export type HnsPlayerStats = OpenApiPlayerStats;
+
 export type HnsResult = OpenApiResult;
+
 export type HnsTeam = OpenApiTeam;
+
 export type HnsTeamLineup = OpenApiTeamLineup;
+
 export type HnsTeamPlayer = OpenApiTeamPlayer;
+
 export type HnsTeamRanking = OpenApiTeamRanking;
 
 export type MatchOutcome = "W" | "D" | "L";
+
 export type MatchSide = "home" | "away";
+
 export type HnsLiveStatus = NonNullable<HnsMatch["liveStatus"]>;
 
 export interface Facility {

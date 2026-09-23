@@ -2,6 +2,7 @@ import type { Match } from "@/types/hns";
 
 export function getMatchVenue(match: Match | null): string | null {
   const place = match?.facility?.place?.trim();
+
   if (place) return place;
 
   return match?.facility?.name?.trim() || null;

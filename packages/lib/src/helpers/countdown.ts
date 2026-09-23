@@ -33,11 +33,14 @@ export function useCountdown(targetUtc: number | null): CountdownState | null {
   useEffect(() => {
     if (targetUtc == null) {
       setState(null);
+
       return;
     }
+
     const update = () => setState(compute(targetUtc));
     update();
     const id = setInterval(update, reduced ? 60_000 : 1000);
+
     return () => clearInterval(id);
   }, [targetUtc, reduced]);
 

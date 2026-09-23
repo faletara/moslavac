@@ -1,5 +1,6 @@
 import type { Payload } from 'payload'
 import { collectionCacheTag } from '@/lib/payload/cacheTags'
+import { tenantRefInfo } from '../access/tenantRef'
 
 /**
  * Javi klupskoj stranici da je sadržaj promijenjen.
@@ -13,16 +14,8 @@ import { collectionCacheTag } from '@/lib/payload/cacheTags'
 
 export type TenantRelation = number | string | { id?: number | string } | null | undefined
 
-interface Tenant {
-  slug?: string | null
-  siteUrl?: string | null
-}
-
-const tenantIdOf = (ref: TenantRelation): number | string | null => {
-  if (ref === null || ref === undefined) return null
-  if (typeof ref === 'object') return ref.id ?? null
-  return ref
-}
+const tenantIdOf = (ref: TenantRelation): number | string | null =>
+  tenantRefInfo.parse(ref).id
 
 export async function revalidateFrontend(args: {
   payload: Payload
@@ -35,18 +28,21 @@ export async function revalidateFrontend(args: {
   // u adminu. Najgori ishod bez nje je sadržaj star do isteka TTL-a.
   try {
     const secret = process.env.REVALIDATE_SECRET
+
     if (!secret) return
 
     const id = tenantIdOf(tenant)
+
     if (id === null) return
 
-    const doc = (await payload.findByID({
+    const doc = await payload.findByID({
       collection: 'tenants',
       id,
       depth: 0,
-    })) as Tenant
+    })
 
     const siteUrl = doc.siteUrl?.trim().replace(/\/+$/, '')
+
     if (!siteUrl || !doc.slug) return
 
     const response = await fetch(`${siteUrl}/api/revalidate`, {

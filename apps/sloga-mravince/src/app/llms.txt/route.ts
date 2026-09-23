@@ -20,6 +20,7 @@ export async function GET(): Promise<Response> {
   const phone = tenant.contact?.phone;
 
   const place = [city, region].filter(Boolean).join(", ");
+
   const summary =
     motto ??
     `Službena stranica nogometnog kluba ${name}${

@@ -45,8 +45,10 @@ describe("adaptDocument", () => {
 describe("fetchDocuments", () => {
   it("queries /documents at depth 0 with no category filter by default", async () => {
     const calls: string[] = [];
+
     const transport: PayloadTransport = async (path) => {
       calls.push(path);
+
       return pageOf([raw()]);
     };
 
@@ -63,8 +65,10 @@ describe("fetchDocuments", () => {
 
   it("adds the category filter when provided", async () => {
     const calls: string[] = [];
+
     const transport: PayloadTransport = async (path) => {
       calls.push(path);
+
       return pageOf([]);
     };
 

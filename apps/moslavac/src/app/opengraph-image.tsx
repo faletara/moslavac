@@ -5,6 +5,7 @@ import {
 } from "@/lib/app-shell/seo/clubCrestCard";
 
 export const size = OG_SIZE;
+
 export const contentType = OG_CONTENT_TYPE;
 
 // Iz `globals.css` (--navy-deep, --club) — ImageResponse ne vidi CSS varijable.

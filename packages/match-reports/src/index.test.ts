@@ -9,9 +9,12 @@ import {
 } from "./index";
 
 const NOW = new Date(Date.UTC(2026, 7, 31, 6, 0, 0));
+
 const KICKOFF = Date.UTC(2026, 7, 29, 15, 0, 0);
 
 const match = (over: Partial<HnsMatch> = {}): HnsMatch =>
+  // SAFETY: fixture nosi samo polja koja izvještaj čita; ostatak HNS-ove
+  // OpenAPI strukture ovaj test ne dira.
   ({
     id: 12345,
     dateTimeUTC: KICKOFF,
@@ -28,6 +31,8 @@ const match = (over: Partial<HnsMatch> = {}): HnsMatch =>
     ...over,
   }) as HnsMatch;
 
+// SAFETY: fixture nosi samo polja koja izvještaj čita; ostatak HNS-ove
+// OpenAPI strukture ovaj test ne dira.
 const EVENTS: HnsMatchEvent[] = [
   {
     eventId: 1,
@@ -44,16 +49,21 @@ const transport =
   async (endpoint) => {
     if (endpoint.includes("/matches/paginated/past"))
       return { result: matches };
+
     if (endpoint.includes("/matches/paginated/future"))
       return { result: [] };
+
     if (endpoint.includes("/events")) return events;
+
     if (/\/match\/\d+(\?|$)/.test(endpoint)) return matches[0];
+
     return null;
   };
 
 const memoryStore = () => {
   const created: MatchReportDraft[] = [];
   const seen = new Set<number>();
+
   const store: NewsStore = {
     has: async (id) => seen.has(id),
     create: async (draft) => {
@@ -61,6 +71,7 @@ const memoryStore = () => {
       created.push(draft);
     },
   };
+
   return { store, created, seen };
 };
 
@@ -114,8 +125,10 @@ describe("publishMatchReports", () => {
   it("preskoči mlađe kategorije", async () => {
     const { store } = memoryStore();
 
+    // SAFETY: fixture nosi samo polja koja izvještaj čita; ostatak HNS-ove
+    // OpenAPI strukture ovaj test ne dira.
     const summary = await run(
-      [match({ competition: { id: 4, name: "Kadeti Jug 26/27" } as never })],
+      [match({ competition: { id: 4, name: "Kadeti Jug 26/27" } as HnsMatch["competition"] })],
       store,
     );
 
@@ -149,8 +162,12 @@ describe("publishMatchReports", () => {
     const summary = await run(
       [
         match({
-          homeTeamResult: { current: 2, half: 1 } as never,
-          awayTeamResult: { current: 1, half: 0 } as never,
+          // SAFETY: fixture nosi samo polja koja izvještaj čita; ostatak HNS-ove
+          // OpenAPI strukture ovaj test ne dira.
+          homeTeamResult: { current: 2, half: 1 } as HnsMatch["homeTeamResult"],
+          // SAFETY: fixture nosi samo polja koja izvještaj čita; ostatak HNS-ove
+          // OpenAPI strukture ovaj test ne dira.
+          awayTeamResult: { current: 1, half: 0 } as HnsMatch["awayTeamResult"],
         }),
       ],
       store,
@@ -163,7 +180,9 @@ describe("publishMatchReports", () => {
 
   it("seniorCompetitionFilter odlučuje što je seniorska utakmica", async () => {
     const { store } = memoryStore();
-    const kup = match({ competition: { id: 7, name: "Kup NS Split" } as never });
+    // SAFETY: fixture nosi samo polja koja izvještaj čita; ostatak HNS-ove
+    // OpenAPI strukture ovaj test ne dira.
+    const kup = match({ competition: { id: 7, name: "Kup NS Split" } as HnsMatch["competition"] });
 
     const summary = await runWithHnsContext(
       {
@@ -180,6 +199,7 @@ describe("publishMatchReports", () => {
 
   it("greška na jednoj utakmici ne ruši obradu", async () => {
     const { store } = memoryStore();
+
     const failing: NewsStore = {
       has: store.has,
       create: async () => {

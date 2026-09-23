@@ -18,13 +18,16 @@ interface Props {
 
 export async function generateStaticParams() {
   const programs = await fetchSchoolPrograms();
+
   return programs.map((program) => ({ id: String(program.id) }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const program = await fetchSchoolProgramById({ id });
+
   if (!program) return { title: "Program nije pronađen" };
+
   return {
     title: `${program.name} — Škola nogometa`,
     description:
@@ -36,14 +39,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function SchoolProgramPage({ params }: Props) {
   const { id } = await params;
+
   const [program, allPrograms] = await Promise.all([
     fetchSchoolProgramById({ id }),
     fetchSchoolPrograms(),
   ]);
+
   if (!program) notFound();
 
   const photoUrl =
-    program.photo?.sizes?.hero?.url ?? program.photo?.url ?? null;
+    program.photo?.heroUrl ?? null;
+
   // Naziv kategorije bez raspona uzrasta (npr. "Limači U7–U9" → "Limači")
   const category = program.ageRange
     ? program.name.replace(program.ageRange, "").trim() || program.name
@@ -53,6 +59,7 @@ export default async function SchoolProgramPage({ params }: Props) {
   const currentIndex = allPrograms.findIndex((p) => p.id === program.id);
   const stepNo = currentIndex >= 0 ? currentIndex + 1 : 1;
   const prev = currentIndex > 0 ? allPrograms[currentIndex - 1] : null;
+
   const next =
     currentIndex >= 0 && currentIndex < allPrograms.length - 1
       ? allPrograms[currentIndex + 1]
@@ -96,6 +103,7 @@ export default async function SchoolProgramPage({ params }: Props) {
             <ol className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-3">
               {allPrograms.map((p, i) => {
                 const isCurrent = p.id === program.id;
+
                 return (
                   <li key={p.id} className="flex items-center gap-2">
                     <Link
@@ -234,9 +242,11 @@ function ProgramNavLink({
   direction: "prev" | "next";
 }) {
   const isNext = direction === "next";
+
   const category = program.ageRange
     ? program.name.replace(program.ageRange, "").trim() || program.name
     : program.name;
+
   return (
     <Link
       href={`/skola-nogometa/${program.id}`}

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { z } from "zod";
 import { collectionCacheTag } from "./cacheTags";
 import { CLUB_FEATURES } from "./clubFeatures";
 import { fetchList } from "./fetchCollection";
@@ -8,6 +9,9 @@ import { runWithPayloadContext } from "./context";
 // frontend ga piše preko `tagPrefix`. Razilaženje bi bilo tiho — CMS bi
 // poništio tag koji nitko ne koristi, a sadržaj bi i dalje čekao istek TTL-a.
 
+/** Testu treba samo id; sadržaj kolekcije nije predmet ovog ugovora. */
+const idSchema = z.object({ id: z.number() });
+
 const tagsOfFetch = async (collection: string, tagPrefix?: string) => {
   let captured: string[] | undefined;
 
@@ -16,10 +20,11 @@ const tagsOfFetch = async (collection: string, tagPrefix?: string) => {
       tenantSlug: "sloga-mravince",
       transport: async (_path, opts) => {
         captured = opts?.next?.tags;
+
         return { docs: [], totalDocs: 0, totalPages: 0, page: 1, limit: 10 };
       },
     },
-    () => fetchList({ collection, tagPrefix, adapt: (doc: unknown) => doc }),
+    () => fetchList({ collection, schema: idSchema, tagPrefix, adapt: (doc) => doc }),
   );
 
   return captured;

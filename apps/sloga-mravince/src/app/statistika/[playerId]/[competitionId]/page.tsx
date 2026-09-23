@@ -7,13 +7,15 @@ import { getCometImageUrl } from "@/lib/hns/imageUrl";
 import { fetchPlayerDetails, fetchPlayerStats } from "@/lib/hns/players";
 import { fetchRoster } from "@/lib/payload/getRoster";
 import { getTenant } from "@/lib/payload/getTenant";
-import type { PayloadMedia } from "@/lib/payload/types";
+import type { MediaImage } from "@/lib/payload/types";
 import { BASE_URL } from "@/lib/siteUrl";
 import {
   buildCompetitionSlug,
   buildPlayerSlug,
   parseTrailingId,
 } from "@/lib/helpers/slug";
+import type { JsonLdNode, PersonJsonLd } from "@/types/jsonld";
+import { isPresent } from "@/lib/helpers/present";
 
 interface Props {
   params: Promise<{ playerId: string; competitionId: string }>;
@@ -21,16 +23,23 @@ interface Props {
 
 export const revalidate = 600;
 
-function splitName(name: string): { first: string; last: string } {
+/** Ime razdvojeno na dio ispred prezimena i samo prezime. */
+interface SplitName {
+  first: string;
+  last: string;
+}
+
+function splitName(name: string): SplitName {
   const parts = name.trim().split(/\s+/);
+
   if (parts.length <= 1) return { first: "", last: parts[0] ?? name };
-  const last = parts.pop() as string;
+  const last = parts.pop() ?? name;
+
   return { first: parts.join(" "), last };
 }
 
-function getCrestSrc(logo: string | PayloadMedia | null | undefined): string {
-  if (!logo) return "/crest.png";
-  return typeof logo === "string" ? logo : (logo.url ?? "/crest.png");
+function getCrestSrc(logo: MediaImage | null | undefined): string {
+  return logo?.url ?? "/crest.png";
 }
 
 export default async function PlayerStatsPage({ params }: Props) {
@@ -51,14 +60,17 @@ export default async function PlayerStatsPage({ params }: Props) {
   // bez server-side redirecta koji uzrokuje dupli fetch/flicker pri navigaciji.
   const { first, last } = splitName(playerDetails.name ?? "");
   const crestSrc = getCrestSrc(tenant.branding?.logo);
+
   // Ista slika kao na izlistu igrača: uploadana fotka iz Payloada ima prednost
   // pred HNS ("Comet") portretom.
   const rosterEntry = roster.find(
     (entry) => String(entry.personId) === personId,
   );
+
   const photoUrl =
     rosterEntry?.photo?.url ??
     (playerDetails.picture ? getCometImageUrl(playerDetails.picture) : null);
+
   const shirtNumber = playerDetails.shirtNumber;
   const isCaptain = playerDetails.captain ?? false;
 
@@ -66,12 +78,12 @@ export default async function PlayerStatsPage({ params }: Props) {
     shirtNumber != null ? `#${String(shirtNumber).padStart(2, "0")}` : null,
     playerDetails.position || null,
     isCaptain ? "Kapetan" : null,
-  ].filter(Boolean) as string[];
+  ].filter(isPresent);
 
   const subParts = [
     playerDetails.age != null ? `Dob ${playerDetails.age}` : null,
     playerStats?.competition?.name || null,
-  ].filter(Boolean) as string[];
+  ].filter(isPresent);
 
   const canonical = `${BASE_URL}/statistika/${buildPlayerSlug({
     personId: Number(personId),
@@ -82,11 +94,9 @@ export default async function PlayerStatsPage({ params }: Props) {
       : competitionId
   }`;
 
-  const athlete: Record<string, unknown> = {
+  const athlete: PersonJsonLd = {
     "@type": "Person",
     name: playerDetails.name,
-    ...(photoUrl ? { image: photoUrl } : {}),
-    ...(playerDetails.position ? { jobTitle: playerDetails.position } : {}),
     memberOf: {
       "@type": "SportsTeam",
       name: tenant.displayName,
@@ -94,7 +104,11 @@ export default async function PlayerStatsPage({ params }: Props) {
     },
   };
 
-  const jsonLd: Record<string, unknown>[] = [
+  if (photoUrl) athlete.image = photoUrl;
+
+  if (playerDetails.position) athlete.jobTitle = playerDetails.position;
+
+  const jsonLd: JsonLdNode[] = [
     {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
@@ -133,7 +147,7 @@ export default async function PlayerStatsPage({ params }: Props) {
     <div className="bg-background pb-20 sm:pb-28">
       {jsonLd.map((schema) => (
         <script
-          key={schema["@type"] as string}
+          key={schema["@type"]}
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
         />

@@ -22,10 +22,12 @@ export function resolveBaseUrl({ devPort }: { devPort: number }): string {
   if (process.env.NEXT_PUBLIC_SITE_URL) {
     return stripTrailingSlash(process.env.NEXT_PUBLIC_SITE_URL);
   }
+
   if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
     return stripTrailingSlash(
       `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`,
     );
   }
+
   return `http://localhost:${devPort}`;
 }

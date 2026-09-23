@@ -29,7 +29,14 @@ const TAB_VALUES = [
   "forma",
   "strijelci",
 ] as const;
+
 type TabValue = (typeof TAB_VALUES)[number];
+
+/** Vrijednost `?tab=` je li jedna od kartica koje ova stranica ima. */
+function isTabValue(value: string | null): value is TabValue {
+  return value !== null && TAB_VALUES.some((tab) => tab === value);
+}
+
 const DEFAULT_TAB: TabValue = "pregled";
 
 interface MatchTabsProps {
@@ -56,18 +63,19 @@ export default function MatchTabs({
 
   const activeTab: TabValue = useMemo(() => {
     const param = searchParams.get("tab");
-    return TAB_VALUES.includes(param as TabValue)
-      ? (param as TabValue)
-      : DEFAULT_TAB;
+
+    return isTabValue(param) ? param : DEFAULT_TAB;
   }, [searchParams]);
 
   const handleTabChange = (value: string) => {
     const params = new URLSearchParams(searchParams.toString());
+
     if (value === DEFAULT_TAB) {
       params.delete("tab");
     } else {
       params.set("tab", value);
     }
+
     const query = params.toString();
     router.replace(query ? `?${query}` : "?", { scroll: false });
   };

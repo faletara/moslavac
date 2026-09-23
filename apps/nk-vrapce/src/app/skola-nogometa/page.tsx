@@ -10,6 +10,7 @@ import type { SchoolProgram } from "@/types/school";
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await fetchPageByKey({ key: "skola-info" });
+
   return {
     title: page?.title ?? "Škola nogometa",
     description:
@@ -111,11 +112,13 @@ function ProgramRow({
   index: number;
   total: number;
 }) {
-  const photoUrl = program.photo?.sizes?.card?.url ?? program.photo?.url ?? null;
+  const photoUrl = program.photo?.cardUrl ?? null;
+
   // Naziv kategorije bez raspona uzrasta (npr. "Limači U7–U9" → "Limači")
   const category = program.ageRange
     ? program.name.replace(program.ageRange, "").trim() || program.name
     : program.name;
+
   const isLast = index === total - 1;
 
   return (

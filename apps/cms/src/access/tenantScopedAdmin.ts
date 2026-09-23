@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import type { ClubFeature } from '@/lib/payload/clubFeatures'
 import { isSuperAdmin } from './roles'
-import { type MaybeTenantUser, tenantRows } from './tenantRef'
+import { type MaybeTenantUser, tenantRefInfo, tenantRows } from './tenantRef'
 
 /**
  * Vidljivost klub-specifične kolekcije u admin sučelju, vođena podacima.
@@ -24,14 +24,11 @@ import { type MaybeTenantUser, tenantRows } from './tenantRef'
  */
 
 const userTenantFeatures = (user: MaybeTenantUser): ClubFeature[] =>
-  tenantRows(user).flatMap((row) =>
-    typeof row?.tenant === 'object' && row.tenant?.features
-      ? row.tenant.features
-      : [],
-  )
+  tenantRows(user).flatMap((row) => tenantRefInfo.parse(row?.tenant).features)
 
 export function canSeeFeature(user: MaybeTenantUser, feature: ClubFeature): boolean {
   if (isSuperAdmin(user)) return true
+
   return userTenantFeatures(user).includes(feature)
 }
 
@@ -41,7 +38,7 @@ export function tenantScopedAdmin(
   const hidden: NonNullable<NonNullable<CollectionConfig['admin']>['hidden']> = ({
     user,
   }) => {
-    return !canSeeFeature(user as MaybeTenantUser, feature)
+    return !canSeeFeature(user, feature)
   }
 
   return { hidden }

@@ -8,9 +8,7 @@ import { CLUB_FEATURES } from "./clubFeatures";
 // Bez `server-only`: CMS (Node, bez Next request konteksta) ovo uvozi.
 
 /** `tenants` kolekcija se ne tagira množinom — usp. getTenant.ts. */
-const TAG_PREFIX_OVERRIDES: Record<string, string> = {
-  tenants: "tenant",
-};
+const TAG_PREFIX_OVERRIDES = new Map([["tenants", "tenant"]]);
 
 /**
  * Cache tag za jednu kolekciju jednog kluba, npr. `news-sloga-mravince`.
@@ -22,7 +20,8 @@ export function collectionCacheTag(
   collectionSlug: string,
   tenantSlug: string,
 ): string {
-  const override = TAG_PREFIX_OVERRIDES[collectionSlug];
+  const override = TAG_PREFIX_OVERRIDES.get(collectionSlug);
   const feature = CLUB_FEATURES.find((item) => item.slug === collectionSlug);
+
   return `${override ?? feature?.feature ?? collectionSlug}-${tenantSlug}`;
 }

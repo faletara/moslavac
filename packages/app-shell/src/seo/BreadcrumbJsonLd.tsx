@@ -14,6 +14,7 @@ export default function BreadcrumbJsonLd({
   trail: { name: string; path: string }[];
 }) {
   const base = baseUrl.replace(/\/+$/, "");
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",

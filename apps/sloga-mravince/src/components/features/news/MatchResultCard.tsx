@@ -14,6 +14,7 @@ export function MatchResultCard({ match }: { match: Match }) {
   const away = match.awayTeam;
   const homeGoals = match.score.home.current;
   const awayGoals = match.score.away.current;
+
   if (!home || !away || homeGoals == null || awayGoals == null) return null;
 
   const { date, time } = match.kickoffAtUtcMs

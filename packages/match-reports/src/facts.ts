@@ -66,9 +66,12 @@ const teamName = (match: Match, side: MatchSide): string =>
  */
 function toFactEvent(match: Match, event: MatchEvent): FactEvent | null {
   if (event.side !== "home" && event.side !== "away") return null;
+
   if (event.minute == null) return null;
   const player = event.player?.name?.trim();
+
   if (!player) return null;
+
   return {
     side: event.side,
     team: teamName(match, event.side),
@@ -89,13 +92,17 @@ export function toMatchFacts(
 
   const home = teamName(match, "home");
   const away = teamName(match, "away");
+
   if (!home || !away) return null;
 
   const collect = (kind: ReturnType<typeof eventKind>): FactEvent[] =>
-    events
-      .filter((e) => eventKind(e.type) === kind)
-      .map((e) => toFactEvent(match, e))
-      .filter((e): e is FactEvent => e !== null);
+    events.flatMap((e) => {
+      if (eventKind(e.type) !== kind) return [];
+
+      const fact = toFactEvent(match, e);
+
+      return fact === null ? [] : [fact];
+    });
 
   const { time } = formatDateTime(match.kickoffAtUtcMs);
 

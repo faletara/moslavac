@@ -21,6 +21,7 @@ export function Hero() {
   // 3D nagib grupe kartica prati miš; isključen ispod 1024px i uz reduced motion.
   useEffect(() => {
     const node = tiltRef.current
+
     if (!node || reduced) return
 
     const canTilt = () => window.innerWidth >= 1024
@@ -32,11 +33,13 @@ export function Hero() {
       const y = (e.clientY - rect.top - rect.height / 2) * -0.012
       node.style.transform = `perspective(1200px) rotateX(${y}deg) rotateY(${x}deg) scale3d(1.01,1.01,1.01)`
     }
+
     const enter = (e: MouseEvent) => {
       if (!canTilt()) return
       node.style.transition = 'transform 0.2s ease'
       move(e)
     }
+
     const leave = () => {
       node.style.transition = 'transform 0.6s ease'
       node.style.transform = 'perspective(1200px) rotateX(0) rotateY(0) scale3d(1,1,1)'
@@ -45,6 +48,7 @@ export function Hero() {
     node.addEventListener('mouseenter', enter)
     node.addEventListener('mousemove', move)
     node.addEventListener('mouseleave', leave)
+
     return () => {
       node.removeEventListener('mouseenter', enter)
       node.removeEventListener('mousemove', move)

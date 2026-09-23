@@ -124,6 +124,7 @@ function promptFacts(facts: MatchFacts) {
   // sam prebrojati po momčadima, a to je aritmetika koju kod već zna — i na
   // kojoj je manji model padao na provjeri.
   const home = yellowCards.filter((e) => e.side === "home").length;
+
   return {
     ...rest,
     // `null` kad HNS ne kaže stranu — tada izvještaj ostaje neutralan.

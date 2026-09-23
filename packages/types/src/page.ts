@@ -1,4 +1,4 @@
-import type { PayloadMedia } from "@/lib/payload/types";
+import type { MediaImage } from "@/lib/payload/schemas";
 
 export type PageKey =
   | "povijest"
@@ -13,9 +13,9 @@ export interface ClubPage {
   key: PageKey;
   title: string;
   eyebrow: string | null;
-  heroImage: PayloadMedia | null;
+  heroImage: MediaImage | null;
   /** Rich-text sadržaj pretvoren u HTML. */
   content: string;
-  gallery: PayloadMedia[];
+  gallery: MediaImage[];
   seoDescription: string | null;
 }

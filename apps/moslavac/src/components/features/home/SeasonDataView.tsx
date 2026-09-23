@@ -13,6 +13,9 @@ import { buildCompetitionSlug, buildPlayerSlug } from "@/lib/helpers/slug";
 import { cn } from "@/lib/utils";
 import type { Competition, CompetitionPlayerStat, TeamRanking } from "@/types/hns";
 
+/** Standardni CSS `ease-in-out` kao Bézier kontrolne točke. */
+const EASE_IN_OUT: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
+
 const rowVariants = {
 	hidden: { opacity: 0, x: -16 },
 	show: {
@@ -20,7 +23,7 @@ const rowVariants = {
 		x: 0,
 		transition: {
 			duration: 0.4,
-			ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number],
+			ease: EASE_IN_OUT,
 		},
 	},
 };
@@ -314,6 +317,7 @@ export default function SeasonDataView({
 								>
 									{standings.map((row, i) => {
 										const teamName = row.team?.name ?? "";
+
 										return (
 											<StandingsRow
 												key={`${row.team?.id ?? teamName}-${i}`}
@@ -346,11 +350,15 @@ export default function SeasonDataView({
 								>
 									{topScorers.map((row, i) => {
 										const teamName = row.team?.name ?? "";
+
 										const isClub =
 											!!shortName && teamName.includes(shortName);
+
 										const isMoslavac =
 											ourTeamId != null && row.team?.id === ourTeamId;
+
 										const key = `${row.player?.personId ?? row.player?.name ?? i}-${i}`;
+
 										return (
 											<ScorerRow
 												key={key}

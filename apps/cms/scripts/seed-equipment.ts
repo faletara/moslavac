@@ -13,6 +13,7 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 
 const TENANT_SLUG = process.env.SEED_TENANT_SLUG ?? 'moslavac'
+
 const ALPAS_BASE = 'https://www.alpashrvatska.hr/snk-moslavac-popovaca'
 
 type Category = 'paketi' | 'dresovi' | 'trenirke' | 'jakne' | 'dodaci'
@@ -188,7 +189,9 @@ const equipment: EquipmentSeed[] = [
 ]
 
 console.log('seed-equipment: starting')
+
 const payloadConfig = await config
+
 const payload = await getPayload({ config: payloadConfig })
 
 const tenants = await payload.find({
@@ -198,13 +201,16 @@ const tenants = await payload.find({
 })
 
 const tenant = tenants.docs[0]
+
 if (!tenant) {
   console.error(`Tenant with slug "${TENANT_SLUG}" not found`)
   process.exit(1)
 }
+
 console.log(`seed-equipment: tenant "${tenant.slug}" (id=${tenant.id})`)
 
 let created = 0
+
 let skipped = 0
 
 for (const item of equipment) {

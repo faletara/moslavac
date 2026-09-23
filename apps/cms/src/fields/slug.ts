@@ -1,4 +1,5 @@
 import type { Field, FieldHook } from 'payload'
+import { rawText } from '../lib/hookValues'
 
 /** Pretvara proizvoljan string u URL-safe slug (bez dijakritike). */
 export const slugify = (value: string): string =>
@@ -18,13 +19,14 @@ export const slugify = (value: string): string =>
  * generira slug iz `title`. Isti obrazac kao u News kolekciji.
  */
 export const formatSlug: FieldHook = ({ value, originalDoc, data }) => {
-  if (typeof value === 'string' && value.length > 0) {
-    return slugify(value)
-  }
-  const fallback = data?.title ?? originalDoc?.title
-  if (typeof fallback === 'string' && fallback.length > 0) {
-    return slugify(fallback)
-  }
+  const entered = rawText.safeParse(value)
+
+  if (entered.success) return slugify(entered.data)
+
+  const fallback = rawText.safeParse(data?.title ?? originalDoc?.title)
+
+  if (fallback.success) return slugify(fallback.data)
+
   return value
 }
 

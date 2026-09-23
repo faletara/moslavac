@@ -19,6 +19,7 @@ const seasonSource = (): Promise<SitemapEntry[]> =>
       .filter((c): c is typeof c & { id: number } => c.id != null)
       .flatMap((c) => {
         const slug = buildCompetitionSlug(c);
+
         return [
           { path: `/sezona/${slug}`, changeFrequency: "daily", priority: 0.8 },
           { path: `/sezona/${slug}/tablica`, changeFrequency: "daily", priority: 0.7 },

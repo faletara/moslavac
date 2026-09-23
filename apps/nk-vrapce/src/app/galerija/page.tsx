@@ -49,12 +49,10 @@ export default async function GalerijaPage() {
 
 function AlbumCard({ album }: { album: GalleryAlbum }) {
   const cover =
-    album.coverImage?.sizes?.card?.url ??
-    album.coverImage?.url ??
-    album.photos[0]?.image.sizes?.card?.url ??
-    album.photos[0]?.image.url ??
-    null;
+    album.coverImage?.cardUrl ?? album.photos[0]?.image.cardUrl ?? null;
+
   const href = `/galerija/${album.slug ?? album.id}`;
+
   return (
     <Link href={href} className="group flex flex-col gap-4">
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-2">

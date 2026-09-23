@@ -21,9 +21,11 @@ export async function markdownProxy(
   if (request.method !== "GET" && request.method !== "HEAD") {
     return NextResponse.next();
   }
+
   if (request.headers.get(MARKDOWN_SOURCE_HEADER)) {
     return NextResponse.next();
   }
+
   if (!wantsMarkdown(request.headers.get("accept"))) {
     return NextResponse.next();
   }
@@ -37,6 +39,7 @@ export async function markdownProxy(
     });
 
     const contentType = upstream.headers.get("content-type") ?? "";
+
     if (!upstream.ok || !contentType.includes("text/html")) {
       return NextResponse.next();
     }

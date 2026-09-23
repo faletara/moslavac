@@ -60,7 +60,9 @@ export const Equipment = clubFeatureCollection('equipment', {
       },
       validate: (value: string | null | undefined) => {
         if (!value) return 'Link je obavezan'
+
         if (!/^https?:\/\//i.test(value)) return 'Link mora počinjati s http:// ili https://'
+
         return true
       },
     },

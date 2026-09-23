@@ -12,47 +12,9 @@ export interface PayloadMedia {
   } | null;
 }
 
-export interface FrontendTenant {
-  id: number;
-  slug: string;
-  displayName: string;
-  active: boolean;
-  hns: {
-    apiKey: string;
-    teamId: string;
-    seniorCompetitionFilter?: string | null;
-  };
-  branding?: {
-    shortName?: string | null;
-    motto?: string | null;
-    founded?: number | null;
-    logo?: PayloadMedia | string | null;
-  } | null;
-  contact?: {
-    email?: string | null;
-    phone?: string | null;
-    address?: string | null;
-    city?: string | null;
-    region?: string | null;
-    mapEmbedUrl?: string | null;
-  } | null;
-  social?: {
-    facebook?: string | null;
-    instagram?: string | null;
-    youtube?: string | null;
-    webshop?: string | null;
-  } | null;
-  payment?: {
-    iban?: string | null;
-    recipient?: string | null;
-    seasonTicketPrice?: number | null;
-  } | null;
-  legal?: {
-    oib?: string | null;
-    registryNumber?: string | null;
-    registryAuthority?: string | null;
-  } | null;
-}
+// `FrontendTenant` je sada izlaz `tenantSchema` (vidi schemas.ts): logo i
+// ostale relacije stižu normalizirane, pa ga ovdje samo ponovno izvozimo.
+export type { FrontendTenant, MediaImage } from "./schemas";
 
 export interface PayloadPaginated<T> {
   docs: T[];

@@ -32,6 +32,7 @@ export function Countdown({ target }: { target: number }) {
 			{TILES.map(({ key, forms }, i) => {
 				const value = state ? String(state[key]).padStart(2, "0") : "––";
 				const isSeconds = key === "seconds";
+
 				return (
 					<div
 						key={key}

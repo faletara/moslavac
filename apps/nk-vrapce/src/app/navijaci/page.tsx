@@ -6,6 +6,7 @@ import { fetchPageByKey } from "@/lib/payload/getPages";
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await fetchPageByKey({ key: "navijaci" });
+
   return {
     title: page?.title ?? "Lunatics Vrapče",
     description:
@@ -44,17 +45,18 @@ const LUNATICS_ART = [
 
 export default async function NavijaciPage() {
   const page = await fetchPageByKey({ key: "navijaci" });
+
   const heroBg =
-    page?.heroImage?.sizes?.hero?.url ??
-    page?.heroImage?.url ??
+    page?.heroImage?.heroUrl ??
     LUNATICS_HERO_BG;
+
   const cmsGallery = page?.gallery ?? [];
 
   // Galerija je CMS-driven; dok klub ne uploada slike, koristi se dostavljena grafika.
   const galleryItems =
     cmsGallery.length > 0
       ? cmsGallery.map((media) => ({
-          src: media.sizes?.card?.url ?? media.url,
+          src: media.cardUrl,
           alt: media.alt || "Lunatics Vrapče",
         }))
       : LUNATICS_ART;

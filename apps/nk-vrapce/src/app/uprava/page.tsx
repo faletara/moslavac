@@ -29,14 +29,15 @@ const groupLabels: Record<BoardRoleGroup, string> = {
 export default async function UpravaPage() {
   const members = await fetchBoardMembers();
 
-  const grouped = groupOrder
-    .map((group) => ({
-      group,
-      members: members
-        .filter((m) => m.roleGroup === group)
-        .sort((a, b) => a.displayOrder - b.displayOrder),
-    }))
-    .filter((section) => section.members.length > 0);
+  const grouped = groupOrder.flatMap((group) => {
+    const groupMembers = members
+      .filter((m) => m.roleGroup === group)
+      .sort((a, b) => a.displayOrder - b.displayOrder);
+
+    if (groupMembers.length === 0) return [];
+
+    return [{ group, members: groupMembers }];
+  });
 
   return (
     <>
@@ -81,7 +82,8 @@ export default async function UpravaPage() {
 }
 
 function MemberCard({ member }: { member: BoardMember }) {
-  const photoUrl = member.photo?.sizes?.card?.url ?? member.photo?.url ?? null;
+  const photoUrl = member.photo?.cardUrl ?? null;
+
   return (
     <FadeInView className="group">
       <div className="relative aspect-[3/4] w-full overflow-hidden bg-brand-navy ring-1 ring-black/5 transition-all duration-300 group-hover:ring-brand-yellow/50 group-hover:shadow-[0_22px_45px_-20px_rgba(10,28,51,0.5)]">

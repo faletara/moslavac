@@ -1,10 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
-
-// The Lexical → HTML converter is a heavy server package; stub it so adaptNews
-// is deterministic and the module imports cleanly under vitest.
-vi.mock("@payloadcms/richtext-lexical/html", () => ({
-  convertLexicalToHTML: ({ data }: { data: unknown }) => (data ? "<p>html</p>" : ""),
-}));
+import { describe, expect, it } from "vitest";
 
 import { runWithPayloadContext } from "./context";
 import type { PayloadTransport } from "./context";
@@ -16,6 +10,20 @@ import {
 } from "./getNews";
 
 type RawNews = Parameters<typeof adaptNews>[0];
+
+/** Polja ovojnice koja pojedini test nadjačava. */
+type PayloadPage = {
+  totalDocs: number;
+  totalPages: number;
+  page: number;
+  limit: number;
+};
+
+type LexicalToHtml = Parameters<typeof adaptNews>[1];
+
+// The real Lexical converter is a heavy server package with its own rendering
+// rules; adaptNews only needs to know that a tree becomes markup.
+const toHtml: LexicalToHtml = ({ data }) => (data ? "<p>html</p>" : "");
 
 const raw = (over: Partial<RawNews> = {}): RawNews => ({
   id: 3,
@@ -32,7 +40,7 @@ const raw = (over: Partial<RawNews> = {}): RawNews => ({
   ...over,
 });
 
-function pageOf(docs: RawNews[], over: Record<string, unknown> = {}) {
+function pageOf(docs: RawNews[], over: Partial<PayloadPage> = {}) {
   return {
     docs,
     totalDocs: docs.length,
@@ -49,7 +57,7 @@ function pageOf(docs: RawNews[], over: Record<string, unknown> = {}) {
 
 describe("adaptNews", () => {
   it("maps content→html, media urls, and the tenant slug", () => {
-    expect(adaptNews(raw())).toMatchObject({
+    expect(adaptNews(raw(), toHtml)).toMatchObject({
       id: 3,
       slug: "naslov",
       title: "Naslov",
@@ -62,15 +70,17 @@ describe("adaptNews", () => {
   });
 
   it("renders empty html when content is null", () => {
-    expect(adaptNews(raw({ content: null })).content).toBe("");
+    expect(adaptNews(raw({ content: null }), toHtml).content).toBe("");
   });
 });
 
 describe("fetchLatestNews", () => {
   it("queries /news sorted -publishedAt with limit 6", async () => {
     const calls: string[] = [];
+
     const transport: PayloadTransport = async (path) => {
       calls.push(path);
+
       return pageOf([raw()]);
     };
 
@@ -110,10 +120,12 @@ describe("fetchNewsPaginated", () => {
 describe("fetchNewsBySlug", () => {
   it("returns null when no doc matches", async () => {
     const transport: PayloadTransport = async () => pageOf([]);
+
     const result = await runWithPayloadContext(
       { transport, tenantSlug: "moslavac" },
       () => fetchNewsBySlug({ slug: "x" }),
     );
+
     expect(result).toBeNull();
   });
 });

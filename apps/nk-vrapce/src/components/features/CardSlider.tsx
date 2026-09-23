@@ -34,11 +34,14 @@ export function CardSlider({
 
 	useEffect(() => {
 		if (!api) return;
+
 		const update = () =>
 			setCanScroll(api.canScrollPrev() || api.canScrollNext());
+
 		update();
 		api.on("reInit", update);
 		api.on("select", update);
+
 		return () => {
 			api.off("reInit", update);
 			api.off("select", update);

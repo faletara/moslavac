@@ -3,6 +3,11 @@
 
 // Index signatures keep these structurally assignable to Payload's richText
 // (SerializedEditorState) field type, which carries `[k: string]: unknown`.
+//
+// `anti-slop/no-unsafe-dictionary-type` prijavljuje svaki od njih. Nisu naš
+// izbor: generirani `payload-types.ts` traži točno taj oblik za `content`, pa
+// bez indeksnog potpisa `paragraphsToLexical` više ne prolazi u CMS. Provjereno
+// uklanjanjem — `seed-news.ts` i `matchReportsStore.ts` odmah padnu.
 interface LexicalTextNode {
   [k: string]: unknown;
   type: "text";
@@ -74,6 +79,8 @@ const paragraphNode = (
   direction: "ltr",
   textFormat: 0,
   textStyle: "",
+  // SAFETY: Payloadov `children` tip ne dopušta uniju s link čvorom, iako ga
+  // `convertLexicalToHTML` obrađuje; oblik je provjeren u `linkParagraph`.
   children: children as LexicalTextNode[],
 });
 

@@ -55,13 +55,18 @@ function TeamBlock({
 export default function NextMatchBar({ slots }: { slots: MatchSlots }) {
   const isNext = isRealMatch(slots.next);
   const match = isNext ? slots.next : slots.previous;
+
   if (!isRealMatch(match)) return null;
 
-  const kickoff = match.kickoffAtUtcMs as number;
+  const kickoff = match.kickoffAtUtcMs;
+
+  if (kickoff == null) return null;
   const { weekdayShort, day, monthShort, time } = formatDateParts(kickoff);
+
   const meta = [match.competition?.name, match.round]
     .filter(Boolean)
     .join(" · ");
+
   const venue = match.facility?.name ?? match.facility?.place ?? null;
 
   const home = match.score.home?.current;

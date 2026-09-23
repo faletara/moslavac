@@ -84,12 +84,9 @@ function NewsCard({
 
 export default async function LatestNewsSection() {
 	const [news, tenant] = await Promise.all([fetchLatestNews(), getTenant()]);
-	const logo =
-		tenant.branding?.logo &&
-		typeof tenant.branding.logo === "object" &&
-		"url" in tenant.branding.logo
-			? tenant.branding.logo
-			: null;
+
+	const logo = tenant.branding?.logo ?? null;
+
 	const fallback = logo?.url ?? "";
 
 	if (!news || news.length === 0) return null;

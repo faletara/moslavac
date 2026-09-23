@@ -60,6 +60,7 @@ export default function Header({ tenant, competitions }: HeaderProps) {
 	// tek kad se header VRATI niže (scroll gore, nije na vrhu), tako nema
 	// bljeska podloge tijekom klizanja prema gore.
 	const bare = (atTop || hidden) && !sheetOpen;
+
 	// Stranice s tamnim hero-om ispod headera traže svijetli tekst (dark).
 	// `/utakmice/...` i `/statistika/...` hvataju samo detaljne rute (ne i
 	// listinge koji koriste svijetli PageHero). Drugdje je vrh svijetao pa tekst
@@ -94,6 +95,7 @@ export default function Header({ tenant, competitions }: HeaderProps) {
 		if ("scrollRestoration" in window.history) {
 			window.history.scrollRestoration = "manual";
 		}
+
 		// The motion value only emits on change, so seed the state from the real
 		// position. Read it a frame later: the browser may still be restoring the
 		// scroll offset while this effect runs.
@@ -102,6 +104,7 @@ export default function Header({ tenant, competitions }: HeaderProps) {
 			setAtTop(y <= 80);
 			anchorY.current = y;
 		});
+
 		return () => cancelAnimationFrame(frame);
 	}, [scrollY]);
 
@@ -110,8 +113,10 @@ export default function Header({ tenant, competitions }: HeaderProps) {
 
 		if (menuOpen) {
 			anchorY.current = currentY;
+
 			return;
 		}
+
 		if (currentY <= 80) {
 			setHidden(false);
 			anchorY.current = currentY;
@@ -161,9 +166,7 @@ export default function Header({ tenant, competitions }: HeaderProps) {
 		});
 
 	const logo =
-		tenant.branding?.logo && typeof tenant.branding.logo === "object"
-			? (tenant.branding.logo as PayloadMedia)
-			: null;
+		tenant.branding?.logo ?? null;
 
 	return (
 		<header className="sticky top-0 z-50 h-20">

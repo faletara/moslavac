@@ -77,9 +77,11 @@ export function YouTubePromoContent({
 }: YouTubePromoContentProps) {
   const youtube = youtubeUrl ?? null;
   const hasChannel = youtube != null;
+
   const headingLines = hasChannel
     ? ["Pratite", "Moslavac", "na YouTubeu"]
     : ["YouTube", "kanal", "nije dostupan"];
+
   const description = hasChannel
     ? "Pretplatite se na službeni YouTube kanal Moslavca za prijenose utakmica, najbolje trenutke i klupski sadržaj."
     : "Službeni YouTube kanal još nije dostupan. Kada ga klub pokrene, ovdje ćemo objaviti provjerenu poveznicu.";

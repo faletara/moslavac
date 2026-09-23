@@ -28,7 +28,35 @@
   `apps/cms/src/app/(payload)/admin/importMap.js`.
 - Root script `lint:oxlint` runs Oxlint. The existing `lint` script (`turbo run lint`,
   ESLint per app) is unchanged; Oxlint runs alongside it, not instead of it.
-- No findings were fixed at install time. Cleanup was not requested.
+
+## Cleanup (2026-09-23)
+
+Run on request: **1483 findings → 8**. `require-readable-spacing` (1193) was fixed
+with `oxlint --fix`; everything else by hand. The largest structural change was a
+zod parse layer at the two I/O boundaries — `packages/payload/src/schemas.ts` and
+`packages/hns/src/schemas.ts` — which normalises Payload media and tenant
+relations into `MediaImage` and removes ~30 representation checks from components.
+`zod@^4.6.5` was added as a direct dependency of every app plus the workspace root.
+
+## Remaining findings (8)
+
+Each is imposed by a third-party type; none can be fixed without breaking a
+contract this repo does not own. Every site carries a comment naming the rule
+and the constraint.
+
+- `packages/ai/src/lexical.ts` — 5× `no-unsafe-dictionary-type`. Payload's
+  generated `payload-types.ts` types the `content` richText column as
+  `{ [k: string]: unknown; root: { … children: { [k: string]: unknown; … }[] } }`.
+  Removing the index signatures was tried and breaks `seed-news.ts` and
+  `matchReportsStore.ts` at compile time.
+- `apps/cms/src/lib/hnsDispatcher.ts` — 2× `no-runtime-typeof`. Node's
+  `dns.lookup` has two overloads whose only difference is whether the second
+  argument is the callback.
+- `apps/cms/src/factories/clubFeatureCollection.ts` — 1× `no-runtime-typeof`.
+  Payload types `admin.hidden` as `((args) => boolean) | boolean` with no
+  discriminator.
+
+`pnpm lint:oxlint` therefore still exits 1.
 
 ## Dependencies
 

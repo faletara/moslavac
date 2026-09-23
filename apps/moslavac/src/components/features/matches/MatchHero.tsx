@@ -9,6 +9,7 @@ import type { MatchEvent } from "@/types/hns";
 import MatchEventBar from "./MatchEventBar";
 
 const EASE = [0.25, 0.1, 0.25, 1] as const;
+
 const EXPO_OUT = [0.16, 1, 0.3, 1] as const;
 
 interface MatchHeroProps {
@@ -60,9 +61,11 @@ export default function MatchHero({
 }: MatchHeroProps) {
   const reduced = useReducedMotion();
 
-  const subline = [date, place].filter(
-    (p): p is string => typeof p === "string" && p.trim().length > 0,
-  );
+  const subline = [date, place].flatMap((part) => {
+    const trimmed = part?.trim();
+
+    return trimmed ? [trimmed] : [];
+  });
 
   const score = (
     <Scoreline
@@ -260,6 +263,7 @@ function Crest({
   side: "home" | "away";
 }) {
   const fromX = side === "home" ? -24 : 24;
+
   return (
     <motion.div
       className="relative shrink-0"
@@ -293,6 +297,7 @@ function TeamName({
   side: "home" | "away";
 }) {
   const fromX = side === "home" ? -24 : 24;
+
   return (
     <motion.h2
       className={cn(

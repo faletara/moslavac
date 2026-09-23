@@ -1,5 +1,6 @@
 import "server-only";
 import { cache } from "react";
+import { z } from "zod";
 
 export interface YouTubeChannelStats {
   subscriberCount: number | null;
@@ -7,16 +8,23 @@ export interface YouTubeChannelStats {
   viewCount: number;
 }
 
-interface YouTubeChannelsResponse {
-  items?: {
-    statistics?: {
-      subscriberCount?: string;
-      hiddenSubscriberCount?: boolean;
-      videoCount?: string;
-      viewCount?: string;
-    };
-  }[];
-}
+/** Odgovor YouTube Data API-ja; opisana su samo polja koja čitamo. */
+const channelsResponse = z.object({
+  items: z
+    .array(
+      z.object({
+        statistics: z
+          .object({
+            subscriberCount: z.string().nullish(),
+            hiddenSubscriberCount: z.boolean().nullish(),
+            videoCount: z.string().nullish(),
+            viewCount: z.string().nullish(),
+          })
+          .nullish(),
+      }),
+    )
+    .nullish(),
+});
 
 /**
  * Turns a channel URL into the lookup param the Data API needs: `/@handle`,
@@ -24,6 +32,7 @@ interface YouTubeChannelsResponse {
  */
 function channelLookupParam(youtubeUrl: string): string | null {
   let url: URL;
+
   try {
     url = new URL(youtubeUrl);
   } catch {
@@ -31,19 +40,24 @@ function channelLookupParam(youtubeUrl: string): string | null {
   }
 
   const [first, second] = url.pathname.split("/").filter(Boolean);
+
   if (!first) return null;
 
   if (first.startsWith("@")) return `forHandle=${encodeURIComponent(first)}`;
+
   if (first === "channel" && second) return `id=${encodeURIComponent(second)}`;
+
   if ((first === "user" || first === "c") && second) {
     return `forUsername=${encodeURIComponent(second)}`;
   }
+
   return null;
 }
 
-function toCount(value: string | undefined): number | null {
+function toCount(value: string | null | undefined): number | null {
   if (value == null) return null;
   const parsed = Number(value);
+
   return Number.isFinite(parsed) ? parsed : null;
 }
 
@@ -55,9 +69,11 @@ function toCount(value: string | undefined): number | null {
 export const getYouTubeChannelStats = cache(
   async (youtubeUrl: string | null | undefined) => {
     const apiKey = process.env.YOUTUBE_API_KEY;
+
     if (!apiKey || !youtubeUrl) return null;
 
     const lookup = channelLookupParam(youtubeUrl);
+
     if (!lookup) return null;
 
     try {
@@ -68,14 +84,17 @@ export const getYouTubeChannelStats = cache(
           next: { revalidate: 3600, tags: ["youtube-channel-stats"] },
         },
       );
+
       if (!response.ok) return null;
 
-      const data = (await response.json()) as YouTubeChannelsResponse;
+      const data = channelsResponse.parse(await response.json());
       const statistics = data.items?.[0]?.statistics;
+
       if (!statistics) return null;
 
       const videoCount = toCount(statistics.videoCount);
       const viewCount = toCount(statistics.viewCount);
+
       if (videoCount == null || viewCount == null) return null;
 
       return {

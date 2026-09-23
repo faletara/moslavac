@@ -40,6 +40,7 @@ export const createCollection = ({
         ...(hooks?.afterChange ?? []),
         async ({ doc, req }) => {
           await notifyFrontend(doc, req.payload)
+
           return doc
         },
       ],
@@ -47,6 +48,7 @@ export const createCollection = ({
         ...(hooks?.afterDelete ?? []),
         async ({ doc, req }) => {
           await notifyFrontend(doc, req.payload)
+
           return doc
         },
       ],

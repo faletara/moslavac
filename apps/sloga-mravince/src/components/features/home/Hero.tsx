@@ -22,6 +22,7 @@ type HeroProps = {
 };
 
 const AUTOPLAY_MS = 6000;
+
 const EXPO_OUT = [0.16, 1, 0.3, 1] as const;
 
 /**
@@ -34,7 +35,9 @@ export default function Hero({ tenant, news }: HeroProps) {
   if (news.length === 0) {
     return <HeroFallback tenant={tenant} />;
   }
+
   const clubName = tenant.branding?.shortName ?? tenant.displayName;
+
   return (
     <>
       {/* Naslovnici h1 pripada klubu, ne naslovu vijesti koji se rotira svakih
@@ -57,6 +60,7 @@ function HeroSlider({
   const [paused, setPaused] = useState(false);
 
   const count = news.length;
+
   const goTo = useCallback(
     (i: number) => setIndex(((i % count) + count) % count),
     [count],
@@ -71,15 +75,19 @@ function HeroSlider({
   useEffect(() => {
     if (reduced || count < 2) {
       width.set(reduced ? 100 : 0);
+
       return;
     }
+
     if (paused) return; // ostavlja width zamrznut na trenutnoj vrijednosti
     width.set(0);
+
     const controls = animate(width, 100, {
       duration: AUTOPLAY_MS / 1000,
       ease: "linear",
       onComplete: () => setIndex((i) => (i + 1) % count),
     });
+
     return () => controls.stop();
   }, [index, paused, reduced, count, width]);
 
@@ -276,22 +284,29 @@ function HeroSlide({
 
   const decideFit = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const el = containerRef.current;
+
     if (!el || !el.clientHeight) return;
     const img = e.currentTarget;
+
     if (!img.naturalWidth || !img.naturalHeight) return;
 
     const containerAspect = el.clientWidth / el.clientHeight;
+
     // Na uskim (portret) ekranima letterbox s blur trakama izgleda lošije od
     // blagog izreza — landscape fotku uvijek popuni preko cijelog frame-a.
     if (containerAspect < 1) {
       setContain(false);
+
       return;
     }
+
     const imageAspect = img.naturalWidth / img.naturalHeight;
+
     const cropFraction =
       imageAspect >= containerAspect
         ? 1 - containerAspect / imageAspect // reže se lijevo/desno
         : 1 - imageAspect / containerAspect; // reže se gore/dolje
+
     setContain(cropFraction > MAX_CROP_FRACTION);
   };
 

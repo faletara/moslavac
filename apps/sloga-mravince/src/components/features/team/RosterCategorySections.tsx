@@ -23,17 +23,24 @@ function getPhotoSrc(
   cometPhotos: Map<number, string>,
 ): string | null {
   return (
-    player.photo?.sizes?.card?.url ??
-    player.photo?.url ??
+    player.photo?.cardUrl ??
     cometPhotos.get(player.personId) ??
     null
   );
 }
 
-function splitName(name: string): { first: string; last: string } {
+/** Ime razdvojeno na dio ispred prezimena i samo prezime. */
+interface SplitName {
+  first: string;
+  last: string;
+}
+
+function splitName(name: string): SplitName {
   const parts = name.trim().split(/\s+/);
+
   if (parts.length <= 1) return { first: "", last: parts[0] ?? name };
-  const last = parts.pop() as string;
+  const last = parts.pop() ?? name;
+
   return { first: parts.join(" "), last };
 }
 
@@ -170,6 +177,7 @@ function playerHref(
 ): string | null {
   if (!competitionSlug || player.position === "trener" || player.personId == null)
     return null;
+
   return `/statistika/${buildPlayerSlug({
     personId: player.personId,
     name: player.displayName,

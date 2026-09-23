@@ -1,40 +1,50 @@
 import "server-only";
 import { convertLexicalToHTML } from "@payloadcms/richtext-lexical/html";
+import { z } from "zod";
 import type { News, PaginatedNews } from "@/types/news";
 import { fetchList, fetchOne, fetchPage } from "./fetchCollection";
-import { mediaUrl } from "./media";
+import { mediaRef, tenantRef } from "./schemas";
 import { resolveTenantSlug } from "./tenant";
-import type { PayloadMedia } from "./types";
 
-interface PayloadNews {
-  id: number;
-  title: string;
-  slug: string | null;
-  content: { root: unknown } | null;
-  publishedAt: string;
-  excerpt: string | null;
-  thumbnail: PayloadMedia | number | null;
-  gallery:
-    | {
-        id?: string;
-        image: PayloadMedia | number;
-      }[]
-    | null;
-  tenant: number | { id: number; slug: string } | null;
-  sourceMatchId: number | string | null;
-  createdAt: string;
-  updatedAt: string;
-}
+export const newsSchema = z.object({
+  id: z.number(),
+  title: z.string(),
+  slug: z.string().nullish().default(null),
+  content: z.object({ root: z.unknown() }).nullish().default(null),
+  publishedAt: z.string(),
+  excerpt: z.string().nullish().default(null),
+  thumbnail: mediaRef,
+  gallery: z
+    .array(z.object({ id: z.string().nullish(), image: mediaRef }))
+    .nullish()
+    .default(null),
+  tenant: tenantRef,
+  sourceMatchId: z.union([z.number(), z.string()]).nullish().default(null),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+
+type PayloadNews = z.output<typeof newsSchema>;
 
 function tenantSlugOf(tenant: PayloadNews["tenant"]): string {
-  if (tenant && typeof tenant === "object") return tenant.slug;
-  return resolveTenantSlug();
+  return tenant?.slug ?? resolveTenantSlug();
 }
 
-export function adaptNews(doc: PayloadNews): News {
+type LexicalToHtml = typeof convertLexicalToHTML;
+
+/**
+ * `toHtml` postoji da test ne mora mockati modul: pretvarač je teški serverski
+ * paket, a ovdje je dovoljan bilo koji poziv s istim potpisom.
+ */
+export function adaptNews(
+  doc: PayloadNews,
+  toHtml: LexicalToHtml = convertLexicalToHTML,
+): News {
   const html = doc.content
-    ? convertLexicalToHTML({
-        data: doc.content as Parameters<typeof convertLexicalToHTML>[0]["data"],
+    ? // SAFETY: Payload čuva Lexical stablo u `content.root`; tip stupca je
+      // širi od onoga što pretvarač traži, a sadržaj je isti.
+      toHtml({
+        data: doc.content as Parameters<LexicalToHtml>[0]["data"],
       })
     : "";
 
@@ -46,11 +56,11 @@ export function adaptNews(doc: PayloadNews): News {
     content: html,
     date: doc.publishedAt ?? doc.createdAt,
     updatedAt: doc.updatedAt ?? doc.publishedAt ?? doc.createdAt,
-    thumbnailPath: mediaUrl(doc.thumbnail),
+    thumbnailPath: doc.thumbnail?.url ?? null,
     imagePaths:
-      doc.gallery
-        ?.map((item) => mediaUrl(item.image))
-        .filter((url): url is string => url !== null) ?? [],
+      doc.gallery?.flatMap((item) =>
+        item.image === null ? [] : [item.image.url],
+      ) ?? [],
     tenantId: tenantSlugOf(doc.tenant),
     // Payload numeric polje stiže kao string iz `numeric` stupca.
     sourceMatchId:
@@ -61,9 +71,10 @@ export function adaptNews(doc: PayloadNews): News {
 export const fetchLatestNews = (): Promise<News[]> =>
   fetchList<PayloadNews, News>({
     collection: "news",
+    schema: newsSchema,
     sort: "-publishedAt",
     limit: 6,
-    adapt: adaptNews,
+    adapt: (doc) => adaptNews(doc),
   });
 
 export const fetchNewsPaginated = (params: {
@@ -72,10 +83,11 @@ export const fetchNewsPaginated = (params: {
 }): Promise<PaginatedNews> =>
   fetchPage<PayloadNews, News>({
     collection: "news",
+    schema: newsSchema,
     sort: "-publishedAt",
     page: params.page,
     size: params.size,
-    adapt: adaptNews,
+    adapt: (doc) => adaptNews(doc),
   });
 
 export const fetchNewsBySlug = (params: {
@@ -83,15 +95,17 @@ export const fetchNewsBySlug = (params: {
 }): Promise<News | null> =>
   fetchOne<PayloadNews, News>({
     collection: "news",
+    schema: newsSchema,
     where: { "where[slug][equals]": params.slug },
-    adapt: adaptNews,
+    adapt: (doc) => adaptNews(doc),
   });
 
 export const fetchNewsById = (params: { id: string }): Promise<News | null> =>
   fetchOne<PayloadNews, News>({
     collection: "news",
+    schema: newsSchema,
     where: { "where[id][equals]": params.id },
-    adapt: adaptNews,
+    adapt: (doc) => adaptNews(doc),
   });
 
 /** Slug + timestamps only, for the sitemap. `depth: 0` and no lexical→HTML
@@ -105,6 +119,7 @@ export interface NewsSitemapEntry {
 export const fetchNewsSitemapEntries = (): Promise<NewsSitemapEntry[]> =>
   fetchList<PayloadNews, NewsSitemapEntry | null>({
     collection: "news",
+    schema: newsSchema,
     sort: "-publishedAt",
     limit: 1000,
     depth: 0,

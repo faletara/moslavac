@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { runWithPayloadContext } from "./context";
 import type { PayloadTransport } from "./context";
-import { adaptAlbum, fetchAlbums } from "./getGallery";
+import { z } from "zod";
+import { adaptAlbum, albumSchema, fetchAlbums } from "./getGallery";
 
-type RawAlbum = Parameters<typeof adaptAlbum>[0];
+/** Dokument kakav Payload vraća po žici, prije raščlanjivanja. */
+type WireAlbum = z.input<typeof albumSchema>;
 
-const raw = (over: Partial<RawAlbum> = {}): RawAlbum => ({
+const raw = (over: Partial<WireAlbum> = {}): WireAlbum => ({
   id: 1,
   title: "Album",
   slug: "album",
@@ -18,6 +20,8 @@ const raw = (over: Partial<RawAlbum> = {}): RawAlbum => ({
   ],
   ...over,
 });
+
+const parsed = (over: Partial<WireAlbum> = {}) => albumSchema.parse(raw(over));
 
 function pageOf(docs: unknown[]) {
   return {
@@ -35,27 +39,45 @@ function pageOf(docs: unknown[]) {
 
 describe("adaptAlbum", () => {
   it("keeps populated photos and drops unpopulated (numeric) ones", () => {
-    const album = adaptAlbum(raw());
-    expect(album.coverImage).toEqual({ id: 1, url: "/cover.jpg", alt: "" });
+    const album = adaptAlbum(parsed());
+    expect(album.coverImage).toEqual({
+      id: 1,
+      url: "/cover.jpg",
+      cardUrl: "/cover.jpg",
+      heroUrl: "/cover.jpg",
+      alt: "",
+      width: null,
+      height: null,
+    });
     expect(album.photos).toHaveLength(1);
     // `caption` je uklonjen kao editorsko polje (ADR-0001), ali ostaje u
     // domenskom tipu kao uvijek-null dok se ne prikazuje na frontendu.
     expect(album.photos[0]).toEqual({
-      image: { id: 2, url: "/p1.jpg", alt: "" },
+      image: {
+        id: 2,
+        url: "/p1.jpg",
+        cardUrl: "/p1.jpg",
+        heroUrl: "/p1.jpg",
+        alt: "",
+        width: null,
+        height: null,
+      },
       caption: null,
     });
   });
 
   it("defaults photos to [] when null", () => {
-    expect(adaptAlbum(raw({ photos: null })).photos).toEqual([]);
+    expect(adaptAlbum(parsed({ photos: null })).photos).toEqual([]);
   });
 });
 
 describe("fetchAlbums", () => {
   it("queries /gallery-albums and tags gallery-<slug>", async () => {
     const calls: { path: string; tags?: string[] }[] = [];
+
     const transport: PayloadTransport = async (path, opts) => {
       calls.push({ path, tags: opts?.next?.tags });
+
       return pageOf([raw()]);
     };
 

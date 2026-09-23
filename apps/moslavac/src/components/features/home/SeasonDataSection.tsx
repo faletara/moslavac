@@ -27,6 +27,7 @@ export default async function SeasonDataSection() {
 	]);
 
 	const topScorers = stats.slice(0, TOP_SCORERS_LIMIT);
+
 	if (standings.length === 0 && topScorers.length === 0) return null;
 
 	const shortName = tenant.branding?.shortName ?? tenant.displayName;

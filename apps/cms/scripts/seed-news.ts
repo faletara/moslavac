@@ -5,6 +5,7 @@ import { paragraphsToLexical } from '@/lib/ai/lexical'
 const TENANT_SLUG = process.env.SEED_TENANT_SLUG ?? 'moslavac'
 
 type Paragraph = string
+
 type NewsSeed = {
   title: string
   excerpt: string
@@ -74,7 +75,9 @@ const news: NewsSeed[] = [
 // after the module's synchronous evaluation finishes, so we must block module
 // evaluation until the seeding work completes.
 console.log('seed-news: starting')
+
 const payloadConfig = await config
+
 const payload = await getPayload({ config: payloadConfig })
 
 const tenants = await payload.find({
@@ -84,14 +87,18 @@ const tenants = await payload.find({
 })
 
 const tenant = tenants.docs[0]
+
 if (!tenant) {
   console.error(`Tenant with slug "${TENANT_SLUG}" not found`)
   process.exit(1)
 }
+
 console.log(`seed-news: tenant "${tenant.slug}" (id=${tenant.id})`)
 
 let created = 0
+
 let skipped = 0
+
 for (const item of news) {
   const existing = await payload.find({
     collection: 'news',

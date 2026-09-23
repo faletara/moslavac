@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/sheet";
 
 type NavLeaf = { href: string; label: string };
+
 type NavEntry = NavLeaf | { label: string; children: NavLeaf[] };
 
 const NAV: NavEntry[] = [
@@ -91,11 +92,13 @@ export default function Header({ clubName }: { clubName: string }) {
 
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
+
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
+
   const isGroupActive = (children: NavLeaf[]) =>
     children.some((c) => isActive(c.href));
 
@@ -106,6 +109,7 @@ export default function Header({ clubName }: { clubName: string }) {
   const lightTop =
     !!pathname &&
     (pathname.startsWith("/novosti/") || pathname.startsWith("/galerija/"));
+
   // Dok je header sakriven (scroll dolje) držimo ga prozirnim — inače bi se
   // tijekom klizanja prema gore na tren obojao bijelo pa nestao (bljesak).
   // Bijela podloga se pojavi tek kad se header VRATI (scroll gore, nije na vrhu).
@@ -155,8 +159,10 @@ export default function Header({ clubName }: { clubName: string }) {
               const active = isLeaf(entry)
                 ? isActive(entry.href)
                 : isGroupActive(entry.children);
+
               const base =
                 "relative inline-flex items-center text-[0.78rem] font-semibold uppercase leading-none tracking-wide transition-colors";
+
               const tone = active
                 ? transparent
                   ? "text-white"
@@ -164,6 +170,7 @@ export default function Header({ clubName }: { clubName: string }) {
                 : transparent
                   ? "text-white/70 hover:text-brand-yellow"
                   : "text-brand-navy/60 hover:text-brand-blue";
+
               const underline = active ? (
                 <span className="absolute -bottom-1.5 left-0 h-0.5 w-full bg-brand-yellow" />
               ) : null;

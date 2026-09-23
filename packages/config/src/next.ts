@@ -69,7 +69,7 @@ export function clubNextConfig(
       : []),
   ].join(", ");
 
-  return {
+  const config: NextConfig = {
     turbopack: {
       root: repoRoot,
     },
@@ -79,9 +79,6 @@ export function clubNextConfig(
     // — zbog toga se nova novost nije vidjela do hard refresha. 120 s je iznad
     // najkraćeg `revalidate` u aplikacijama (30 s), pa SWR i dalje radi, kratko.
     expireTime: 120,
-    ...(redirects.length > 0
-      ? { redirects: async () => redirects }
-      : {}),
     async headers() {
       return [
         {
@@ -127,4 +124,10 @@ export function clubNextConfig(
       imageSizes: [256],
     },
   };
+
+  // Prazan `redirects` bi Nextu rekao da preusmjerenja postoje, ali ih nema;
+  // ključ se zato postavlja samo kada ih klub stvarno ima.
+  if (redirects.length > 0) config.redirects = async () => redirects;
+
+  return config;
 }

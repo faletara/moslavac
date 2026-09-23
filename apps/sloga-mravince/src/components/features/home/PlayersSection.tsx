@@ -15,12 +15,14 @@ export default async function PlayersSection({
   players: RosterEntry[];
 }) {
   const squad = players.filter((p) => p.position !== "trener");
+
   if (squad.length === 0) return null;
 
   const [cometPhotos, senior] = await Promise.all([
     resolveCometPhotoUrls(squad),
     fetchSeniorCompetition(),
   ]);
+
   const competitionSlug = senior ? buildCompetitionSlug(senior) : null;
 
   const carouselPlayers: CarouselPlayer[] = squad.map((entry) => ({

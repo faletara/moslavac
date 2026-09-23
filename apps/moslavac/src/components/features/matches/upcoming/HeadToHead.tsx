@@ -97,6 +97,7 @@ function H2HRow({
 
   const outcomeLabel =
     ourGoals > theirGoals ? "P" : ourGoals < theirGoals ? "I" : "N";
+
   const outcomeStyle =
     ourGoals > theirGoals
       ? "bg-emerald-500 text-white"

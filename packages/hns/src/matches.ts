@@ -13,6 +13,7 @@ import { adaptLineups, adaptMatch, adaptMatchEvent, adaptMatchInfo } from "./ada
 import { hnsList, hnsResource } from "./fetchResource";
 
 const MATCH_TTL = 60;
+
 const LIVE_MATCH_TTL = 30;
 
 async function fetchPastTeamMatches(): Promise<Match[]> {
@@ -23,6 +24,7 @@ async function fetchPastTeamMatches(): Promise<Match[]> {
     revalidate: MATCH_TTL,
     paginated: true,
   });
+
   return matches.map(adaptMatch);
 }
 
@@ -34,6 +36,7 @@ async function fetchFutureTeamMatches(): Promise<Match[]> {
     revalidate: MATCH_TTL,
     paginated: true,
   });
+
   return matches.map(adaptMatch);
 }
 
@@ -42,6 +45,7 @@ export async function fetchAllMatches(): Promise<Match[]> {
     fetchPastTeamMatches(),
     fetchFutureTeamMatches(),
   ]);
+
   return [...past, ...future];
 }
 
@@ -64,6 +68,7 @@ async function fetchTodayMatches(): Promise<Match[]> {
 
   return matches.filter((m) => {
     if (m.kickoffAtUtcMs == null) return false;
+
     return (
       m.kickoffAtUtcMs >= todayMs &&
       m.kickoffAtUtcMs < tomorrowMs &&
@@ -80,6 +85,7 @@ async function fetchFutureMatches(): Promise<Match[]> {
     revalidate: MATCH_TTL,
     paginated: true,
   });
+
   return matches.map(adaptMatch);
 }
 
@@ -88,13 +94,16 @@ export async function fetchUpcomingMatches(): Promise<Match[]> {
     fetchTodayMatches(),
     fetchFutureMatches(),
   ]);
+
   const seen = new Set<number>();
   const merged: Match[] = [];
+
   for (const m of [...today, ...future]) {
     if (m.id == null || seen.has(m.id)) continue;
     seen.add(m.id);
     merged.push(m);
   }
+
   return merged.sort(
     (a, b) => (a.kickoffAtUtcMs ?? 0) - (b.kickoffAtUtcMs ?? 0),
   );
@@ -108,6 +117,7 @@ export async function fetchMatchInfo(params: {
     tag: `match-${params.matchId}`,
     revalidate: LIVE_MATCH_TTL,
   });
+
   return match ? adaptMatch(match) : null;
 }
 
@@ -119,6 +129,7 @@ export async function fetchMatchEvents(params: {
     tag: `match-${params.matchId}-events`,
     revalidate: LIVE_MATCH_TTL,
   });
+
   return events.map(adaptMatchEvent);
 }
 
@@ -130,6 +141,7 @@ export async function fetchMatchLineups(params: {
     tag: `match-${params.matchId}-lineups`,
     revalidate: MATCH_TTL,
   });
+
   return adaptLineups(lineups);
 }
 
@@ -141,5 +153,6 @@ export async function fetchMatchReferees(params: {
     tag: `match-${params.matchId}-referees`,
     revalidate: MATCH_TTL,
   });
+
   return adaptMatchInfo(info);
 }

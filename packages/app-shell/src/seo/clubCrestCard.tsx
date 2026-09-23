@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { getTenant } from "@/lib/payload/getTenant";
+import type { FrontendTenant } from "@/lib/payload/types";
 
 /**
  * Zadana OG/Twitter kartica kluba: grb u sredini na klupskoj podlozi. Koristi se
@@ -10,6 +11,7 @@ import { getTenant } from "@/lib/payload/getTenant";
  */
 
 export const OG_SIZE = { width: 1200, height: 630 };
+
 export const OG_CONTENT_TYPE = "image/png";
 
 type CrestCardInput = {
@@ -23,13 +25,11 @@ type CrestCardInput = {
   color?: string;
 };
 
-function tenantLogoUrl(logo: unknown): string | null {
-  const url =
-    typeof logo === "string"
-      ? logo
-      : typeof logo === "object" && logo !== null && "url" in logo
-        ? (logo as { url?: string | null }).url
-        : null;
+type TenantLogo = NonNullable<FrontendTenant["branding"]>["logo"];
+
+function tenantLogoUrl(logo: TenantLogo | undefined): string | null {
+  const url = logo?.url ?? null;
+
   // Satori dohvaća samo apsolutne adrese; relativna bi se tiho izgubila.
   return url && /^https?:\/\//i.test(url) ? url : null;
 }
@@ -38,6 +38,7 @@ function tenantLogoUrl(logo: unknown): string | null {
 async function localCrestSrc(crestFile: string): Promise<string | null> {
   try {
     const bytes = await readFile(join(process.cwd(), "public", crestFile), "base64");
+
     return `data:image/png;base64,${bytes}`;
   } catch {
     return null;
@@ -51,6 +52,7 @@ export async function renderClubCrestCard({
   color = "#ffffff",
 }: CrestCardInput): Promise<ImageResponse> {
   const tenant = await getTenant();
+
   const crestSrc =
     tenantLogoUrl(tenant.branding?.logo) ??
     (crestFile ? await localCrestSrc(crestFile) : null);

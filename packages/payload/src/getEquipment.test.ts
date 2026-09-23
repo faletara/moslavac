@@ -1,11 +1,17 @@
 import { describe, expect, it } from "vitest";
 import { runWithPayloadContext } from "./context";
 import type { PayloadFetchOptions, PayloadTransport } from "./context";
-import { adaptEquipment, fetchFeaturedEquipment } from "./getEquipment";
+import { z } from "zod";
+import {
+  adaptEquipment,
+  equipmentSchema,
+  fetchFeaturedEquipment,
+} from "./getEquipment";
 
-type RawEq = Parameters<typeof adaptEquipment>[0];
+/** Dokument kakav Payload vraća po žici, prije raščlanjivanja. */
+type WireEquipment = z.input<typeof equipmentSchema>;
 
-const raw = (over: Partial<RawEq> = {}): RawEq => ({
+const raw = (over: Partial<WireEquipment> = {}): WireEquipment => ({
   id: 1,
   displayName: "Dres",
   name: "dres-home",
@@ -32,6 +38,9 @@ const raw = (over: Partial<RawEq> = {}): RawEq => ({
   ...over,
 });
 
+const parsed = (over: Partial<WireEquipment> = {}) =>
+  equipmentSchema.parse(raw(over));
+
 function pageOf(docs: unknown[]) {
   return {
     docs,
@@ -48,7 +57,7 @@ function pageOf(docs: unknown[]) {
 
 describe("adaptEquipment", () => {
   it("prefers the card-sized image and maps the tenant slug", () => {
-    expect(adaptEquipment(raw())).toMatchObject({
+    expect(adaptEquipment(parsed())).toMatchObject({
       imagePath: "/card.jpg",
       imageAlt: "Alt",
       tenantId: "moslavac",
@@ -57,13 +66,16 @@ describe("adaptEquipment", () => {
   });
 
   it("falls back to the original url and to displayName for alt", () => {
-    const eq = adaptEquipment(raw({ image: { id: 5, url: "/full.jpg", alt: "" } }));
+    const eq = adaptEquipment(
+      parsed({ image: { id: 5, url: "/full.jpg", alt: "" } }),
+    );
+
     expect(eq.imagePath).toBe("/full.jpg");
     expect(eq.imageAlt).toBe("Dres");
   });
 
   it("yields an empty path when the image is unpopulated", () => {
-    const eq = adaptEquipment(raw({ image: null }));
+    const eq = adaptEquipment(parsed({ image: null }));
     expect(eq.imagePath).toBe("");
     expect(eq.imageAlt).toBe("Dres");
   });
@@ -72,8 +84,10 @@ describe("adaptEquipment", () => {
 describe("fetchFeaturedEquipment", () => {
   it("filters active + featured, limit 12, tags equipment-<slug>", async () => {
     const calls: { path: string; opts?: PayloadFetchOptions }[] = [];
+
     const transport: PayloadTransport = async (path, opts) => {
       calls.push({ path, opts });
+
       return pageOf([raw()]);
     };
 

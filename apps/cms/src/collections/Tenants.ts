@@ -1,15 +1,13 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig, Condition } from 'payload'
 import { CLUB_FEATURE_OPTIONS } from '@/lib/payload/clubFeatures'
 import { isSuperAdmin, superAdminOnly, superAdminUI } from '../access/roles'
 import { mediaField } from '../fields/media'
+import type { Tenant } from '../payload-types'
 import { revalidateFrontend } from '../lib/revalidateFrontend'
 
 /** UI-uvjet: prikaži samo Moslavcu (ili super-adminu) — druge klubove ne zanima. */
-const moslavacOnlyUI = (
-  data: { slug?: string } | undefined,
-  _sibling: unknown,
-  { user }: { user?: unknown },
-): boolean => data?.slug === 'moslavac' || isSuperAdmin(user as Parameters<typeof isSuperAdmin>[0])
+const moslavacOnlyUI: Condition<Tenant> = (data, _sibling, { user }) =>
+  data?.slug === 'moslavac' || isSuperAdmin(user)
 
 export const Tenants: CollectionConfig = {
   slug: 'tenants',
@@ -39,6 +37,7 @@ export const Tenants: CollectionConfig = {
           collectionSlug: 'tenants',
           tenant: doc.id,
         })
+
         return doc
       },
     ],

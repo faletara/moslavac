@@ -1,19 +1,21 @@
 import "server-only";
-import type { GalleryAlbum } from "@/types/gallery";
+import { z } from "zod";
+import type { GalleryAlbum, GalleryPhoto } from "@/types/gallery";
 import { clubFeatureQuery } from "./clubFeatures";
 import { fetchList, fetchOne } from "./fetchCollection";
-import { mediaObject } from "./media";
-import type { PayloadMedia } from "./types";
+import { mediaRef } from "./schemas";
 
-interface PayloadAlbum {
-  id: number;
-  title: string;
-  slug: string | null;
-  date: string | null;
-  coverImage: PayloadMedia | number | null;
-  description: string | null;
-  photos: (PayloadMedia | number)[] | null;
-}
+export const albumSchema = z.object({
+  id: z.number(),
+  title: z.string(),
+  slug: z.string().nullish().default(null),
+  date: z.string().nullish().default(null),
+  coverImage: mediaRef,
+  description: z.string().nullish().default(null),
+  photos: z.array(mediaRef).nullish().default(null),
+});
+
+type PayloadAlbum = z.output<typeof albumSchema>;
 
 export function adaptAlbum(doc: PayloadAlbum): GalleryAlbum {
   return {
@@ -21,12 +23,13 @@ export function adaptAlbum(doc: PayloadAlbum): GalleryAlbum {
     title: doc.title,
     slug: doc.slug ?? null,
     date: doc.date ?? null,
-    coverImage: mediaObject(doc.coverImage),
+    coverImage: doc.coverImage,
     description: doc.description ?? null,
-    photos: (doc.photos ?? [])
-      .map((item) => mediaObject(item))
-      .filter((img): img is PayloadMedia => Boolean(img))
-      .map((image) => ({ image, caption: null as string | null })),
+    photos: (doc.photos ?? []).flatMap((image): GalleryPhoto[] =>
+      // `caption` je uklonjen kao editorsko polje (ADR-0001), ali ostaje u
+      // domenskom tipu kao uvijek-null dok se ne prikazuje na frontendu.
+      image === null ? [] : [{ image, caption: null }],
+    ),
   };
 }
 
@@ -35,6 +38,7 @@ const galleryFeature = clubFeatureQuery("gallery");
 export const fetchAlbums = (): Promise<GalleryAlbum[]> =>
   fetchList<PayloadAlbum, GalleryAlbum>({
     ...galleryFeature,
+    schema: albumSchema,
     sort: "displayOrder",
     limit: 100,
     adapt: adaptAlbum,
@@ -45,6 +49,7 @@ export const fetchAlbumBySlug = (params: {
 }): Promise<GalleryAlbum | null> =>
   fetchOne<PayloadAlbum, GalleryAlbum>({
     ...galleryFeature,
+    schema: albumSchema,
     where: { "where[slug][equals]": params.slug },
     adapt: adaptAlbum,
   });

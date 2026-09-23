@@ -13,17 +13,22 @@ export async function resolveCometPhotoUrls(
   const needed = entries.filter(
     (entry) => !entry.photo?.url && entry.personId != null,
   );
+
   const results = await Promise.all(
     needed.map(async (entry) => {
       const details = await fetchPlayerDetails({
         personId: String(entry.personId),
       }).catch(() => null);
+
       return [entry.personId, details?.picture ?? null] as const;
     }),
   );
+
   const map = new Map<number, string>();
+
   for (const [personId, picture] of results) {
     if (picture) map.set(personId, getCometImageUrl(picture));
   }
+
   return map;
 }

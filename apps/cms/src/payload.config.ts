@@ -25,6 +25,7 @@ import { matchReportsCronEndpoint } from "./endpoints/matchReportsCron";
 import type { Config } from "./payload-types";
 
 const filename = fileURLToPath(import.meta.url);
+
 const dirname = path.dirname(filename);
 
 if (!process.env.PAYLOAD_SECRET) {
@@ -115,6 +116,7 @@ export default buildConfig({
 					disablePayloadAccessControl: true,
 					generateFileURL: ({ filename, prefix }) => {
 						const base = process.env.R2_PUBLIC_URL ?? "";
+
 						return prefix
 							? `${base}/${prefix}/${filename}`
 							: `${base}/${filename}`;
@@ -124,6 +126,7 @@ export default buildConfig({
 					disablePayloadAccessControl: true,
 					generateFileURL: ({ filename, prefix }) => {
 						const base = process.env.R2_PUBLIC_URL ?? "";
+
 						return prefix
 							? `${base}/${prefix}/${filename}`
 							: `${base}/${filename}`;

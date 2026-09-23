@@ -14,6 +14,7 @@ interface Params {
 
 export async function generateStaticParams() {
   const competitions = await fetchCurrentSeasonCompetitions();
+
   return competitions
     .filter((c): c is typeof c & { id: number } => c.id != null)
     .map((c) => ({ competitionId: buildCompetitionSlug(c) }));
@@ -30,6 +31,7 @@ export async function generateMetadata({
   const name = info?.name ?? "Sezona";
   const slug = info ? buildCompetitionSlug(info) : competitionId;
   const description = `Ljestvica, utakmice i statistike za natjecanje ${name}.`;
+
   return {
     title: name,
     description,
@@ -55,6 +57,7 @@ export default async function SeasonLayout({
   const { competitionId } = await params;
   const id = parseTrailingId(competitionId);
   const info = await fetchCompetitionInfo({ competitionId: id });
+
   return (
     <SeasonLayoutClient
       competitionId={id}

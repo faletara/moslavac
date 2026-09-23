@@ -51,6 +51,7 @@ function PlayerRow({ player }: { player: LineupPlayer }) {
  */
 function isHeadCoach(role: string | null): boolean {
   const r = (role ?? "").toLowerCase();
+
   return r.includes("trener") && (r.includes("glavni") || r.trim() === "trener");
 }
 
@@ -64,6 +65,7 @@ function SideLineup({
   const players = lineup?.players ?? [];
   const starters = players.filter((player) => player.starting);
   const substitutes = players.filter((player) => !player.starting);
+
   const coaches = (lineup?.officials ?? []).filter((official) =>
     isHeadCoach(official.role),
   );

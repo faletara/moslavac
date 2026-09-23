@@ -37,6 +37,7 @@ describe("buildClubManifest", () => {
       tenant: tenant({ branding: { motto: "Ponos naše općine" } }),
       themeColor,
     });
+
     const bezMotta = buildClubManifest({ tenant: tenant(), themeColor });
 
     expect(sMottom.description).toBe("Ponos naše općine");

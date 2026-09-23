@@ -24,13 +24,16 @@ export async function redirectClubOwnerToOwnTenant(
   segments: string[] | undefined,
 ): Promise<void> {
   if (!segments || segments.length !== 2) return
+
   if (segments[0] !== 'collections' || segments[1] !== 'tenants') return
 
   const payload = await getPayload({ config })
   const { user } = await payload.auth({ headers: await nextHeaders() })
+
   if (!user || isSuperAdmin(user)) return
 
-  const tenantId = firstTenantId(user as MaybeTenantUser)
+  const tenantId = firstTenantId(user)
+
   if (tenantId === null) return
 
   redirect(`${payload.config.routes.admin}/collections/tenants/${tenantId}`)

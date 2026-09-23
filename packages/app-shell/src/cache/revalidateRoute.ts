@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { revalidatePath, revalidateTag } from "next/cache";
 
 /**
@@ -12,16 +13,24 @@ import { revalidatePath, revalidateTag } from "next/cache";
  * poziv dolazi izvana, iz CMS-a.
  */
 
-interface RevalidateRequest {
-  tags?: unknown;
-}
+/**
+ * Tijelo zahtjeva. Zod odbacuje sve što nije neprazan string, pa poziv nikad ne
+ * grana po `typeof` i tijelo ne treba tvrditi.
+ */
+const revalidateBody = z
+  .object({
+    tags: z
+      .array(z.unknown())
+      .nullish()
+      .transform((tags) =>
+        (tags ?? []).flatMap((tag) => {
+          const parsed = z.string().min(1).safeParse(tag);
 
-function parseTags(body: RevalidateRequest): string[] {
-  if (!Array.isArray(body.tags)) return [];
-  return body.tags.filter(
-    (tag): tag is string => typeof tag === "string" && tag.length > 0,
-  );
-}
+          return parsed.success ? [parsed.data] : [];
+        }),
+      ),
+  })
+  .transform((body) => body.tags);
 
 export function createRevalidateRoute() {
   return async function POST(request: Request): Promise<Response> {
@@ -33,8 +42,9 @@ export function createRevalidateRoute() {
     }
 
     let tags: string[];
+
     try {
-      tags = parseTags((await request.json()) as RevalidateRequest);
+      tags = revalidateBody.parse(await request.json());
     } catch {
       return Response.json(
         { revalidated: false, error: "invalid JSON body" },

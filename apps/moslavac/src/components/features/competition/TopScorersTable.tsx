@@ -70,8 +70,10 @@ export default function TopScorersTable({
           {scorers.map((s, i) => {
             const teamId = s.team?.id;
             const highlight = teamId != null && highlightSet.has(teamId);
+
             const isMoslavac =
               moslavacTeamId != null && teamId === moslavacTeamId;
+
             return (
               <ScorerRow
                 key={`${s.player?.personId ?? s.player?.name ?? "x"}-${i}`}
@@ -106,6 +108,7 @@ function ScorerRow({
   const playerName = scorer.player?.name ?? "-";
   const playerPicture = scorer.player?.picture ?? null;
   const teamName = scorer.team?.name ?? "-";
+
   const isLinkable =
     isMoslavac &&
     personId != null &&

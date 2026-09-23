@@ -14,10 +14,18 @@ const POSITION_LABEL: Record<Exclude<RosterPosition, "trener">, string> = {
   napadac: "Napad",
 };
 
-function splitName(name: string): { first: string; last: string } {
+/** Ime razdvojeno na dio ispred prezimena i samo prezime. */
+interface SplitName {
+  first: string;
+  last: string;
+}
+
+function splitName(name: string): SplitName {
   const parts = name.trim().split(/\s+/);
+
   if (parts.length === 1) return { first: "", last: parts[0] };
-  const last = parts.pop() as string;
+  const last = parts.pop() ?? name;
+
   return { first: parts.join(" "), last };
 }
 
@@ -34,8 +42,10 @@ function PlayerCard({
   photo: string | null;
 }) {
   const { first, last } = splitName(player.displayName);
+
   const position =
     player.position !== "trener" ? POSITION_LABEL[player.position] : null;
+
   const number =
     player.jerseyNumber !== null
       ? String(player.jerseyNumber).padStart(2, "0")
@@ -70,6 +80,8 @@ function PlayerCard({
           <span
             aria-hidden
             className="text-stroke pointer-events-none absolute bottom-2 left-4 font-display text-[4.5rem] leading-none tabular-nums opacity-80"
+            // SAFETY: `--*` je CSS custom property; Reactov `CSSProperties` popisuje samo
+            // standardna svojstva, pa ga inline stil ovdje mora proširiti.
             style={{ "--text-stroke-color": "#ffffff" } as React.CSSProperties}
           >
             {number}
@@ -115,6 +127,8 @@ function PlayerCard({
         <span
           aria-hidden
           className="text-stroke pointer-events-none relative font-display text-[7rem] leading-none tabular-nums transition-opacity duration-300 group-hover:opacity-0 sm:text-[8rem]"
+          // SAFETY: `--*` je CSS custom property; Reactov `CSSProperties` popisuje samo
+          // standardna svojstva, pa ga inline stil ovdje mora proširiti.
           style={{ "--text-stroke-color": "var(--club)" } as React.CSSProperties}
         >
           {number}
@@ -158,6 +172,7 @@ export default function PlayersCarousel({
 
   const onScroll = useCallback(() => {
     const el = scrollerRef.current;
+
     if (!el) return;
     const max = el.scrollWidth - el.clientWidth;
     setProgress(max > 0 ? el.scrollLeft / max : 1);
@@ -168,6 +183,7 @@ export default function PlayersCarousel({
   const scrollBy = useCallback(
     (direction: 1 | -1) => {
       const el = scrollerRef.current;
+
       if (!el) return;
       el.scrollBy({
         left: direction * el.clientWidth * 0.8,

@@ -9,6 +9,7 @@ import { Countdown } from "./Countdown";
 // samo broj, dodamo "kolo" da korisniku bude jasno o čemu se radi.
 function formatRound(round: string): string {
   const trimmed = round.trim();
+
   return /^\d+$/.test(trimmed) ? `${trimmed}. kolo` : trimmed;
 }
 
@@ -48,6 +49,7 @@ function TeamBlock({
   align: "start" | "end";
 }) {
   const toStart = align === "start";
+
   return (
     <div
       className={`flex flex-col items-center gap-5 text-center sm:gap-6 ${

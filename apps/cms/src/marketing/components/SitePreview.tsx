@@ -39,6 +39,7 @@ export function SitePreview({ className }: { className?: string }) {
   useEffect(() => {
     if (reduced) return
     const id = setInterval(() => setStep((s) => (s + 1) % MOMENTS.length), 2800)
+
     return () => clearInterval(id)
   }, [reduced])
 

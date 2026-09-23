@@ -20,13 +20,17 @@ export function isCalledOff(match: Match): boolean {
 /** Croatian label for a called-off fixture, or null when it is still on. */
 export function calledOffLabel(match: Match): string | null {
   if (match.liveStatus === "CANCELED") return "Otkazano";
+
   if (match.liveStatus === "POSTPONED") return "Odgođeno";
+
   return null;
 }
 
 /** Minute to display for a live match — `45+2` when HNS supplies it. */
 export function liveMinute(match: Match): string | null {
   const display = match.currentMinute?.trim();
+
   if (display) return display;
+
   return match.minute != null ? `${match.minute}'` : null;
 }

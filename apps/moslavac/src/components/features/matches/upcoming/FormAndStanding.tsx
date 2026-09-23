@@ -48,9 +48,11 @@ export default function FormAndStanding({
 
   const homeRanking = standings?.find((r) => r.team?.id === homeTeamId);
   const awayRanking = standings?.find((r) => r.team?.id === awayTeamId);
+
   const homeForm = competitionMatches
     ? getRecentForm(competitionMatches, homeTeamId)
     : [];
+
   const awayForm = competitionMatches
     ? getRecentForm(competitionMatches, awayTeamId)
     : [];
@@ -61,6 +63,7 @@ export default function FormAndStanding({
   if (!hasAnyData) return null;
 
   const stats: ComparisonStat[] = [];
+
   if (homeRanking || awayRanking) {
     stats.push({
       label: "Pozicija",
@@ -314,6 +317,7 @@ function FormDot({ result }: { result: FormResult }) {
     D: "bg-muted text-muted-foreground",
     L: "bg-rose-500 text-white",
   };
+
   return (
     <span
       role="img"

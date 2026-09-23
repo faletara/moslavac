@@ -17,5 +17,6 @@ export function seasonTag(): string {
 /** Puni naziv za eyebrow, npr. „Sezona 2026/27". */
 export function seasonLabel(): string {
   const tag = currentSeasonTag();
+
   return `Sezona 20${tag}`;
 }

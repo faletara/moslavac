@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   description: "Dresovi, oprema i navijački artikli NK Moslavac.",
   alternates: { canonical: "/oprema" },
 };
+
 import { pluralize } from "@/lib/helpers/plural";
 import { fetchEquipment } from "@/lib/payload/getEquipment";
 import { getTenant } from "@/lib/payload/getTenant";
@@ -46,6 +47,7 @@ export default async function OpremaPage() {
       acc[cat] = items
         .filter((e) => e.category === cat)
         .sort((a, b) => a.displayOrder - b.displayOrder);
+
       return acc;
     },
     { paketi: [], dresovi: [], trenirke: [], jakne: [], dodaci: [] },
@@ -91,6 +93,7 @@ export default async function OpremaPage() {
       ) : (
         populated.map((cat) => {
           const group = grouped[cat];
+
           return (
             <section key={cat} className="space-y-12 sm:space-y-16">
               <SectionHeader title={categoryLabels[cat]} count={group.length} />

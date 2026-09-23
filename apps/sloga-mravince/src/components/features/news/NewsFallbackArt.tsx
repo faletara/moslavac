@@ -62,6 +62,8 @@ export default function NewsFallbackArt({
           <span
             key={i}
             style={
+              // SAFETY: `--*` je CSS custom property; Reactov `CSSProperties` popisuje samo
+              // standardna svojstva, pa ga inline stil ovdje mora proširiti.
               {
                 "--text-stroke-color": `rgba(255,255,255,${STROKE_ALPHA[size]})`,
               } as React.CSSProperties

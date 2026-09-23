@@ -8,5 +8,6 @@ export async function GET(
   ctx: RouteContext<"/api/images/[uuid]">,
 ) {
   const { uuid } = await ctx.params;
+
   return createHnsImageResponse(req, uuid);
 }

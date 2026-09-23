@@ -1,16 +1,28 @@
 import { describe, expect, it, vi } from "vitest";
 import { runWithHnsContext } from "./context";
 import type { HnsFetchOptions, HnsTransport } from "./context";
+import type { JsonValue } from "@/types/json";
 import { hnsList, hnsListResult, hnsResource } from "./fetchResource";
 
-type Call = { endpoint: string; opts?: HnsFetchOptions };
+interface Call {
+  endpoint: string;
+  opts?: HnsFetchOptions;
+}
 
-function recorder(body: unknown): { transport: HnsTransport; calls: Call[] } {
+interface Recorder {
+  transport: HnsTransport;
+  calls: Call[];
+}
+
+function recorder(body: JsonValue): Recorder {
   const calls: Call[] = [];
+
   const transport: HnsTransport = async (endpoint, opts) => {
     calls.push({ endpoint, opts });
+
     return body;
   };
+
   return { transport, calls };
 }
 
@@ -44,6 +56,7 @@ describe("hnsList", () => {
 
   it("returns a bare array unchanged (non-paginated)", async () => {
     const { transport } = recorder([{ id: 9 }]);
+
     const result = await runWithHnsContext(ctx(transport), () =>
       hnsList<{ id: number }>({
         path: () => `/api/live/match/1/events`,
@@ -51,6 +64,7 @@ describe("hnsList", () => {
         revalidate: 30,
       }),
     );
+
     expect(result).toEqual([{ id: 9 }]);
   });
 
@@ -87,6 +101,7 @@ describe("hnsList", () => {
     const transport: HnsTransport = async () => {
       throw new Error("boom");
     };
+
     const spy = vi.spyOn(console, "error").mockImplementation(() => {});
 
     const result = await runWithHnsContext(ctx(transport), () =>
@@ -102,6 +117,7 @@ describe("hnsList", () => {
 describe("hnsListResult", () => {
   it("reports ok:true with the unwrapped data on success", async () => {
     const { transport } = recorder({ result: [{ id: 1 }, { id: 2 }] });
+
     const result = await runWithHnsContext(ctx(transport), () =>
       hnsListResult<{ id: number }>({
         path: () => `/api/live/x`,
@@ -109,6 +125,7 @@ describe("hnsListResult", () => {
         paginated: true,
       }),
     );
+
     expect(result).toEqual({ data: [{ id: 1 }, { id: 2 }], ok: true });
   });
 
@@ -116,10 +133,13 @@ describe("hnsListResult", () => {
     const transport: HnsTransport = async () => {
       throw new Error("boom");
     };
+
     const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+
     const result = await runWithHnsContext(ctx(transport), () =>
       hnsListResult({ path: () => `/api/live/x`, revalidate: 60 }),
     );
+
     expect(result).toEqual({ data: [], ok: false });
     expect(spy).toHaveBeenCalledOnce();
     spy.mockRestore();
@@ -129,6 +149,7 @@ describe("hnsListResult", () => {
 describe("hnsResource", () => {
   it("returns the fetched object", async () => {
     const { transport } = recorder({ id: 7, name: "match" });
+
     const result = await runWithHnsContext(ctx(transport), () =>
       hnsResource<{ id: number; name: string }>({
         path: () => `/api/live/match/7`,
@@ -136,14 +157,17 @@ describe("hnsResource", () => {
         revalidate: 30,
       }),
     );
+
     expect(result).toEqual({ id: 7, name: "match" });
   });
 
   it("returns null when the transport yields null", async () => {
     const { transport } = recorder(null);
+
     const result = await runWithHnsContext(ctx(transport), () =>
       hnsResource({ path: () => `/api/live/match/7`, revalidate: 30 }),
     );
+
     expect(result).toBeNull();
   });
 
@@ -151,6 +175,7 @@ describe("hnsResource", () => {
     const transport: HnsTransport = async () => {
       throw new Error("boom");
     };
+
     const spy = vi.spyOn(console, "error").mockImplementation(() => {});
 
     const result = await runWithHnsContext(ctx(transport), () =>

@@ -41,6 +41,7 @@ const NUMERAL_WORDS = [
  */
 function numbersInSentencesAbout(text: string, topic: RegExp): Set<number> {
   const found = new Set<number>();
+
   const sentences = text
     .replace(MINUTE_IN_TEXT, " ")
     .split(/(?<=[.!?])\s+/)
@@ -50,8 +51,10 @@ function numbersInSentencesAbout(text: string, topic: RegExp): Set<number> {
     for (const match of sentence.matchAll(/\b(\d{1,3})\b/g)) {
       found.add(Number(match[1]));
     }
+
     for (const [value, word] of NUMERAL_WORDS.entries()) {
       if (value === 0) continue;
+
       // `\b` je u JS-u ASCII: ispred "č" nema granice riječi, pa `\bčetir`
       // nikad ne pogodi "četiri". Zato lookbehind na bilo koje slovo.
       if (new RegExp(`(?<!\\p{L})${word.slice(0, -1)}`, "iu").test(sentence)) {
@@ -59,6 +62,7 @@ function numbersInSentencesAbout(text: string, topic: RegExp): Set<number> {
       }
     }
   }
+
   return found;
 }
 
@@ -74,14 +78,17 @@ function numberProblems(
   requireAll: boolean,
 ): string[] {
   const problems: string[] = [];
+
   if (requireAll) {
     for (const value of expected) {
       if (!found.has(value)) problems.push(`${label}: nedostaje ${value}`);
     }
   }
+
   for (const value of found) {
     if (!expected.has(value)) problems.push(`${label}: izmišljen broj ${value}`);
   }
+
   return problems;
 }
 
@@ -93,11 +100,13 @@ function numberProblems(
  */
 function yellowCardProblems(text: string, facts: MatchFacts): string[] {
   const total = facts.yellowCards.length;
+
   if (total === 0) return [];
 
   const home = facts.yellowCards.filter((e) => e.side === "home").length;
   const away = total - home;
   const found = numbersInSentencesAbout(text, /žut/i);
+
   if (found.size === 0) return [`žuti kartoni (${total}) se ne spominju`];
 
   return numberProblems(
@@ -117,11 +126,13 @@ function yellowCardProblems(text: string, facts: MatchFacts): string[] {
  */
 function nameStem(word: string): string {
   const w = word.trim();
+
   return w.length > 3 && /[aeiou]$/i.test(w) ? w.slice(0, -1) : w;
 }
 
 const surnameStem = (player: string): string => {
   const parts = player.trim().split(/\s+/);
+
   return nameStem(parts[parts.length - 1] ?? player);
 };
 
@@ -135,6 +146,7 @@ const firstNameStem = (player: string): string =>
  */
 function mentions(text: string, stem: string): boolean {
   const escaped = stem.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
   return new RegExp(`(?<!\\p{L})${escaped}`, "iu").test(text);
 }
 
@@ -149,14 +161,17 @@ function playerProblems(text: string, facts: MatchFacts): string[] {
 
   named.forEach((event, index) => {
     const own = stems[index] ?? event.player;
+
     const ambiguous = stems.some(
       (other, j) => j !== index && other.toLowerCase() === own.toLowerCase(),
     );
+
     const needed = ambiguous ? [firstNameStem(event.player), own] : [own];
 
     if (!needed.every((stem) => mentions(text, stem))) {
       problems.push(`nedostaje ${event.player}`);
     }
+
     if (!text.includes(event.display.replace(/'$/, ""))) {
       problems.push(`nedostaje minuta ${event.display} (${event.player})`);
     }
@@ -181,9 +196,11 @@ export function verifyReport(
   // Puko `includes("7:0")` prolazi i na satnici „17:00”, pa rezultat ne smije
   // imati znamenku ni dvotočku uza se.
   const score = `${facts.homeGoals}:${facts.awayGoals}`;
+
   const scoreStandsAlone = new RegExp(
     `(?<![\\d:])${facts.homeGoals}:${facts.awayGoals}(?![\\d:])`,
   );
+
   if (!scoreStandsAlone.test(text)) {
     problems.push(`rezultat ${score} nije naveden`);
   }
@@ -195,6 +212,7 @@ export function verifyReport(
   // Minute svih događaja su dopuštene, i onih koje tekst ne mora spomenuti —
   // model smije istaknuti pojedini žuti karton, samo ga ne smije izmisliti.
   const known = new Set(allEvents(facts).map((e) => e.display.replace(/'$/, "")));
+
   for (const match of text.matchAll(MINUTE_IN_TEXT)) {
     if (!known.has(match[1])) {
       problems.push(`izmišljena minuta ${match[1]}'`);

@@ -15,12 +15,14 @@ export async function fetchTeamStandings(params: {
   competitionId: number;
 }): Promise<TeamRanking[]> {
   const teamId = Number(await getHnsTeamId());
+
   const rows = await hnsList<HnsTeamRanking>({
     path: () =>
       `/api/live/competition/${params.competitionId}/standings/official`,
     tag: `standings-${params.competitionId}`,
     revalidate: STANDINGS_TTL,
   });
+
   return rows.map((row) => adaptTeamRanking(row, teamId));
 }
 
@@ -28,12 +30,14 @@ export async function fetchTeamStandingsUnofficial(params: {
   competitionId: number;
 }): Promise<TeamRanking[]> {
   const teamId = Number(await getHnsTeamId());
+
   const rows = await hnsList<HnsTeamRanking>({
     path: () =>
       `/api/live/competition/${params.competitionId}/standings/unofficial`,
     tag: `standings-unofficial-${params.competitionId}`,
     revalidate: STANDINGS_TTL,
   });
+
   return rows.map((row) => adaptTeamRanking(row, teamId));
 }
 
@@ -46,6 +50,7 @@ export async function fetchCompetitionGoalStats(params: {
     tag: `stats-goals-${params.competitionId}`,
     revalidate: STANDINGS_TTL,
   });
+
   return stats.map(adaptCompetitionPlayerStat);
 }
 
@@ -67,6 +72,7 @@ export async function fetchCompetitionRedCardStats(params: {
     tag: `stats-red-${params.competitionId}`,
     revalidate: STANDINGS_TTL,
   });
+
   return stats.map(adaptCompetitionPlayerStat);
 }
 
@@ -79,6 +85,7 @@ export async function fetchCompetitionYellowCardStats(params: {
     tag: `stats-yellow-${params.competitionId}`,
     revalidate: STANDINGS_TTL,
   });
+
   return stats.map(adaptCompetitionPlayerStat);
 }
 
@@ -89,6 +96,7 @@ async function fanOutCompetitionStats(
   statKind: "goals" | "yellowCards" | "redCards",
 ): Promise<CompetitionPlayerStat[]> {
   const standings = await fetchTeamStandings({ competitionId });
+
   const teamIds = standings
     .map((row) => row.team?.id)
     .filter((id): id is number => id != null);

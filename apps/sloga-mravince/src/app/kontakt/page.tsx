@@ -39,10 +39,13 @@ export default async function ContactPage() {
   ]
     .filter(Boolean)
     .join(", ");
+
   const locationLine = cmsLocation || club?.address || club?.facility?.address || "";
+
   const mapQuery = locationLine
     ? encodeURIComponent(`${name}, ${locationLine}`)
     : null;
+
   const membershipHref = email
     ? `mailto:${email}?subject=${encodeURIComponent("Učlanjenje u klub")}`
     : (facebook ?? null);

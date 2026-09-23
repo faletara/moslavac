@@ -19,11 +19,13 @@ export default function NavLink({
 }: NavLinkProps) {
   const pathname = usePathname();
   const isExternal = href.startsWith("http");
+
   const isActive =
     !isExternal && (pathname === href || pathname.startsWith(`${href}/`));
 
   const base =
     "inline-flex items-center text-xs font-medium uppercase tracking-[0.2em] transition-colors hover:text-foreground";
+
   const state = isActive ? "text-foreground" : "text-muted-foreground";
 
   if (isExternal) {

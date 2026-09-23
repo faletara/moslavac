@@ -18,25 +18,15 @@ const loadMatchReports = () =>
     import('@/lib/hns/context'),
   ])
 
-interface TenantRow {
-  id: number
-  slug: string
-  hns?: {
-    apiKey?: string | null
-    teamId?: string | null
-    seniorCompetitionFilter?: string | null
-    matchReports?: boolean | null
-    matchPagePath?: string | null
-  } | null
-}
-
 /**
  * Cron zna samo za `CRON_SECRET`. Bez njega bi bilo tko mogao pokrenuti
  * generiranje i potrošiti kredit kod OpenAI-a.
  */
 function isAuthorized(req: PayloadRequest): boolean {
   const secret = process.env.CRON_SECRET
+
   if (!secret) return false
+
   return req.headers.get('authorization') === `Bearer ${secret}`
 }
 
@@ -55,6 +45,7 @@ function writerFor(
   fallbacks: FallbackEvent[],
 ): MatchReportWriter {
   const apiKey = process.env.OPENAI_API_KEY
+
   if (!apiKey) return reports.templateWriter
 
   return reports.withFallback(
@@ -80,6 +71,7 @@ async function handler(req: PayloadRequest): Promise<Response> {
 
   const { payload } = req
   const [reports, { runWithHnsContext }] = await loadMatchReports()
+
   const { docs } = await payload.find({
     collection: 'tenants',
     depth: 0,
@@ -93,11 +85,18 @@ async function handler(req: PayloadRequest): Promise<Response> {
     (PublishSummary & { fallbacks?: FallbackEvent[] }) | { error: string }
   > = {}
 
-  for (const tenant of docs as unknown as TenantRow[]) {
+  for (const tenant of docs) {
+    const slug = tenant.slug
+
+    // Slug je ključ rezultata i cache tagova. Payload ga tipizira kao
+    // neobavezan, pa tenant bez njega nema kamo upisati ishod — preskače se.
+    if (!slug) continue
+
     const apiKey = tenant.hns?.apiKey
     const teamId = tenant.hns?.teamId
+
     if (!apiKey || !teamId) {
-      results[tenant.slug] = { error: 'nedostaje hns.apiKey ili hns.teamId' }
+      results[slug] = { error: 'nedostaje hns.apiKey ili hns.teamId' }
       continue
     }
 
@@ -113,7 +112,7 @@ async function handler(req: PayloadRequest): Promise<Response> {
         },
         () =>
           reports.publishMatchReports({
-            writer: writerFor(reports, payload, tenant.slug, fallbacks),
+            writer: writerFor(reports, payload, slug, fallbacks),
             store: payloadNewsStore(
               payload,
               tenant.id,
@@ -121,13 +120,14 @@ async function handler(req: PayloadRequest): Promise<Response> {
             ),
           }),
       )
+
       // Prazan niz znači da je model prošao provjeru na svakoj utakmici.
-      results[tenant.slug] =
+      results[slug] =
         fallbacks.length > 0 ? { ...summary, fallbacks } : summary
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
       payload.logger.error({ tenant: tenant.slug, err: error }, 'match-reports')
-      results[tenant.slug] = { error: message }
+      results[slug] = { error: message }
     }
   }
 

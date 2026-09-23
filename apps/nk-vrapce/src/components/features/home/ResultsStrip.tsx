@@ -17,6 +17,7 @@ const DATE_FMT = new Intl.DateTimeFormat("hr-HR", {
 // samo broj, dodamo "kolo" da korisniku bude jasno o čemu se radi.
 function formatRound(round: string): string {
 	const trimmed = round.trim();
+
 	return /^\d+$/.test(trimmed) ? `${trimmed}. kolo` : trimmed;
 }
 
@@ -34,6 +35,7 @@ function TeamRow({
 	won: boolean;
 }) {
 	const logo = teamLogo(team);
+
 	return (
 		<div className="flex items-center gap-3">
 			<span className="relative flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-navy/5 ring-1 ring-brand-navy/10">
@@ -93,6 +95,7 @@ export function ResultsStrip({ results }: { results: PlayedMatchSummary[] }) {
 						const home = m.score.home?.current ?? 0;
 						const away = m.score.away?.current ?? 0;
 						const d = m.kickoffAtUtcMs ? new Date(m.kickoffAtUtcMs) : null;
+
 						return (
 							<article
 								key={m.id ?? i}

@@ -21,7 +21,9 @@ const SUSPENDED = true;
 const BYPASS_TOKEN = "7f905df87bbd36ea5e7dedb50b70ae96";
 
 const BYPASS_COOKIE = "moslavac-pristup";
+
 const BYPASS_QUERY = "pristup";
+
 const RETRY_AFTER_SECONDS = 86_400;
 
 /**
@@ -66,6 +68,7 @@ export function applySuspension(
       path: "/",
       maxAge: 60 * 60 * 24 * 30,
     });
+
     return response;
   }
 

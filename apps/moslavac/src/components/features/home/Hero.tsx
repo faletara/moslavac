@@ -30,6 +30,7 @@ export default function Hero({ tenant, hasNextMatch }: HeroProps) {
     target: sectionRef,
     offset: ["start start", "end start"],
   });
+
   const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "16%"]);
   const watermarkY = useTransform(scrollYProgress, [0, 1], ["0%", "-14%"]);
   const contentY = useTransform(scrollYProgress, [0, 1], ["0%", "-45%"]);
@@ -162,20 +163,27 @@ export default function Hero({ tenant, hasNextMatch }: HeroProps) {
 /** Stable per-letter keys: each repeated character gets an occurrence index. */
 function toKeyedLetters(word: string): { char: string; key: string }[] {
   const seen = new Map<string, number>();
+
   return [...word].map((char) => {
     const count = seen.get(char) ?? 0;
     seen.set(char, count + 1);
+
     return { char, key: `${char}${count}` };
   });
 }
 
-function splitDisplayName(displayName: string): {
+/** Ime kluba razdvojeno na kraticu (npr. „SNK”) i ostatak. */
+interface SplitDisplayName {
   prefix: string | null;
   main: string;
-} {
+}
+
+function splitDisplayName(displayName: string): SplitDisplayName {
   const trimmed = displayName.trim();
   const parts = trimmed.split(/\s+/);
+
   if (parts.length <= 1) return { prefix: null, main: trimmed || displayName };
   const [first, ...rest] = parts;
+
   return { prefix: first ?? null, main: rest.join(" ") };
 }

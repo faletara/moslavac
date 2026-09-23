@@ -1,11 +1,11 @@
-const NAMED_ENTITIES: Record<string, string> = {
-  amp: "&",
-  lt: "<",
-  gt: ">",
-  quot: '"',
-  apos: "'",
-  nbsp: " ",
-};
+const NAMED_ENTITIES = new Map([
+  ["amp", "&"],
+  ["lt", "<"],
+  ["gt", ">"],
+  ["quot", '"'],
+  ["apos", "'"],
+  ["nbsp", " "],
+]);
 
 function decodeEntities(text: string): string {
   return text.replace(/&(#x?[0-9a-f]+|[a-z]+);/gi, (match, body: string) => {
@@ -14,9 +14,11 @@ function decodeEntities(text: string): string {
         body[1] === "x" || body[1] === "X"
           ? parseInt(body.slice(2), 16)
           : parseInt(body.slice(1), 10);
+
       return Number.isNaN(codePoint) ? match : String.fromCodePoint(codePoint);
     }
-    return NAMED_ENTITIES[body.toLowerCase()] ?? match;
+
+    return NAMED_ENTITIES.get(body.toLowerCase()) ?? match;
   });
 }
 
@@ -37,5 +39,6 @@ export function htmlToMetaDescription(html: string, maxLength = 160): string {
   const clipped = text.slice(0, maxLength - 1);
   const lastSpace = clipped.lastIndexOf(" ");
   const head = (lastSpace > 0 ? clipped.slice(0, lastSpace) : clipped).trimEnd();
+
   return `${head}…`;
 }

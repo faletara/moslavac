@@ -52,6 +52,8 @@ export default function MarqueeStrip({
         "flex overflow-hidden border-y border-black/25 bg-club-red py-3.5 text-white sm:py-4",
         className,
       )}
+      // SAFETY: `--*` je CSS custom property; Reactov `CSSProperties` popisuje samo
+      // standardna svojstva, pa ga inline stil ovdje mora proširiti.
       style={{ "--marquee-duration": `${duration}s` } as CSSProperties}
     >
       <span className="sr-only">{accessibleText}</span>

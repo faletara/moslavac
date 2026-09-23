@@ -1,4 +1,4 @@
-import type { PayloadMedia } from "@/lib/payload/types";
+import type { MediaImage } from "@/lib/payload/schemas";
 
 export interface SchoolProgram {
   id: number;
@@ -7,6 +7,6 @@ export interface SchoolProgram {
   coach: string | null;
   schedule: string | null;
   description: string | null;
-  photo: PayloadMedia | null;
+  photo: MediaImage | null;
   displayOrder: number;
 }

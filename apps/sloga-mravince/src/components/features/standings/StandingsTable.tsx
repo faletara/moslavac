@@ -7,6 +7,7 @@ function goalDiff(row: TeamRanking): number {
 }
 
 const STAT_HEAD = "px-1 py-4 text-center font-semibold sm:px-4";
+
 const STAT_CELL =
   "px-1 py-4.5 text-center text-sm tabular-nums sm:px-4 sm:text-base";
 
@@ -68,6 +69,7 @@ export default function StandingsTable({
             const ring = !mine && row.team?.id != null && ringed.has(row.team.id);
             const muted = mine ? "text-white/85" : "text-muted-foreground";
             const rowBorder = !mine && "border-b border-foreground/10";
+
             return (
               <tr
                 key={row.team?.id ?? row.position ?? name}

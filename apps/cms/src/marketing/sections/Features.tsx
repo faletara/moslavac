@@ -221,6 +221,7 @@ function RoundPanel() {
     { home: 'NK Sokol', away: 'Naš klub', score: '1:1', tag: '27. kolo', win: false },
     { home: 'Naš klub', away: 'NK Hrast', score: '3:1', tag: '26. kolo', win: true },
   ]
+
   const bars = [40, 78, 55, 96, 34, 62, 88]
   const rounds = ['22', '23', '24', '25', '26', '27', '28']
 

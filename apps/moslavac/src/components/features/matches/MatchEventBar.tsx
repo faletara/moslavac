@@ -61,10 +61,12 @@ export default function MatchEventBar({
   // from the rail so the icons never overlap (à la broadcast match centres).
   const MIN_GAP = 5; // percent of the rail before two icons would collide
   const level = new Map<MatchEvent, number>();
+
   const assignFloors = (lane: MatchEvent[]) => {
     const sorted = [...lane].sort((a, b) => minuteOf(a) - minuteOf(b));
     let lastPct = -100;
     let floor = 0;
+
     for (const e of sorted) {
       const p = pct(minuteOf(e));
       floor = p - lastPct < MIN_GAP ? floor + 1 : 0;
@@ -72,6 +74,7 @@ export default function MatchEventBar({
       lastPct = p;
     }
   };
+
   assignFloors(barEvents.filter((e) => e.side === "home"));
   assignFloors(barEvents.filter((e) => e.side === "away"));
 
@@ -126,6 +129,7 @@ export default function MatchEventBar({
             const floor = level.get(e) ?? 0;
             const offset = 6 + floor * 21;
             const label = `${e.player?.shortName ?? e.player?.name ?? ""} ${minute}'`.trim();
+
             return (
               <div
                 key={`${e.id ?? i}`}

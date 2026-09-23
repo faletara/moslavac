@@ -12,6 +12,7 @@ import {
 } from "@/lib/payload/getNews";
 import { getTenant, tenantSlug } from "@/lib/payload/getTenant";
 import { BASE_URL } from "@/lib/siteUrl";
+import type { NewsArticleJsonLd } from "@/types/jsonld";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -26,55 +27,65 @@ function fetchNewsDoc(idOrSlug: string) {
 
 export async function generateStaticParams() {
   const result = await fetchNewsPaginated({ page: 1, size: 200 });
+
   return result.content.map((item) => ({ id: item.slug ?? String(item.id) }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const news = await fetchNewsDoc(id);
+
   if (!news) return { title: "Vijest nije pronađena" };
   const text = news.content.replace(/<[^>]+>/g, "").trim();
   const description = text.slice(0, 160);
   const slug = news.slug ?? id;
+
+  const openGraph: NonNullable<Metadata["openGraph"]> = {
+    type: "article",
+    title: news.title,
+    description,
+    publishedTime: news.date,
+  };
+
+  const twitter: NonNullable<Metadata["twitter"]> = {
+    card: news.thumbnailPath ? "summary_large_image" : "summary",
+    title: news.title,
+    description,
+  };
+
+  if (news.thumbnailPath) {
+    openGraph.images = [{ url: news.thumbnailPath, alt: news.title }];
+    twitter.images = [news.thumbnailPath];
+  }
+
   return {
     title: news.title,
     description,
     alternates: {
       canonical: `${BASE_URL}/novosti/${slug}`,
     },
-    openGraph: {
-      type: "article",
-      title: news.title,
-      description,
-      publishedTime: news.date,
-      ...(news.thumbnailPath
-        ? { images: [{ url: news.thumbnailPath, alt: news.title }] }
-        : {}),
-    },
-    twitter: {
-      card: news.thumbnailPath ? "summary_large_image" : "summary",
-      title: news.title,
-      description,
-      ...(news.thumbnailPath ? { images: [news.thumbnailPath] } : {}),
-    },
+    openGraph,
+    twitter,
   };
 }
 
 export default async function NewsDetailPage({ params }: Props) {
   const { id } = await params;
   const news = await fetchNewsDoc(id);
+
   if (!news || news.tenantId !== tenantSlug) notFound();
   const slug = news.slug ?? id;
   const tenant = await getTenant();
 
   const date = new Date(news.date);
   const formattedDate = formatDateLong(news.date);
+
   const formattedTime = date.toLocaleTimeString("hr-HR", {
     hour: "2-digit",
     minute: "2-digit",
   });
 
-  const articleJsonLd: Record<string, unknown> = {
+  const articleJsonLd: NewsArticleJsonLd = {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
     headline: news.title,
@@ -85,8 +96,9 @@ export default async function NewsDetailPage({ params }: Props) {
       "@type": "Organization",
       name: tenant.displayName,
     },
-    ...(news.thumbnailPath ? { image: [news.thumbnailPath] } : {}),
   };
+
+  if (news.thumbnailPath) articleJsonLd.image = [news.thumbnailPath];
 
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",

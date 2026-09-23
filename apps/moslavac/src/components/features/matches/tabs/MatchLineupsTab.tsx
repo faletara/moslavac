@@ -20,6 +20,7 @@ export default function MatchLineupsTab({
 }: MatchLineupsTabProps) {
   const moslavacTeamId = useOurTeamId();
   const competitionId = match.competition?.id ?? null;
+
   const hasLineups =
     (lineups?.home?.players?.length ?? 0) > 0 ||
     (lineups?.away?.players?.length ?? 0) > 0;
@@ -173,6 +174,7 @@ function PlayerRow({
   muted?: boolean;
 }) {
   const playerName = player.name ?? "";
+
   const isLinkable =
     isMoslavac &&
     player.personId != null &&

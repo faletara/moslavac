@@ -9,7 +9,9 @@ import type { Match, MatchInfo } from "@/types/hns";
  */
 function isReferee(role: string | null): boolean {
   const r = (role ?? "").toLowerCase();
+
   if (r.includes("delegat") || r.includes("kontrolor")) return false;
+
   return r.includes("sudac");
 }
 
@@ -40,6 +42,7 @@ export default function MatchFacts({
   info: MatchInfo | null;
 }) {
   const facility = match.facility;
+
   const officials = (info?.officials ?? []).filter(
     (official) => official.name.trim() !== "" && isReferee(official.role),
   );
@@ -79,6 +82,7 @@ export default function MatchFacts({
     : encodeURIComponent(
         [venueName, venueAddress, venuePlace].filter(Boolean).join(", "),
       );
+
   const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${destination}`;
 
   return (

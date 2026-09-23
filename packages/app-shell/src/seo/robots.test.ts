@@ -6,10 +6,12 @@ const baseUrl = "https://klub.example";
 const ruleFor = (agent: string) => {
   const rules = buildRobots({ baseUrl }).rules;
   const list = Array.isArray(rules) ? rules : [rules];
+
   return list.find((rule) => {
     const agents = Array.isArray(rule.userAgent)
       ? rule.userAgent
       : [rule.userAgent];
+
     return agents.includes(agent);
   });
 };
@@ -73,6 +75,7 @@ describe("buildRobotsTxt", () => {
   it("izriče Content Signals za svaki blok pravila", () => {
     const agentBlocks = txt.split("\n\n").filter((b) => b.startsWith("User-agent:"));
     expect(agentBlocks.length).toBeGreaterThan(0);
+
     for (const block of agentBlocks) {
       expect(block, block).toMatch(
         /^Content-Signal: ai-train=(yes|no), search=(yes|no), ai-input=(yes|no)$/m,
@@ -90,6 +93,7 @@ describe("buildRobotsTxt", () => {
     const block = txt
       .split("\n\n")
       .find((b) => b.startsWith("User-agent: CCBot"));
+
     expect(block).toContain(
       "Content-Signal: ai-train=no, search=no, ai-input=no",
     );

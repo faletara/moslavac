@@ -22,10 +22,9 @@ export default function Footer({ tenant }: FooterProps) {
   const phone = tenant.contact?.phone;
   const address = tenant.contact?.address;
   const city = tenant.contact?.city;
+
   const logo =
-    tenant.branding?.logo && typeof tenant.branding.logo === "object"
-      ? (tenant.branding.logo as PayloadMedia)
-      : null;
+    tenant.branding?.logo ?? null;
 
   return (
     <footer className="dark relative mt-24 overflow-hidden border-t-2 border-primary bg-navy-deep text-foreground">

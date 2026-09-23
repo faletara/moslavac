@@ -112,6 +112,7 @@ export function buildRobotsTxt({ baseUrl }: { baseUrl: string }): string {
       // Signal stoji unutar bloka na koji se odnosi, kako nalaže specifikacija.
       contentSignalLine(rule.signals),
     ];
+
     return lines.join("\n");
   });
 

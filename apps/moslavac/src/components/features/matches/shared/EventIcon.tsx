@@ -27,6 +27,7 @@ export function EventIcon({ kind, className, subDirection }: EventIconProps) {
       />
     );
   }
+
   if (kind === "red") {
     return (
       <span
@@ -36,6 +37,7 @@ export function EventIcon({ kind, className, subDirection }: EventIconProps) {
       />
     );
   }
+
   if (kind === "sub") {
     return (
       <ArrowLeftRight
@@ -57,6 +59,7 @@ export function EventIcon({ kind, className, subDirection }: EventIconProps) {
       />
     );
   }
+
   if (kind === "goal" || kind === "own-goal") {
     return (
       <Icon

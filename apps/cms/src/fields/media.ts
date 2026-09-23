@@ -1,4 +1,4 @@
-import type { Field } from 'payload'
+import type { ArrayField, Field, UploadField } from 'payload'
 
 interface MediaFieldOptions {
   label?: string
@@ -7,14 +7,20 @@ interface MediaFieldOptions {
 }
 
 /** Single upload polje vezano na `media`. Koristi 7+ kolekcija. */
-export const mediaField = (name: string, opts: MediaFieldOptions = {}): Field => ({
-  name,
-  label: opts.label ?? 'Slika',
-  type: 'upload',
-  relationTo: 'media',
-  ...(opts.required ? { required: true } : {}),
-  ...(opts.description ? { admin: { description: opts.description } } : {}),
-})
+export const mediaField = (name: string, opts: MediaFieldOptions = {}): Field => {
+  const field: UploadField = {
+    name,
+    label: opts.label ?? 'Slika',
+    type: 'upload',
+    relationTo: 'media',
+  }
+
+  if (opts.required) field.required = true
+
+  if (opts.description) field.admin = { description: opts.description }
+
+  return field
+}
 
 interface MediaArrayOptions {
   label?: string
@@ -27,12 +33,8 @@ interface MediaArrayOptions {
 export const mediaArrayField = (
   name: string,
   opts: MediaArrayOptions = {},
-): Field => ({
-  name,
-  label: opts.label ?? 'Fotografije',
-  type: 'array',
-  ...(opts.description ? { admin: { description: opts.description } } : {}),
-  fields: [
+): Field => {
+  const fields: Field[] = [
     {
       name: 'image',
       label: 'Slika',
@@ -40,8 +42,20 @@ export const mediaArrayField = (
       relationTo: 'media',
       required: true,
     },
-    ...(opts.withCaption
-      ? [{ name: 'caption', label: 'Opis (natpis)', type: 'text' } as Field]
-      : []),
-  ],
-})
+  ]
+
+  if (opts.withCaption) {
+    fields.push({ name: 'caption', label: 'Opis (natpis)', type: 'text' })
+  }
+
+  const field: ArrayField = {
+    name,
+    label: opts.label ?? 'Fotografije',
+    type: 'array',
+    fields,
+  }
+
+  if (opts.description) field.admin = { description: opts.description }
+
+  return field
+}

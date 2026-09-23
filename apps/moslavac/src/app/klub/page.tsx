@@ -18,6 +18,7 @@ export const metadata: Metadata = {
 
 export default async function KlubPage() {
   const tenant = await getTenant();
+
   const team = await fetchTeamDetails({
     teamId: tenant.hns.teamId,
   });
@@ -147,6 +148,7 @@ function InfoList({
       <p className="text-sm text-muted-foreground">Nema podataka.</p>
     );
   }
+
   return (
     <dl className="flex flex-col divide-y divide-border/60 border-y border-border/60">
       {rows.map((row) => (
@@ -180,13 +182,16 @@ function ContactGrid({
   } | null;
 }) {
   const links: Array<{ label: string; href: string; value: string }> = [];
+
   if (email) {
     links.push({ label: "Email", href: `mailto:${email}`, value: email });
   }
+
   if (phone) {
     const tel = phone.replace(/\s+/g, "");
     links.push({ label: "Telefon", href: `tel:${tel}`, value: phone });
   }
+
   if (social?.facebook) {
     links.push({
       label: "Facebook",
@@ -194,6 +199,7 @@ function ContactGrid({
       value: social.facebook.replace(/^https?:\/\//, ""),
     });
   }
+
   if (social?.youtube) {
     links.push({
       label: "YouTube",
@@ -201,6 +207,7 @@ function ContactGrid({
       value: social.youtube.replace(/^https?:\/\//, ""),
     });
   }
+
   if (social?.webshop) {
     links.push({
       label: "Webshop",
@@ -220,12 +227,14 @@ function ContactGrid({
     <ul className="grid gap-px bg-border/60 sm:grid-cols-2">
       {links.map((link) => {
         const isExternal = link.href.startsWith("http");
+
         const Icon =
           link.label === "Email"
             ? Mail
             : link.label === "Telefon"
               ? Phone
               : ExternalLink;
+
         return (
           <li key={link.label} className="bg-background">
             <a
@@ -324,14 +333,13 @@ function SectionBlock({
 }
 
 function resolveLogoUrl(
-  brandingLogo: { url?: string | null } | string | null | undefined,
+  brandingLogo: { url?: string | null } | null | undefined,
   hnsPicture: string | null | undefined,
 ): string | null {
-  if (brandingLogo) {
-    if (typeof brandingLogo === "string") return brandingLogo;
-    if (brandingLogo.url) return brandingLogo.url;
-  }
+  if (brandingLogo?.url) return brandingLogo.url;
+
   if (hnsPicture) return getCometImageUrl(hnsPicture);
+
   return null;
 }
 

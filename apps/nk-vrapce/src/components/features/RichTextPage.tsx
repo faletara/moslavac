@@ -37,7 +37,7 @@ export function RichTextPage({
           <FadeInView delay={0.1}>
             <figure className="relative mt-12 aspect-[16/7] w-full overflow-hidden sm:mt-16">
               <Image
-                src={page.heroImage.sizes?.hero?.url ?? page.heroImage.url}
+                src={page.heroImage.heroUrl}
                 alt={page.heroImage.alt || page.title}
                 fill
                 sizes="(min-width: 1024px) 896px, 100vw"
@@ -68,7 +68,7 @@ export function RichTextPage({
                   className="group relative aspect-square overflow-hidden bg-muted"
                 >
                   <Image
-                    src={media.sizes?.card?.url ?? media.url}
+                    src={media.cardUrl}
                     alt={media.alt || page.title}
                     fill
                     sizes="(min-width: 640px) 384px, 100vw"

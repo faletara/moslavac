@@ -61,8 +61,9 @@ export function MotionPreset({
     visible.scale = 1
   }
 
-  // Sve varijante primaju isti ref; tip se svodi na motion.div da TS ne traži
-  // presjek referenci svih HTML elemenata.
+  // SAFETY: sve varijante primaju isti ref; tip se svodi na `motion.div` da TS
+  // ne traži presjek referenci svih HTML elemenata. Sam element bira
+  // `component`, pa je runtime i dalje točan.
   const Tag = motion[component] as typeof motion.div
 
   return (

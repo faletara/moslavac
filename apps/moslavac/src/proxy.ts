@@ -8,6 +8,7 @@ import { suspensionGate } from "@/lib/app-shell/suspension/suspensionGate";
  */
 export default async function proxy(request: NextRequest) {
   const suspended = suspensionGate(request);
+
   if (suspended) return suspended;
 
   return markdownProxy(request);

@@ -16,7 +16,7 @@ const TENANT_SLUG = process.env.SEED_TENANT_SLUG ?? 'garicgaresnica'
 
 type Position = 'vratar' | 'obrambeni' | 'vezni' | 'napadac' | 'trener'
 
-const positionByPersonId: Record<number, Position> = {
+const positionByPersonId = {
   437283: 'vratar', // Luka Rijetković
   72577: 'vratar', // Tomislav Dubravac
 
@@ -40,10 +40,12 @@ const positionByPersonId: Record<number, Position> = {
   472609: 'napadac', // Diogo Santana da Silva
 
   76889: 'trener', // Tihomir Pokopac
-}
+} satisfies Record<number, Position>
 
 console.log('fix-roster-positions-garic: starting')
+
 const payloadConfig = await config
+
 const payload = await getPayload({ config: payloadConfig })
 
 const tenants = await payload.find({
@@ -53,17 +55,21 @@ const tenants = await payload.find({
 })
 
 const tenant = tenants.docs[0]
+
 if (!tenant) {
   console.error(`Tenant with slug "${TENANT_SLUG}" not found`)
   process.exit(1)
 }
 
 let updated = 0
+
 let unchanged = 0
+
 let missing = 0
 
 for (const [personIdRaw, position] of Object.entries(positionByPersonId)) {
   const personId = Number(personIdRaw)
+
   const found = await payload.find({
     collection: 'roster',
     where: {
@@ -73,6 +79,7 @@ for (const [personIdRaw, position] of Object.entries(positionByPersonId)) {
   })
 
   const doc = found.docs[0]
+
   if (!doc) {
     console.warn(`  missing (personId=${personId})`)
     missing++

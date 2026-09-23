@@ -31,6 +31,7 @@ import { getTenant } from "@/lib/payload/getTenant";
 
 export async function generateMetadata(): Promise<Metadata> {
 	const tenant = await getTenant();
+
 	return {
 		title: {
 			absolute: tenant.displayName,
@@ -65,21 +66,28 @@ export default async function HomePage() {
 			fetchRoster(),
 			(async () => {
 				const competition = await fetchSeniorCompetition();
+
 				if (!competition?.id) return null;
+
 				const rows = await fetchTeamStandings({
 					competitionId: competition.id,
 				});
+
 				return { competition, rows };
 			})(),
 			(async () => {
 				try {
 					const competition = await fetchSeniorCompetition();
+
 					if (!competition?.id) return { results: [] };
+
 					const [matches, teamIdStr] = await Promise.all([
 						fetchCompetitionMatches({ competitionId: competition.id }),
 						getHnsTeamId(),
 					]);
+
 					const results = getRecentForm(matches, Number(teamIdStr), 3);
+
 					return { results };
 				} catch {
 					return { results: [] };
@@ -91,9 +99,12 @@ export default async function HomePage() {
 						fetchMatchSlots(),
 						getHnsTeamId(),
 					]);
+
 					// HNS zna vratiti prazan objekt umjesto null kad utakmice nema.
 					const next = slots.next;
+
 					if (next?.kickoffAtUtcMs == null) return null;
+
 					return { match: next, ourTeamId: Number(teamIdStr) };
 				} catch {
 					return null;
@@ -102,19 +113,19 @@ export default async function HomePage() {
 		]);
 
 	const galleryPreview = albums.slice(0, 3);
+
 	// Teaser momčadi — bez stožera, igrači s fotkom prvi, do 8 kartica
 	const squadPreview = roster
 		.filter((p) => p.position !== "trener")
 		.sort((a, b) => {
 			const aHasPhoto = a.photo ? 0 : 1;
 			const bHasPhoto = b.photo ? 0 : 1;
+
 			return aHasPhoto - bHasPhoto || a.displayOrder - b.displayOrder;
 		})
 		.slice(0, 8);
-	const logoFallback =
-		tenant.branding?.logo && typeof tenant.branding.logo === "object"
-			? (tenant.branding.logo.url ?? "")
-			: "";
+
+	const logoFallback = tenant.branding?.logo?.url ?? "";
 
 	return (
 		<>
@@ -183,8 +194,7 @@ export default async function HomePage() {
 							title: a.title,
 							href: `/galerija/${a.slug ?? a.id}`,
 							cover:
-								a.coverImage?.sizes?.card?.url ??
-								a.coverImage?.url ??
+								a.coverImage?.cardUrl ??
 								a.photos[0]?.image.url ??
 								"",
 						}))}
@@ -218,6 +228,7 @@ function Band({
 			: tone === "surface"
 				? "bg-surface"
 				: "";
+
 	return <div className={`py-16 sm:py-24 ${toneClass}`}>{children}</div>;
 }
 
@@ -235,6 +246,7 @@ function LatestNews({
 	logoFallback: string;
 }) {
 	const [lead, ...rest] = news;
+
 	if (!lead) return null;
 	const secondary = rest.slice(0, 3);
 	const hasList = secondary.length > 0;
@@ -375,6 +387,7 @@ function TeaserBand({
 	variant?: "plain" | "yellow";
 }) {
 	const onYellow = variant === "yellow";
+
 	return (
 		<section className="mx-auto w-full max-w-6xl px-6 sm:px-10">
 			<div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
