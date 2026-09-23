@@ -61,7 +61,8 @@ export default async function MatchOgImage({
   params: Promise<{ matchId: string }>;
 }) {
   const { matchId } = await params;
-  const match = await fetchMatchInfo({ matchId: parseTrailingId(matchId) });
+  const mid = parseTrailingId(matchId);
+  const match = mid == null ? null : await fetchMatchInfo({ matchId: mid });
 
   if (!match) {
     return new ImageResponse(

@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import MatchesList from "@/components/features/competition/MatchesList";
 import { redirectToCanonical } from "@/lib/helpers/canonical";
 import {
@@ -15,6 +16,8 @@ export const revalidate = 180;
 export default async function CompetitionMatchesPage({ params }: Props) {
   const { competitionId } = await params;
   const cid = parseTrailingId(competitionId);
+
+  if (cid == null) notFound();
 
   const [info, matches] = await Promise.all([
     fetchCompetitionInfo({ competitionId: cid }),

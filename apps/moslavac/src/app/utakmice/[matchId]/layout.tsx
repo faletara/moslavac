@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { getCometImageUrl } from "@/lib/hns/imageUrl";
 import {
   fetchAllCompetitionMatches,
@@ -57,7 +58,10 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { matchId } = await params;
-  const match = await fetchMatchInfo({ matchId: parseTrailingId(matchId) });
+  const mid = parseTrailingId(matchId);
+
+  if (mid == null) notFound();
+  const match = await fetchMatchInfo({ matchId: mid });
 
   if (!match) return { title: "Utakmica" };
 
@@ -106,10 +110,13 @@ export default async function MatchLayout({
   params: Promise<Params>;
 }) {
   const { matchId } = await params;
+  const mid = parseTrailingId(matchId);
+
+  if (mid == null) notFound();
 
   // fetch is deduplicated with generateMetadata's call (same URL + cache key)
   const [match, tenant] = await Promise.all([
-    fetchMatchInfo({ matchId: parseTrailingId(matchId) }),
+    fetchMatchInfo({ matchId: mid }),
     getTenant(),
   ]);
 

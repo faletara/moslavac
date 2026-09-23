@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import {
   fetchCompetitionInfo,
   fetchCurrentSeasonCompetitions,
@@ -27,6 +28,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { competitionId } = await params;
   const id = parseTrailingId(competitionId);
+
+  if (id == null) notFound();
   const info = await fetchCompetitionInfo({ competitionId: id });
   const name = info?.name ?? "Sezona";
   const slug = info ? buildCompetitionSlug(info) : competitionId;
@@ -56,6 +59,8 @@ export default async function SeasonLayout({
 }) {
   const { competitionId } = await params;
   const id = parseTrailingId(competitionId);
+
+  if (id == null) notFound();
   const info = await fetchCompetitionInfo({ competitionId: id });
 
   return (

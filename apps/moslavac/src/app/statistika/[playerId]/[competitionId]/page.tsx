@@ -22,8 +22,11 @@ export const revalidate = 600;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { playerId, competitionId } = await params;
-  const personId = String(parseTrailingId(playerId));
+  const parsedPersonId = parseTrailingId(playerId);
   const cid = parseTrailingId(competitionId);
+
+  if (parsedPersonId == null || cid == null) notFound();
+  const personId = String(parsedPersonId);
 
   const [details, stats] = await Promise.all([
     fetchPlayerDetails({ personId }),
@@ -68,8 +71,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PlayerStatsPage({ params }: Props) {
   const { playerId, competitionId } = await params;
-  const personId = String(parseTrailingId(playerId));
+  const parsedPersonId = parseTrailingId(playerId);
   const cid = parseTrailingId(competitionId);
+
+  if (parsedPersonId == null || cid == null) notFound();
+  const personId = String(parsedPersonId);
 
   const [playerDetails, playerStats] = await Promise.all([
     fetchPlayerDetails({ personId }),

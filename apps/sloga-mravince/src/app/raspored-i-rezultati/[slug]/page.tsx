@@ -77,7 +77,10 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const match = await fetchMatchInfo({ matchId: parseTrailingId(slug) });
+  const matchId = parseTrailingId(slug);
+
+  if (matchId == null) notFound();
+  const match = await fetchMatchInfo({ matchId });
 
   if (!match) return {};
 
@@ -106,6 +109,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function MatchPage({ params }: Props) {
   const { slug } = await params;
   const matchId = parseTrailingId(slug);
+
+  if (matchId == null) notFound();
 
   const [match, events, lineups, info] = await Promise.all([
     fetchMatchInfo({ matchId }),

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import CardsTable from "@/components/features/competition/CardsTable";
 import { redirectToCanonical } from "@/lib/helpers/canonical";
 import { fetchCompetitionInfo } from "@/lib/hns/competitions";
@@ -15,10 +16,10 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { competitionId } = await params;
+  const cid = parseTrailingId(competitionId);
 
-  const info = await fetchCompetitionInfo({
-    competitionId: parseTrailingId(competitionId),
-  });
+  if (cid == null) notFound();
+  const info = await fetchCompetitionInfo({ competitionId: cid });
 
   const slug = info ? buildCompetitionSlug(info) : competitionId;
   const name = info?.name ?? "Sezona";
@@ -33,6 +34,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function CompetitionCardsPage({ params }: Props) {
   const { competitionId } = await params;
   const cid = parseTrailingId(competitionId);
+
+  if (cid == null) notFound();
 
   const [info, yellowCards, redCards] = await Promise.all([
     fetchCompetitionInfo({ competitionId: cid }),

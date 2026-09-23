@@ -27,11 +27,22 @@ export function slugify(input: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-/** Extracts the trailing run of digits as the entity id. */
-export function parseTrailingId(slug: string): number {
-  const m = slug.match(/(\d+)$/);
+// HNS ids are 9-10 digits today. 15 digits stays below
+// Number.MAX_SAFE_INTEGER, so every accepted id round-trips exactly.
+const MAX_ID_DIGITS = 15;
 
-  return m ? Number(m[1]) : NaN;
+const TRAILING_ID_RE = new RegExp(`(?:^|\\D)(\\d{1,${MAX_ID_DIGITS}})$`);
+
+/**
+ * Extracts the trailing run of digits as the entity id, or null when there is
+ * no usable id: no trailing digits, a run too long to be an HNS id, or zero.
+ * Routes call `notFound()` on null, so a junk slug never reaches HNS.
+ */
+export function parseTrailingId(slug: string): number | null {
+  const m = slug.match(TRAILING_ID_RE);
+  const id = m ? Number(m[1]) : 0;
+
+  return id > 0 ? id : null;
 }
 
 export function buildMatchSlug(m: Match): string {

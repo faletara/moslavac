@@ -30,6 +30,8 @@ export const revalidate = 30;
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { matchId } = await params;
   const mid = parseTrailingId(matchId);
+
+  if (mid == null) notFound();
   const matchInfo = await fetchMatchInfo({ matchId: mid });
 
   if (!matchInfo) return {};
@@ -76,6 +78,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function MatchInfoPage({ params }: Props) {
   const { matchId } = await params;
   const mid = parseTrailingId(matchId);
+
+  if (mid == null) notFound();
 
   const [matchInfo, events, lineups, refereeData] = await Promise.all([
     fetchMatchInfo({ matchId: mid }),

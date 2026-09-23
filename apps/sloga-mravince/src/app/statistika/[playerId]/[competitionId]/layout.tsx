@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { fetchCompetitionInfo } from "@/lib/hns/competitions";
 import { fetchPlayerDetails } from "@/lib/hns/players";
 import { BASE_URL } from "@/lib/siteUrl";
@@ -21,6 +22,8 @@ export async function generateMetadata({
   const { playerId, competitionId } = await params;
   const personId = parseTrailingId(playerId);
   const cid = parseTrailingId(competitionId);
+
+  if (personId == null || cid == null) notFound();
 
   const [playerResult, competitionResult] = await Promise.allSettled([
     fetchPlayerDetails({ personId: String(personId) }),
