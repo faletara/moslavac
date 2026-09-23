@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { ImageResponse } from "next/og";
 import { formatDateTime } from "@/lib/helpers/date";
 import { loadGoogleFont } from "@/lib/helpers/googleFont";
@@ -56,7 +57,9 @@ export default async function MatchOgImage({
 }) {
   const { slug } = await params;
   const matchId = parseTrailingId(slug);
-  const match = matchId == null ? null : await fetchMatchInfo({ matchId });
+
+  if (matchId == null) notFound();
+  const match = await fetchMatchInfo({ matchId });
 
   if (!match) {
     return new ImageResponse(
