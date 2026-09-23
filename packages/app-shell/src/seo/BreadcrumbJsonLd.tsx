@@ -1,3 +1,5 @@
+import { serializeJsonLd } from "@/lib/helpers/jsonLd";
+
 /**
  * `BreadcrumbList` za jednu stranicu. Google iz njega crta putanju umjesto
  * golog URL-a u rezultatu, a hub stranice (`/novosti`, `/utakmice`) su mu
@@ -32,7 +34,7 @@ export default function BreadcrumbJsonLd({
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
     />
   );
 }

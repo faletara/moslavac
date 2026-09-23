@@ -27,6 +27,7 @@ import type {
   PostalAddressJsonLd,
   SportsEventJsonLd,
 } from "@/types/jsonld";
+import { serializeJsonLd } from "@/lib/helpers/jsonLd";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -141,7 +142,7 @@ export default async function MatchPage({ params }: Props) {
         <script
           key={schema["@type"]}
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(schema) }}
         />
       ))}
 

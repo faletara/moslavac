@@ -11,6 +11,7 @@ import { BASE_URL } from "@/lib/siteUrl";
 import { buildMatchSlug, parseTrailingId } from "@/lib/helpers/slug";
 import type { Match } from "@/types/hns";
 import type { PostalAddressJsonLd, SportsEventJsonLd } from "@/types/jsonld";
+import { serializeJsonLd } from "@/lib/helpers/jsonLd";
 
 interface Params {
   matchId: string;
@@ -208,12 +209,12 @@ export default async function MatchLayout({
       {jsonLd && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
         />
       )}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
       />
       {children}
     </>

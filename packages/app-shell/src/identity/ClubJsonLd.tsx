@@ -1,5 +1,6 @@
 import type { FrontendTenant } from "@/lib/payload/types";
 import type { Facility } from "@/types/hns";
+import { serializeJsonLd } from "@/lib/helpers/jsonLd";
 import { buildClubJsonLd } from "./clubIdentity";
 
 /**
@@ -26,11 +27,11 @@ export default function ClubJsonLd({
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(organization) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(organization) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(website) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(website) }}
       />
     </>
   );

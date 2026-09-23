@@ -13,6 +13,7 @@ import { getTenant, tenantSlug } from "@/lib/payload/getTenant";
 import { redirectToCanonical } from "@/lib/helpers/canonical";
 import { BASE_URL } from "@/lib/siteUrl";
 import type { NewsArticleJsonLd } from "@/types/jsonld";
+import { serializeJsonLd } from "@/lib/helpers/jsonLd";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -125,11 +126,11 @@ export default async function NewsDetailPage({ params }: Props) {
     <article className="pb-24">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(articleJsonLd) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
       />
       <TrackEvent event="News Article View" props={{ title: news.title }} />
 

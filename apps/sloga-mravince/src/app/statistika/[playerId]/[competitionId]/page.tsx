@@ -16,6 +16,7 @@ import {
 } from "@/lib/helpers/slug";
 import type { JsonLdNode, PersonJsonLd } from "@/types/jsonld";
 import { isPresent } from "@/lib/helpers/present";
+import { serializeJsonLd } from "@/lib/helpers/jsonLd";
 
 interface Props {
   params: Promise<{ playerId: string; competitionId: string }>;
@@ -149,7 +150,7 @@ export default async function PlayerStatsPage({ params }: Props) {
         <script
           key={schema["@type"]}
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(schema) }}
         />
       ))}
 

@@ -4,6 +4,7 @@ import { InkPageHero } from "@/components/layout/InkPageHero";
 import { fetchClubDetails } from "@/lib/hns/team";
 import { getTenant } from "@/lib/payload/getTenant";
 import { BASE_URL } from "@/lib/siteUrl";
+import { serializeJsonLd } from "@/lib/helpers/jsonLd";
 
 export const revalidate = 3600;
 
@@ -68,7 +69,7 @@ export default async function ContactPage() {
     <div className="bg-background">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumb) }}
       />
 
       <InkPageHero title={["Kontakt"]} />

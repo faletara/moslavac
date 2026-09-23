@@ -21,7 +21,8 @@
     "apps/cms/src/app/(payload)/admin/importMap.js"
   ],
   "jsPlugins": [
-    { "name": "anti-slop", "specifier": "./tools/oxlint/anti-slop/index.ts" }
+    { "name": "anti-slop", "specifier": "./tools/oxlint/anti-slop/index.ts" },
+    { "name": "moslavac", "specifier": "./tools/oxlint/moslavac/index.ts" }
   ],
   "rules": {
     "oxc/no-accumulating-spread": "error",
@@ -42,6 +43,7 @@
     "anti-slop/no-unsafe-dictionary-type": "error",
     "anti-slop/no-widen-then-assert": "error",
     "anti-slop/require-readable-spacing": "error",
-    "anti-slop/require-safety-comment-for-type-assertion": "error"
+    "anti-slop/require-safety-comment-for-type-assertion": "error",
+    "moslavac/no-raw-json-in-html": "error"
   }
 }

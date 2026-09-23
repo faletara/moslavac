@@ -7,6 +7,7 @@ import { Features } from '@/marketing/sections/Features'
 import { Hero } from '@/marketing/sections/Hero'
 import { HowItWorks } from '@/marketing/sections/HowItWorks'
 import { Included } from '@/marketing/sections/Included'
+import { serializeJsonLd } from '@/lib/helpers/jsonLd'
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -53,7 +54,7 @@ export default function HomePage() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
       <Hero />
       <Features />

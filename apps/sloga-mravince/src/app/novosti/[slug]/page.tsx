@@ -16,6 +16,7 @@ import type {
   NewsArticleJsonLd,
   OrganizationJsonLd,
 } from "@/types/jsonld";
+import { serializeJsonLd } from "@/lib/helpers/jsonLd";
 
 export const revalidate = 60;
 
@@ -165,7 +166,7 @@ export default async function NewsDetailPage({ params }: Props) {
         <script
           key={schema["@type"]}
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(schema) }}
         />
       ))}
 

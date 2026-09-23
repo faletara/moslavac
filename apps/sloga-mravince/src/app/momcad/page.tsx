@@ -11,6 +11,7 @@ import { buildCompetitionSlug } from "@/lib/helpers/slug";
 import type { MediaImage } from "@/lib/payload/types";
 import type { RosterEntry, RosterPosition } from "@/types/roster";
 import type { JsonLdNode, SportsTeamJsonLd } from "@/types/jsonld";
+import { serializeJsonLd } from "@/lib/helpers/jsonLd";
 
 export const revalidate = 300;
 
@@ -159,7 +160,7 @@ export default async function TeamPage() {
         <script
           key={schema["@type"]}
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(schema) }}
         />
       ))}
 
