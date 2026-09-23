@@ -4,7 +4,7 @@ import type {
   MatchReportWriter,
   PublishSummary,
 } from '@/lib/match-reports/index'
-import { matchesBearerSecret } from '../lib/bearerSecret'
+import { matchesBearerSecret } from '@/lib/helpers/bearerSecret'
 import { hnsDispatcher } from '../lib/hnsDispatcher'
 import { payloadNewsStore } from '../lib/matchReportsStore'
 

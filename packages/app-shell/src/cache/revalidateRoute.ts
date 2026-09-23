@@ -1,6 +1,6 @@
-import { createHash, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
 import { revalidatePath, revalidateTag } from "next/cache";
+import { matchesBearerSecret } from "@/lib/helpers/bearerSecret";
 
 /**
  * `POST /api/revalidate` — jedini ulazni webhook klupske stranice.
@@ -47,15 +47,6 @@ export type RevalidateCache = {
   revalidatePath: typeof revalidatePath;
 };
 
-const sha256 = (value: string): Buffer => createHash("sha256").update(value).digest();
-
-/**
- * Usporedba u konstantnom vremenu. Hash izjednači duljine, jer
- * `timingSafeEqual` baca na različitim duljinama.
- */
-const isAuthorized = (header: string | null, secret: string): boolean =>
-  timingSafeEqual(sha256(header ?? ""), sha256(`Bearer ${secret}`));
-
 export function createRevalidateRoute(
   cache: RevalidateCache = { revalidateTag, revalidatePath },
 ) {
@@ -65,12 +56,12 @@ export function createRevalidateRoute(
     const header = request.headers.get("authorization");
 
     // Obje usporedbe se uvijek izvrše, pa vrijeme ne otkriva koja je tajna pala.
-    const current = isAuthorized(header, secret ?? "");
-    const rollout = isAuthorized(header, previous ?? "");
+    const current = matchesBearerSecret(header, secret);
+    const rollout = matchesBearerSecret(header, previous);
 
     // Bez konfiguriranog secreta ruta je zatvorena, a ne otvorena; prazna
     // prijelazna tajna se ne prihvaća.
-    if (!secret || !(current || (Boolean(previous) && rollout))) {
+    if (!secret || !(current || rollout)) {
       return Response.json({ revalidated: false }, { status: 401 });
     }
 

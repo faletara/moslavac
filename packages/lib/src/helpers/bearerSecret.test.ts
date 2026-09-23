@@ -25,3 +25,11 @@ describe('matchesBearerSecret', () => {
     expect(matchesBearerSecret('Bearer x', undefined)).toBe(false)
   })
 })
+
+describe('matchesBearerSecret bez tajne', () => {
+  it('nepostavljena ili prazna tajna nikad ne prolazi', () => {
+    expect(matchesBearerSecret('Bearer ', undefined)).toBe(false)
+    expect(matchesBearerSecret('Bearer ', '')).toBe(false)
+    expect(matchesBearerSecret(null, '')).toBe(false)
+  })
+})
