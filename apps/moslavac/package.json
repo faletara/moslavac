@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@lucide/lab": "^0.1.2",
-    "@payloadcms/richtext-lexical": "^3.84.1",
+    "@payloadcms/richtext-lexical": "3.90.1",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.1",
     "@vercel/analytics": "^2.0.1",
