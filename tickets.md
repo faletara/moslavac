@@ -12,7 +12,7 @@ Ograničenje: HNS API, HNS podaci i HNS ključevi nisu naši i ne mogu se mijenj
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 Fingerprint: `apps/cms/src/collections/Tenants.ts:platform-fields-without-field-update-access`
 
@@ -21,6 +21,12 @@ Fingerprint: `apps/cms/src/collections/Tenants.ts:platform-fields-without-field-
 - [ ] `hns.apiKey` zadržava postojeći read access.
 - [ ] Regresijski test radi kroz Local API s `overrideAccess: false` (tenant-admin i super-admin).
 
+
+## Answer
+
+Riješeno. Platformska polja Tenanta imaju `superAdminOnlyField` za update. `hns.matchPagePath` (preseljeno iz 11) prihvaća samo `^[a-z0-9/-]+$`.
+
+Ljudski korak: prije deploya provjeriti ima li u produkciji Tenant s `matchPagePath` koji ne prolazi novo pravilo, jer bi blokirao spremanje.
 ---
 
 ## 02: `siteUrl` je provjereni https origin, a revalidacijski poziv ne slijedi preusmjeravanja
@@ -29,7 +35,7 @@ Fingerprint: `apps/cms/src/collections/Tenants.ts:platform-fields-without-field-
 
 **Blocked by:** 01
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 Fingerprint: `apps/cms/src/lib/revalidateFrontend.ts:unvalidated-siteUrl-outbound-post`
 
@@ -38,6 +44,12 @@ Fingerprint: `apps/cms/src/lib/revalidateFrontend.ts:unvalidated-siteUrl-outboun
 - [ ] Poziv koristi `redirect: 'manual'`.
 - [ ] Test: `siteUrl` na loopback ne proizvodi nijedan odlazni zahtjev, a dozvoljeni origin proizvodi točno jedan.
 
+
+## Answer
+
+Riješeno. `siteUrl` se na spremanju provjerava kao https origin. Slanje ide samo na hostove iz `REVALIDATE_ALLOWED_HOSTS`, s `redirect: 'manual'`.
+
+Ljudski korak: postaviti `REVALIDATE_ALLOWED_HOSTS` na CMS-u. Bez te varijable CMS ne šalje revalidaciju.
 ---
 
 ## 03: Revalidacijska tajna vrijedi samo za jedan klub
@@ -46,7 +58,7 @@ Fingerprint: `apps/cms/src/lib/revalidateFrontend.ts:unvalidated-siteUrl-outboun
 
 **Blocked by:** 02
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 Fingerprint: `apps/cms/src/lib/revalidateFrontend.ts:shared-revalidate-secret-sent-to-tenant-writable-siteUrl`
 
@@ -56,6 +68,17 @@ Fingerprint: `apps/cms/src/lib/revalidateFrontend.ts:shared-revalidate-secret-se
 - [ ] Upute za deploy (env varijable po klubu) ažurirane su u `docs/NEW-CLUB.md`.
 - [ ] Nakon deploya zamijeniti stari zajednički `REVALIDATE_SECRET` (ljudski korak, zabilježiti u Answer).
 
+
+## Answer
+
+Riješeno. Tajna kluba je HMAC-SHA256(CMS `REVALIDATE_SECRET`, slug), a ruta je uspoređuje u konstantnom vremenu. `REVALIDATE_SECRET_PREVIOUS` služi samo za prelazak.
+
+Ljudski korak (redoslijed je u `docs/NEW-CLUB.md`):
+1. Na klubovima postaviti novi `REVALIDATE_SECRET` i `REVALIDATE_SECRET_PREVIOUS` = stara zajednička tajna. Deployati klubove.
+2. Na CMS-u postaviti NOVU master tajnu i `REVALIDATE_ALLOWED_HOSTS`. Deployati CMS.
+3. Maknuti `REVALIDATE_SECRET_PREVIOUS` s klubova i ponovno ih deployati.
+
+Stara tajna mora biti zamijenjena, inače vrijednosti klubova ostaju izračunljive.
 ---
 
 ## 04: HNS ključ ostaje na serveru
@@ -64,7 +87,7 @@ Fingerprint: `apps/cms/src/lib/revalidateFrontend.ts:shared-revalidate-secret-se
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 Fingerprint: `packages/payload/src/getTenant.ts:authenticated-tenant-hns-apiKey-to-client-component`
 
@@ -73,6 +96,12 @@ Fingerprint: `packages/payload/src/getTenant.ts:authenticated-tenant-hns-apiKey-
 - [ ] Regresijski test serijalizira props client komponenti (RSC flight) i potvrđuje da ključ nije u izlazu.
 - [ ] Vrijedi za svih 5 Club appova, uključujući `template`.
 
+
+## Answer
+
+Riješeno. Javni `FrontendTenant` nema `hns.apiKey`. Ključ čita samo serverski `getHnsApiKey()`. RSC flight test potvrđuje da ključ ne ide u browser.
+
+Ljudski korak: nakon deploya redeployati ili revalidirati sve Club appove, da stari cache ne servira ključ. Ključ se ne može rotirati jer je HNS-ov.
 ---
 
 ## 05: API ključ može izdati samo super-admin
@@ -81,7 +110,7 @@ Fingerprint: `packages/payload/src/getTenant.ts:authenticated-tenant-hns-apiKey-
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 Fingerprint: `apps/cms/src/collections/Users.ts:apiKey-field-access:tenant-admin-self-mint`
 
@@ -89,6 +118,12 @@ Fingerprint: `apps/cms/src/collections/Users.ts:apiKey-field-access:tenant-admin
 - [ ] Super-admin može postaviti ključ, i on radi.
 - [ ] Postoji skripta ili upit koji izlista korisnike s postavljenim `apiKeyIndex`, da super-admin ukloni ključeve koje nije izdala platforma.
 
+
+## Answer
+
+Riješeno. Polje `apiKey` je `superAdminOnlyField`, pa tenant-admin ne može postaviti `apiKeyIndex`.
+
+Ljudski korak: u produkciji pokrenuti `cd apps/cms && pnpm payload run scripts/list-api-key-users.ts` i ukloniti ključeve koje nije izdala platforma.
 ---
 
 ## 06: Zaključavanja dokumenata vezana su uz tenant i korisnika
@@ -97,7 +132,7 @@ Fingerprint: `apps/cms/src/collections/Users.ts:apiKey-field-access:tenant-admin
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 Fingerprint: `payload-locked-documents-defaultAccess-no-tenant-scope`
 
@@ -106,6 +141,15 @@ Fingerprint: `payload-locked-documents-defaultAccess-no-tenant-scope`
 - [ ] Polje `user` na zaključavanju uvijek je trenutni korisnik.
 - [ ] Nakon pokušaja kluba A, update kluba B i dalje uspijeva.
 
+
+## Answer
+
+Riješeno. Kolekcija `payload-locked-documents` se nakon `buildConfig` mijenja tako da:
+- korisnik čita, mijenja i briše samo svoja zaključavanja;
+- create uvijek postavlja trenutnog korisnika;
+- create prolazi samo ako korisnik smije uređivati dokument.
+
+Svjesno prihvaćeno: korisnici ne vide tuđa zaključavanja. Svaki klub danas ima jedan račun. Ako klubovi dobiju više urednika, dozvoliti čitanje zaključavanja unutar istog Tenanta.
 ---
 
 ## 07: Admin `form-state` zaključava samo dokumente koje korisnik smije uređivati
@@ -114,7 +158,7 @@ Fingerprint: `payload-locked-documents-defaultAccess-no-tenant-scope`
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 Fingerprint: `payloadcms-ui-handleFormStateLocking-db-create-no-document-access-check`
 
@@ -123,6 +167,12 @@ Fingerprint: `payloadcms-ui-handleFormStateLocking-db-create-no-document-access-
 - [ ] Vlasnik dokumenta i dalje normalno dobiva zaključavanje u adminu.
 - [ ] Problem je prijavljen upstream Payloadu (link zabilježen u Answer).
 
+
+## Answer
+
+Riješeno. `form-state` je omotan u `layout.tsx` (`formStateLockGuard`). Zaključavanje nastaje samo ako korisnik može uređivati dokument, a provjeru dijeli s ticketom 06 (`canEditDocument`).
+
+Ljudski korak: prijaviti problem Payloadu kroz njihov privatni kanal za ranjivosti. Nacrt je u `~/security-audit-skill/moslavac/run-1/payload-upstream-report-draft.md`. Ovdje zabilježiti link.
 ---
 
 ## 08: Siguran JSON-LD serializer u svim Club appovima
@@ -131,7 +181,7 @@ Fingerprint: `payloadcms-ui-handleFormStateLocking-db-create-no-document-access-
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 Fingerprint: `club-apps/json-ld/JSON.stringify-inline-script-breakout`
 
@@ -139,6 +189,10 @@ Fingerprint: `club-apps/json-ld/JSON.stringify-inline-script-breakout`
 - [ ] Test: vrijednost `</script><script>…` renderira se bez `</script` unutar elementa, a `JSON.parse` vraća originalni tekst.
 - [ ] Lint pravilo ili test sprječava novi goli `JSON.stringify` u `dangerouslySetInnerHTML`.
 
+
+## Answer
+
+Riješeno. Svi JSON-LD blokovi idu kroz `<JsonLdScript>` (`serializeJsonLd`). Oxlint pravilo `moslavac/no-raw-json-in-html` sprječava povratak na goli `JSON.stringify`.
 ---
 
 ## 09: Kanonski HNS id-jevi u rutama
@@ -147,7 +201,7 @@ Fingerprint: `club-apps/json-ld/JSON.stringify-inline-script-breakout`
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 Fingerprint: `hns-unscoped-id-routes-upstream-fanout` (dio)
 
@@ -155,6 +209,10 @@ Fingerprint: `hns-unscoped-id-routes-upstream-fanout` (dio)
 - [ ] Slug bez znamenki ili s nekonačnim ili predugim brojem daje 0 HNS poziva.
 - [ ] Postojeći testovi `slug` i `imageResponse` su prošireni.
 
+
+## Answer
+
+Riješeno. UUID se pretvara u mala slova. `parseTrailingId` vraća `null` za neispravne ili predugačke id-jeve, a rute tada vraćaju 404 bez HNS poziva.
 ---
 
 ## 10: HNS id rute prihvaćaju samo id-jeve kluba
@@ -163,7 +221,7 @@ Fingerprint: `hns-unscoped-id-routes-upstream-fanout` (dio)
 
 **Blocked by:** 09
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 Fingerprint: `hns-unscoped-id-routes-upstream-fanout`
 
@@ -172,6 +230,14 @@ Fingerprint: `hns-unscoped-id-routes-upstream-fanout`
 - [ ] Vlastite utakmice i natjecanja kluba rade kao prije.
 - [ ] Test s lažnim HNS transportom broji pozive za strane i vlastite id-jeve.
 
+
+## Answer
+
+Riješeno. Rute za natjecanja i utakmice rade kroz `fetchClubCompetition` i `fetchClubMatch`. sloga-mravince statistika provjerava roster kluba. moslavac statistika namjerno nije ograničena na roster, jer linka i protivničke igrače.
+
+Promjena ponašanja: `/sezona/*` za natjecanja iz prošlih sezona sada vraća 404.
+
+Ljudski korak: smoke test u pravom buildu za vlastitu, protivničku i stranu utakmicu te za OG slike.
 ---
 
 ## 11: Hardening paket
@@ -180,7 +246,7 @@ Fingerprint: `hns-unscoped-id-routes-upstream-fanout`
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [ ] CMS postavlja `serverURL` i `csrf` listu na admin origin. Auth cookie je `secure` u produkciji.
 - [ ] `matchReportsCron` bearer usporedba koristi constant-time compare.
@@ -190,6 +256,19 @@ Fingerprint: `hns-unscoped-id-routes-upstream-fanout`
 - [ ] `hns.matchPagePath` prihvaća samo `^[a-z0-9/-]+$`.
 - [ ] Club appovi deklariraju `@payloadcms/richtext-lexical` >= 3.90.1 tamo gdje se koristi.
 
+
+## Answer
+
+Riješeno:
+- `serverURL` i `csrf` iz `PAYLOAD_SERVER_URL`, a ako nije postavljen, iz Vercel URL-ova;
+- `secure` cookie;
+- zajednička constant-time provjera bearer tokena u `packages/lib`;
+- `.env*` u `.gitignore`;
+- Payload pinan na 3.90.1;
+- obrisan `apps/moslavac/package-lock.json`;
+- club appovi na `richtext-lexical` 3.90.1.
+
+Ljudski korak: postaviti `PAYLOAD_SERVER_URL` na CMS-u. Admin se u devu mora otvarati na `http://localhost:43102`.
 ---
 
 ## 12: Provjera povijesti `.env.example`
