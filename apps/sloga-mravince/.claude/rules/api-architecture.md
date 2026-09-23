@@ -77,3 +77,6 @@ here — do not add a per-app client data stack.
   layer so it returns domain types.
 - Duplicate a fetcher or a mapping into an app; it belongs in `packages/`.
 - Use `any` for a response, or declare a type that duplicates `packages/types`.
+- Hand a secret to a client component. `getTenant()` returns the public
+  Tenant, without `hns.apiKey`; only `packages/hns/src/client.ts` calls
+  `getHnsApiKey()`. The HNS key belongs to the federation and cannot be rotated.
