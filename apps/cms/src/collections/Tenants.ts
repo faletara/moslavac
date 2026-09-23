@@ -1,6 +1,6 @@
 import type { CollectionConfig, Condition } from 'payload'
 import { CLUB_FEATURE_OPTIONS } from '@/lib/payload/clubFeatures'
-import { isSuperAdmin, superAdminOnly, superAdminUI } from '../access/roles'
+import { isSuperAdmin, superAdminOnly, superAdminOnlyField, superAdminUI } from '../access/roles'
 import { mediaField } from '../fields/media'
 import type { Tenant } from '../payload-types'
 import { revalidateFrontend } from '../lib/revalidateFrontend'
@@ -56,6 +56,7 @@ export const Tenants: CollectionConfig = {
       required: true,
       unique: true,
       index: true,
+      access: { update: superAdminOnlyField },
       admin: {
         condition: superAdminUI,
         description: 'Tehnički identifikator kluba — ne mijenjati (razbija stranicu).',
@@ -65,6 +66,7 @@ export const Tenants: CollectionConfig = {
       name: 'siteUrl',
       label: 'URL stranice kluba',
       type: 'text',
+      access: { update: superAdminOnlyField },
       admin: {
         condition: superAdminUI,
         description:
@@ -76,6 +78,7 @@ export const Tenants: CollectionConfig = {
       label: 'Klub aktivan',
       type: 'checkbox',
       defaultValue: true,
+      access: { update: superAdminOnlyField },
       admin: {
         condition: superAdminUI,
       },
@@ -86,10 +89,8 @@ export const Tenants: CollectionConfig = {
       type: 'select',
       hasMany: true,
       options: CLUB_FEATURE_OPTIONS,
-      access: {
-        // Samo platforma (super-admin) uključuje rubrike klubu; klub si ih ne dodjeljuje sam.
-        update: ({ req: { user } }) => isSuperAdmin(user),
-      },
+      // Samo platforma (super-admin) uključuje rubrike klubu; klub si ih ne dodjeljuje sam.
+      access: { update: superAdminOnlyField },
       admin: {
         condition: superAdminUI,
         description: 'Rubrike koje klub koristi — određuje vidljivost kolekcija u adminu.',
@@ -99,6 +100,9 @@ export const Tenants: CollectionConfig = {
       name: 'hns',
       type: 'group',
       label: 'HNS integracija',
+      // Pristup na grupi pokriva sva podpolja: Payload vlasnikov zapis odbaci i
+      // zadrži spremljenu grupu.
+      access: { update: superAdminOnlyField },
       admin: {
         condition: superAdminUI,
         description: 'Integracija s Hrvatskim nogometnim savezom (održava platforma).',
@@ -148,6 +152,17 @@ export const Tenants: CollectionConfig = {
           label: 'Putanja do stranice utakmice',
           type: 'text',
           defaultValue: '/raspored-i-rezultati',
+          // Putanja ide u poveznicu u objavljenoj novosti, pa ne smije nositi
+          // host, upit ni fragment. Prazno = zadana putanja u cronu.
+          validate: (value: string | null | undefined) => {
+            if (!value) return true
+
+            if (!/^[a-z0-9/-]+$/.test(value)) {
+              return 'Samo mala slova, brojevi, crtice i kose crte (npr. /raspored-i-rezultati).'
+            }
+
+            return true
+          },
           admin: {
             condition: (_, siblingData) => Boolean(siblingData?.matchReports),
             description:
@@ -212,6 +227,7 @@ export const Tenants: CollectionConfig = {
                 {
                   name: 'mapEmbedUrl',
                   type: 'text',
+                  access: { update: superAdminOnlyField },
                   // Skriveno iz forme — nk-vrapce zadržava spremljenu vrijednost;
                   // ostali klubovi fallbackaju na koordinate stadiona.
                   admin: { hidden: true },
