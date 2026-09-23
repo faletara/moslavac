@@ -42,7 +42,7 @@ export async function canEditDocument({ req, ...args }: EditTarget): Promise<boo
   try {
     const access = await req.payload.collections[slug].config.access.update({ id, req })
 
-    if (typeof access === 'boolean') return access
+    if (access === true || access === false) return access
 
     const { totalDocs } = await req.payload.count({
       collection: slug,
