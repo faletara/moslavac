@@ -5,6 +5,7 @@ import * as migration_20260825_120000_tenants_social_instagram from './20260825_
 import * as migration_20260831_084754_match_reports from './20260831_084754_match_reports';
 import * as migration_20260831_093506_match_page_path from './20260831_093506_match_page_path';
 import * as migration_20260921_090000_tenants_site_url from './20260921_090000_tenants_site_url';
+import * as migration_20260923_083351_objectkey_storage_s3 from './20260923_083351_objectkey_storage_s3';
 
 export const migrations = [
   {
@@ -35,11 +36,16 @@ export const migrations = [
   {
     up: migration_20260831_093506_match_page_path.up,
     down: migration_20260831_093506_match_page_path.down,
-    name: '20260831_093506_match_page_path'
+    name: '20260831_093506_match_page_path',
   },
   {
     up: migration_20260921_090000_tenants_site_url.up,
     down: migration_20260921_090000_tenants_site_url.down,
     name: '20260921_090000_tenants_site_url',
+  },
+  {
+    up: migration_20260923_083351_objectkey_storage_s3.up,
+    down: migration_20260923_083351_objectkey_storage_s3.down,
+    name: '20260923_083351_objectkey_storage_s3'
   },
 ];
