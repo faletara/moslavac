@@ -3,6 +3,7 @@ import PlayerStatsBoard, {
   type PlayerStatsData,
 } from "@/components/features/players/PlayerStatsBoard";
 import PlayerStatsHero from "@/components/features/players/PlayerStatsHero";
+import JsonLdScript from "@/lib/app-shell/seo/JsonLdScript";
 import { getCometImageUrl } from "@/lib/hns/imageUrl";
 import { fetchPlayerDetails, fetchPlayerStats } from "@/lib/hns/players";
 import { fetchRoster } from "@/lib/payload/getRoster";
@@ -16,7 +17,6 @@ import {
 } from "@/lib/helpers/slug";
 import type { JsonLdNode, PersonJsonLd } from "@/types/jsonld";
 import { isPresent } from "@/lib/helpers/present";
-import { serializeJsonLd } from "@/lib/helpers/jsonLd";
 
 interface Props {
   params: Promise<{ playerId: string; competitionId: string }>;
@@ -147,11 +147,7 @@ export default async function PlayerStatsPage({ params }: Props) {
   return (
     <div className="bg-background pb-20 sm:pb-28">
       {jsonLd.map((schema) => (
-        <script
-          key={schema["@type"]}
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: serializeJsonLd(schema) }}
-        />
+        <JsonLdScript key={schema["@type"]} data={schema} />
       ))}
 
       <PlayerStatsHero

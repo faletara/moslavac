@@ -1,30 +1,48 @@
 import { defineRule } from "@oxlint/plugins";
 
-import type { ESTree } from "@oxlint/plugins";
+import type { ESTree, SourceCode } from "@oxlint/plugins";
 
-const SINK = "dangerouslySetInnerHTML";
+import { resolveVariable } from "../../anti-slop/shared/scope.ts";
 
-function isJsonStringify(callee: ESTree.Node): boolean {
-  return (
-    callee.type === "MemberExpression" &&
-    !callee.computed &&
-    callee.object.type === "Identifier" &&
-    callee.object.name === "JSON" &&
-    callee.property.type === "Identifier" &&
-    callee.property.name === "stringify"
-  );
+const HTML_SINK_PROP = "dangerouslySetInnerHTML";
+
+const JSON_LD_TYPE = "application/ld+json";
+
+/** The one file allowed to render a JSON-LD script; everything else renders `<JsonLdScript>`. */
+const JSON_LD_SCRIPT_FILE = /[\\/]packages[\\/]app-shell[\\/]src[\\/]seo[\\/]JsonLdScript\.tsx$/;
+
+function isGlobalJson(sourceCode: SourceCode, expression: ESTree.Node): boolean {
+  if (expression.type !== "Identifier" || expression.name !== "JSON") return false;
+
+  if (sourceCode.isGlobalReference(expression)) return true;
+
+  const variable = resolveVariable(sourceCode, expression);
+
+  return variable === null || variable.defs.length === 0;
 }
 
-/** JSX atribut ili ključ objekta (`createElement`) koji HTML ubacuje bez escapea. */
+function isJsonStringify(sourceCode: SourceCode, callee: ESTree.Node): boolean {
+  if (callee.type !== "MemberExpression") return false;
+
+  if (!isGlobalJson(sourceCode, callee.object)) return false;
+
+  const property = callee.property;
+
+  return callee.computed
+    ? property.type === "Literal" && property.value === "stringify"
+    : property.type === "Identifier" && property.name === "stringify";
+}
+
+/** A JSX attribute or object key (`createElement` props) that injects HTML unescaped. */
 function isHtmlSink(node: ESTree.Node): boolean {
   if (node.type === "JSXAttribute") {
-    return node.name.type === "JSXIdentifier" && node.name.name === SINK;
+    return node.name.type === "JSXIdentifier" && node.name.name === HTML_SINK_PROP;
   }
 
   if (node.type === "Property") {
     return (
-      (node.key.type === "Identifier" && node.key.name === SINK) ||
-      (node.key.type === "Literal" && node.key.value === SINK)
+      (node.key.type === "Identifier" && node.key.name === HTML_SINK_PROP) ||
+      (node.key.type === "Literal" && node.key.value === HTML_SINK_PROP)
     );
   }
 
@@ -42,26 +60,57 @@ function isInsideHtmlSink(node: ESTree.Node): boolean {
   return false;
 }
 
+function isJsonLdTypeValue(value: ESTree.JSXAttribute["value"]): boolean {
+  if (value === null) return false;
+
+  if (value.type === "Literal") return value.value === JSON_LD_TYPE;
+
+  return (
+    value.type === "JSXExpressionContainer" &&
+    value.expression.type === "Literal" &&
+    value.expression.value === JSON_LD_TYPE
+  );
+}
+
+function isJsonLdScript(node: ESTree.JSXOpeningElement): boolean {
+  if (node.name.type !== "JSXIdentifier" || node.name.name !== "script") return false;
+
+  return node.attributes.some(
+    (attribute) =>
+      attribute.type === "JSXAttribute" &&
+      attribute.name.type === "JSXIdentifier" &&
+      attribute.name.name === "type" &&
+      isJsonLdTypeValue(attribute.value),
+  );
+}
+
 /**
- * Goli `JSON.stringify` u `dangerouslySetInnerHTML` ne escapea `<`, pa tekst iz
- * CMS-a ili HNS-a sa `</script>` izlazi iz JSON-LD skripte (ticket 08).
+ * JSON.stringify does not escape `<`, so CMS or HNS text containing `</script>`
+ * breaks out of an inline JSON-LD script. JSON-LD goes through `<JsonLdScript>`.
  */
 export const noRawJsonInHtmlRule = defineRule({
   meta: {
     type: "problem",
     docs: {
       description:
-        "Disallow JSON.stringify inside dangerouslySetInnerHTML; use serializeJsonLd, which escapes <, >, &, U+2028 and U+2029.",
+        "Disallow JSON.stringify inside dangerouslySetInnerHTML and JSON-LD scripts outside JsonLdScript.",
     },
     messages: {
       rawJson:
-        "`JSON.stringify` ne escapea `</script>`. Koristi `serializeJsonLd` iz `@/lib/helpers/jsonLd`.",
+        "`JSON.stringify` does not escape `</script>` in HTML. Render JSON-LD with `<JsonLdScript>` or serialize with `serializeJsonLd`.",
+      jsonLdScript:
+        "Render JSON-LD with `<JsonLdScript data={...} />` from `@/lib/app-shell/seo/JsonLdScript`, which escapes `</script>`.",
     },
   },
   createOnce(context) {
     return {
+      JSXOpeningElement(node) {
+        if (JSON_LD_SCRIPT_FILE.test(context.filename)) return;
+
+        if (isJsonLdScript(node)) context.report({ node, messageId: "jsonLdScript" });
+      },
       CallExpression(node) {
-        if (isJsonStringify(node.callee) && isInsideHtmlSink(node)) {
+        if (isJsonStringify(context.sourceCode, node.callee) && isInsideHtmlSink(node)) {
           context.report({ node, messageId: "rawJson" });
         }
       },

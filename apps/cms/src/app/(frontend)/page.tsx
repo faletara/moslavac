@@ -1,3 +1,4 @@
+import JsonLdScript from '@/lib/app-shell/seo/JsonLdScript'
 import { BRAND, LEGAL, PRICING } from '@/marketing/config'
 import { FAQ } from '@/marketing/data/faq'
 import { Clubs } from '@/marketing/sections/Clubs'
@@ -7,7 +8,6 @@ import { Features } from '@/marketing/sections/Features'
 import { Hero } from '@/marketing/sections/Hero'
 import { HowItWorks } from '@/marketing/sections/HowItWorks'
 import { Included } from '@/marketing/sections/Included'
-import { serializeJsonLd } from '@/lib/helpers/jsonLd'
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -52,10 +52,7 @@ const jsonLd = {
 export default function HomePage() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
-      />
+      <JsonLdScript data={jsonLd} />
       <Hero />
       <Features />
       <HowItWorks />

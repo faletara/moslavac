@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import MatchHero from "@/components/features/matches/MatchHero";
 import MatchTabs from "@/components/features/matches/MatchTabs";
 import { RefreshWhile } from "@/components/ui/refresh-while";
+import JsonLdScript from "@/lib/app-shell/seo/JsonLdScript";
 import { redirectToCanonical } from "@/lib/helpers/canonical";
 import { formatDateTime } from "@/lib/helpers/date";
 import {
@@ -27,7 +28,6 @@ import type {
   PostalAddressJsonLd,
   SportsEventJsonLd,
 } from "@/types/jsonld";
-import { serializeJsonLd } from "@/lib/helpers/jsonLd";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -139,11 +139,7 @@ export default async function MatchPage({ params }: Props) {
   return (
     <div className="bg-background">
       {jsonLd.map((schema) => (
-        <script
-          key={schema["@type"]}
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: serializeJsonLd(schema) }}
-        />
+        <JsonLdScript key={schema["@type"]} data={schema} />
       ))}
 
       {/* Dok utakmica traje, stranica se sama osvježava — bez F5 na tribini. */}

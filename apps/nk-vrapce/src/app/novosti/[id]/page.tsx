@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { TrackEvent } from "@/components/analytics/TrackEvent";
+import JsonLdScript from "@/lib/app-shell/seo/JsonLdScript";
 import { formatDateLong } from "@/lib/helpers/date";
 import {
   fetchNewsById,
@@ -13,7 +14,6 @@ import {
 import { getTenant, tenantSlug } from "@/lib/payload/getTenant";
 import { BASE_URL } from "@/lib/siteUrl";
 import type { NewsArticleJsonLd } from "@/types/jsonld";
-import { serializeJsonLd } from "@/lib/helpers/jsonLd";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -118,14 +118,8 @@ export default async function NewsDetailPage({ params }: Props) {
 
   return (
     <article className="mx-auto w-full max-w-3xl px-6 pt-12 pb-24 sm:pt-16 lg:px-8">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(articleJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
-      />
+      <JsonLdScript data={articleJsonLd} />
+      <JsonLdScript data={breadcrumbJsonLd} />
       <TrackEvent event="News Article View" props={{ title: news.title }} />
       <Link
         href="/novosti"

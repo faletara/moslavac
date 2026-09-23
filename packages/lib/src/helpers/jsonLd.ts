@@ -12,8 +12,8 @@ const HTML_UNSAFE = /[<>&\u2028\u2029]/g;
  * Goli `JSON.stringify` ne escapea `<`, pa naslov iz CMS-a ili ime momčadi iz
  * HNS-a sa `</script>` zatvara element i otvara izvršnu skriptu. Ovdje svaki
  * takav znak postaje `\uXXXX` escape: preglednik ne vidi oznaku, a `JSON.parse`
- * vraća isti tekst. Oxlint pravilo `moslavac/no-raw-json-in-html` traži ovaj
- * helper u svakom `dangerouslySetInnerHTML`.
+ * vraća isti tekst. Stranice ga ne zovu izravno nego renderiraju
+ * `<JsonLdScript>` iz `packages/app-shell/src/seo`.
  */
 export function serializeJsonLd(data: JsonLdRoot): string {
   return JSON.stringify(data).replace(

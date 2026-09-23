@@ -1,4 +1,4 @@
-import { serializeJsonLd } from "@/lib/helpers/jsonLd";
+import JsonLdScript from "./JsonLdScript";
 
 /**
  * `BreadcrumbList` za jednu stranicu. Google iz njega crta putanju umjesto
@@ -31,10 +31,5 @@ export default function BreadcrumbJsonLd({
     ],
   };
 
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
-    />
-  );
+  return <JsonLdScript data={jsonLd} />;
 }

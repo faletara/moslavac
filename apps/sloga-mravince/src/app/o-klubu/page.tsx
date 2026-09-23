@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { InkPageHero } from "@/components/layout/InkPageHero";
+import JsonLdScript from "@/lib/app-shell/seo/JsonLdScript";
 import { fetchPageByKey } from "@/lib/payload/getPages";
 import { getTenant } from "@/lib/payload/getTenant";
 import { BASE_URL } from "@/lib/siteUrl";
-import { serializeJsonLd } from "@/lib/helpers/jsonLd";
 
 export const revalidate = 3600;
 
@@ -54,10 +54,7 @@ export default async function AboutPage() {
 
   return (
     <div className="bg-background">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumb) }}
-      />
+      <JsonLdScript data={breadcrumb} />
 
       <InkPageHero title={page?.eyebrow ? [page.eyebrow, title] : [title]} watermark="1925" />
 

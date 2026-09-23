@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import JsonLdScript from "@/lib/app-shell/seo/JsonLdScript";
 import { getCometImageUrl } from "@/lib/hns/imageUrl";
 import {
   fetchAllCompetitionMatches,
@@ -11,7 +12,6 @@ import { BASE_URL } from "@/lib/siteUrl";
 import { buildMatchSlug, parseTrailingId } from "@/lib/helpers/slug";
 import type { Match } from "@/types/hns";
 import type { PostalAddressJsonLd, SportsEventJsonLd } from "@/types/jsonld";
-import { serializeJsonLd } from "@/lib/helpers/jsonLd";
 
 interface Params {
   matchId: string;
@@ -206,16 +206,8 @@ export default async function MatchLayout({
 
   return (
     <>
-      {jsonLd && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
-        />
-      )}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
-      />
+      {jsonLd && <JsonLdScript data={jsonLd} />}
+      <JsonLdScript data={breadcrumbJsonLd} />
       {children}
     </>
   );
