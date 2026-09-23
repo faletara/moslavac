@@ -36,22 +36,22 @@ importers:
   apps/cms:
     dependencies:
       '@payloadcms/db-postgres':
-        specifier: latest
+        specifier: 3.90.1
         version: 3.90.1(payload@3.90.1(graphql@16.14.0)(typescript@5.9.3))
       '@payloadcms/next':
-        specifier: latest
+        specifier: 3.90.1
         version: 3.90.1(@types/react@19.2.14)(graphql@16.14.0)(monaco-editor@0.55.1)(next@16.2.5(babel-plugin-macros@3.1.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.77.4))(payload@3.90.1(graphql@16.14.0)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
       '@payloadcms/plugin-multi-tenant':
-        specifier: latest
+        specifier: 3.90.1
         version: 3.90.1(@payloadcms/ui@3.90.1(@types/react@19.2.14)(monaco-editor@0.55.1)(next@16.2.5(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.77.4))(payload@3.90.1(graphql@16.14.0)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(payload@3.90.1(graphql@16.14.0)(typescript@5.9.3))
       '@payloadcms/richtext-lexical':
-        specifier: latest
+        specifier: 3.90.1
         version: 3.90.1(@faceless-ui/modal@3.0.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@faceless-ui/scroll-info@2.0.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@payloadcms/next@3.90.1(@types/react@19.2.14)(graphql@16.14.0)(monaco-editor@0.55.1)(next@16.2.5(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.77.4))(payload@3.90.1(graphql@16.14.0)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(@types/react@19.2.14)(monaco-editor@0.55.1)(next@16.2.5(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.77.4))(payload@3.90.1(graphql@16.14.0)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)(yjs@13.6.30)
       '@payloadcms/storage-s3':
-        specifier: latest
+        specifier: 3.90.1
         version: 3.90.1(@types/react@19.2.14)(monaco-editor@0.55.1)(next@16.2.5(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.77.4))(payload@3.90.1(graphql@16.14.0)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
       '@payloadcms/ui':
-        specifier: latest
+        specifier: 3.90.1
         version: 3.90.1(@types/react@19.2.14)(monaco-editor@0.55.1)(next@16.2.5(babel-plugin-macros@3.1.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.77.4))(payload@3.90.1(graphql@16.14.0)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
       clsx:
         specifier: ^2.1.1
@@ -78,7 +78,7 @@ importers:
         specifier: ^7.8.0
         version: 7.8.0(@aws-sdk/credential-provider-node@3.972.39)(undici@6.25.0)(zod@4.6.5)
       payload:
-        specifier: latest
+        specifier: 3.90.1
         version: 3.90.1(graphql@16.14.0)(typescript@5.9.3)
       react:
         specifier: 19.2.4

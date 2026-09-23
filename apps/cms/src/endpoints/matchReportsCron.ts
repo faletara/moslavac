@@ -4,6 +4,7 @@ import type {
   MatchReportWriter,
   PublishSummary,
 } from '@/lib/match-reports/index'
+import { matchesBearerSecret } from '../lib/bearerSecret'
 import { hnsDispatcher } from '../lib/hnsDispatcher'
 import { payloadNewsStore } from '../lib/matchReportsStore'
 
@@ -23,11 +24,10 @@ const loadMatchReports = () =>
  * generiranje i potrošiti kredit kod OpenAI-a.
  */
 function isAuthorized(req: PayloadRequest): boolean {
-  const secret = process.env.CRON_SECRET
-
-  if (!secret) return false
-
-  return req.headers.get('authorization') === `Bearer ${secret}`
+  return matchesBearerSecret(
+    req.headers.get('authorization'),
+    process.env.CRON_SECRET,
+  )
 }
 
 /**

@@ -7,6 +7,7 @@ import {
   superAdminOnlyField,
   superAdminUI,
 } from '../access/roles'
+import { isProduction } from '../lib/adminOrigin'
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -25,6 +26,9 @@ export const Users: CollectionConfig = {
     useAPIKey: true,
     maxLoginAttempts: 5,
     lockTime: 600_000, // 10 min
+    // Payload po defaultu izostavlja `Secure`; u produkciji cookie ide samo
+    // preko https-a.
+    cookies: { secure: isProduction(process.env) },
   },
   access: {
     create: superAdminOnly,
