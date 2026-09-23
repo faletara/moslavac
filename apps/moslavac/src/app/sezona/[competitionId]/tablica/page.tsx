@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import StandingsTable from "@/components/features/competition/StandingsTable";
 import { redirectToCanonical } from "@/lib/helpers/canonical";
-import { fetchCompetitionInfo } from "@/lib/hns/competitions";
+import { fetchClubCompetition } from "@/lib/hns/clubScope";
 import { fetchTeamStandings } from "@/lib/hns/standings";
 import { BASE_URL } from "@/lib/siteUrl";
 import { buildCompetitionSlug, parseTrailingId } from "@/lib/helpers/slug";
@@ -12,13 +13,12 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { competitionId } = await params;
+  const cid = parseTrailingId(competitionId);
+  const competition = cid == null ? null : await fetchClubCompetition(cid);
 
-  const info = await fetchCompetitionInfo({
-    competitionId: parseTrailingId(competitionId),
-  });
-
-  const slug = info ? buildCompetitionSlug(info) : competitionId;
-  const name = info?.name ?? "Sezona";
+  if (!competition) notFound();
+  const slug = buildCompetitionSlug(competition);
+  const name = competition.name;
 
   return {
     title: `Ljestvica - ${name}`,
@@ -30,18 +30,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function CompetitionStandingsPage({ params }: Props) {
   const { competitionId } = await params;
   const cid = parseTrailingId(competitionId);
+  const competition = cid == null ? null : await fetchClubCompetition(cid);
 
-  const [info, standings] = await Promise.all([
-    fetchCompetitionInfo({ competitionId: cid }),
-    fetchTeamStandings({ competitionId: cid }),
-  ]);
+  if (!competition) notFound();
 
-  if (info) {
-    redirectToCanonical(
-      `/sezona/${competitionId}/tablica`,
-      `/sezona/${buildCompetitionSlug(info)}/tablica`,
-    );
-  }
+  redirectToCanonical(
+    `/sezona/${competitionId}/tablica`,
+    `/sezona/${buildCompetitionSlug(competition)}/tablica`,
+  );
+
+  const standings = await fetchTeamStandings({
+    competitionId: competition.id,
+  });
 
   return <StandingsTable standings={standings} />;
 }

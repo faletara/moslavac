@@ -8,7 +8,7 @@ import type {
 } from "@/types/hns";
 import { adaptCompetition, adaptMatch } from "./adapters";
 import { currentSeasonTag, getSeniorCompetitionFilter } from "./client";
-import { hnsList, hnsListResult, hnsResource } from "./fetchResource";
+import { hnsList, hnsListResult } from "./fetchResource";
 import { isFinished } from "./matchStatus";
 import { fetchUpcomingMatches } from "./matches";
 
@@ -52,18 +52,6 @@ export async function fetchSeniorCompetition(): Promise<Competition | null> {
   if (!filter) return null;
 
   return competitions.find((c) => c.name.includes(filter)) ?? null;
-}
-
-export async function fetchCompetitionInfo(params: {
-  competitionId: number;
-}): Promise<Competition | null> {
-  const competition = await hnsResource<HnsCompetition>({
-    path: () => `/api/live/competition/${params.competitionId}`,
-    tag: `competition-${params.competitionId}`,
-    revalidate: COMPETITIONS_TTL,
-  });
-
-  return adaptCompetition(competition);
 }
 
 async function fetchPastCompetitionMatches(

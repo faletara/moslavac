@@ -1,9 +1,8 @@
+import { notFound } from "next/navigation";
 import MatchesList from "@/components/features/competition/MatchesList";
 import { redirectToCanonical } from "@/lib/helpers/canonical";
-import {
-  fetchCompetitionInfo,
-  fetchCompetitionMatches,
-} from "@/lib/hns/competitions";
+import { fetchClubCompetition } from "@/lib/hns/clubScope";
+import { fetchCompetitionMatches } from "@/lib/hns/competitions";
 import { buildCompetitionSlug, parseTrailingId } from "@/lib/helpers/slug";
 
 interface Props {
@@ -15,18 +14,18 @@ export const revalidate = 180;
 export default async function CompetitionMatchesPage({ params }: Props) {
   const { competitionId } = await params;
   const cid = parseTrailingId(competitionId);
+  const competition = cid == null ? null : await fetchClubCompetition(cid);
 
-  const [info, matches] = await Promise.all([
-    fetchCompetitionInfo({ competitionId: cid }),
-    fetchCompetitionMatches({ competitionId: cid }),
-  ]);
+  if (!competition) notFound();
 
-  if (info) {
-    redirectToCanonical(
-      `/sezona/${competitionId}`,
-      `/sezona/${buildCompetitionSlug(info)}`,
-    );
-  }
+  redirectToCanonical(
+    `/sezona/${competitionId}`,
+    `/sezona/${buildCompetitionSlug(competition)}`,
+  );
+
+  const matches = await fetchCompetitionMatches({
+    competitionId: competition.id,
+  });
 
   return <MatchesList matches={matches} />;
 }

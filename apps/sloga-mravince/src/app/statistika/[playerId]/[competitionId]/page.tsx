@@ -45,8 +45,11 @@ function getCrestSrc(logo: MediaImage | null | undefined): string {
 
 export default async function PlayerStatsPage({ params }: Props) {
   const { playerId, competitionId } = await params;
-  const personId = String(parseTrailingId(playerId));
+  const parsedPersonId = parseTrailingId(playerId);
   const cid = parseTrailingId(competitionId);
+
+  if (parsedPersonId == null || cid == null) notFound();
+  const personId = String(parsedPersonId);
 
   const [playerDetails, playerStats, tenant, roster] = await Promise.all([
     fetchPlayerDetails({ personId }),

@@ -7,8 +7,10 @@ export const runtime = "nodejs";
 const CACHE_CONTROL =
   "public, max-age=86400, s-maxage=604800, stale-while-revalidate=86400";
 
+// Matched against the lowercased id: HNS issues lowercase UUIDs, and one
+// canonical form means every case variant shares one HNS fetch and cache tag.
 const UUID_RE =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 
 function detectContentType(bytes: Buffer): string {
   if (
@@ -30,8 +32,10 @@ function detectContentType(bytes: Buffer): string {
 
 export async function createHnsImageResponse(
   req: Request,
-  uuid: string,
+  rawUuid: string,
 ): Promise<Response> {
+  const uuid = rawUuid.toLowerCase();
+
   if (!UUID_RE.test(uuid)) {
     return new Response("Invalid image id", { status: 400 });
   }

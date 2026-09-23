@@ -52,6 +52,13 @@ at 256×256 and 180×180 — the sizes `buildClubManifest` declares.
   directly; nothing fetches data from the browser. The single route handler that
   serves the browser is `/api/images/[uuid]`, which proxies HNS crest bytes. See
   each app's `.claude/rules/api-architecture.md`.
+- **Club scope** — the HNS ids that belong to a Tenant's club: its
+  current-season competitions (and their sub-competitions), every match the
+  club plays, and every match in those competitions. HNS id routes check a
+  visitor-chosen id against it (`packages/hns/src/clubScope.ts`) before any
+  upstream fan-out.
+- **ClubCompetition** / **ClubMatch** — a Competition / Match resolved through
+  the club scope; its `id` is always known.
 
 ## Match reports
 

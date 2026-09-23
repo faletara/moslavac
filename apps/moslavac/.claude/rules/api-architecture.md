@@ -32,6 +32,16 @@ cannot be fetched from the browser. Build its URL with `getCometImageUrl` from
 `@/lib/hns/imageUrl` — that module is deliberately free of `server-only` so
 client components can use it too.
 
+## HNS id routes: club scope first
+
+A route whose URL carries an HNS id (`/sezona/*`, `/utakmice/*`,
+`/raspored-i-rezultati/*`) is visitor-chosen input sent upstream with the
+club's API key. Parse the id with `parseTrailingId` (`notFound()` on null),
+then resolve it through `fetchClubCompetition` / `fetchClubMatch` from
+`@/lib/hns/clubScope` (`notFound()` on null) **before** any fetch that fans
+out per team or pages through matches. Never pass a route id straight to a
+competition or match fetcher.
+
 ## The CMS-to-app path: cache revalidation
 
 `app/api/revalidate` is an **inbound** webhook, not a round-trip: the CMS calls
