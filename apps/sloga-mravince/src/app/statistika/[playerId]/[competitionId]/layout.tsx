@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { fetchPlayerDetails, fetchPlayerStats } from "@/lib/hns/players";
+import { fetchRosterEntry } from "@/lib/payload/getRoster";
 import { BASE_URL } from "@/lib/siteUrl";
 import {
   buildCompetitionSlug,
@@ -23,6 +24,9 @@ export async function generateMetadata({
   const cid = parseTrailingId(competitionId);
 
   if (personId == null || cid == null) notFound();
+
+  // Igrač izvan momčadi kluba: 404 prije ijednog HNS poziva (vidi page.tsx).
+  if (!(await fetchRosterEntry(personId))) notFound();
 
   // Natjecanje se čita iz igračeve statistike (isti HNS URL kao na stranici),
   // pa id natjecanja iz URL-a nikad ne postaje HNS putanja.

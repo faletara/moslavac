@@ -1,3 +1,5 @@
+import { isProduction } from './isProduction'
+
 /** Lokalni CMS (`pnpm dev` sluša na 43102). */
 const DEV_ORIGIN = 'http://localhost:43102'
 
@@ -22,10 +24,6 @@ export type AdminOrigins = {
   /** Payload `csrf`: svi originsi s kojih admin smije slati auth cookie. */
   csrf: string[]
 }
-
-/** Jedini izvor istine za "produkciju" (i `Secure` auth cookie ga koristi). */
-export const isProduction = (env: AdminOriginEnv): boolean =>
-  env.NODE_ENV === 'production'
 
 const DEV_ORIGINS: AdminOrigins = { serverURL: DEV_ORIGIN, csrf: [DEV_ORIGIN] }
 

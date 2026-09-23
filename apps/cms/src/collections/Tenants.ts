@@ -19,6 +19,20 @@ const validateSiteUrl: TextFieldSingleValidation = (value, { previousValue }) =>
   return parsed.ok ? true : parsed.reason
 }
 
+/**
+ * `hns.matchPagePath` ide u poveznicu u objavljenoj novosti, pa ne smije nositi
+ * host, upit ni fragment. Bez vrijednosti cron uzima zadanu putanju.
+ */
+const validateMatchPagePath: TextFieldSingleValidation = (value) => {
+  if (value === null || value === undefined) return true
+
+  if (!/^[a-z0-9/-]+$/.test(value)) {
+    return 'Samo mala slova, brojevi, crtice i kose crte (npr. /raspored-i-rezultati).'
+  }
+
+  return true
+}
+
 /** UI-uvjet: prikaži samo Moslavcu (ili super-adminu) — druge klubove ne zanima. */
 const moslavacOnlyUI: Condition<Tenant> = (data, _sibling, { user }) =>
   data?.slug === 'moslavac' || isSuperAdmin(user)
@@ -167,17 +181,7 @@ export const Tenants: CollectionConfig = {
           label: 'Putanja do stranice utakmice',
           type: 'text',
           defaultValue: '/raspored-i-rezultati',
-          // Putanja ide u poveznicu u objavljenoj novosti, pa ne smije nositi
-          // host, upit ni fragment. Bez vrijednosti cron uzima zadanu putanju.
-          validate: (value: string | null | undefined) => {
-            if (value === null || value === undefined) return true
-
-            if (!/^[a-z0-9/-]+$/.test(value)) {
-              return 'Samo mala slova, brojevi, crtice i kose crte (npr. /raspored-i-rezultati).'
-            }
-
-            return true
-          },
+          validate: validateMatchPagePath,
           admin: {
             condition: (_, siblingData) => Boolean(siblingData?.matchReports),
             description:
