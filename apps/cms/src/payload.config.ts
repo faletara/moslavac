@@ -22,6 +22,7 @@ import { Tenants } from "./collections/Tenants";
 import { Users } from "./collections/Users";
 import { hnsPlayerSearchEndpoint } from "./endpoints/hnsPlayerSearch";
 import { matchReportsCronEndpoint } from "./endpoints/matchReportsCron";
+import { resolveAdminOrigin } from "./lib/adminOrigin";
 import type { Config } from "./payload-types";
 
 const filename = fileURLToPath(import.meta.url);
@@ -31,6 +32,8 @@ const dirname = path.dirname(filename);
 if (!process.env.PAYLOAD_SECRET) {
 	throw new Error("PAYLOAD_SECRET env var is required");
 }
+
+const adminOrigin = resolveAdminOrigin(process.env);
 
 const TENANT_COLLECTION_SLUGS = [
 	"news",
@@ -44,6 +47,10 @@ const tenantCollections = Object.fromEntries(
 );
 
 export default buildConfig({
+	// Auth cookie vrijedi samo za zahtjeve s admin origina (Payload ga inače
+	// prihvaća s bilo kojeg Origina, pa bi sestrinska domena mogla slati izmjene).
+	serverURL: adminOrigin,
+	csrf: [adminOrigin],
 	admin: {
 		user: Users.slug,
 		components: {

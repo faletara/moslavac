@@ -9,10 +9,8 @@ dist/
 out/
 build/
 
-# Env
-.env
-.env.local
-.env.*.local
+# Env: svaka lokalna env datoteka (npr. povučeni `.env.vercel-prod`), osim predloška
+.env*
 !.env.example
 
 # Logs

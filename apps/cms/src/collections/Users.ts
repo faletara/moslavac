@@ -25,6 +25,9 @@ export const Users: CollectionConfig = {
     useAPIKey: true,
     maxLoginAttempts: 5,
     lockTime: 600_000, // 10 min
+    // Payload po defaultu izostavlja `Secure`; u produkciji cookie ide samo
+    // preko https-a.
+    cookies: { secure: process.env.NODE_ENV === 'production' },
   },
   access: {
     create: superAdminOnly,
