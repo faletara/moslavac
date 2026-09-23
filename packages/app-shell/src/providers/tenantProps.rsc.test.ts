@@ -9,9 +9,10 @@ import { getTenant } from "@/lib/payload/getTenant";
 
 // Next's own flight server, the one that turns a Server Component tree into the
 // RSC payload inlined into every page's HTML. Club apps depend on `next`; the
-// monorepo root does not, so resolve it from a Club app.
+// monorepo root does not, so resolve it from `template`, the scaffold every new
+// club is copied from.
 const requireFromApp = createRequire(
-  new URL("../../../../apps/moslavac/package.json", import.meta.url),
+  new URL("../../../../apps/template/package.json", import.meta.url),
 );
 
 interface FlightServer {

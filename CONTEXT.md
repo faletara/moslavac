@@ -8,7 +8,9 @@ and discussion.
 - **Tenant** — one football club's record in the shared Payload CMS (`tenants`
   collection), keyed by `slug` (e.g. `moslavac`, `nk-vrapce`). Holds branding,
   contact, HNS keys, payment, legal, and enabled **ClubFeatures**. Frontends
-  resolve their tenant from `PAYLOAD_TENANT_SLUG`.
+  resolve their tenant from `PAYLOAD_TENANT_SLUG`. A Club app sees the
+  **public Tenant** (`FrontendTenant`, from `getTenant()`), which has no HNS
+  key; only the server HNS client reads the key, via `getHnsApiKey()`.
 - **ClubFeature** — a capability flag on a Tenant (`pages`, `documents`, `board`,
   `school`, `gallery`). A club-specific CMS collection declares the feature it
   serves; it appears in that club's admin only when the Tenant has the feature

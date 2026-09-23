@@ -66,6 +66,6 @@ export const getTenant = cache(async (): Promise<FrontendTenant> => {
  * (`packages/hns/src/client.ts`) za `API_KEY` zaglavlje. Ključ pripada savezu
  * i ne može se rotirati, pa ga nikad ne prosljeđuj u props ni u Tenant.
  */
-export const getHnsApiKey = cache(
-  async (): Promise<string> => (await fetchTenantRecord()).hnsApiKey,
-);
+export async function getHnsApiKey(): Promise<string> {
+  return (await fetchTenantRecord()).hnsApiKey;
+}
