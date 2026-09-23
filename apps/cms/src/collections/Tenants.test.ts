@@ -124,9 +124,12 @@ describe('Tenants hns.matchPagePath', () => {
     expect(validate('hns.matchPagePath', value)).toBe(true)
   })
 
-  it('accepts a missing value, which falls back to the default path', () => {
-    expect(validate('hns.matchPagePath', null)).toBe(true)
-  })
+  it.each([null, ''])(
+    'accepts a missing value (%j), which falls back to the default path',
+    (value) => {
+      expect(validate('hns.matchPagePath', value)).toBe(true)
+    },
+  )
 
   it.each([
     '/Raspored',
@@ -137,7 +140,6 @@ describe('Tenants hns.matchPagePath', () => {
     '/raspored i rezultati',
     '/rašpored',
     '/../admin',
-    '',
   ])('rejects %j', (value) => {
     expect(validate('hns.matchPagePath', value)).toEqual(expect.any(String))
   })

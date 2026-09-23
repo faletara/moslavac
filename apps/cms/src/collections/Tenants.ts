@@ -21,10 +21,11 @@ const validateSiteUrl: TextFieldSingleValidation = (value, { previousValue }) =>
 
 /**
  * `hns.matchPagePath` ide u poveznicu u objavljenoj novosti, pa ne smije nositi
- * host, upit ni fragment. Bez vrijednosti cron uzima zadanu putanju.
+ * host, upit ni fragment. Bez vrijednosti (i praznog stringa, kad se polje
+ * očisti u adminu) cron uzima zadanu putanju.
  */
 const validateMatchPagePath: TextFieldSingleValidation = (value) => {
-  if (value === null || value === undefined) return true
+  if (!value) return true
 
   if (!/^[a-z0-9/-]+$/.test(value)) {
     return 'Samo mala slova, brojevi, crtice i kose crte (npr. /raspored-i-rezultati).'
