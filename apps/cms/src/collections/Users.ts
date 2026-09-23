@@ -78,6 +78,20 @@ export const Users: CollectionConfig = {
       },
     },
     /**
+     * Override Payloadovog `apiKey` polja. Payload njegov create/update access
+     * prenosi na `apiKeyIndex` (po kojem se prijavljuje ključem), pa
+     * tenant-admin više ne može sam sebi izdati ključ. Bez ovog polja oba
+     * ostaju otvorena svakome s pristupom adminu.
+     */
+    {
+      name: 'apiKey',
+      type: 'text',
+      access: {
+        create: superAdminOnlyField,
+        update: superAdminOnlyField,
+      },
+    },
+    /**
      * Polje inače dodaje multi-tenant plugin (`includeDefaultField`), no tada
      * mu ne možemo dati `admin.condition`. Deklariramo ga ručno da tenant-admin
      * ne gleda dodjelu klubova koju ionako ne smije mijenjati.
