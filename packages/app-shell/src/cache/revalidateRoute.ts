@@ -1,3 +1,4 @@
+import { createHash, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
 import { revalidatePath, revalidateTag } from "next/cache";
 
@@ -11,6 +12,14 @@ import { revalidatePath, revalidateTag } from "next/cache";
  *
  * Ovo NIJE server→vlastiti-API round-trip koji zabranjuje `api-architecture.md`:
  * poziv dolazi izvana, iz CMS-a.
+ *
+ * `REVALIDATE_SECRET` kluba je tajna samo tog kluba: CMS je izvodi iz svoje
+ * tajne i sluga Tenanta (vidi `apps/cms/src/lib/revalidateFrontend.ts`), pa
+ * vjerodajnica drugog kluba ovdje ne prolazi.
+ *
+ * `REVALIDATE_SECRET_PREVIOUS` služi samo za prelazak s jedne tajne na drugu
+ * (npr. sa stare zajedničke): dok je postavljena, ruta prihvaća i nju. Nakon
+ * što CMS prijeđe na novu tajnu, varijabla se briše.
  */
 
 /**
@@ -32,12 +41,36 @@ const revalidateBody = z
   })
   .transform((body) => body.tags);
 
-export function createRevalidateRoute() {
+/** Next cache API koji ruta poziva; test ga zamjenjuje jer bez Next runtimea baca. */
+export type RevalidateCache = {
+  revalidateTag: typeof revalidateTag;
+  revalidatePath: typeof revalidatePath;
+};
+
+const sha256 = (value: string): Buffer => createHash("sha256").update(value).digest();
+
+/**
+ * Usporedba u konstantnom vremenu. Hash izjednači duljine, jer
+ * `timingSafeEqual` baca na različitim duljinama.
+ */
+const isAuthorized = (header: string | null, secret: string): boolean =>
+  timingSafeEqual(sha256(header ?? ""), sha256(`Bearer ${secret}`));
+
+export function createRevalidateRoute(
+  cache: RevalidateCache = { revalidateTag, revalidatePath },
+) {
   return async function POST(request: Request): Promise<Response> {
     const secret = process.env.REVALIDATE_SECRET;
+    const previous = process.env.REVALIDATE_SECRET_PREVIOUS;
+    const header = request.headers.get("authorization");
 
-    // Bez konfiguriranog secreta ruta je zatvorena, a ne otvorena.
-    if (!secret || request.headers.get("authorization") !== `Bearer ${secret}`) {
+    // Obje usporedbe se uvijek izvrše, pa vrijeme ne otkriva koja je tajna pala.
+    const current = isAuthorized(header, secret ?? "");
+    const rollout = isAuthorized(header, previous ?? "");
+
+    // Bez konfiguriranog secreta ruta je zatvorena, a ne otvorena; prazna
+    // prijelazna tajna se ne prihvaća.
+    if (!secret || !(current || (Boolean(previous) && rollout))) {
       return Response.json({ revalidated: false }, { status: 401 });
     }
 
@@ -62,7 +95,7 @@ export function createRevalidateRoute() {
     // `{ expire: 0 }` = istekni odmah, bez serviranja stale sadržaja; poziv bez
     // drugog argumenta je u Next 16 deprecated.
     for (const tag of tags) {
-      revalidateTag(tag, { expire: 0 });
+      cache.revalidateTag(tag, { expire: 0 });
     }
 
     // Tag pokriva Data Cache fetcha, ali prerenderirane HTML/RSC zapise ruta
@@ -70,7 +103,7 @@ export function createRevalidateRoute() {
     // nekoliko puta tjedno, pa je cijena zanemariva u odnosu na rizik da neka
     // ruta ostane stara. `"layout"` hvata sve rute ispod root layouta, pa se
     // popis putanja ne mora održavati po klubu (rute se razlikuju).
-    revalidatePath("/", "layout");
+    cache.revalidatePath("/", "layout");
 
     return Response.json({ revalidated: true, tags, now: Date.now() });
   };

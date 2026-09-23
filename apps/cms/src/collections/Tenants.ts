@@ -1,9 +1,23 @@
-import type { CollectionConfig, Condition } from 'payload'
+import type { CollectionConfig, Condition, TextFieldSingleValidation } from 'payload'
 import { CLUB_FEATURE_OPTIONS } from '@/lib/payload/clubFeatures'
-import { isSuperAdmin, superAdminOnly, superAdminUI } from '../access/roles'
+import { isSuperAdmin, superAdminOnly, superAdminOnlyField, superAdminUI } from '../access/roles'
 import { mediaField } from '../fields/media'
 import type { Tenant } from '../payload-types'
+import { parseClubOrigin } from '../lib/clubOrigin'
 import { revalidateFrontend } from '../lib/revalidateFrontend'
+
+/**
+ * `siteUrl` mora biti https origin kluba (vidi `lib/clubOrigin`). Validacija ide
+ * na svako spremanje Tenanta, i vlasnikovo, pa zatečena neispravna adresa ne
+ * blokira spremanje polja koje on ne vidi; slanje je svejedno preskače.
+ */
+const validateSiteUrl: TextFieldSingleValidation = (value, { previousValue }) => {
+  if (!value || value === previousValue) return true
+
+  const parsed = parseClubOrigin(value)
+
+  return parsed.ok ? true : parsed.reason
+}
 
 /** UI-uvjet: prikaži samo Moslavcu (ili super-adminu) — druge klubove ne zanima. */
 const moslavacOnlyUI: Condition<Tenant> = (data, _sibling, { user }) =>
@@ -56,6 +70,7 @@ export const Tenants: CollectionConfig = {
       required: true,
       unique: true,
       index: true,
+      access: { update: superAdminOnlyField },
       admin: {
         condition: superAdminUI,
         description: 'Tehnički identifikator kluba — ne mijenjati (razbija stranicu).',
@@ -65,10 +80,12 @@ export const Tenants: CollectionConfig = {
       name: 'siteUrl',
       label: 'URL stranice kluba',
       type: 'text',
+      access: { update: superAdminOnlyField },
+      validate: validateSiteUrl,
       admin: {
         condition: superAdminUI,
         description:
-          'Npr. https://www.hnkslogamravince.com — na ovu adresu CMS javi da je sadržaj promijenjen, da se novost odmah vidi. Prazno = klub čeka istek cachea.',
+          'Npr. https://www.hnkslogamravince.com — na ovu adresu CMS javi da je sadržaj promijenjen, da se novost odmah vidi. Domena mora biti i u REVALIDATE_ALLOWED_HOSTS na CMS-u. Prazno = klub čeka istek cachea.',
       },
     },
     {
@@ -76,6 +93,7 @@ export const Tenants: CollectionConfig = {
       label: 'Klub aktivan',
       type: 'checkbox',
       defaultValue: true,
+      access: { update: superAdminOnlyField },
       admin: {
         condition: superAdminUI,
       },
@@ -86,10 +104,8 @@ export const Tenants: CollectionConfig = {
       type: 'select',
       hasMany: true,
       options: CLUB_FEATURE_OPTIONS,
-      access: {
-        // Samo platforma (super-admin) uključuje rubrike klubu; klub si ih ne dodjeljuje sam.
-        update: ({ req: { user } }) => isSuperAdmin(user),
-      },
+      // Samo platforma (super-admin) uključuje rubrike klubu; klub si ih ne dodjeljuje sam.
+      access: { update: superAdminOnlyField },
       admin: {
         condition: superAdminUI,
         description: 'Rubrike koje klub koristi — određuje vidljivost kolekcija u adminu.',
@@ -99,6 +115,9 @@ export const Tenants: CollectionConfig = {
       name: 'hns',
       type: 'group',
       label: 'HNS integracija',
+      // Pristup na grupi pokriva sva podpolja: Payload vlasnikov zapis odbaci i
+      // zadrži spremljenu grupu.
+      access: { update: superAdminOnlyField },
       admin: {
         condition: superAdminUI,
         description: 'Integracija s Hrvatskim nogometnim savezom (održava platforma).',
@@ -148,6 +167,17 @@ export const Tenants: CollectionConfig = {
           label: 'Putanja do stranice utakmice',
           type: 'text',
           defaultValue: '/raspored-i-rezultati',
+          // Putanja ide u poveznicu u objavljenoj novosti, pa ne smije nositi
+          // host, upit ni fragment. Bez vrijednosti cron uzima zadanu putanju.
+          validate: (value: string | null | undefined) => {
+            if (value === null || value === undefined) return true
+
+            if (!/^[a-z0-9/-]+$/.test(value)) {
+              return 'Samo mala slova, brojevi, crtice i kose crte (npr. /raspored-i-rezultati).'
+            }
+
+            return true
+          },
           admin: {
             condition: (_, siblingData) => Boolean(siblingData?.matchReports),
             description:
@@ -212,6 +242,7 @@ export const Tenants: CollectionConfig = {
                 {
                   name: 'mapEmbedUrl',
                   type: 'text',
+                  access: { update: superAdminOnlyField },
                   // Skriveno iz forme — nk-vrapce zadržava spremljenu vrijednost;
                   // ostali klubovi fallbackaju na koordinate stadiona.
                   admin: { hidden: true },

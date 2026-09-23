@@ -96,6 +96,8 @@ Preostali koraci (ukratko):
        displayName, features, hns.apiKey, hns.teamId,
        branding / contact (uklj. city + region) / social / payment / legal
   2. Upiši PAYLOAD_API_KEY u apps/$SLUG/.env.local (API-key korisnik iz Payloada).
+     Upiši i REVALIDATE_SECRET (tajna samo ovog kluba, izvedena iz CMS-ove):
+       printf %s $SLUG | openssl dgst -sha256 -hmac "<CMS REVALIDATE_SECRET>" | awk '{print \$NF}'
   3. Instaliraj i pokreni:
        pnpm install
        pnpm --filter @moslavac/$SLUG dev
@@ -103,5 +105,6 @@ Preostali koraci (ukratko):
      po želji dodaj display font; zamijeni placeholdere u public/.
      (Server komponente zovu @/lib/payload|hns izravno; klijent api.* hookove.)
   5. Deploy na Vercel: novi projekt, Root Directory = apps/$SLUG,
-     postavi env vars (uklj. NEXT_PUBLIC_SITE_URL na pravu domenu).
+     postavi env vars (uklj. NEXT_PUBLIC_SITE_URL na pravu domenu i
+     REVALIDATE_SECRET), a domenu dodaj u REVALIDATE_ALLOWED_HOSTS na CMS-u.
 EOF
