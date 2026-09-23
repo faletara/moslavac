@@ -44,6 +44,12 @@ any fetch that fans out per team or pages through matches. Each parses the id
 slug or a foreign id. Never pass a route id straight to a competition or match
 fetcher.
 
+`/statistika/[playerId]/[competitionId]` carries two ids and is scoped by both:
+the player must be on the club's roster (`fetchRosterEntry` from
+`@/lib/payload/getRoster`, a Payload lookup) and the competition must be one of
+the club's (`resolveClubCompetitionOr404`). The page and its layout run both
+checks before any per-player HNS call.
+
 ## The CMS-to-app path: cache revalidation
 
 `app/api/revalidate` is an **inbound** webhook, not a round-trip: the CMS calls

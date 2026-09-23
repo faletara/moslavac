@@ -3,6 +3,7 @@ import PlayerStatsBoard, {
   type PlayerStatsData,
 } from "@/components/features/players/PlayerStatsBoard";
 import PlayerStatsHero from "@/components/features/players/PlayerStatsHero";
+import { resolveClubCompetitionOr404 } from "@/lib/app-shell/routes/clubScopeRoute";
 import JsonLdScript from "@/lib/app-shell/seo/JsonLdScript";
 import { getCometImageUrl } from "@/lib/hns/imageUrl";
 import { fetchPlayerDetails, fetchPlayerStats } from "@/lib/hns/players";
@@ -46,20 +47,23 @@ function getCrestSrc(logo: MediaImage | null | undefined): string {
 export default async function PlayerStatsPage({ params }: Props) {
   const { playerId, competitionId } = await params;
   const parsedPersonId = parseTrailingId(playerId);
-  const cid = parseTrailingId(competitionId);
 
-  if (parsedPersonId == null || cid == null) notFound();
+  if (parsedPersonId == null) notFound();
 
-  // Samo igrači iz momčadi kluba, i to prije ijednog HNS poziva: `personId`
-  // bira posjetitelj, a HNS poziv ide s ključem kluba.
-  const rosterEntry = await fetchRosterEntry(parsedPersonId);
+  // Samo igrači iz momčadi kluba i samo klupska natjecanja, i to prije
+  // ijednog HNS poziva po igraču: oba ida bira posjetitelj, a HNS poziv ide
+  // s ključem kluba. Provjera natjecanja je keširani popis natjecanja kluba.
+  const [rosterEntry, competition] = await Promise.all([
+    fetchRosterEntry(parsedPersonId),
+    resolveClubCompetitionOr404(competitionId),
+  ]);
 
   if (!rosterEntry) notFound();
   const personId = String(parsedPersonId);
 
   const [playerDetails, playerStats, tenant] = await Promise.all([
     fetchPlayerDetails({ personId }),
-    fetchPlayerStats({ personId, competitionId: cid }),
+    fetchPlayerStats({ personId, competitionId: competition.id }),
     getTenant(),
   ]);
 
