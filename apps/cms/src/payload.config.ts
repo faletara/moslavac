@@ -7,6 +7,7 @@ import { buildConfig } from "payload";
 import { fileURLToPath } from "url";
 import sharp from "sharp";
 
+import { withBoundDocumentLocks } from "./access/lockedDocuments";
 import { isSuperAdmin } from "./access/roles";
 import { CLUB_FEATURES } from "@/lib/payload/clubFeatures";
 import { BoardMembers } from "./collections/BoardMembers";
@@ -43,6 +44,8 @@ const tenantCollections = Object.fromEntries(
 	TENANT_COLLECTION_SLUGS.map((slug) => [slug, {}]),
 );
 
+// Zaključavanja dokumenata dodaje tek Payloadova sanitizacija, pa se vežu uz
+// korisnika i tenant nakon `buildConfig` (vidi `withBoundDocumentLocks`).
 export default buildConfig({
 	admin: {
 		user: Users.slug,
@@ -145,4 +148,4 @@ export default buildConfig({
 			},
 		}),
 	],
-});
+}).then(withBoundDocumentLocks);
