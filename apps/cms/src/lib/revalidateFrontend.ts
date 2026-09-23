@@ -58,9 +58,9 @@ export async function revalidateFrontend(args: {
   // Revalidacija je nuspojava spremanja: njezin pad ne smije srušiti spremanje
   // u adminu. Najgori ishod bez nje je sadržaj star do isteka TTL-a.
   try {
-    const secret = process.env.REVALIDATE_SECRET
+    const masterSecret = process.env.REVALIDATE_SECRET
 
-    if (!secret) return
+    if (!masterSecret) return
 
     const id = tenantIdOf(tenant)
 
@@ -92,7 +92,7 @@ export async function revalidateFrontend(args: {
       redirect: 'manual',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${clubRevalidateSecret(secret, doc.slug)}`,
+        Authorization: `Bearer ${clubRevalidateSecret(masterSecret, doc.slug)}`,
       },
       body: JSON.stringify({ tags: [collectionCacheTag(collectionSlug, doc.slug)] }),
       // Spremanje u adminu čeka ovaj poziv; nedostupna klupska stranica ga ne

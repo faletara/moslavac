@@ -73,6 +73,21 @@ describe("createRevalidateRoute", () => {
     expect(revalidatedTags).toEqual([]);
   });
 
+  it("also accepts the previous shared secret while it is set for the rollout", async () => {
+    vi.stubEnv("REVALIDATE_SECRET_PREVIOUS", "dummy-old-shared");
+
+    expect((await post(`Bearer ${CLUB_B_SECRET}`)).status).toBe(200);
+    expect((await post("Bearer dummy-old-shared")).status).toBe(200);
+    expect((await post(`Bearer ${CLUB_A_SECRET}`)).status).toBe(401);
+  });
+
+  it("rejects the previous shared secret once it is removed", async () => {
+    vi.stubEnv("REVALIDATE_SECRET_PREVIOUS", "");
+
+    expect((await post("Bearer dummy-old-shared")).status).toBe(401);
+    expect((await post("Bearer ")).status).toBe(401);
+  });
+
   it("stays closed when the club has no secret configured", async () => {
     vi.stubEnv("REVALIDATE_SECRET", "");
 

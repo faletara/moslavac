@@ -16,6 +16,10 @@ import { revalidatePath, revalidateTag } from "next/cache";
  * `REVALIDATE_SECRET` kluba je tajna samo tog kluba: CMS je izvodi iz svoje
  * tajne i sluga Tenanta (vidi `apps/cms/src/lib/revalidateFrontend.ts`), pa
  * vjerodajnica drugog kluba ovdje ne prolazi.
+ *
+ * `REVALIDATE_SECRET_PREVIOUS` služi samo za prelazak s jedne tajne na drugu
+ * (npr. sa stare zajedničke): dok je postavljena, ruta prihvaća i nju. Nakon
+ * što CMS prijeđe na novu tajnu, varijabla se briše.
  */
 
 /**
@@ -57,9 +61,16 @@ export function createRevalidateRoute(
 ) {
   return async function POST(request: Request): Promise<Response> {
     const secret = process.env.REVALIDATE_SECRET;
+    const previous = process.env.REVALIDATE_SECRET_PREVIOUS;
+    const header = request.headers.get("authorization");
 
-    // Bez konfiguriranog secreta ruta je zatvorena, a ne otvorena.
-    if (!secret || !isAuthorized(request.headers.get("authorization"), secret)) {
+    // Obje usporedbe se uvijek izvrše, pa vrijeme ne otkriva koja je tajna pala.
+    const current = isAuthorized(header, secret ?? "");
+    const rollout = isAuthorized(header, previous ?? "");
+
+    // Bez konfiguriranog secreta ruta je zatvorena, a ne otvorena; prazna
+    // prijelazna tajna se ne prihvaća.
+    if (!secret || !(current || (Boolean(previous) && rollout))) {
       return Response.json({ revalidated: false }, { status: 401 });
     }
 

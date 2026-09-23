@@ -56,6 +56,8 @@ Payload afterChange ──► apps/cms/src/lib/revalidateFrontend
   bearer. The route compares it in constant time. A credential issued to
   another club gets 401, and an unset secret closes the route. How to compute
   it: `docs/NEW-CLUB.md`.
+- `REVALIDATE_SECRET_PREVIOUS` is for rotation only: while set, the route also
+  accepts it. Remove it once the CMS sends the new secret.
 - The CMS only calls an https origin whose host is in its
   `REVALIDATE_ALLOWED_HOSTS`, always at `/api/revalidate`, and does not follow
   redirects. A club missing from that list is skipped.

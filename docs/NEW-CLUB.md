@@ -48,7 +48,8 @@ U Payload adminu (`http://localhost:43102/admin` → **Tenants → Create**):
 
 ## 3. Env (`apps/<slug>/.env.local`)
 
-`new-club.sh` generira većinu; ručno upiši `PAYLOAD_API_KEY`.
+`new-club.sh` generira većinu; ručno upiši `PAYLOAD_API_KEY` i `REVALIDATE_SECRET`
+(naredba je ispod tablice).
 
 | Var | Opis |
 | --- | --- |
@@ -58,6 +59,7 @@ U Payload adminu (`http://localhost:43102/admin` → **Tenants → Create**):
 | `HNS_API_BASE` | HNS endpoint (default `https://api-hns.analyticom.de`) |
 | `NEXT_PUBLIC_SITE_URL` | Bazni URL (prod domena; lokalno `http://localhost:<port>`) |
 | `REVALIDATE_SECRET` | Tajna samo ovog kluba za `/api/revalidate` (vidi dolje). Bez nje je ruta zatvorena i sadržaj čeka istek cachea |
+| `REVALIDATE_SECRET_PREVIOUS` | Samo tijekom promjene tajne (vidi dolje), inače se ne postavlja |
 
 **`REVALIDATE_SECRET` kluba** nije ista vrijednost kao na CMS-u. CMS je za svaki
 klub izvodi iz svoje tajne i sluga Tenanta, pa tajna jednog kluba ne otvara
@@ -69,6 +71,18 @@ printf %s <slug> | openssl dgst -sha256 -hmac "$REVALIDATE_SECRET" | awk '{print
 
 Promjena CMS-ove tajne mijenja tajne svih klubova: nakon rotacije ponovno
 izračunaj i upiši vrijednost u svaki klupski projekt.
+
+**Promjena tajne bez prekida** (rotacija ili prvi prelazak sa stare zajedničke
+tajne na tajne po klubu). Ruta kluba dok je postavljen `REVALIDATE_SECRET_PREVIOUS`
+prihvaća i tu staru vrijednost:
+
+1. U svakom klupskom projektu postavi `REVALIDATE_SECRET` na novu tajnu kluba
+   (izračunatu iz nove CMS tajne) i `REVALIDATE_SECRET_PREVIOUS` na vrijednost
+   koju CMS šalje sada (kod prvog prelaska: stara zajednička tajna). Redeployaj
+   klubove.
+2. Na CMS-u postavi novi `REVALIDATE_SECRET` i redeployaj CMS.
+3. Iz svih klupskih projekata obriši `REVALIDATE_SECRET_PREVIOUS` i redeployaj.
+   Dok je postavljena, stara tajna i dalje otvara revalidaciju.
 
 ## 4. Install + dev
 
