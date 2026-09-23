@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { TrackEvent } from "@/components/analytics/TrackEvent";
 import MatchHero from "@/components/features/matches/MatchHero";
 import MatchTabs from "@/components/features/matches/tabs/MatchTabs";
 import { RefreshWhile } from "@/components/ui/refresh-while";
 import { isLive, liveMinute } from "@/lib/hns/matchStatus";
 import { fetchAllCompetitionMatches } from "@/lib/hns/competitions";
-import { fetchClubMatch } from "@/lib/hns/clubScope";
+import { resolveClubMatchOr404 } from "@/lib/app-shell/routes/clubScopeRoute";
 import {
   fetchMatchEvents,
   fetchMatchLineups,
@@ -19,7 +18,7 @@ import {
 import { formatDateTime } from "@/lib/helpers/date";
 import { redirectToCanonical } from "@/lib/helpers/canonical";
 import { BASE_URL } from "@/lib/siteUrl";
-import { buildMatchSlug, parseTrailingId } from "@/lib/helpers/slug";
+import { buildMatchSlug } from "@/lib/helpers/slug";
 import type { CompetitionPlayerStat, Match, TeamRanking } from "@/types/hns";
 
 interface Props {
@@ -30,10 +29,7 @@ export const revalidate = 30;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { matchId } = await params;
-  const mid = parseTrailingId(matchId);
-  const matchInfo = mid == null ? null : await fetchClubMatch(mid);
-
-  if (!matchInfo) notFound();
+  const matchInfo = await resolveClubMatchOr404(matchId);
 
   const home = matchInfo.homeTeam?.name ?? "N/A";
   const away = matchInfo.awayTeam?.name ?? "N/A";
@@ -91,10 +87,7 @@ export default async function MatchInfoPage({ params }: Props) {
   const { matchId } = await params;
   // Tuđa utakmica završava ovdje: bez događaja, postava, tablice i fan-outa
   // strijelaca po momčadima natjecanja.
-  const mid = parseTrailingId(matchId);
-  const matchInfo = mid == null ? null : await fetchClubMatch(mid);
-
-  if (!matchInfo) notFound();
+  const matchInfo = await resolveClubMatchOr404(matchId);
 
   // Collapse numeric/partial-slug duplicates onto the canonical slug URL.
   redirectToCanonical(

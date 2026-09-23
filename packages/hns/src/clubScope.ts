@@ -8,8 +8,9 @@ import { fetchMatchInfo } from "./matches";
 // `/raspored-i-rezultati/*`). The id in the URL is visitor-chosen, and every
 // HNS call goes out with the club's API key. The competition and match pages
 // fan out per team (standings, scorers, cards, paged match lists), so an id
-// must belong to the club before any of that runs. Routes parse the id from
-// the slug (`parseTrailingId`), call these resolvers, and `notFound()` on null.
+// must belong to the club before any of that runs. Routes reach these through
+// `resolveClubCompetitionOr404` / `resolveClubMatchOr404` (app-shell), which
+// parse the slug and `notFound()` on null.
 //
 // The membership data is the club's current-season competition list: one
 // HNS URL, cached for an hour and already fetched by every page's shell.
