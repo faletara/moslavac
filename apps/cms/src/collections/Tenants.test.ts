@@ -54,7 +54,6 @@ const fieldAt = (path: string): Field => {
   return field
 }
 
-/** Access funkcije ovdje čitaju samo `req.user`; ostatak argumenata je ispuna. */
 const accessArgs = (user: User | null): Parameters<FieldAccess>[0] => ({
   // SAFETY: access funkcije Tenanta čitaju samo `req.user`.
   req: { user } as PayloadRequest,
@@ -99,11 +98,12 @@ describe('Tenants platform fields', () => {
   })
 })
 
-/** Validator polja; ovdje čita samo vrijednost, pa su opcije ispuna. */
 const validate = (path: string, value: string | null): true | string => {
   const field = fieldAt(path)
 
-  if (field.type !== 'text' || field.hasMany || !field.validate) return true
+  if (field.type !== 'text' || field.hasMany || !field.validate) {
+    throw new Error(`${path} nema validator tekstualnog polja`)
+  }
 
   // SAFETY: validatori Tenanta ne čitaju opcije (req, data, operation).
   const result = field.validate(value, {} as Parameters<TextFieldSingleValidation>[1])
@@ -118,9 +118,8 @@ describe('Tenants hns.matchPagePath', () => {
     expect(validate('hns.matchPagePath', value)).toBe(true)
   })
 
-  it('accepts an empty value, which falls back to the default path', () => {
+  it('accepts a missing value, which falls back to the default path', () => {
     expect(validate('hns.matchPagePath', null)).toBe(true)
-    expect(validate('hns.matchPagePath', '')).toBe(true)
   })
 
   it.each([
@@ -132,7 +131,8 @@ describe('Tenants hns.matchPagePath', () => {
     '/raspored i rezultati',
     '/rašpored',
     '/../admin',
-  ])('rejects %s', (value) => {
+    '',
+  ])('rejects %j', (value) => {
     expect(validate('hns.matchPagePath', value)).toEqual(expect.any(String))
   })
 })

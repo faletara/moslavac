@@ -153,9 +153,9 @@ export const Tenants: CollectionConfig = {
           type: 'text',
           defaultValue: '/raspored-i-rezultati',
           // Putanja ide u poveznicu u objavljenoj novosti, pa ne smije nositi
-          // host, upit ni fragment. Prazno = zadana putanja u cronu.
+          // host, upit ni fragment. Bez vrijednosti cron uzima zadanu putanju.
           validate: (value: string | null | undefined) => {
-            if (!value) return true
+            if (value === null || value === undefined) return true
 
             if (!/^[a-z0-9/-]+$/.test(value)) {
               return 'Samo mala slova, brojevi, crtice i kose crte (npr. /raspored-i-rezultati).'
