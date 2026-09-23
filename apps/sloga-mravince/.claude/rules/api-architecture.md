@@ -36,11 +36,19 @@ client components can use it too.
 
 A route whose URL carries an HNS id (`/sezona/*`, `/utakmice/*`,
 `/raspored-i-rezultati/*`) is visitor-chosen input sent upstream with the
-club's API key. Parse the id with `parseTrailingId` (`notFound()` on null),
-then resolve it through `fetchClubCompetition` / `fetchClubMatch` from
-`@/lib/hns/clubScope` (`notFound()` on null) **before** any fetch that fans
-out per team or pages through matches. Never pass a route id straight to a
-competition or match fetcher.
+club's API key. Resolve the route slug with `resolveClubCompetitionOr404` /
+`resolveClubMatchOr404` from `@/lib/app-shell/routes/clubScopeRoute` **before**
+any fetch that fans out per team or pages through matches. Each parses the id
+(`parseTrailingId`), checks it against the club scope (`fetchClubCompetition` /
+`fetchClubMatch` from `@/lib/hns/clubScope`) and calls `notFound()` on a junk
+slug or a foreign id. Never pass a route id straight to a competition or match
+fetcher.
+
+`/statistika/[playerId]/[competitionId]` carries two ids and is scoped by both:
+the player must be on the club's roster (`fetchRosterEntry` from
+`@/lib/payload/getRoster`, a Payload lookup) and the competition must be one of
+the club's (`resolveClubCompetitionOr404`). The page and its layout run both
+checks before any per-player HNS call.
 
 ## The CMS-to-app path: cache revalidation
 

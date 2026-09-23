@@ -1,16 +1,15 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import JsonLdScript from "@/lib/app-shell/seo/JsonLdScript";
 import { getCometImageUrl } from "@/lib/hns/imageUrl";
 import {
   fetchAllCompetitionMatches,
   fetchCurrentSeasonCompetitions,
 } from "@/lib/hns/competitions";
-import { fetchClubMatch } from "@/lib/hns/clubScope";
+import { resolveClubMatchOr404 } from "@/lib/app-shell/routes/clubScopeRoute";
 import { formatDateTime } from "@/lib/helpers/date";
 import { getTenant } from "@/lib/payload/getTenant";
 import { BASE_URL } from "@/lib/siteUrl";
-import { buildMatchSlug, parseTrailingId } from "@/lib/helpers/slug";
+import { buildMatchSlug } from "@/lib/helpers/slug";
 import type { Match } from "@/types/hns";
 import type { PostalAddressJsonLd, SportsEventJsonLd } from "@/types/jsonld";
 
@@ -59,10 +58,7 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { matchId } = await params;
-  const mid = parseTrailingId(matchId);
-  const match = mid == null ? null : await fetchClubMatch(mid);
-
-  if (!match) notFound();
+  const match = await resolveClubMatchOr404(matchId);
 
   const home = match.homeTeam?.name ?? "Domaćin";
   const away = match.awayTeam?.name ?? "Gost";
@@ -109,17 +105,12 @@ export default async function MatchLayout({
   params: Promise<Params>;
 }) {
   const { matchId } = await params;
-  const mid = parseTrailingId(matchId);
-
-  if (mid == null) notFound();
 
   // fetch is deduplicated with generateMetadata's call (same URL + cache key)
   const [match, tenant] = await Promise.all([
-    fetchClubMatch(mid),
+    resolveClubMatchOr404(matchId),
     getTenant(),
   ]);
-
-  if (!match) notFound();
 
   const home = match.homeTeam?.name ?? "Domaćin";
   const away = match.awayTeam?.name ?? "Gost";

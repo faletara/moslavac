@@ -57,11 +57,11 @@ export function createRevalidateRoute(
 
     // Obje usporedbe se uvijek izvrše, pa vrijeme ne otkriva koja je tajna pala.
     const current = matchesBearerSecret(header, secret);
-    const rollout = matchesBearerSecret(header, previous);
+    const matchesPrevious = matchesBearerSecret(header, previous);
 
     // Bez konfiguriranog secreta ruta je zatvorena, a ne otvorena; prazna
     // prijelazna tajna se ne prihvaća.
-    if (!secret || !(current || rollout)) {
+    if (!secret || !(current || matchesPrevious)) {
       return Response.json({ revalidated: false }, { status: 401 });
     }
 

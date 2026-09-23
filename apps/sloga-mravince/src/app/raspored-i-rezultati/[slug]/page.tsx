@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import MatchHero from "@/components/features/matches/MatchHero";
 import MatchTabs from "@/components/features/matches/MatchTabs";
@@ -11,7 +10,7 @@ import {
   fetchAllCompetitionMatches,
   fetchCurrentSeasonCompetitions,
 } from "@/lib/hns/competitions";
-import { fetchClubMatch } from "@/lib/hns/clubScope";
+import { resolveClubMatchOr404 } from "@/lib/app-shell/routes/clubScopeRoute";
 import {
   fetchMatchEvents,
   fetchMatchLineups,
@@ -21,7 +20,7 @@ import { isFinished, isLive } from "@/lib/hns/matchStatus";
 import { fetchTeamStandings } from "@/lib/hns/standings";
 import { getTenant } from "@/lib/payload/getTenant";
 import { BASE_URL } from "@/lib/siteUrl";
-import { buildMatchSlug, parseTrailingId } from "@/lib/helpers/slug";
+import { buildMatchSlug } from "@/lib/helpers/slug";
 import type { Match } from "@/types/hns";
 import type {
   JsonLdNode,
@@ -78,10 +77,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const id = parseTrailingId(slug);
-  const match = id == null ? null : await fetchClubMatch(id);
-
-  if (!match) notFound();
+  const match = await resolveClubMatchOr404(slug);
 
   const title = matchTitle(match);
 
@@ -108,10 +104,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function MatchPage({ params }: Props) {
   const { slug } = await params;
   // Tuđa utakmica završava ovdje: bez događaja, postava i tablice.
-  const id = parseTrailingId(slug);
-  const match = id == null ? null : await fetchClubMatch(id);
-
-  if (!match) notFound();
+  const match = await resolveClubMatchOr404(slug);
 
   // Collapse the bare-id and partial-slug forms onto the canonical URL, so the
   // same match isn't indexed under several addresses.

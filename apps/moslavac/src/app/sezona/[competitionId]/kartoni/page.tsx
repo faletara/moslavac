@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import CardsTable from "@/components/features/competition/CardsTable";
 import { redirectToCanonical } from "@/lib/helpers/canonical";
-import { fetchClubCompetition } from "@/lib/hns/clubScope";
+import { resolveClubCompetitionOr404 } from "@/lib/app-shell/routes/clubScopeRoute";
 import {
   fetchAllCompetitionRedCards,
   fetchAllCompetitionYellowCards,
 } from "@/lib/hns/standings";
 import { BASE_URL } from "@/lib/siteUrl";
-import { buildCompetitionSlug, parseTrailingId } from "@/lib/helpers/slug";
+import { buildCompetitionSlug } from "@/lib/helpers/slug";
 
 interface Props {
   params: Promise<{ competitionId: string }>;
@@ -16,10 +15,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { competitionId } = await params;
-  const cid = parseTrailingId(competitionId);
-  const competition = cid == null ? null : await fetchClubCompetition(cid);
-
-  if (!competition) notFound();
+  const competition = await resolveClubCompetitionOr404(competitionId);
   const slug = buildCompetitionSlug(competition);
   const name = competition.name;
 
@@ -32,10 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function CompetitionCardsPage({ params }: Props) {
   const { competitionId } = await params;
-  const cid = parseTrailingId(competitionId);
-  const competition = cid == null ? null : await fetchClubCompetition(cid);
-
-  if (!competition) notFound();
+  const competition = await resolveClubCompetitionOr404(competitionId);
 
   redirectToCanonical(
     `/sezona/${competitionId}/kartoni`,

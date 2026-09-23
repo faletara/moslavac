@@ -113,11 +113,7 @@ async function handler(req: PayloadRequest): Promise<Response> {
         () =>
           reports.publishMatchReports({
             writer: writerFor(reports, payload, slug, fallbacks),
-            store: payloadNewsStore(
-              payload,
-              tenant.id,
-              tenant.hns?.matchPagePath ?? '/raspored-i-rezultati',
-            ),
+            store: payloadNewsStore(payload, tenant.id, tenant.hns?.matchPagePath),
           }),
       )
 

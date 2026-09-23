@@ -3,6 +3,19 @@ import { linkParagraph, paragraphsToLexical } from '@/lib/ai/lexical'
 import type { MatchReportDraft, NewsStore } from '@/lib/match-reports/index'
 import { slugify } from '../fields/slug'
 
+const DEFAULT_MATCH_PAGE_PATH = '/raspored-i-rezultati'
+
+/**
+ * Putanja rubrike s utakmicama za poveznicu u izvještaju: s uvodnom kosom
+ * crtom, bez one na kraju, da spajanje ne da "//". Prazna vrijednost (polje
+ * očišćeno u adminu) uzima zadanu, jer bi "/" dao poveznicu "//<slug>".
+ */
+export function matchPageBasePath(matchPagePath: string | null | undefined): string {
+  const trimmed = (matchPagePath ?? '').replace(/^\/+|\/+$/g, '')
+
+  return trimmed ? `/${trimmed}` : DEFAULT_MATCH_PAGE_PATH
+}
+
 /**
  * Payload iza `NewsStore` sučelja. Testovi umjesto ovoga koriste `Map` — zato
  * šav i postoji.
@@ -10,10 +23,9 @@ import { slugify } from '../fields/slug'
 export function payloadNewsStore(
   payload: Payload,
   tenantId: number,
-  matchPagePath: string,
+  matchPagePath: string | null | undefined,
 ): NewsStore {
-  // Bez uvodne kose crte i bez one na kraju, da spajanje ne da "//".
-  const basePath = `/${matchPagePath.replace(/^\/+|\/+$/g, '')}`
+  const basePath = matchPageBasePath(matchPagePath)
 
   return {
     async has(sourceMatchId) {
