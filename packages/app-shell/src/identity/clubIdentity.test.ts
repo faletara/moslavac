@@ -10,7 +10,7 @@ function tenant(overrides: Partial<FrontendTenant> = {}): FrontendTenant {
     slug: "primjer",
     displayName: "ŠNK Primjer",
     active: true,
-    hns: { apiKey: "k", teamId: "1" },
+    hns: { teamId: "1" },
     ...overrides,
   };
 }

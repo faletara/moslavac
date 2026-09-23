@@ -7,6 +7,7 @@ import {
   superAdminOnlyField,
   superAdminUI,
 } from '../access/roles'
+import { isProduction } from '../lib/isProduction'
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -25,6 +26,9 @@ export const Users: CollectionConfig = {
     useAPIKey: true,
     maxLoginAttempts: 5,
     lockTime: 600_000, // 10 min
+    // Payload po defaultu izostavlja `Secure`; u produkciji cookie ide samo
+    // preko https-a.
+    cookies: { secure: isProduction(process.env) },
   },
   access: {
     create: superAdminOnly,
@@ -73,6 +77,21 @@ export const Users: CollectionConfig = {
       type: 'checkbox',
       access: {
         read: superAdminOnlyField,
+        create: superAdminOnlyField,
+        update: superAdminOnlyField,
+      },
+    },
+    /**
+     * Override Payloadovog `apiKey` polja. Payload njegov create/update access
+     * prenosi na `apiKeyIndex` (po kojem se prijavljuje ključem), pa
+     * tenant-admin više ne može sam sebi izdati ključ. Bez ovog polja oba
+     * ostaju otvorena svakome s pristupom adminu.
+     */
+    {
+      name: 'apiKey',
+      type: 'text',
+      label: 'API ključ',
+      access: {
         create: superAdminOnlyField,
         update: superAdminOnlyField,
       },

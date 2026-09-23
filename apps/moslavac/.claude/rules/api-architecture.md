@@ -32,6 +32,18 @@ cannot be fetched from the browser. Build its URL with `getCometImageUrl` from
 `@/lib/hns/imageUrl` — that module is deliberately free of `server-only` so
 client components can use it too.
 
+## HNS id routes: club scope first
+
+A route whose URL carries an HNS id (`/sezona/*`, `/utakmice/*`,
+`/raspored-i-rezultati/*`) is visitor-chosen input sent upstream with the
+club's API key. Resolve the route slug with `resolveClubCompetitionOr404` /
+`resolveClubMatchOr404` from `@/lib/app-shell/routes/clubScopeRoute` **before**
+any fetch that fans out per team or pages through matches. Each parses the id
+(`parseTrailingId`), checks it against the club scope (`fetchClubCompetition` /
+`fetchClubMatch` from `@/lib/hns/clubScope`) and calls `notFound()` on a junk
+slug or a foreign id. Never pass a route id straight to a competition or match
+fetcher.
+
 ## The CMS-to-app path: cache revalidation
 
 `app/api/revalidate` is an **inbound** webhook, not a round-trip: the CMS calls
@@ -51,7 +63,16 @@ Payload afterChange ──► apps/cms/src/lib/revalidateFrontend
 - Tag names come from `collectionCacheTag`
   (`packages/payload/src/cacheTags.ts`) — the same module the CMS calls — so the
   two sides cannot drift apart silently.
-- `REVALIDATE_SECRET` must match the CMS. An unset secret closes the route.
+- `REVALIDATE_SECRET` is this club's own secret, not the CMS's: the CMS derives
+  it as HMAC-SHA256(its `REVALIDATE_SECRET`, tenant slug) and sends it as the
+  bearer. The route compares it in constant time. A credential issued to
+  another club gets 401, and an unset secret closes the route. How to compute
+  it: `docs/NEW-CLUB.md`.
+- `REVALIDATE_SECRET_PREVIOUS` is for rotation only: while set, the route also
+  accepts it. Remove it once the CMS sends the new secret.
+- The CMS only calls an https origin whose host is in its
+  `REVALIDATE_ALLOWED_HOSTS`, always at `/api/revalidate`, and does not follow
+  redirects. A club missing from that list is skipped.
 
 ## Adding a fetch
 
@@ -77,3 +98,6 @@ here — do not add a per-app client data stack.
   layer so it returns domain types.
 - Duplicate a fetcher or a mapping into an app; it belongs in `packages/`.
 - Use `any` for a response, or declare a type that duplicates `packages/types`.
+- Hand a secret to a client component. `getTenant()` returns the public
+  Tenant, without `hns.apiKey`; only `packages/hns/src/client.ts` calls
+  `getHnsApiKey()`. The HNS key belongs to the federation and cannot be rotated.

@@ -8,7 +8,9 @@ and discussion.
 - **Tenant** — one football club's record in the shared Payload CMS (`tenants`
   collection), keyed by `slug` (e.g. `moslavac`, `nk-vrapce`). Holds branding,
   contact, HNS keys, payment, legal, and enabled **ClubFeatures**. Frontends
-  resolve their tenant from `PAYLOAD_TENANT_SLUG`.
+  resolve their tenant from `PAYLOAD_TENANT_SLUG`. A Club app sees the
+  **public Tenant** (`FrontendTenant`, from `getTenant()`), which has no HNS
+  key; only the server HNS client reads the key, via `getHnsApiKey()`.
 - **ClubFeature** — a capability flag on a Tenant (`pages`, `documents`, `board`,
   `school`, `gallery`). A club-specific CMS collection declares the feature it
   serves; it appears in that club's admin only when the Tenant has the feature
@@ -50,6 +52,17 @@ at 256×256 and 180×180 — the sizes `buildClubManifest` declares.
   directly; nothing fetches data from the browser. The single route handler that
   serves the browser is `/api/images/[uuid]`, which proxies HNS crest bytes. See
   each app's `.claude/rules/api-architecture.md`.
+- **Club scope** — the HNS ids that belong to a Tenant's club: its
+  current-season competitions (and their sub-competitions), every match the
+  club plays, and every match in those competitions. HNS id routes check a
+  visitor-chosen id against it (`packages/hns/src/clubScope.ts`) before any
+  upstream fan-out. Player ids have their own scope, the club's roster
+  (`packages/payload/src/getRoster.ts`): sloga-mravince statistika pages 404 a
+  player off the roster, and also a competition outside the club scope.
+  moslavac statistika deliberately has no player scope, because its match and
+  league pages link opponent players.
+- **ClubCompetition** / **ClubMatch** — a Competition / Match resolved through
+  the club scope; its `id` is always known.
 
 ## Match reports
 

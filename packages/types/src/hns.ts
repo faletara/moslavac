@@ -117,6 +117,9 @@ export interface Competition {
   competitionElements: Competition[];
 }
 
+/** A competition the club plays, resolved from a route id: the id is known. */
+export type ClubCompetition = Competition & { id: number };
+
 export interface MatchPhase {
   id: number | null;
   name: string;
@@ -167,6 +170,9 @@ export interface Match {
   showEvents: boolean;
   allowDetail: boolean;
 }
+
+/** A match in the club's scope, resolved from a route id: the id is known. */
+export type ClubMatch = Match & { id: number };
 
 export interface MatchSlots {
   next: Match | null;

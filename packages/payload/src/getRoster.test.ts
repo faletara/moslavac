@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { runWithPayloadContext } from "./context";
 import type { PayloadFetchOptions, PayloadTransport } from "./context";
 import { z } from "zod";
-import { adaptRoster, fetchRoster, rosterSchema } from "./getRoster";
+import { adaptRoster, fetchRoster, fetchRosterEntry, rosterSchema } from "./getRoster";
 
 /** Dokument kakav Payload vraća po žici, prije raščlanjivanja. */
 type WireRoster = z.input<typeof rosterSchema>;
@@ -80,5 +80,28 @@ describe("fetchRoster", () => {
     expect(calls[0]!.opts?.authenticated).toBe(true);
     expect(calls[0]!.opts?.next?.revalidate).toBe(300);
     expect(calls[0]!.opts?.next?.tags).toEqual(["roster-moslavac"]);
+  });
+});
+
+describe("fetchRosterEntry", () => {
+  // Momčad kluba: igrač 99 i unos bez HNS igrača (personId 0).
+  const transport: PayloadTransport = async () =>
+    pageOf([raw(), raw({ id: 2, displayName: "Bez HNS-a", personId: null })]);
+
+  const lookup = (personId: number) =>
+    runWithPayloadContext({ transport, tenantSlug: "sloga-mravince" }, () =>
+      fetchRosterEntry(personId),
+    );
+
+  it("returns the club's player", async () => {
+    expect((await lookup(99))?.displayName).toBe("Ivan Horvat");
+  });
+
+  it("returns null for a player outside the club's roster", async () => {
+    expect(await lookup(12345)).toBeNull();
+  });
+
+  it("never matches a roster entry that has no HNS player", async () => {
+    expect(await lookup(0)).toBeNull();
   });
 });

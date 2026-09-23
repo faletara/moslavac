@@ -1,3 +1,5 @@
+import JsonLdScript from "./JsonLdScript";
+
 /**
  * `BreadcrumbList` za jednu stranicu. Google iz njega crta putanju umjesto
  * golog URL-a u rezultatu, a hub stranice (`/novosti`, `/utakmice`) su mu
@@ -29,10 +31,5 @@ export default function BreadcrumbJsonLd({
     ],
   };
 
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-    />
-  );
+  return <JsonLdScript data={jsonLd} />;
 }

@@ -1,9 +1,8 @@
 import { ImageResponse } from "next/og";
 import { formatDateTime } from "@/lib/helpers/date";
 import { loadGoogleFont } from "@/lib/helpers/googleFont";
+import { resolveClubMatchOr404 } from "@/lib/app-shell/routes/clubScopeRoute";
 import { fetchHnsCrestDataUri } from "@/lib/hns/images";
-import { fetchMatchInfo } from "@/lib/hns/matches";
-import { parseTrailingId } from "@/lib/helpers/slug";
 
 export const size = { width: 1200, height: 630 };
 
@@ -61,30 +60,8 @@ export default async function MatchOgImage({
   params: Promise<{ matchId: string }>;
 }) {
   const { matchId } = await params;
-  const match = await fetchMatchInfo({ matchId: parseTrailingId(matchId) });
-
-  if (!match) {
-    return new ImageResponse(
-      (
-        <div
-          style={{
-            width: "100%",
-            height: "100%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            background: NAVY_DEEP,
-            color: "#ffffff",
-            fontSize: 56,
-            fontWeight: 700,
-          }}
-        >
-          SNK Moslavac
-        </div>
-      ),
-      { ...size },
-    );
-  }
+  // Tuđa ili nepostojeća utakmica: 404 prije grbova i fontova.
+  const match = await resolveClubMatchOr404(matchId);
 
   // Geist u obje težine koje poster koristi: satori tiho ignorira `fontWeight`
   // za koji nema učitan rez, pa bi bez ovoga sve ispalo u regularu.

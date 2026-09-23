@@ -6,12 +6,34 @@ const here = (p: string) => fileURLToPath(new URL(p, import.meta.url));
 export default defineConfig({
   test: {
     environment: "node",
-    // Every Club app is covered by the same glob, so a new club is picked up
-    // without editing this file — divergence between clubs cannot hide from CI.
-    include: [
-      "packages/**/*.test.ts",
-      "apps/*/src/**/*.test.ts",
-      "apps/*/src/**/*.test.tsx",
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: "unit",
+          // Every Club app is covered by the same glob, so a new club is picked
+          // up without editing this file — divergence between clubs cannot
+          // hide from CI.
+          include: [
+            "packages/**/*.test.ts",
+            "apps/*/src/**/*.test.ts",
+            "apps/*/src/**/*.test.tsx",
+            "tools/oxlint/moslavac/**/*.test.ts",
+          ],
+          exclude: ["**/node_modules/**", "**/*.rsc.test.ts"],
+        },
+      },
+      {
+        // `*.rsc.test.ts` renders the RSC flight payload the way Next does for
+        // a Server Component; React's flight server needs the `react-server`
+        // export condition, which only a separate Node process can switch on.
+        extends: true,
+        test: {
+          name: "rsc",
+          include: ["packages/**/*.rsc.test.ts"],
+          execArgv: ["--conditions=react-server"],
+        },
+      },
     ],
   },
   resolve: {

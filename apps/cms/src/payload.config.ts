@@ -7,6 +7,7 @@ import { buildConfig } from "payload";
 import { fileURLToPath } from "url";
 import sharp from "sharp";
 
+import { withBoundDocumentLocks } from "./access/lockCollectionAccess";
 import { isSuperAdmin } from "./access/roles";
 import { CLUB_FEATURES } from "@/lib/payload/clubFeatures";
 import { BoardMembers } from "./collections/BoardMembers";
@@ -22,6 +23,7 @@ import { Tenants } from "./collections/Tenants";
 import { Users } from "./collections/Users";
 import { hnsPlayerSearchEndpoint } from "./endpoints/hnsPlayerSearch";
 import { matchReportsCronEndpoint } from "./endpoints/matchReportsCron";
+import { resolveAdminOrigins } from "./lib/adminOrigin";
 import type { Config } from "./payload-types";
 
 const filename = fileURLToPath(import.meta.url);
@@ -31,6 +33,8 @@ const dirname = path.dirname(filename);
 if (!process.env.PAYLOAD_SECRET) {
 	throw new Error("PAYLOAD_SECRET env var is required");
 }
+
+const adminOrigins = resolveAdminOrigins(process.env);
 
 const TENANT_COLLECTION_SLUGS = [
 	"news",
@@ -43,7 +47,13 @@ const tenantCollections = Object.fromEntries(
 	TENANT_COLLECTION_SLUGS.map((slug) => [slug, {}]),
 );
 
+// Zaključavanja dokumenata dodaje tek Payloadova sanitizacija, pa se vežu uz
+// korisnika i tenant nakon `buildConfig` (vidi `withBoundDocumentLocks`).
 export default buildConfig({
+	// Auth cookie vrijedi samo za zahtjeve s admin origina (Payload ga inače
+	// prihvaća s bilo kojeg Origina, pa bi sestrinska domena mogla slati izmjene).
+	serverURL: adminOrigins.serverURL,
+	csrf: adminOrigins.csrf,
 	admin: {
 		user: Users.slug,
 		components: {
@@ -145,4 +155,4 @@ export default buildConfig({
 			},
 		}),
 	],
-});
+}).then(withBoundDocumentLocks);

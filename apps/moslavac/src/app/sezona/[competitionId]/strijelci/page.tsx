@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import TopScorersTable from "@/components/features/competition/TopScorersTable";
 import { redirectToCanonical } from "@/lib/helpers/canonical";
-import { fetchCompetitionInfo } from "@/lib/hns/competitions";
+import { resolveClubCompetitionOr404 } from "@/lib/app-shell/routes/clubScopeRoute";
 import { fetchAllCompetitionScorers } from "@/lib/hns/standings";
 import { BASE_URL } from "@/lib/siteUrl";
-import { buildCompetitionSlug, parseTrailingId } from "@/lib/helpers/slug";
+import { buildCompetitionSlug } from "@/lib/helpers/slug";
 
 interface Props {
   params: Promise<{ competitionId: string }>;
@@ -12,13 +12,9 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { competitionId } = await params;
-
-  const info = await fetchCompetitionInfo({
-    competitionId: parseTrailingId(competitionId),
-  });
-
-  const slug = info ? buildCompetitionSlug(info) : competitionId;
-  const name = info?.name ?? "Sezona";
+  const competition = await resolveClubCompetitionOr404(competitionId);
+  const slug = buildCompetitionSlug(competition);
+  const name = competition.name;
 
   return {
     title: `Strijelci - ${name}`,
@@ -29,25 +25,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function CompetitionScorersPage({ params }: Props) {
   const { competitionId } = await params;
-  const cid = parseTrailingId(competitionId);
+  const competition = await resolveClubCompetitionOr404(competitionId);
 
-  const [info, scorers] = await Promise.all([
-    fetchCompetitionInfo({ competitionId: cid }),
-    fetchAllCompetitionScorers({ competitionId: cid }),
-  ]);
+  redirectToCanonical(
+    `/sezona/${competitionId}/strijelci`,
+    `/sezona/${buildCompetitionSlug(competition)}/strijelci`,
+  );
 
-  if (info) {
-    redirectToCanonical(
-      `/sezona/${competitionId}/strijelci`,
-      `/sezona/${buildCompetitionSlug(info)}/strijelci`,
-    );
-  }
+  const scorers = await fetchAllCompetitionScorers({
+    competitionId: competition.id,
+  });
 
   return (
     <TopScorersTable
       scorers={scorers}
       isLoading={false}
-      competitionId={cid}
+      competitionId={competition.id}
     />
   );
 }

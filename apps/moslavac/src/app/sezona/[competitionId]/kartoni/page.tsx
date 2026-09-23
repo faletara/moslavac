@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import CardsTable from "@/components/features/competition/CardsTable";
 import { redirectToCanonical } from "@/lib/helpers/canonical";
-import { fetchCompetitionInfo } from "@/lib/hns/competitions";
+import { resolveClubCompetitionOr404 } from "@/lib/app-shell/routes/clubScopeRoute";
 import {
   fetchAllCompetitionRedCards,
   fetchAllCompetitionYellowCards,
 } from "@/lib/hns/standings";
 import { BASE_URL } from "@/lib/siteUrl";
-import { buildCompetitionSlug, parseTrailingId } from "@/lib/helpers/slug";
+import { buildCompetitionSlug } from "@/lib/helpers/slug";
 
 interface Props {
   params: Promise<{ competitionId: string }>;
@@ -15,13 +15,9 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { competitionId } = await params;
-
-  const info = await fetchCompetitionInfo({
-    competitionId: parseTrailingId(competitionId),
-  });
-
-  const slug = info ? buildCompetitionSlug(info) : competitionId;
-  const name = info?.name ?? "Sezona";
+  const competition = await resolveClubCompetitionOr404(competitionId);
+  const slug = buildCompetitionSlug(competition);
+  const name = competition.name;
 
   return {
     title: `Kartoni - ${name}`,
@@ -32,27 +28,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function CompetitionCardsPage({ params }: Props) {
   const { competitionId } = await params;
-  const cid = parseTrailingId(competitionId);
+  const competition = await resolveClubCompetitionOr404(competitionId);
 
-  const [info, yellowCards, redCards] = await Promise.all([
-    fetchCompetitionInfo({ competitionId: cid }),
-    fetchAllCompetitionYellowCards({ competitionId: cid }),
-    fetchAllCompetitionRedCards({ competitionId: cid }),
+  redirectToCanonical(
+    `/sezona/${competitionId}/kartoni`,
+    `/sezona/${buildCompetitionSlug(competition)}/kartoni`,
+  );
+
+  const [yellowCards, redCards] = await Promise.all([
+    fetchAllCompetitionYellowCards({ competitionId: competition.id }),
+    fetchAllCompetitionRedCards({ competitionId: competition.id }),
   ]);
-
-  if (info) {
-    redirectToCanonical(
-      `/sezona/${competitionId}/kartoni`,
-      `/sezona/${buildCompetitionSlug(info)}/kartoni`,
-    );
-  }
 
   return (
     <CardsTable
       yellowCards={yellowCards}
       redCards={redCards}
       isLoading={false}
-      competitionId={cid}
+      competitionId={competition.id}
     />
   );
 }

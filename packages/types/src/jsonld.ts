@@ -149,3 +149,12 @@ export type JsonLdNode =
   | ProfilePageJsonLd
   | SportsEventJsonLd
   | SportsTeamJsonLd;
+
+/**
+ * Sadržaj jednog `<script type="application/ld+json">`: jedan čvor ili
+ * `@graph` čvorova. Širi je od `JsonLdNode` jer stranice slažu i vlastite
+ * čvorove (`WebSite`, `BreadcrumbList` iz literala).
+ */
+export type JsonLdRoot =
+  | { "@type": string }
+  | { "@graph": readonly { "@type": string }[] };

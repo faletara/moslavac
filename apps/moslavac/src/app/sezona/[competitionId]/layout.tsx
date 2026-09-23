@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
-import {
-  fetchCompetitionInfo,
-  fetchCurrentSeasonCompetitions,
-} from "@/lib/hns/competitions";
+import { resolveClubCompetitionOr404 } from "@/lib/app-shell/routes/clubScopeRoute";
+import { fetchCurrentSeasonCompetitions } from "@/lib/hns/competitions";
 import { BASE_URL } from "@/lib/siteUrl";
-import { buildCompetitionSlug, parseTrailingId } from "@/lib/helpers/slug";
+import { buildCompetitionSlug } from "@/lib/helpers/slug";
 import { seasonTag } from "@/lib/season";
 import SeasonLayoutClient from "./SeasonLayoutClient";
 
@@ -26,10 +24,9 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { competitionId } = await params;
-  const id = parseTrailingId(competitionId);
-  const info = await fetchCompetitionInfo({ competitionId: id });
-  const name = info?.name ?? "Sezona";
-  const slug = info ? buildCompetitionSlug(info) : competitionId;
+  const competition = await resolveClubCompetitionOr404(competitionId);
+  const name = competition.name;
+  const slug = buildCompetitionSlug(competition);
   const description = `Ljestvica, utakmice i statistike za natjecanje ${name}.`;
 
   return {
@@ -55,13 +52,13 @@ export default async function SeasonLayout({
   params: Promise<Params>;
 }) {
   const { competitionId } = await params;
-  const id = parseTrailingId(competitionId);
-  const info = await fetchCompetitionInfo({ competitionId: id });
+  // Tuđe natjecanje završava ovdje, prije ikakvog fan-outa na HNS.
+  const competition = await resolveClubCompetitionOr404(competitionId);
 
   return (
     <SeasonLayoutClient
-      competitionId={id}
-      competitionName={info?.name ?? null}
+      competitionId={competition.id}
+      competitionName={competition.name}
       seasonTag={seasonTag()}
     >
       {children}

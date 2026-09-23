@@ -1,10 +1,8 @@
 import MatchesList from "@/components/features/competition/MatchesList";
 import { redirectToCanonical } from "@/lib/helpers/canonical";
-import {
-  fetchCompetitionInfo,
-  fetchCompetitionMatches,
-} from "@/lib/hns/competitions";
-import { buildCompetitionSlug, parseTrailingId } from "@/lib/helpers/slug";
+import { resolveClubCompetitionOr404 } from "@/lib/app-shell/routes/clubScopeRoute";
+import { fetchCompetitionMatches } from "@/lib/hns/competitions";
+import { buildCompetitionSlug } from "@/lib/helpers/slug";
 
 interface Props {
   params: Promise<{ competitionId: string }>;
@@ -14,19 +12,16 @@ export const revalidate = 180;
 
 export default async function CompetitionMatchesPage({ params }: Props) {
   const { competitionId } = await params;
-  const cid = parseTrailingId(competitionId);
+  const competition = await resolveClubCompetitionOr404(competitionId);
 
-  const [info, matches] = await Promise.all([
-    fetchCompetitionInfo({ competitionId: cid }),
-    fetchCompetitionMatches({ competitionId: cid }),
-  ]);
+  redirectToCanonical(
+    `/sezona/${competitionId}`,
+    `/sezona/${buildCompetitionSlug(competition)}`,
+  );
 
-  if (info) {
-    redirectToCanonical(
-      `/sezona/${competitionId}`,
-      `/sezona/${buildCompetitionSlug(info)}`,
-    );
-  }
+  const matches = await fetchCompetitionMatches({
+    competitionId: competition.id,
+  });
 
   return <MatchesList matches={matches} />;
 }

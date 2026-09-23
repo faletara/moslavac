@@ -31,6 +31,7 @@ U Payload adminu (`http://localhost:43102/admin` → **Tenants → Create**):
 | `slug` | ✅ | = `PAYLOAD_TENANT_SLUG` (npr. `nk-primjer`) |
 | `displayName` | ✅ | Puni naziv (npr. `NK Primjer`) |
 | `active` | — | Uključeno (default) |
+| `siteUrl` | — | Produkcijski https origin (npr. `https://www.nk-primjer.hr`), bez putanje. Na njega CMS šalje revalidaciju; domena mora biti i u `REVALIDATE_ALLOWED_HOSTS` CMS-a (korak 7) |
 | `features` | — | Klupske rubrike: `pages`, `documents`, `board`, `school`, `gallery` (uključi samo što klub koristi — gate-a vidljivost tih kolekcija u adminu) |
 | `hns.apiKey` | ✅ | HNS API ključ |
 | `hns.teamId` | ✅ | HNS ID kluba (highlight vlastitog tima, roster, rezultati) |
@@ -47,7 +48,8 @@ U Payload adminu (`http://localhost:43102/admin` → **Tenants → Create**):
 
 ## 3. Env (`apps/<slug>/.env.local`)
 
-`new-club.sh` generira većinu; ručno upiši `PAYLOAD_API_KEY`.
+`new-club.sh` generira većinu; ručno upiši `PAYLOAD_API_KEY` i `REVALIDATE_SECRET`
+(naredba je ispod tablice).
 
 | Var | Opis |
 | --- | --- |
@@ -56,6 +58,31 @@ U Payload adminu (`http://localhost:43102/admin` → **Tenants → Create**):
 | `PAYLOAD_API_KEY` | API-key korisnik iz Payloada (za autenticirane pozive) |
 | `HNS_API_BASE` | HNS endpoint (default `https://api-hns.analyticom.de`) |
 | `NEXT_PUBLIC_SITE_URL` | Bazni URL (prod domena; lokalno `http://localhost:<port>`) |
+| `REVALIDATE_SECRET` | Tajna samo ovog kluba za `/api/revalidate` (vidi dolje). Bez nje je ruta zatvorena i sadržaj čeka istek cachea |
+| `REVALIDATE_SECRET_PREVIOUS` | Samo tijekom promjene tajne (vidi dolje), inače se ne postavlja |
+
+**`REVALIDATE_SECRET` kluba** nije ista vrijednost kao na CMS-u. CMS je za svaki
+klub izvodi iz svoje tajne i sluga Tenanta, pa tajna jednog kluba ne otvara
+revalidaciju drugog. Izračunaj je ondje gdje imaš CMS-ov `REVALIDATE_SECRET`:
+
+```bash
+printf %s <slug> | openssl dgst -sha256 -hmac "$REVALIDATE_SECRET" | awk '{print $NF}'
+```
+
+Promjena CMS-ove tajne mijenja tajne svih klubova: nakon rotacije ponovno
+izračunaj i upiši vrijednost u svaki klupski projekt.
+
+**Promjena tajne bez prekida** (rotacija ili prvi prelazak sa stare zajedničke
+tajne na tajne po klubu). Ruta kluba dok je postavljen `REVALIDATE_SECRET_PREVIOUS`
+prihvaća i tu staru vrijednost:
+
+1. U svakom klupskom projektu postavi `REVALIDATE_SECRET` na novu tajnu kluba
+   (izračunatu iz nove CMS tajne) i `REVALIDATE_SECRET_PREVIOUS` na vrijednost
+   koju CMS šalje sada (kod prvog prelaska: stara zajednička tajna). Redeployaj
+   klubove.
+2. Na CMS-u postavi novi `REVALIDATE_SECRET` i redeployaj CMS.
+3. Iz svih klupskih projekata obriši `REVALIDATE_SECRET_PREVIOUS` i redeployaj.
+   Dok je postavljena, stara tajna i dalje otvara revalidaciju.
 
 ## 4. Install + dev
 
@@ -103,8 +130,12 @@ sadržaj (vijesti, oprema, roster, utakmice) dolazi iz CMS-a i HNS-a po tenantu.
 
 - Novi projekt, **Root Directory** = `apps/<slug>`.
 - Env vars: `PAYLOAD_TENANT_SLUG`, `PAYLOAD_API_URL`, `PAYLOAD_API_KEY`,
-  `HNS_API_BASE`, `NEXT_PUBLIC_SITE_URL` (= prava domena).
+  `HNS_API_BASE`, `NEXT_PUBLIC_SITE_URL` (= prava domena), `REVALIDATE_SECRET`
+  (tajna kluba iz koraka 3).
 - Ako su mijenjana CMS polja: pokreni postgres migraciju prije/uz deploy CMS-a.
+- CMS: dodaj domenu kluba (samo host, npr. `www.nk-primjer.hr`) u
+  `REVALIDATE_ALLOWED_HOSTS` (zarezom odvojen popis) i redeployaj CMS. Bez toga
+  CMS ne šalje revalidaciju na `siteUrl` i sadržaj čeka istek cachea.
 
 ---
 

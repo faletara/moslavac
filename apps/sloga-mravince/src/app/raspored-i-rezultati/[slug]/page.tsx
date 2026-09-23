@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import MatchHero from "@/components/features/matches/MatchHero";
 import MatchTabs from "@/components/features/matches/MatchTabs";
 import { RefreshWhile } from "@/components/ui/refresh-while";
+import JsonLdScript from "@/lib/app-shell/seo/JsonLdScript";
 import { redirectToCanonical } from "@/lib/helpers/canonical";
 import { formatDateTime } from "@/lib/helpers/date";
 import {
   fetchAllCompetitionMatches,
   fetchCurrentSeasonCompetitions,
 } from "@/lib/hns/competitions";
+import { resolveClubMatchOr404 } from "@/lib/app-shell/routes/clubScopeRoute";
 import {
   fetchMatchEvents,
-  fetchMatchInfo,
   fetchMatchLineups,
   fetchMatchReferees,
 } from "@/lib/hns/matches";
@@ -20,7 +20,7 @@ import { isFinished, isLive } from "@/lib/hns/matchStatus";
 import { fetchTeamStandings } from "@/lib/hns/standings";
 import { getTenant } from "@/lib/payload/getTenant";
 import { BASE_URL } from "@/lib/siteUrl";
-import { buildMatchSlug, parseTrailingId } from "@/lib/helpers/slug";
+import { buildMatchSlug } from "@/lib/helpers/slug";
 import type { Match } from "@/types/hns";
 import type {
   JsonLdNode,
@@ -77,9 +77,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const match = await fetchMatchInfo({ matchId: parseTrailingId(slug) });
-
-  if (!match) return {};
+  const match = await resolveClubMatchOr404(slug);
 
   const title = matchTitle(match);
 
@@ -105,16 +103,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function MatchPage({ params }: Props) {
   const { slug } = await params;
-  const matchId = parseTrailingId(slug);
-
-  const [match, events, lineups, info] = await Promise.all([
-    fetchMatchInfo({ matchId }),
-    fetchMatchEvents({ matchId }),
-    fetchMatchLineups({ matchId }),
-    fetchMatchReferees({ matchId }),
-  ]);
-
-  if (!match) notFound();
+  // Tuđa utakmica završava ovdje: bez događaja, postava i tablice.
+  const match = await resolveClubMatchOr404(slug);
 
   // Collapse the bare-id and partial-slug forms onto the canonical URL, so the
   // same match isn't indexed under several addresses.
@@ -123,12 +113,17 @@ export default async function MatchPage({ params }: Props) {
     `/raspored-i-rezultati/${buildMatchSlug(match)}`,
   );
 
-  // Keyed off the match's own competition, so it can only start once the match
-  // resolves. Cup ties have no table — an empty list simply hides the tab.
+  // Match detail plus the table of the match's own competition. It all waits
+  // for the club-scope check above, then runs in parallel. Cup ties have no
+  // table — an empty list simply hides the tab.
   const competitionId = match.competition?.id ?? null;
 
-  const standings =
-    competitionId != null ? await fetchTeamStandings({ competitionId }) : [];
+  const [events, lineups, info, standings] = await Promise.all([
+    fetchMatchEvents({ matchId: match.id }),
+    fetchMatchLineups({ matchId: match.id }),
+    fetchMatchReferees({ matchId: match.id }),
+    competitionId != null ? fetchTeamStandings({ competitionId }) : [],
+  ]);
 
   const live = isLive(match);
   const started = live || isFinished(match);
@@ -138,11 +133,7 @@ export default async function MatchPage({ params }: Props) {
   return (
     <div className="bg-background">
       {jsonLd.map((schema) => (
-        <script
-          key={schema["@type"]}
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-        />
+        <JsonLdScript key={schema["@type"]} data={schema} />
       ))}
 
       {/* Dok utakmica traje, stranica se sama osvježava — bez F5 na tribini. */}

@@ -168,16 +168,15 @@ export const tenantSchema = z.object({
   active: z.boolean().nullish().transform((active) => active ?? true),
   // Nepotpun `hns` blok daje prazne vrijednosti umjesto iznimke: HNS dohvat
   // tada zakaže sam za sebe, a ostatak stranice se i dalje prikaže.
+  // `hns.apiKey` namjerno nije ovdje: Tenant ide u client komponente, a ključ
+  // smije vidjeti samo serverski HNS klijent (vidi `tenantRecordSchema`).
   hns: z
     .object({
-      apiKey: z.string().nullish().transform((key) => key ?? ""),
       teamId: z.string().nullish().transform((id) => id ?? ""),
       seniorCompetitionFilter: z.string().nullish().default(null),
     })
     .nullish()
-    .transform(
-      (hns) => hns ?? { apiKey: "", teamId: "", seniorCompetitionFilter: null },
-    ),
+    .transform((hns) => hns ?? { teamId: "", seniorCompetitionFilter: null }),
   branding: z
     .object({
       shortName: z.string().nullish().default(null),
@@ -225,4 +224,22 @@ export const tenantSchema = z.object({
     .default(null),
 });
 
+/** Javni Tenant: smije u client komponente jer nema nijednu tajnu. */
 export type FrontendTenant = z.output<typeof tenantSchema>;
+
+/** HNS ključ Tenanta. Čita ga samo serverski HNS klijent. */
+const tenantHnsApiKeySchema = z
+  .object({
+    hns: z.object({ apiKey: z.string().nullish() }).nullish(),
+  })
+  .transform((doc) => doc.hns?.apiKey ?? "");
+
+/**
+ * Tenant iz autentificiranog dohvata, razdvojen na javni Tenant i HNS ključ.
+ * `tenantSchema` odbacuje `hns.apiKey`, pa ključ nikad ne završi u objektu
+ * koji putuje u browser.
+ */
+export const tenantRecordSchema = z.preprocess(
+  (doc) => ({ tenant: doc, hnsApiKey: doc }),
+  z.object({ tenant: tenantSchema, hnsApiKey: tenantHnsApiKeySchema }),
+);

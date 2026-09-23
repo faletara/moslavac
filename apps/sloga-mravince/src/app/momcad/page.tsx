@@ -2,6 +2,7 @@ import { Shield } from "lucide-react";
 import type { Metadata } from "next";
 import { RosterCategorySections } from "@/components/features/team/RosterCategorySections";
 import { InkPageHero } from "@/components/layout/InkPageHero";
+import JsonLdScript from "@/lib/app-shell/seo/JsonLdScript";
 import { fetchSeniorCompetition } from "@/lib/hns/competitions";
 import { fetchRoster } from "@/lib/payload/getRoster";
 import { getTenant } from "@/lib/payload/getTenant";
@@ -156,11 +157,7 @@ export default async function TeamPage() {
   return (
     <div className="bg-background">
       {jsonLd.map((schema) => (
-        <script
-          key={schema["@type"]}
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-        />
+        <JsonLdScript key={schema["@type"]} data={schema} />
       ))}
 
       <InkPageHero title="Momčad" />

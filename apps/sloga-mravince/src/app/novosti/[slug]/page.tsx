@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MatchResultCard } from "@/components/features/news/MatchResultCard";
+import JsonLdScript from "@/lib/app-shell/seo/JsonLdScript";
 import { formatDateLong } from "@/lib/helpers/date";
 import { fetchMatchInfo } from "@/lib/hns/matches";
 import { htmlToMetaDescription } from "@/lib/helpers/text";
@@ -162,11 +163,7 @@ export default async function NewsDetailPage({ params }: Props) {
   return (
     <article>
       {jsonLd.map((schema) => (
-        <script
-          key={schema["@type"]}
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-        />
+        <JsonLdScript key={schema["@type"]} data={schema} />
       ))}
 
       {/* Zaglavlje članka nosi isti kino-tretman kao udarna vijest na

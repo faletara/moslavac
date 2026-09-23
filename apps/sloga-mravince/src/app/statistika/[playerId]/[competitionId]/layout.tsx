@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
-import { fetchCompetitionInfo } from "@/lib/hns/competitions";
-import { fetchPlayerDetails } from "@/lib/hns/players";
+import { notFound } from "next/navigation";
+import { resolveClubCompetitionOr404 } from "@/lib/app-shell/routes/clubScopeRoute";
+import { fetchPlayerDetails, fetchPlayerStats } from "@/lib/hns/players";
+import { fetchRosterEntry } from "@/lib/payload/getRoster";
 import { BASE_URL } from "@/lib/siteUrl";
 import {
   buildCompetitionSlug,
@@ -20,18 +22,35 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { playerId, competitionId } = await params;
   const personId = parseTrailingId(playerId);
-  const cid = parseTrailingId(competitionId);
 
-  const [playerResult, competitionResult] = await Promise.allSettled([
+  if (personId == null) notFound();
+
+  // Igrač izvan momčadi kluba ili tuđe natjecanje: 404 prije ijednog HNS
+  // poziva po igraču (vidi page.tsx).
+  const [rosterEntry, clubCompetition] = await Promise.all([
+    fetchRosterEntry(personId),
+    resolveClubCompetitionOr404(competitionId),
+  ]);
+
+  if (!rosterEntry) notFound();
+
+  // Naziv natjecanja čita se iz igračeve statistike (isti HNS URL kao na
+  // stranici).
+  const [playerResult, statsResult] = await Promise.allSettled([
     fetchPlayerDetails({ personId: String(personId) }),
-    fetchCompetitionInfo({ competitionId: cid }),
+    fetchPlayerStats({
+      personId: String(personId),
+      competitionId: clubCompetition.id,
+    }),
   ]);
 
   const player =
     playerResult.status === "fulfilled" ? playerResult.value : null;
 
   const competition =
-    competitionResult.status === "fulfilled" ? competitionResult.value : null;
+    statsResult.status === "fulfilled"
+      ? (statsResult.value?.competition ?? null)
+      : null;
 
   const playerName = player?.name ?? null;
   const competitionName = competition?.name ?? null;

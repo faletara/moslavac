@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { TrackEvent } from "@/components/analytics/TrackEvent";
 import MatchHero from "@/components/features/matches/MatchHero";
 import MatchTabs from "@/components/features/matches/tabs/MatchTabs";
 import { RefreshWhile } from "@/components/ui/refresh-while";
 import { isLive, liveMinute } from "@/lib/hns/matchStatus";
 import { fetchAllCompetitionMatches } from "@/lib/hns/competitions";
+import { resolveClubMatchOr404 } from "@/lib/app-shell/routes/clubScopeRoute";
 import {
   fetchMatchEvents,
-  fetchMatchInfo,
   fetchMatchLineups,
   fetchMatchReferees,
 } from "@/lib/hns/matches";
@@ -19,7 +18,8 @@ import {
 import { formatDateTime } from "@/lib/helpers/date";
 import { redirectToCanonical } from "@/lib/helpers/canonical";
 import { BASE_URL } from "@/lib/siteUrl";
-import { buildMatchSlug, parseTrailingId } from "@/lib/helpers/slug";
+import { buildMatchSlug } from "@/lib/helpers/slug";
+import type { CompetitionPlayerStat, Match, TeamRanking } from "@/types/hns";
 
 interface Props {
   params: Promise<{ matchId: string }>;
@@ -29,10 +29,7 @@ export const revalidate = 30;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { matchId } = await params;
-  const mid = parseTrailingId(matchId);
-  const matchInfo = await fetchMatchInfo({ matchId: mid });
-
-  if (!matchInfo) return {};
+  const matchInfo = await resolveClubMatchOr404(matchId);
 
   const home = matchInfo.homeTeam?.name ?? "N/A";
   const away = matchInfo.awayTeam?.name ?? "N/A";
@@ -73,18 +70,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+/** Standings, all matches and scorers of the match's competition; empty without one. */
+async function fetchCompetitionTabs(
+  competitionId: number | null,
+): Promise<[TeamRanking[], Match[], CompetitionPlayerStat[]]> {
+  if (competitionId == null) return [[], [], []];
+
+  return Promise.all([
+    fetchTeamStandings({ competitionId }),
+    fetchAllCompetitionMatches({ competitionId }),
+    fetchAllCompetitionScorers({ competitionId }),
+  ]);
+}
+
 export default async function MatchInfoPage({ params }: Props) {
   const { matchId } = await params;
-  const mid = parseTrailingId(matchId);
-
-  const [matchInfo, events, lineups, refereeData] = await Promise.all([
-    fetchMatchInfo({ matchId: mid }),
-    fetchMatchEvents({ matchId: mid }),
-    fetchMatchLineups({ matchId: mid }),
-    fetchMatchReferees({ matchId: mid }),
-  ]);
-
-  if (!matchInfo) notFound();
+  // Tuđa utakmica završava ovdje: bez događaja, postava, tablice i fan-outa
+  // strijelaca po momčadima natjecanja.
+  const matchInfo = await resolveClubMatchOr404(matchId);
 
   // Collapse numeric/partial-slug duplicates onto the canonical slug URL.
   redirectToCanonical(
@@ -92,19 +95,18 @@ export default async function MatchInfoPage({ params }: Props) {
     `/utakmice/${buildMatchSlug(matchInfo)}`,
   );
 
-  // Competition-level data the tabs (standings / form / scorers) render.
-  // Keyed off the match's competition, so it can only start once matchInfo
-  // resolves — the three requests then run in parallel.
+  // Match detail plus the competition-level data the tabs (standings / form /
+  // scorers) render. It all waits for the club-scope check above, then runs
+  // in parallel.
   const competitionId = matchInfo.competition?.id ?? null;
 
-  const [standings, competitionMatches, scorers] =
-    competitionId != null
-      ? await Promise.all([
-          fetchTeamStandings({ competitionId }),
-          fetchAllCompetitionMatches({ competitionId }),
-          fetchAllCompetitionScorers({ competitionId }),
-        ])
-      : [[], [], []];
+  const [events, lineups, refereeData, [standings, competitionMatches, scorers]] =
+    await Promise.all([
+      fetchMatchEvents({ matchId: matchInfo.id }),
+      fetchMatchLineups({ matchId: matchInfo.id }),
+      fetchMatchReferees({ matchId: matchInfo.id }),
+      fetchCompetitionTabs(competitionId),
+    ]);
 
   const { date, time } = formatDateTime(matchInfo.kickoffAtUtcMs ?? 0);
 
@@ -127,7 +129,7 @@ export default async function MatchInfoPage({ params }: Props) {
     <div className="pb-24">
       <TrackEvent
         event="Match View"
-        props={{ matchId: mid, competition: matchInfo.competition?.name ?? "" }}
+        props={{ matchId: matchInfo.id, competition: matchInfo.competition?.name ?? "" }}
       />
 
       {/* Dok utakmica traje, stranica se sama osvježava — bez F5. */}

@@ -3,6 +3,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { TrackEvent } from "@/components/analytics/TrackEvent";
 import NewsArticleHero from "@/components/features/news/NewsArticleHero";
+import JsonLdScript from "@/lib/app-shell/seo/JsonLdScript";
 import { formatDateLong } from "@/lib/helpers/date";
 import {
   fetchNewsById,
@@ -123,14 +124,8 @@ export default async function NewsDetailPage({ params }: Props) {
 
   return (
     <article className="pb-24">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
+      <JsonLdScript data={articleJsonLd} />
+      <JsonLdScript data={breadcrumbJsonLd} />
       <TrackEvent event="News Article View" props={{ title: news.title }} />
 
       <NewsArticleHero

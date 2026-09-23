@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
+import JsonLdScript from "@/lib/app-shell/seo/JsonLdScript";
 import { getCometImageUrl } from "@/lib/hns/imageUrl";
 import {
   fetchAllCompetitionMatches,
   fetchCurrentSeasonCompetitions,
 } from "@/lib/hns/competitions";
-import { fetchMatchInfo } from "@/lib/hns/matches";
+import { resolveClubMatchOr404 } from "@/lib/app-shell/routes/clubScopeRoute";
 import { formatDateTime } from "@/lib/helpers/date";
 import { getTenant } from "@/lib/payload/getTenant";
 import { BASE_URL } from "@/lib/siteUrl";
-import { buildMatchSlug, parseTrailingId } from "@/lib/helpers/slug";
+import { buildMatchSlug } from "@/lib/helpers/slug";
 import type { Match } from "@/types/hns";
 import type { PostalAddressJsonLd, SportsEventJsonLd } from "@/types/jsonld";
 
@@ -57,9 +58,7 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { matchId } = await params;
-  const match = await fetchMatchInfo({ matchId: parseTrailingId(matchId) });
-
-  if (!match) return { title: "Utakmica" };
+  const match = await resolveClubMatchOr404(matchId);
 
   const home = match.homeTeam?.name ?? "Domaćin";
   const away = match.awayTeam?.name ?? "Gost";
@@ -109,11 +108,9 @@ export default async function MatchLayout({
 
   // fetch is deduplicated with generateMetadata's call (same URL + cache key)
   const [match, tenant] = await Promise.all([
-    fetchMatchInfo({ matchId: parseTrailingId(matchId) }),
+    resolveClubMatchOr404(matchId),
     getTenant(),
   ]);
-
-  if (!match) return <>{children}</>;
 
   const home = match.homeTeam?.name ?? "Domaćin";
   const away = match.awayTeam?.name ?? "Gost";
@@ -205,16 +202,8 @@ export default async function MatchLayout({
 
   return (
     <>
-      {jsonLd && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-      )}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
+      {jsonLd && <JsonLdScript data={jsonLd} />}
+      <JsonLdScript data={breadcrumbJsonLd} />
       {children}
     </>
   );

@@ -1,6 +1,7 @@
 import { ExternalLink, Mail, MapPin, Phone } from "lucide-react";
 import type { Metadata } from "next";
 import { InkPageHero } from "@/components/layout/InkPageHero";
+import JsonLdScript from "@/lib/app-shell/seo/JsonLdScript";
 import { fetchClubDetails } from "@/lib/hns/team";
 import { getTenant } from "@/lib/payload/getTenant";
 import { BASE_URL } from "@/lib/siteUrl";
@@ -66,10 +67,7 @@ export default async function ContactPage() {
 
   return (
     <div className="bg-background">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
-      />
+      <JsonLdScript data={breadcrumb} />
 
       <InkPageHero title={["Kontakt"]} />
 

@@ -3,9 +3,11 @@ import PlayerStatsBoard, {
   type PlayerStatsData,
 } from "@/components/features/players/PlayerStatsBoard";
 import PlayerStatsHero from "@/components/features/players/PlayerStatsHero";
+import { resolveClubCompetitionOr404 } from "@/lib/app-shell/routes/clubScopeRoute";
+import JsonLdScript from "@/lib/app-shell/seo/JsonLdScript";
 import { getCometImageUrl } from "@/lib/hns/imageUrl";
 import { fetchPlayerDetails, fetchPlayerStats } from "@/lib/hns/players";
-import { fetchRoster } from "@/lib/payload/getRoster";
+import { fetchRosterEntry } from "@/lib/payload/getRoster";
 import { getTenant } from "@/lib/payload/getTenant";
 import type { MediaImage } from "@/lib/payload/types";
 import { BASE_URL } from "@/lib/siteUrl";
@@ -44,14 +46,25 @@ function getCrestSrc(logo: MediaImage | null | undefined): string {
 
 export default async function PlayerStatsPage({ params }: Props) {
   const { playerId, competitionId } = await params;
-  const personId = String(parseTrailingId(playerId));
-  const cid = parseTrailingId(competitionId);
+  const parsedPersonId = parseTrailingId(playerId);
 
-  const [playerDetails, playerStats, tenant, roster] = await Promise.all([
+  if (parsedPersonId == null) notFound();
+
+  // Samo igrači iz momčadi kluba i samo klupska natjecanja, i to prije
+  // ijednog HNS poziva po igraču: oba ida bira posjetitelj, a HNS poziv ide
+  // s ključem kluba. Provjera natjecanja je keširani popis natjecanja kluba.
+  const [rosterEntry, competition] = await Promise.all([
+    fetchRosterEntry(parsedPersonId),
+    resolveClubCompetitionOr404(competitionId),
+  ]);
+
+  if (!rosterEntry) notFound();
+  const personId = String(parsedPersonId);
+
+  const [playerDetails, playerStats, tenant] = await Promise.all([
     fetchPlayerDetails({ personId }),
-    fetchPlayerStats({ personId, competitionId: cid }),
+    fetchPlayerStats({ personId, competitionId: competition.id }),
     getTenant(),
-    fetchRoster(),
   ]);
 
   if (!playerDetails) notFound();
@@ -63,12 +76,8 @@ export default async function PlayerStatsPage({ params }: Props) {
 
   // Ista slika kao na izlistu igrača: uploadana fotka iz Payloada ima prednost
   // pred HNS ("Comet") portretom.
-  const rosterEntry = roster.find(
-    (entry) => String(entry.personId) === personId,
-  );
-
   const photoUrl =
-    rosterEntry?.photo?.url ??
+    rosterEntry.photo?.url ??
     (playerDetails.picture ? getCometImageUrl(playerDetails.picture) : null);
 
   const shirtNumber = playerDetails.shirtNumber;
@@ -146,11 +155,7 @@ export default async function PlayerStatsPage({ params }: Props) {
   return (
     <div className="bg-background pb-20 sm:pb-28">
       {jsonLd.map((schema) => (
-        <script
-          key={schema["@type"]}
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-        />
+        <JsonLdScript key={schema["@type"]} data={schema} />
       ))}
 
       <PlayerStatsHero
