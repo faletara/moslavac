@@ -20,7 +20,9 @@ import { isSuperAdmin } from './roles'
 const LOCKED_DOCUMENTS_SLUG = 'payload-locked-documents'
 
 /**
- * Read/update/delete: korisnik vidi i mijenja samo zaključavanja koja sam drži.
+ * Read/update/delete: korisnik vidi i mijenja samo zaključavanja koja sam drži;
+ * super-admin (platforma) sva. Kompromis: dva urednika istog kluba više ne
+ * vide tuđe zaključavanje u adminu (nema "dokument uređuje X" upozorenja).
  */
 export const ownLocksOnly: Access = ({ req: { user } }) => {
   if (!user) return false
@@ -103,7 +105,7 @@ export const bindLockToEditor: CollectionBeforeChangeHook = async ({
 }
 
 /** Dio sanitizirane kolekcije koji `withBoundDocumentLocks` čita i mijenja. */
-interface CollectionRules {
+interface SanitizedCollectionPart {
   slug: string
   access: Partial<Record<'read' | 'update' | 'delete', Access>>
   hooks: { beforeChange: CollectionBeforeChangeHook[] }
@@ -115,7 +117,7 @@ interface CollectionRules {
  * hook postavljaju na već sanitiziranu konfiguraciju iz `buildConfig`.
  */
 export const withBoundDocumentLocks = <
-  Config extends { collections: CollectionRules[] },
+  Config extends { collections: SanitizedCollectionPart[] },
 >(
   config: Config,
 ): Config => {
