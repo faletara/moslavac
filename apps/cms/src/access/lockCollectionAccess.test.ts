@@ -12,7 +12,7 @@ import {
   bindLockToEditor,
   ownLocksOnly,
   withBoundDocumentLocks,
-} from './lockedDocuments'
+} from './lockCollectionAccess'
 
 /** Korisnik iz baze; access i hook čitaju samo `id`, `collection` i `roles`. */
 const asUser = (id: number, roles: User['roles']): User => ({

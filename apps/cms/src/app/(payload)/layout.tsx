@@ -7,7 +7,7 @@ import { handleServerFunctions, RootLayout } from '@payloadcms/next/layouts'
 import { buildFormStateHandler } from '@payloadcms/ui/utilities/buildFormState'
 import React from 'react'
 
-import { guardFormStateLocking } from '@/access/documentLock'
+import { guardFormStateLocking } from '@/access/formStateLockGuard'
 import { importMap } from './admin/importMap.js'
 import './custom.scss'
 
@@ -16,7 +16,7 @@ type Args = {
 }
 
 // Lokalna izmjena generirane datoteke: `form-state` smije zaključati samo
-// dokument koji korisnik smije uređivati. Vidi `@/access/documentLock`.
+// dokument koji korisnik smije uređivati. Vidi `@/access/formStateLockGuard`.
 const serverFunctions = { 'form-state': guardFormStateLocking(buildFormStateHandler) }
 
 const serverFunction: ServerFunctionClient = async function (args) {

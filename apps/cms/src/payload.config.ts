@@ -7,7 +7,7 @@ import { buildConfig } from "payload";
 import { fileURLToPath } from "url";
 import sharp from "sharp";
 
-import { withBoundDocumentLocks } from "./access/lockedDocuments";
+import { withBoundDocumentLocks } from "./access/lockCollectionAccess";
 import { isSuperAdmin } from "./access/roles";
 import { CLUB_FEATURES } from "@/lib/payload/clubFeatures";
 import { BoardMembers } from "./collections/BoardMembers";

@@ -1,11 +1,6 @@
-import {
-  type Access,
-  type CollectionBeforeChangeHook,
-  type CollectionSlug,
-  Forbidden,
-  type PayloadRequest,
-} from 'payload'
+import { type Access, type CollectionBeforeChangeHook, Forbidden } from 'payload'
 import { z } from 'zod'
+import { canEditDocument } from './canEditDocument'
 import { isSuperAdmin } from './roles'
 
 /**
@@ -48,38 +43,6 @@ const lockedDocumentRef = z.object({
   ]),
 })
 
-type LockedDocumentRef = z.infer<typeof lockedDocumentRef>
-
-/**
- * Smije li korisnik iz `req` uređivati dokument. Izvršava update access
- * kolekcije (s omotačem multi-tenant plugina), a kad access vrati Where,
- * provjeri da ga dokument zadovoljava — isto kao Payloadova update operacija.
- */
-const canUpdateDocument = async (
-  req: PayloadRequest,
-  { relationTo, value: id }: LockedDocumentRef,
-): Promise<boolean> => {
-  // SAFETY: slug dolazi iz zahtjeva; nepoznat slug daje `undefined` i odbija
-  // se odmah ispod.
-  const slug = relationTo as CollectionSlug
-  const collection = req.payload.collections[slug]
-
-  if (!collection) return false
-
-  const access = await collection.config.access.update({ id, req })
-
-  if (access === true || access === false) return access
-
-  const { totalDocs } = await req.payload.count({
-    collection: slug,
-    overrideAccess: true,
-    req,
-    where: { and: [{ id: { equals: id } }, access] },
-  })
-
-  return totalDocs > 0
-}
-
 /**
  * beforeChange na create i update: zaključavanje uvijek glasi na trenutnog
  * korisnika i smije pokazivati samo na dokument koji on smije uređivati.
@@ -97,7 +60,13 @@ export const bindLockToEditor: CollectionBeforeChangeHook = async ({
   )
 
   const allowed =
-    user && document.success && (await canUpdateDocument(req, document.data))
+    user &&
+    document.success &&
+    (await canEditDocument({
+      collectionSlug: document.data.relationTo,
+      id: document.data.value,
+      req,
+    }))
 
   if (!allowed) throw new Forbidden(req.t)
 
