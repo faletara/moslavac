@@ -51,13 +51,15 @@ const matches = new Map([
   ],
 ]);
 
-function fakeHns() {
+function fakeHns({ competitionListDown = false } = {}) {
   const calls: string[] = [];
 
   const transport: HnsTransport = async (endpoint) => {
     calls.push(endpoint);
 
     if (endpoint.startsWith("/api/live/competition/list/active/42")) {
+      if (competitionListDown) throw new Error("HNS fetch failed (503)");
+
       return clubCompetitions;
     }
 
@@ -84,7 +86,7 @@ describe("fetchClubCompetition", () => {
     const hns = fakeHns();
 
     const competition = await hns.run(() =>
-      fetchClubCompetition(`4-nl-srediste-26-27-${OWN_COMPETITION}`),
+      fetchClubCompetition(OWN_COMPETITION),
     );
 
     expect(competition).toMatchObject({ id: OWN_COMPETITION });
@@ -97,7 +99,7 @@ describe("fetchClubCompetition", () => {
     const hns = fakeHns();
 
     const competition = await hns.run(() =>
-      fetchClubCompetition(`tuda-liga-${FOREIGN_COMPETITION}`),
+      fetchClubCompetition(FOREIGN_COMPETITION),
     );
 
     expect(competition).toBeNull();
@@ -105,25 +107,11 @@ describe("fetchClubCompetition", () => {
     expect(hns.calls[0]).toContain("/api/live/competition/list/active/42");
   });
 
-  it("slug bez valjanog id-ja ne dira HNS", async () => {
-    const hns = fakeHns();
-
-    for (const slug of ["sezona", "1".repeat(400), "liga-0"]) {
-      expect(await hns.run(() => fetchClubCompetition(slug))).toBeNull();
-    }
-
-    expect(hns.calls).toHaveLength(0);
-  });
-
   it("baca grešku kad popis natjecanja nije dostupan, umjesto lažnog 404", async () => {
-    const transport: HnsTransport = async () => {
-      throw new Error("HNS fetch failed (503)");
-    };
+    const hns = fakeHns({ competitionListDown: true });
 
     await expect(
-      runWithHnsContext({ transport, teamId: "42", apiKey: "test-key" }, () =>
-        fetchClubCompetition(`liga-${OWN_COMPETITION}`),
-      ),
+      hns.run(() => fetchClubCompetition(OWN_COMPETITION)),
     ).rejects.toThrow();
   });
 });
@@ -132,7 +120,7 @@ describe("fetchClubMatch", () => {
   it("utakmicu kluba vraća uz jedan HNS poziv", async () => {
     const hns = fakeHns();
 
-    const found = await hns.run(() => fetchClubMatch("nas-klub-gosti-101"));
+    const found = await hns.run(() => fetchClubMatch(101));
 
     expect(found).toMatchObject({ id: 101 });
     expect(hns.calls).toEqual(["/api/live/match/101?teamIdFilter=42"]);
@@ -141,7 +129,7 @@ describe("fetchClubMatch", () => {
   it("vraća utakmicu drugih momčadi u klupskom natjecanju", async () => {
     const hns = fakeHns();
 
-    const found = await hns.run(() => fetchClubMatch("102"));
+    const found = await hns.run(() => fetchClubMatch(102));
 
     expect(found).toMatchObject({ id: 102 });
     expect(hns.calls).toHaveLength(2);
@@ -150,7 +138,7 @@ describe("fetchClubMatch", () => {
   it("vraća utakmicu iz podnatjecanja klupske lige", async () => {
     const hns = fakeHns();
 
-    expect(await hns.run(() => fetchClubMatch("103"))).toMatchObject({
+    expect(await hns.run(() => fetchClubMatch(103))).toMatchObject({
       id: 103,
     });
   });
@@ -158,7 +146,7 @@ describe("fetchClubMatch", () => {
   it("tuđu utakmicu odbija nakon dohvata utakmice i popisa natjecanja", async () => {
     const hns = fakeHns();
 
-    const found = await hns.run(() => fetchClubMatch("tuda-utakmica-5000"));
+    const found = await hns.run(() => fetchClubMatch(5000));
 
     expect(found).toBeNull();
     expect(hns.calls).toEqual([
@@ -170,17 +158,7 @@ describe("fetchClubMatch", () => {
   it("nepostojeća utakmica košta jedan HNS poziv", async () => {
     const hns = fakeHns();
 
-    expect(await hns.run(() => fetchClubMatch("utakmica-777"))).toBeNull();
+    expect(await hns.run(() => fetchClubMatch(777))).toBeNull();
     expect(hns.calls).toHaveLength(1);
-  });
-
-  it("slug bez valjanog id-ja ne dira HNS", async () => {
-    const hns = fakeHns();
-
-    for (const slug of ["utakmica", `x-${"9".repeat(20)}`, "abc-123-def"]) {
-      expect(await hns.run(() => fetchClubMatch(slug))).toBeNull();
-    }
-
-    expect(hns.calls).toHaveLength(0);
   });
 });

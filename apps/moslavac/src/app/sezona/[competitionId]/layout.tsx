@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { fetchClubCompetition } from "@/lib/hns/clubScope";
 import { fetchCurrentSeasonCompetitions } from "@/lib/hns/competitions";
 import { BASE_URL } from "@/lib/siteUrl";
-import { buildCompetitionSlug } from "@/lib/helpers/slug";
+import { buildCompetitionSlug, parseTrailingId } from "@/lib/helpers/slug";
 import { seasonTag } from "@/lib/season";
 import SeasonLayoutClient from "./SeasonLayoutClient";
 
@@ -25,7 +25,8 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { competitionId } = await params;
-  const competition = await fetchClubCompetition(competitionId);
+  const cid = parseTrailingId(competitionId);
+  const competition = cid == null ? null : await fetchClubCompetition(cid);
 
   if (!competition) notFound();
   const name = competition.name;
@@ -56,7 +57,8 @@ export default async function SeasonLayout({
 }) {
   const { competitionId } = await params;
   // Tuđe natjecanje završava ovdje, prije ikakvog fan-outa na HNS.
-  const competition = await fetchClubCompetition(competitionId);
+  const cid = parseTrailingId(competitionId);
+  const competition = cid == null ? null : await fetchClubCompetition(cid);
 
   if (!competition) notFound();
 

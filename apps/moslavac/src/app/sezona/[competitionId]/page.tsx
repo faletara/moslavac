@@ -3,7 +3,7 @@ import MatchesList from "@/components/features/competition/MatchesList";
 import { redirectToCanonical } from "@/lib/helpers/canonical";
 import { fetchClubCompetition } from "@/lib/hns/clubScope";
 import { fetchCompetitionMatches } from "@/lib/hns/competitions";
-import { buildCompetitionSlug } from "@/lib/helpers/slug";
+import { buildCompetitionSlug, parseTrailingId } from "@/lib/helpers/slug";
 
 interface Props {
   params: Promise<{ competitionId: string }>;
@@ -13,7 +13,8 @@ export const revalidate = 180;
 
 export default async function CompetitionMatchesPage({ params }: Props) {
   const { competitionId } = await params;
-  const competition = await fetchClubCompetition(competitionId);
+  const cid = parseTrailingId(competitionId);
+  const competition = cid == null ? null : await fetchClubCompetition(cid);
 
   if (!competition) notFound();
 

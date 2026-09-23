@@ -25,8 +25,7 @@ export async function generateMetadata({
   if (personId == null || cid == null) notFound();
 
   // Natjecanje se čita iz igračeve statistike (isti HNS URL kao na stranici),
-  // ne iz `fetchCompetitionInfo`: id natjecanja iz URL-a tako nikad ne
-  // postaje HNS putanja.
+  // pa id natjecanja iz URL-a nikad ne postaje HNS putanja.
   const [playerResult, statsResult] = await Promise.allSettled([
     fetchPlayerDetails({ personId: String(personId) }),
     fetchPlayerStats({ personId: String(personId), competitionId: cid }),

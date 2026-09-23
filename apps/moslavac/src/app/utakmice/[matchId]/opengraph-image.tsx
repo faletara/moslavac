@@ -4,6 +4,7 @@ import { formatDateTime } from "@/lib/helpers/date";
 import { loadGoogleFont } from "@/lib/helpers/googleFont";
 import { fetchClubMatch } from "@/lib/hns/clubScope";
 import { fetchHnsCrestDataUri } from "@/lib/hns/images";
+import { parseTrailingId } from "@/lib/helpers/slug";
 
 export const size = { width: 1200, height: 630 };
 
@@ -62,7 +63,8 @@ export default async function MatchOgImage({
 }) {
   const { matchId } = await params;
   // Tuđa ili nepostojeća utakmica: 404 prije grbova i fontova.
-  const match = await fetchClubMatch(matchId);
+  const id = parseTrailingId(matchId);
+  const match = id == null ? null : await fetchClubMatch(id);
 
   if (!match) notFound();
 

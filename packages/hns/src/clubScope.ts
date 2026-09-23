@@ -1,6 +1,5 @@
 import "server-only";
-import { parseTrailingId } from "@/lib/helpers/slug";
-import type { Competition, Match } from "@/types/hns";
+import type { ClubCompetition, ClubMatch, Competition } from "@/types/hns";
 import { getHnsTeamId } from "./client";
 import { fetchCurrentSeasonCompetitionsResult } from "./competitions";
 import { fetchMatchInfo } from "./matches";
@@ -9,8 +8,8 @@ import { fetchMatchInfo } from "./matches";
 // `/raspored-i-rezultati/*`). The id in the URL is visitor-chosen, and every
 // HNS call goes out with the club's API key. The competition and match pages
 // fan out per team (standings, scorers, cards, paged match lists), so an id
-// must belong to the club before any of that runs. Routes call these
-// resolvers and `notFound()` on null.
+// must belong to the club before any of that runs. Routes parse the id from
+// the slug (`parseTrailingId`), call these resolvers, and `notFound()` on null.
 //
 // The membership data is the club's current-season competition list: one
 // HNS URL, cached for an hour and already fetched by every page's shell.
@@ -38,22 +37,15 @@ function competitionIds(competitions: Competition[]): Set<number> {
   return ids;
 }
 
-/** A club competition as resolved from a route: its id is always known. */
-export type ClubCompetition = Competition & { id: number };
-
 /**
- * The club's competition named by a `/sezona/[competitionId]` slug, or null
- * for a junk slug or a competition the club does not play this season.
- * Costs the one cached competition-list call; the entry doubles as the
- * competition info, so routes need no separate `fetchCompetitionInfo`.
+ * The club's competition with this id, or null for a competition the club
+ * does not play this season. Costs the one cached competition-list call; the
+ * list entry carries the competition's name, so routes need no separate
+ * per-id competition fetch.
  */
 export async function fetchClubCompetition(
-  slug: string,
+  id: number,
 ): Promise<ClubCompetition | null> {
-  const id = parseTrailingId(slug);
-
-  if (id == null) return null;
-
   const competitions = await fetchClubCompetitions();
 
   return (
@@ -62,26 +54,23 @@ export async function fetchClubCompetition(
 }
 
 /**
- * The match named by a match-route slug, or null for a junk slug, an unknown
- * id, or a match outside the club's scope. In scope: every match the club
- * plays (any season), and any match in the club's current competitions,
- * which the league pages link to.
+ * The match with this id, or null for an unknown id or a match outside the
+ * club's scope. In scope: every match the club plays (any season), and any
+ * match in the club's current competitions, which the league pages link to.
  *
  * Costs one HNS call (the match itself, which the page needs anyway). Only a
  * match the club does not play adds the cached competition-list call.
  */
-export async function fetchClubMatch(slug: string): Promise<Match | null> {
-  const matchId = parseTrailingId(slug);
-
-  if (matchId == null) return null;
-
-  const [match, teamId] = await Promise.all([
+export async function fetchClubMatch(
+  matchId: number,
+): Promise<ClubMatch | null> {
+  const [info, teamId] = await Promise.all([
     fetchMatchInfo({ matchId }),
     getHnsTeamId(),
   ]);
 
-  if (!match) return null;
-
+  if (info?.id !== matchId) return null;
+  const match: ClubMatch = { ...info, id: matchId };
   const clubTeamId = Number(teamId);
 
   if (match.homeTeam?.id === clubTeamId || match.awayTeam?.id === clubTeamId) {

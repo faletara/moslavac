@@ -5,7 +5,7 @@ import { redirectToCanonical } from "@/lib/helpers/canonical";
 import { fetchClubCompetition } from "@/lib/hns/clubScope";
 import { fetchTeamStandings } from "@/lib/hns/standings";
 import { BASE_URL } from "@/lib/siteUrl";
-import { buildCompetitionSlug } from "@/lib/helpers/slug";
+import { buildCompetitionSlug, parseTrailingId } from "@/lib/helpers/slug";
 
 interface Props {
   params: Promise<{ competitionId: string }>;
@@ -13,7 +13,8 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { competitionId } = await params;
-  const competition = await fetchClubCompetition(competitionId);
+  const cid = parseTrailingId(competitionId);
+  const competition = cid == null ? null : await fetchClubCompetition(cid);
 
   if (!competition) notFound();
   const slug = buildCompetitionSlug(competition);
@@ -28,7 +29,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function CompetitionStandingsPage({ params }: Props) {
   const { competitionId } = await params;
-  const competition = await fetchClubCompetition(competitionId);
+  const cid = parseTrailingId(competitionId);
+  const competition = cid == null ? null : await fetchClubCompetition(cid);
 
   if (!competition) notFound();
 

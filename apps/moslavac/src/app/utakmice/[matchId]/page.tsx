@@ -19,7 +19,8 @@ import {
 import { formatDateTime } from "@/lib/helpers/date";
 import { redirectToCanonical } from "@/lib/helpers/canonical";
 import { BASE_URL } from "@/lib/siteUrl";
-import { buildMatchSlug } from "@/lib/helpers/slug";
+import { buildMatchSlug, parseTrailingId } from "@/lib/helpers/slug";
+import type { CompetitionPlayerStat, Match, TeamRanking } from "@/types/hns";
 
 interface Props {
   params: Promise<{ matchId: string }>;
@@ -29,7 +30,8 @@ export const revalidate = 30;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { matchId } = await params;
-  const matchInfo = await fetchClubMatch(matchId);
+  const mid = parseTrailingId(matchId);
+  const matchInfo = mid == null ? null : await fetchClubMatch(mid);
 
   if (!matchInfo) notFound();
 
@@ -72,14 +74,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+/** Standings, all matches and scorers of the match's competition; empty without one. */
+async function fetchCompetitionTabs(
+  competitionId: number | null,
+): Promise<[TeamRanking[], Match[], CompetitionPlayerStat[]]> {
+  if (competitionId == null) return [[], [], []];
+
+  return Promise.all([
+    fetchTeamStandings({ competitionId }),
+    fetchAllCompetitionMatches({ competitionId }),
+    fetchAllCompetitionScorers({ competitionId }),
+  ]);
+}
+
 export default async function MatchInfoPage({ params }: Props) {
   const { matchId } = await params;
   // Tuđa utakmica završava ovdje: bez događaja, postava, tablice i fan-outa
   // strijelaca po momčadima natjecanja.
-  const matchInfo = await fetchClubMatch(matchId);
+  const mid = parseTrailingId(matchId);
+  const matchInfo = mid == null ? null : await fetchClubMatch(mid);
 
-  if (matchInfo?.id == null) notFound();
-  const mid = matchInfo.id;
+  if (!matchInfo) notFound();
 
   // Collapse numeric/partial-slug duplicates onto the canonical slug URL.
   redirectToCanonical(
@@ -92,21 +107,13 @@ export default async function MatchInfoPage({ params }: Props) {
   // in parallel.
   const competitionId = matchInfo.competition?.id ?? null;
 
-  const [
-    events,
-    lineups,
-    refereeData,
-    standings,
-    competitionMatches,
-    scorers,
-  ] = await Promise.all([
-    fetchMatchEvents({ matchId: mid }),
-    fetchMatchLineups({ matchId: mid }),
-    fetchMatchReferees({ matchId: mid }),
-    competitionId != null ? fetchTeamStandings({ competitionId }) : [],
-    competitionId != null ? fetchAllCompetitionMatches({ competitionId }) : [],
-    competitionId != null ? fetchAllCompetitionScorers({ competitionId }) : [],
-  ]);
+  const [events, lineups, refereeData, [standings, competitionMatches, scorers]] =
+    await Promise.all([
+      fetchMatchEvents({ matchId: matchInfo.id }),
+      fetchMatchLineups({ matchId: matchInfo.id }),
+      fetchMatchReferees({ matchId: matchInfo.id }),
+      fetchCompetitionTabs(competitionId),
+    ]);
 
   const { date, time } = formatDateTime(matchInfo.kickoffAtUtcMs ?? 0);
 
@@ -129,7 +136,7 @@ export default async function MatchInfoPage({ params }: Props) {
     <div className="pb-24">
       <TrackEvent
         event="Match View"
-        props={{ matchId: mid, competition: matchInfo.competition?.name ?? "" }}
+        props={{ matchId: matchInfo.id, competition: matchInfo.competition?.name ?? "" }}
       />
 
       {/* Dok utakmica traje, stranica se sama osvježava — bez F5. */}

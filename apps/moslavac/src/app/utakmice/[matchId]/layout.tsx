@@ -9,7 +9,7 @@ import { fetchClubMatch } from "@/lib/hns/clubScope";
 import { formatDateTime } from "@/lib/helpers/date";
 import { getTenant } from "@/lib/payload/getTenant";
 import { BASE_URL } from "@/lib/siteUrl";
-import { buildMatchSlug } from "@/lib/helpers/slug";
+import { buildMatchSlug, parseTrailingId } from "@/lib/helpers/slug";
 import type { Match } from "@/types/hns";
 import type { PostalAddressJsonLd, SportsEventJsonLd } from "@/types/jsonld";
 
@@ -58,7 +58,8 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { matchId } = await params;
-  const match = await fetchClubMatch(matchId);
+  const mid = parseTrailingId(matchId);
+  const match = mid == null ? null : await fetchClubMatch(mid);
 
   if (!match) notFound();
 
@@ -107,10 +108,13 @@ export default async function MatchLayout({
   params: Promise<Params>;
 }) {
   const { matchId } = await params;
+  const mid = parseTrailingId(matchId);
+
+  if (mid == null) notFound();
 
   // fetch is deduplicated with generateMetadata's call (same URL + cache key)
   const [match, tenant] = await Promise.all([
-    fetchClubMatch(matchId),
+    fetchClubMatch(mid),
     getTenant(),
   ]);
 

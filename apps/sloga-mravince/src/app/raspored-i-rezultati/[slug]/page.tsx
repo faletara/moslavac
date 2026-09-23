@@ -20,7 +20,7 @@ import { isFinished, isLive } from "@/lib/hns/matchStatus";
 import { fetchTeamStandings } from "@/lib/hns/standings";
 import { getTenant } from "@/lib/payload/getTenant";
 import { BASE_URL } from "@/lib/siteUrl";
-import { buildMatchSlug } from "@/lib/helpers/slug";
+import { buildMatchSlug, parseTrailingId } from "@/lib/helpers/slug";
 import type { Match } from "@/types/hns";
 import type {
   JsonLdNode,
@@ -77,7 +77,8 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const match = await fetchClubMatch(slug);
+  const id = parseTrailingId(slug);
+  const match = id == null ? null : await fetchClubMatch(id);
 
   if (!match) notFound();
 
@@ -106,10 +107,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function MatchPage({ params }: Props) {
   const { slug } = await params;
   // Tuđa utakmica završava ovdje: bez događaja, postava i tablice.
-  const match = await fetchClubMatch(slug);
+  const id = parseTrailingId(slug);
+  const match = id == null ? null : await fetchClubMatch(id);
 
-  if (match?.id == null) notFound();
-  const matchId = match.id;
+  if (!match) notFound();
 
   // Collapse the bare-id and partial-slug forms onto the canonical URL, so the
   // same match isn't indexed under several addresses.
@@ -118,14 +119,15 @@ export default async function MatchPage({ params }: Props) {
     `/raspored-i-rezultati/${buildMatchSlug(match)}`,
   );
 
-  // Keyed off the match's own competition, so it can only start once the match
-  // resolves. Cup ties have no table — an empty list simply hides the tab.
+  // Match detail plus the table of the match's own competition. It all waits
+  // for the club-scope check above, then runs in parallel. Cup ties have no
+  // table — an empty list simply hides the tab.
   const competitionId = match.competition?.id ?? null;
 
   const [events, lineups, info, standings] = await Promise.all([
-    fetchMatchEvents({ matchId }),
-    fetchMatchLineups({ matchId }),
-    fetchMatchReferees({ matchId }),
+    fetchMatchEvents({ matchId: match.id }),
+    fetchMatchLineups({ matchId: match.id }),
+    fetchMatchReferees({ matchId: match.id }),
     competitionId != null ? fetchTeamStandings({ competitionId }) : [],
   ]);
 
