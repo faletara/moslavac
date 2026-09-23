@@ -10,9 +10,9 @@ import {
   fetchAllCompetitionMatches,
   fetchCurrentSeasonCompetitions,
 } from "@/lib/hns/competitions";
+import { fetchClubMatch } from "@/lib/hns/clubScope";
 import {
   fetchMatchEvents,
-  fetchMatchInfo,
   fetchMatchLineups,
   fetchMatchReferees,
 } from "@/lib/hns/matches";
@@ -20,7 +20,7 @@ import { isFinished, isLive } from "@/lib/hns/matchStatus";
 import { fetchTeamStandings } from "@/lib/hns/standings";
 import { getTenant } from "@/lib/payload/getTenant";
 import { BASE_URL } from "@/lib/siteUrl";
-import { buildMatchSlug, parseTrailingId } from "@/lib/helpers/slug";
+import { buildMatchSlug } from "@/lib/helpers/slug";
 import type { Match } from "@/types/hns";
 import type {
   JsonLdNode,
@@ -77,12 +77,9 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const matchId = parseTrailingId(slug);
+  const match = await fetchClubMatch(slug);
 
-  if (matchId == null) notFound();
-  const match = await fetchMatchInfo({ matchId });
-
-  if (!match) return {};
+  if (!match) notFound();
 
   const title = matchTitle(match);
 
@@ -108,18 +105,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function MatchPage({ params }: Props) {
   const { slug } = await params;
-  const matchId = parseTrailingId(slug);
+  // Tuđa utakmica završava ovdje: bez događaja, postava i tablice.
+  const match = await fetchClubMatch(slug);
 
-  if (matchId == null) notFound();
-
-  const [match, events, lineups, info] = await Promise.all([
-    fetchMatchInfo({ matchId }),
-    fetchMatchEvents({ matchId }),
-    fetchMatchLineups({ matchId }),
-    fetchMatchReferees({ matchId }),
-  ]);
-
-  if (!match) notFound();
+  if (match?.id == null) notFound();
+  const matchId = match.id;
 
   // Collapse the bare-id and partial-slug forms onto the canonical URL, so the
   // same match isn't indexed under several addresses.
@@ -132,8 +122,12 @@ export default async function MatchPage({ params }: Props) {
   // resolves. Cup ties have no table — an empty list simply hides the tab.
   const competitionId = match.competition?.id ?? null;
 
-  const standings =
-    competitionId != null ? await fetchTeamStandings({ competitionId }) : [];
+  const [events, lineups, info, standings] = await Promise.all([
+    fetchMatchEvents({ matchId }),
+    fetchMatchLineups({ matchId }),
+    fetchMatchReferees({ matchId }),
+    competitionId != null ? fetchTeamStandings({ competitionId }) : [],
+  ]);
 
   const live = isLive(match);
   const started = live || isFinished(match);

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { fetchCompetitionInfo } from "@/lib/hns/competitions";
-import { fetchPlayerDetails } from "@/lib/hns/players";
+import { fetchPlayerDetails, fetchPlayerStats } from "@/lib/hns/players";
 import { BASE_URL } from "@/lib/siteUrl";
 import {
   buildCompetitionSlug,
@@ -25,16 +24,21 @@ export async function generateMetadata({
 
   if (personId == null || cid == null) notFound();
 
-  const [playerResult, competitionResult] = await Promise.allSettled([
+  // Natjecanje se čita iz igračeve statistike (isti HNS URL kao na stranici),
+  // ne iz `fetchCompetitionInfo`: id natjecanja iz URL-a tako nikad ne
+  // postaje HNS putanja.
+  const [playerResult, statsResult] = await Promise.allSettled([
     fetchPlayerDetails({ personId: String(personId) }),
-    fetchCompetitionInfo({ competitionId: cid }),
+    fetchPlayerStats({ personId: String(personId), competitionId: cid }),
   ]);
 
   const player =
     playerResult.status === "fulfilled" ? playerResult.value : null;
 
   const competition =
-    competitionResult.status === "fulfilled" ? competitionResult.value : null;
+    statsResult.status === "fulfilled"
+      ? (statsResult.value?.competition ?? null)
+      : null;
 
   const playerName = player?.name ?? null;
   const competitionName = competition?.name ?? null;

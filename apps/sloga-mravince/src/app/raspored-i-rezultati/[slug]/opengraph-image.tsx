@@ -2,9 +2,8 @@ import { notFound } from "next/navigation";
 import { ImageResponse } from "next/og";
 import { formatDateTime } from "@/lib/helpers/date";
 import { loadGoogleFont } from "@/lib/helpers/googleFont";
+import { fetchClubMatch } from "@/lib/hns/clubScope";
 import { fetchHnsCrestDataUri } from "@/lib/hns/images";
-import { fetchMatchInfo } from "@/lib/hns/matches";
-import { parseTrailingId } from "@/lib/helpers/slug";
 
 export const size = { width: 1200, height: 630 };
 
@@ -56,32 +55,10 @@ export default async function MatchOgImage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const matchId = parseTrailingId(slug);
+  // Tuđa ili nepostojeća utakmica: 404 prije grbova i fontova.
+  const match = await fetchClubMatch(slug);
 
-  if (matchId == null) notFound();
-  const match = await fetchMatchInfo({ matchId });
-
-  if (!match) {
-    return new ImageResponse(
-      (
-        <div
-          style={{
-            width: "100%",
-            height: "100%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            background: INK,
-            color: "#ffffff",
-            fontSize: 56,
-          }}
-        >
-          HNK Sloga Mravince
-        </div>
-      ),
-      { ...size },
-    );
-  }
+  if (!match) notFound();
 
   const [homeCrest, awayCrest, anton] = await Promise.all([
     fetchHnsCrestDataUri(match.homeTeam?.picture),
