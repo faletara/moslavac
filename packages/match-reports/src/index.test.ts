@@ -45,13 +45,13 @@ const EVENTS: HnsMatchEvent[] = [
 
 /** Vraća stranične liste za `/matches/paginated/...` i detalj za `/match/:id`. */
 const transport =
-  (matches: HnsMatch[], events = EVENTS): HnsTransport =>
+  (matches: HnsMatch[], events = EVENTS, future: HnsMatch[] = []): HnsTransport =>
   async (endpoint) => {
     if (endpoint.includes("/matches/paginated/past"))
       return { result: matches };
 
     if (endpoint.includes("/matches/paginated/future"))
-      return { result: [] };
+      return { result: future };
 
     if (endpoint.includes("/events")) return events;
 
@@ -195,6 +195,38 @@ describe("publishMatchReports", () => {
     );
 
     expect(summary.published).toEqual([]);
+  });
+
+  it("sljedeći protivnik je seniorski, ne omladinski", async () => {
+    const { store, created } = memoryStore();
+
+    const upcoming = (id: number, day: number, competition: string, away: string) =>
+      match({
+        id,
+        dateTimeUTC: Date.UTC(2026, 8, day, 14, 0, 0),
+        liveStatus: "NOT_STARTED",
+        // SAFETY: fixture nosi samo ime i id; ostatak HNS-ove strukture test ne dira.
+        awayTeam: { id, name: away } as HnsMatch["awayTeam"],
+        // SAFETY: fixture nosi samo ime i id; ostatak HNS-ove strukture test ne dira.
+        competition: { id, name: competition } as HnsMatch["competition"],
+      });
+
+    await runWithHnsContext(
+      {
+        transport: transport([match()], EVENTS, [
+          upcoming(20, 2, "1. HNL juniori 26/27", "RNK Split 1912"),
+          upcoming(21, 5, "Treća NL Jug 26/27", "HNK Primorac (BNM)"),
+        ]),
+        teamId: "1",
+        apiKey: "k",
+      },
+      () => publishMatchReports({ writer: templateWriter, store, now: NOW }),
+    );
+
+    const closing = created[0].paragraphs.at(-1);
+
+    expect(closing).toContain("HNK Primorac (BNM)");
+    expect(closing).not.toContain("RNK Split 1912");
   });
 
   it("greška na jednoj utakmici ne ruši obradu", async () => {

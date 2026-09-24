@@ -77,8 +77,9 @@ function hasUsableEvents(facts: MatchFacts): boolean {
 }
 
 /**
- * Prva sljedeća utakmica kluba nakon ove. Kod izvještaja objavljenog danima
- * poslije, „sljedeća” je prva koja tek dolazi — ne ona odmah iza u rasporedu.
+ * Prva sljedeća seniorska utakmica kluba nakon ove. Kod izvještaja objavljenog
+ * danima poslije, „sljedeća” je prva koja tek dolazi — ne ona odmah iza u
+ * rasporedu. Raspored nosi sve uzraste, pa bez filtra juniori ispadnu protivnik.
  */
 async function fetchNextMatch(
   match: Match,
@@ -87,7 +88,10 @@ async function fetchNextMatch(
   const upcoming = await fetchUpcomingMatches();
 
   const next = upcoming.find(
-    (m) => m.kickoffAtUtcMs != null && m.kickoffAtUtcMs > (match.kickoffAtUtcMs ?? 0),
+    (m) =>
+      isSeniorMatch(m) &&
+      m.kickoffAtUtcMs != null &&
+      m.kickoffAtUtcMs > (match.kickoffAtUtcMs ?? 0),
   );
 
   if (!next?.kickoffAtUtcMs) return null;
