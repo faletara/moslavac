@@ -181,10 +181,40 @@ function playerProblems(text: string, facts: MatchFacts): string[] {
 }
 
 /**
+ * Sljedećeg protivnika sad piše model, pa provjera mora uhvatiti kad ga
+ * ispusti — izostavljanje nije laž, ali podatak nestane. Traži se vrijeme i
+ * korijen najduže riječi iz imena. Korijen je kraći za dva slova jer hrvatski
+ * zna izbaciti i samoglasnik („Primorac” → „Primorcem”).
+ */
+function nextMatchProblems(text: string, facts: MatchFacts): string[] {
+  const next = facts.nextMatch;
+
+  if (!next) return [];
+
+  const problems: string[] = [];
+
+  const longest = next.opponent
+    .split(/[^\p{L}]+/u)
+    .reduce((a, b) => (b.length > a.length ? b : a), "");
+
+  const stem = longest.slice(0, Math.max(4, longest.length - 2));
+
+  if (stem && !mentions(text, stem)) {
+    problems.push(`nedostaje sljedeći protivnik ${next.opponent}`);
+  }
+
+  if (!text.includes(next.time)) {
+    problems.push(`nedostaje vrijeme sljedeće utakmice ${next.time}`);
+  }
+
+  return problems;
+}
+
+/**
  * Provjera prije objave. Nema urednika koji bi uhvatio grešku (vidi ADR 0002),
- * pa brojevi moraju proći kroz kod. Provjeravamo četvero: točan rezultat, sve
- * golove i crvene kartone poimence, točan broj žutih kartona, i da tekst ne
- * spominje minutu koje u činjenicama nema.
+ * pa brojevi moraju proći kroz kod. Provjeravamo petero: točan rezultat, sve
+ * golove i crvene kartone poimence, točan broj žutih kartona, sljedećeg
+ * protivnika, i da tekst ne spominje minutu koje u činjenicama nema.
  */
 export function verifyReport(
   paragraphs: string[],
@@ -208,6 +238,8 @@ export function verifyReport(
   problems.push(...playerProblems(text, facts));
 
   problems.push(...yellowCardProblems(text, facts));
+
+  problems.push(...nextMatchProblems(text, facts));
 
   // Minute svih događaja su dopuštene, i onih koje tekst ne mora spomenuti —
   // model smije istaknuti pojedini žuti karton, samo ga ne smije izmisliti.

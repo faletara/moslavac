@@ -105,6 +105,30 @@ describe("openAiWriter", () => {
     expect(input).toContain("Stadion Glavica");
   });
 
+  it("šalje sljedećeg protivnika — model ga piše svojim riječima", async () => {
+    const { client, create } = fakeClient("Tekst.");
+
+    await openAiWriter({ apiKey: "sk-test", client })({
+      ...facts,
+      nextMatch: {
+        opponent: "NK Vodice",
+        atHome: false,
+        dateLong: "26. rujna 2026.",
+        time: "16:30",
+      },
+    });
+
+    // SAFETY: `create.mock.calls` je netipiziran, a ovaj test sam gradi ulaz
+    // koji je proslijeđen, pa zna da je string.
+    const input = JSON.parse(create.mock.calls[0][0].input as string);
+    expect(input.sljedecaUtakmica).toEqual({
+      protivnik: "NK Vodice",
+      gdje: "u gostima",
+      datum: "26. rujna 2026.",
+      vrijeme: "16:30",
+    });
+  });
+
   it("žute kartone šalje kao zbrojeve, ne kao popis imena", async () => {
     const { client, create } = fakeClient("Tekst.");
 

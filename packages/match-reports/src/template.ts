@@ -192,10 +192,9 @@ function cards(facts: MatchFacts): string {
 }
 
 /**
- * Kontekst nakon utakmice: sljedeći protivnik. Ovo NE piše model. Prepuštanje
- * modelu značilo je da podatak povremeno nestane — a nestao podatak provjera
- * ne hvata, jer izostavljanje nije laž. Zato ga kod uvijek dopiše sam, uvijek
- * jednako i uvijek točno.
+ * Kontekst nakon utakmice: sljedeći protivnik, šablonskim riječima. Model ga
+ * piše svojim riječima; ako ga ispusti, `verifyReport` odbije tekst i ova
+ * rečenica dođe sa šablonom.
  *
  * Mjesto na tablici je namjerno izbačeno: pozicija se mijenja svakim kolom, a
  * novost stoji u arhivi zauvijek, pa bi tvrdnja ubrzo bila netočna.
@@ -220,6 +219,10 @@ export const templateWriter: MatchReportWriter = async (facts) => {
   const cardsText = cards(facts);
 
   if (cardsText) paragraphs.push(cardsText);
+
+  const closing = aftermathParagraph(facts);
+
+  if (closing) paragraphs.push(closing);
 
   return paragraphs;
 };

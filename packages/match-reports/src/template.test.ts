@@ -171,6 +171,12 @@ describe("aftermathParagraph", () => {
     expect(aftermathParagraph(home)).toContain("Sljedeći protivnik kod kuće:");
   });
 
+  it("šablona ga dopiše kao zadnji odlomak", async () => {
+    const paragraphs = await templateWriter(withContext);
+
+    expect(paragraphs.at(-1)).toBe(aftermathParagraph(withContext));
+  });
+
   it("prazan je kad HNS nema raspored", () => {
     expect(aftermathParagraph(facts())).toBe("");
   });

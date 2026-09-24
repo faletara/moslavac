@@ -10,11 +10,7 @@ import {
 import { isFinished } from "@/lib/hns/matchStatus";
 import type { Match } from "@/types/hns";
 import { toMatchFacts, type MatchFacts, type NextMatchFact } from "./facts";
-import {
-  aftermathParagraph,
-  templateTitle,
-  type MatchReportWriter,
-} from "./template";
+import { templateTitle, type MatchReportWriter } from "./template";
 
 export type { MatchFacts, FactEvent, NextMatchFact } from "./facts";
 
@@ -188,13 +184,11 @@ export async function publishMatchReports(
 
       const facts: MatchFacts = { ...base, nextMatch };
 
-      // Zadnji odlomak nije model — vidi `aftermathParagraph`.
-      const written = await opts.writer(facts);
-      const closing = aftermathParagraph(facts);
+      const paragraphs = await opts.writer(facts);
 
       await opts.store.create({
         title: templateTitle(facts),
-        paragraphs: closing ? [...written, closing] : written,
+        paragraphs,
         publishedAt: new Date(facts.kickoffAtUtcMs),
         sourceMatchId: matchId,
         matchSlug: facts.matchSlug,

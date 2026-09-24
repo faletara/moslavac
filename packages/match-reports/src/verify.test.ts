@@ -272,3 +272,31 @@ describe("imena igrača u živoj rečenici", () => {
     );
   });
 });
+
+describe("sljedeći protivnik", () => {
+  const withNext: MatchFacts = {
+    ...facts,
+    nextMatch: {
+      opponent: "HNK Primorac (BNM)",
+      atHome: false,
+      dateLong: "5. rujna 2026.",
+      time: "16:30",
+    },
+  };
+
+  it("prihvaća protivnika u padežu", () => {
+    const text = [
+      ...good,
+      "Sloga iduće gostuje kod Primorca, 5. rujna u 16:30.",
+    ];
+
+    expect(verifyReport(text, withNext)).toEqual({ ok: true, problems: [] });
+  });
+
+  it("odbija tekst koji je ispustio sljedećeg protivnika", () => {
+    expect(verifyReport(good, withNext).problems).toEqual([
+      "nedostaje sljedeći protivnik HNK Primorac (BNM)",
+      "nedostaje vrijeme sljedeće utakmice 16:30",
+    ]);
+  });
+});
