@@ -1,200 +1,19 @@
+"use client";
+
+import { ArrowDown, ArrowUp } from "lucide-react";
 import { HnsCrest } from "@/components/HnsCrest";
+import { useOurTeamId } from "@/components/providers/TenantProvider";
 import { cn } from "@/lib/utils";
-import type {
-  Match,
-  MatchEvent,
-  MatchEventKind,
-  Team,
-} from "@/types/hns";
+import type { Match, MatchEvent } from "@/types/hns";
 import { EventIcon } from "./EventIcon";
-
-/** Događaji koje tijek prikazuje. Ostalo (statistika, komentari) se izostavlja. */
-const SHOWN: MatchEventKind[] = ["goal", "own-goal", "yellow", "red", "sub"];
-
-/**
- * HNS ne šalje "početak" i "kraj" kao imenovane tipove — šalje ih kao događaje
- * s PRAZNIM imenom tipa. Bez njih tijek počinje usred igre i nikad ne završava.
- */
-function isBoundary(event: MatchEvent): boolean {
-  return !event.type?.name?.trim();
-}
-
-/**
- * Which boundary is a start and which is an end CANNOT be read off the minute:
- * HNS is inconsistent about it. One match reports the end of the first half with
- * `minute: null`, the next reports it as `minute: 45`. What does hold is the
- * order within a phase — a phase's first boundary opens it, its last closes it.
- */
-function boundaryRoles(events: MatchEvent[]): Map<MatchEvent, "start" | "end"> {
-  const byPhase = new Map<string, MatchEvent[]>();
-
-  for (const event of events) {
-    if (!isBoundary(event)) continue;
-    const phase = event.phase?.code ?? event.phase?.name ?? "";
-    const list = byPhase.get(phase) ?? [];
-    list.push(event);
-    byPhase.set(phase, list);
-  }
-
-  const roles = new Map<MatchEvent, "start" | "end">();
-
-  for (const list of byPhase.values()) {
-    const ordered = [...list].sort(
-      (a, b) => (a.orderNumber ?? 0) - (b.orderNumber ?? 0),
-    );
-
-    const first = ordered[0];
-    const last = ordered[ordered.length - 1];
-
-    if (first) roles.set(first, "start");
-
-    if (last && last !== first) roles.set(last, "end");
-  }
-
-  return roles;
-}
-
-interface EventRow {
-  kind: "event";
-  key: string;
-  minute: string;
-  eventKind: MatchEventKind;
-  player: string;
-  detail: string | null;
-  team: Team | null;
-}
-
-interface MarkerRow {
-  kind: "marker";
-  key: string;
-  label: string;
-  score: string | null;
-}
-
-type Row = EventRow | MarkerRow;
-
-interface Sortable {
-  row: Row;
-  phase: number;
-  /** 0 = phase start marker, 1 = play, 2 = phase end marker. */
-  tier: number;
-  minute: number;
-  stoppage: number;
-  order: number;
-}
-
-function scoreLine(home: number | null, away: number | null): string | null {
-  return home != null && away != null ? `${home}:${away}` : null;
-}
-
-function buildRows(match: Match, events: MatchEvent[]): Row[] {
-  const roles = boundaryRoles(events);
-
-  // Phases ranked by first appearance — no hardcoded list, so extra time and
-  // penalties fall into place behind the two halves without being named here.
-  const phaseRank = new Map<string, number>();
-
-  for (const event of events) {
-    const phase = event.phase?.code ?? event.phase?.name ?? "";
-
-    if (!phaseRank.has(phase)) phaseRank.set(phase, phaseRank.size);
-  }
-
-  const endBoundaries = events.filter((e) => roles.get(e) === "end");
-
-  const lastEnd = endBoundaries.reduce<MatchEvent | null>(
-    (latest, event) =>
-      latest == null || (event.orderNumber ?? 0) > (latest.orderNumber ?? 0)
-        ? event
-        : latest,
-    null,
-  );
-
-  const items: Sortable[] = [];
-
-  for (const [index, event] of events.entries()) {
-    const phaseKey = event.phase?.code ?? event.phase?.name ?? "";
-    const phase = phaseRank.get(phaseKey) ?? 0;
-    const order = event.orderNumber ?? index;
-
-    if (isBoundary(event)) {
-      const role = roles.get(event);
-
-      if (!role) continue;
-
-      // Only the very first whistle is announced. A "start of the second half"
-      // marker sitting right under the half-time one says nothing new.
-      if (role === "start" && phase !== 0) continue;
-
-      const isFinal = role === "end" && event === lastEnd;
-
-      const label =
-        role === "start"
-          ? "Početak"
-          : isFinal
-            ? "Kraj"
-            : phase === 0
-              ? "Poluvrijeme"
-              : (event.phase?.name ?? "Kraj faze");
-
-      const score = isFinal
-        ? scoreLine(match.score.home?.current, match.score.away?.current)
-        : role === "end" && phase === 0
-          ? scoreLine(match.score.home?.half, match.score.away?.half)
-          : null;
-
-      items.push({
-        row: { kind: "marker", key: `marker-${order}`, label, score },
-        phase,
-        tier: role === "start" ? 0 : 2,
-        minute: 0,
-        stoppage: 0,
-        order,
-      });
-      continue;
-    }
-
-    const kind = event.kind;
-
-    if (!SHOWN.includes(kind)) continue;
-
-    const team = event.side === "home" ? match.homeTeam : match.awayTeam;
-
-    items.push({
-      row: {
-        kind: "event",
-        key: `event-${event.id ?? order}`,
-        minute: event.displayMinute?.trim() || `${event.minute ?? 0}'`,
-        eventKind: kind,
-        player:
-          event.player?.name?.trim() || event.teamOfficial?.name?.trim() || "-",
-        detail:
-          kind === "sub" && event.secondaryPlayer?.name
-            ? `Izlazi ${event.secondaryPlayer.name}`
-            : null,
-        team: team ?? event.club ?? null,
-      },
-      phase,
-      tier: 1,
-      // `orderNumber` alone is NOT chronological — HNS has been seen numbering a
-      // 45' goal after a 45+1' one. Minute plus stoppage time is, so it leads.
-      minute: event.minute ?? 0,
-      stoppage: event.stoppageTime ?? 0,
-      order,
-    });
-  }
-
-  items.sort(
-    (a, b) =>
-      a.phase - b.phase ||
-      a.tier - b.tier ||
-      a.minute - b.minute ||
-      a.stoppage - b.stoppage ||
-      a.order - b.order,
-  );
-
-  return items.map((item) => item.row);
-}
+import MatchRibbon from "./MatchRibbon";
+import {
+  buildRows,
+  ribbonItems,
+  type EventRow,
+  type MarkerRow,
+  type Row,
+} from "./timeline";
 
 /** Granica faze — ink traka koja presijeca tijek. */
 function Marker({ row }: { row: MarkerRow }) {
@@ -214,19 +33,93 @@ function Marker({ row }: { row: MarkerRow }) {
   );
 }
 
-function Event({ row, divider }: { row: EventRow; divider: boolean }) {
+/**
+ * Zajednički okvir retka: id za skok s lente, bljesak kad se na njega skoči i
+ * crveni rub za događaje naše momčadi. Rub je uvijek tu (proziran kod gostiju),
+ * pa se minute svih redaka poravnavaju u isti stupac.
+ */
+function rowFrame(row: EventRow, className?: string) {
+  return {
+    id: row.anchor,
+    className: cn(
+      "scroll-mt-28 border-l-[3px] outline-offset-2 transition-[outline-color] duration-500 data-flash:outline-2 data-flash:outline-club-red",
+      row.ours ? "border-club-red" : "border-transparent",
+      className,
+    ),
+  };
+}
+
+function Minute({ row, className }: { row: EventRow; className?: string }) {
   return (
-    <li
+    <span
       className={cn(
-        "flex items-center gap-2.5 py-4 sm:gap-4 sm:py-5",
-        // Hairline only BETWEEN events. A phase marker brings its own rules, so
-        // the last event before one must not stack a third line under itself.
-        divider && "border-b border-foreground/10",
+        "min-w-11 font-display leading-none tabular-nums sm:min-w-13",
+        className,
       )}
     >
-      <span className="min-w-11 font-display text-lg leading-none tabular-nums text-club-red sm:min-w-13 sm:text-2xl">
-        {row.minute}
+      {row.minute}
+    </span>
+  );
+}
+
+/** Gol je ink ploča s novim rezultatom — oko ga nađe bez čitanja. */
+function GoalEvent({ row }: { row: EventRow }) {
+  return (
+    <li
+      {...rowFrame(
+        row,
+        "my-2 flex items-center gap-2.5 bg-ink-deep py-4 pl-3 pr-4 text-chalk shadow-[0_18px_36px_-24px] shadow-ink-deep sm:gap-4 sm:py-5 sm:pl-4 sm:pr-6",
+      )}
+    >
+      <Minute row={row} className="text-xl text-club-red sm:text-3xl" />
+
+      <span className="flex w-4 shrink-0 justify-center sm:w-5">
+        <EventIcon
+          kind={row.eventKind}
+          className={cn(row.eventKind === "goal" && "text-chalk")}
+        />
       </span>
+
+      <HnsCrest
+        picture={row.team?.picture}
+        name={row.team?.name}
+        size={36}
+        className="size-7 shrink-0 rounded-full bg-white p-0.5 sm:size-9"
+      />
+
+      <div className="min-w-0 flex-1">
+        <p className="font-display text-lg uppercase leading-tight tracking-wide sm:text-2xl">
+          {row.player}
+        </p>
+        <p className="mt-1 truncate text-[0.58rem] font-bold uppercase tracking-[0.12em] text-chalk/55 sm:text-[0.62rem] sm:tracking-[0.14em]">
+          {row.eventKind === "own-goal" ? "Autogol" : row.team?.name}
+        </p>
+      </div>
+
+      {row.score && (
+        <span className="shrink-0 font-display text-3xl leading-none tabular-nums sm:text-5xl">
+          {row.score.home}
+          <span className="mx-0.5 text-club-red">:</span>
+          {row.score.away}
+        </span>
+      )}
+    </li>
+  );
+}
+
+/** Karton — standardni redak, glas ispod gola. */
+function CardEvent({ row, divider }: { row: EventRow; divider: boolean }) {
+  return (
+    <li
+      {...rowFrame(
+        row,
+        cn(
+          "flex items-center gap-2.5 py-4 pl-3 sm:gap-4 sm:py-5 sm:pl-4",
+          divider && "border-b border-b-foreground/10",
+        ),
+      )}
+    >
+      <Minute row={row} className="text-lg text-foreground/45 sm:text-2xl" />
 
       <span className="flex w-4 shrink-0 justify-center sm:w-5">
         <EventIcon kind={row.eventKind} />
@@ -243,14 +136,8 @@ function Event({ row, divider }: { row: EventRow; divider: boolean }) {
         <p className="font-display text-base uppercase leading-tight tracking-wide sm:text-xl">
           {row.player}
         </p>
-        <p className="mt-1 text-[0.58rem] font-bold uppercase leading-snug tracking-[0.12em] text-muted-foreground sm:text-[0.62rem] sm:tracking-[0.14em]">
+        <p className="mt-1 truncate text-[0.58rem] font-bold uppercase tracking-[0.12em] text-muted-foreground sm:text-[0.62rem] sm:tracking-[0.14em]">
           {row.team?.name}
-          {row.detail && (
-            <>
-              <span className="hidden sm:inline"> · </span>
-              <span className="block sm:inline">{row.detail}</span>
-            </>
-          )}
         </p>
       </div>
     </li>
@@ -258,13 +145,76 @@ function Event({ row, divider }: { row: EventRow; divider: boolean }) {
 }
 
 /**
- * Tijek utakmice — jedan stupac editorial redaka: Anton minuta lijevo (isti
- * ritam kao dan na rasporedu), znak događaja, grb kluba tik uz ime igrača, pa
- * naziv kluba u podretku. Granice faza (Početak / Poluvrijeme / Kraj) presijecaju
- * listu kao ink trake, uz rezultat na poluvremenu i kraju.
+ * Izmjena — sažet redak u pola visine: tko ulazi, tko izlazi, u jednom retku.
+ * Ostaje na svom mjestu u tijeku, ali ne vuče pogled s golova.
+ */
+function SubEvent({ row, divider }: { row: EventRow; divider: boolean }) {
+  return (
+    <li
+      {...rowFrame(
+        row,
+        cn(
+          "flex items-center gap-2.5 py-2.5 pl-3 sm:gap-4 sm:pl-4",
+          divider && "border-b border-b-foreground/10",
+        ),
+      )}
+    >
+      <Minute
+        row={row}
+        className="text-sm text-foreground/35 sm:text-base"
+      />
+
+      <span className="flex w-4 shrink-0 justify-center sm:w-5">
+        <EventIcon kind="sub" className="size-3.5" />
+      </span>
+
+      <HnsCrest
+        picture={row.team?.picture}
+        name={row.team?.name}
+        size={24}
+        className="size-5 shrink-0 rounded-full bg-white p-px ring-1 ring-black/5"
+      />
+
+      <p className="flex min-w-0 flex-1 flex-wrap items-center gap-x-4 gap-y-0.5 text-[0.7rem] font-bold uppercase tracking-[0.08em] sm:text-xs">
+        <span className="flex min-w-0 items-center gap-1">
+          <ArrowUp
+            aria-label="Ulazi"
+            strokeWidth={3}
+            className="size-3 shrink-0 text-emerald-700 dark:text-emerald-400"
+          />
+          <span className="wrap-break-word">{row.player}</span>
+        </span>
+        {row.subOut && (
+          <span className="flex min-w-0 items-center gap-1 text-muted-foreground">
+            <ArrowDown
+              aria-label="Izlazi"
+              strokeWidth={3}
+              className="size-3 shrink-0 text-club-red"
+            />
+            <span className="wrap-break-word">{row.subOut}</span>
+          </span>
+        )}
+      </p>
+    </li>
+  );
+}
+
+function isGoal(row: Row | undefined): boolean {
+  return (
+    row?.kind === "event" &&
+    (row.eventKind === "goal" || row.eventKind === "own-goal")
+  );
+}
+
+/**
+ * Tijek utakmice — lenta golova i kartona na vrhu, pa popis po minutama.
+ * Tri težine retka: gol je ink ploča s rezultatom, karton standardni redak,
+ * izmjena sažet redak. Granice faza (Početak / Poluvrijeme / Kraj) presijecaju
+ * popis kao ink trake, uz rezultat na poluvremenu i kraju.
  *
  * Namjerno jedan stupac, ne dvostrana os: na mobitelu bi svaka strana dobila
- * ~40% širine i hrvatska imena bi se lomila u tri retka.
+ * ~40% širine i hrvatska imena bi se lomila u tri retka. Stranu nosi grb, a
+ * naše događaje crveni rub.
  */
 export default function EventsTimeline({
   match,
@@ -273,7 +223,7 @@ export default function EventsTimeline({
   match: Match;
   events: MatchEvent[];
 }) {
-  const rows = buildRows(match, events);
+  const rows = buildRows(match, events, useOurTeamId());
   const hasEvents = rows.some((row) => row.kind === "event");
 
   if (!hasEvents) {
@@ -284,19 +234,30 @@ export default function EventsTimeline({
     );
   }
 
+  const ribbon = ribbonItems(rows);
+
   return (
-    <ol>
-      {rows.map((row, index) =>
-        row.kind === "marker" ? (
-          <Marker key={row.key} row={row} />
-        ) : (
-          <Event
-            key={row.key}
-            row={row}
-            divider={rows[index + 1]?.kind === "event"}
-          />
-        ),
-      )}
-    </ol>
+    <div className="space-y-8">
+      <MatchRibbon match={match} items={ribbon.items} length={ribbon.length} />
+
+      <ol>
+        {rows.map((row, index) => {
+          if (row.kind === "marker") return <Marker key={row.key} row={row} />;
+
+          if (isGoal(row)) return <GoalEvent key={row.key} row={row} />;
+
+          // Hairline only BETWEEN two plain rows. A phase marker brings its own
+          // rules and a goal plate its own edge, so neither gets a third line.
+          const next = rows[index + 1];
+          const divider = next?.kind === "event" && !isGoal(next);
+
+          return row.eventKind === "sub" ? (
+            <SubEvent key={row.key} row={row} divider={divider} />
+          ) : (
+            <CardEvent key={row.key} row={row} divider={divider} />
+          );
+        })}
+      </ol>
+    </div>
   );
 }
