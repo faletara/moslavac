@@ -128,7 +128,7 @@ export default function MatchRibbon({
                 "group absolute flex -translate-x-1/2 items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-club-red focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                 goal
                   ? "size-6 rounded-full transition-transform duration-200 hover:scale-110 active:scale-95 sm:size-7"
-                  : "h-6 w-4 sm:h-7",
+                  : cn("h-6 w-4 sm:h-7", side === "home" ? "items-end" : "items-start"),
                 goal &&
                   (ours
                     ? "bg-club-red text-white"
@@ -183,12 +183,13 @@ export default function MatchRibbon({
 
   return (
     <div className="grid grid-cols-[1.5rem_minmax(0,1fr)] gap-x-4 sm:grid-cols-[1.75rem_minmax(0,1fr)] sm:gap-x-6">
-      <div />
-      {/* Visina je rezervirana i kad je prazno, da lenta ne skače. */}
+      <div className="hidden sm:block" />
+      {/* Samo gdje postoji hover — na mobitelu bi red bio uvijek prazan.
+          Visina je rezervirana i kad je prazno, da lenta ne skače. */}
       <p
         aria-live="polite"
         className={cn(
-          "mx-3 mb-3 h-4 truncate text-[0.62rem] font-bold uppercase leading-4 tracking-[0.16em] transition-opacity duration-150",
+          "mx-3 mb-3 hidden h-4 truncate sm:block text-[0.62rem] font-bold uppercase leading-4 tracking-[0.16em] transition-opacity duration-150",
           active ? "opacity-100" : "opacity-0",
         )}
       >
@@ -236,8 +237,9 @@ export default function MatchRibbon({
             style={{ left: `${(minute / length) * 100}%` }}
           >
             {minute}&apos;
+            {/* Rezultat visi desno, izvan oznake, da "45'" ostane točno ispod crtice. */}
             {minute === 45 && halfScore && (
-              <span className="ml-1.5 font-display text-[0.7rem] leading-none tracking-normal text-club-red">
+              <span className="absolute left-full ml-1.5 font-display text-[0.7rem] leading-none tracking-normal text-club-red">
                 {halfScore}
               </span>
             )}
