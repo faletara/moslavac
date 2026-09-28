@@ -10,6 +10,7 @@ import MatchRibbon from "./MatchRibbon";
 import {
   buildRows,
   ribbonItems,
+  sideOf,
   type EventRow,
   type MarkerRow,
   type Row,
@@ -223,7 +224,8 @@ export default function EventsTimeline({
   match: Match;
   events: MatchEvent[];
 }) {
-  const rows = buildRows(match, events, useOurTeamId());
+  const ourTeamId = useOurTeamId();
+  const rows = buildRows(match, events, ourTeamId);
   const hasEvents = rows.some((row) => row.kind === "event");
 
   if (!hasEvents) {
@@ -238,7 +240,12 @@ export default function EventsTimeline({
 
   return (
     <div className="space-y-8">
-      <MatchRibbon match={match} items={ribbon.items} length={ribbon.length} />
+      <MatchRibbon
+        match={match}
+        items={ribbon.items}
+        length={ribbon.length}
+        ourSide={sideOf(match, ourTeamId)}
+      />
 
       <ol>
         {rows.map((row, index) => {

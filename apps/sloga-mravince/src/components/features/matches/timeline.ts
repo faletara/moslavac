@@ -106,7 +106,7 @@ function scoreLine(
  * Naša strana po HNS id-u momčadi. `match.teamSide` nije pouzdan: dohvat
  * pojedine utakmice ga vraća prazan.
  */
-function sideOf(match: Match, ourTeamId: number | null): MatchSide | null {
+export function sideOf(match: Match, ourTeamId: number | null): MatchSide | null {
   if (ourTeamId == null) return null;
 
   if (match.homeTeam?.id === ourTeamId) return "home";

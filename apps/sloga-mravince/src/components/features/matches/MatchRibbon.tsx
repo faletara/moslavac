@@ -1,10 +1,10 @@
 "use client";
 
 import { useReducedMotion } from "framer-motion";
-import { useEffect, useRef, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { HnsCrest } from "@/components/HnsCrest";
 import { cn } from "@/lib/utils";
-import type { Match } from "@/types/hns";
+import type { Match, MatchSide } from "@/types/hns";
 import { EventIcon } from "./EventIcon";
 import type { RibbonItem } from "./timeline";
 
@@ -64,15 +64,21 @@ export default function MatchRibbon({
   match,
   items,
   length,
+  ourSide,
 }: {
   match: Match;
   items: RibbonItem[];
   /** Duljina osi u minutama. */
   length: number;
+  /** Naši golovi su crveni, kao crveni rub u popisu. */
+  ourSide: MatchSide | null;
 }) {
   const reduced = useReducedMotion();
   const wide = useWide();
   const flash = useRef<{ row: HTMLElement; timer: number } | null>(null);
+  // Opis znaka pod mišem/fokusom. Stoji u svom redu iznad lente, a ne kao
+  // tooltip uz znak — tooltip je prekrivao susjedne znakove i oznake osi.
+  const [active, setActive] = useState<RibbonItem | null>(null);
 
   // Novi skok gasi prethodni bljesak, a odlazak sa stranice gasi tajmer.
   const clearFlash = () => {
@@ -112,114 +118,151 @@ export default function MatchRibbon({
     flash.current = { row, timer: window.setTimeout(clearFlash, 1600) };
   };
 
+  /** Razmak od šine do najnižeg kata, u px — tu stane "noga" znaka. */
+  const STEM = 10;
+
   const lane = (side: "home" | "away") => (
     <div
       className="relative"
-      style={{ height: 36 + maxFloor(side) * FLOOR }}
+      style={{ height: STEM + 34 + maxFloor(side) * FLOOR }}
     >
       {items
         .filter((item) => item.side === side)
         .map((item) => {
           const goal =
             item.eventKind === "goal" || item.eventKind === "own-goal";
-          const offset = (level.get(item.key) ?? 0) * FLOOR;
+          const ours = ourSide != null && item.side === ourSide;
+          const distance = STEM + (level.get(item.key) ?? 0) * FLOOR;
 
           return (
             <button
               key={item.key}
               type="button"
               onClick={() => jump(item.anchor)}
+              onMouseEnter={() => setActive(item)}
+              onMouseLeave={() => setActive(null)}
+              onFocus={() => setActive(item)}
+              onBlur={() => setActive(null)}
               aria-label={item.label}
               className={cn(
-                "group absolute flex size-6 -translate-x-1/2 sm:size-8 items-center justify-center outline-none transition-transform duration-200 hover:scale-110 focus-visible:ring-2 focus-visible:ring-club-red active:scale-95",
-                side === "home" ? "bottom-1" : "top-1",
-                goal && "rounded-full bg-ink-deep text-chalk shadow-[0_6px_14px_-6px] shadow-ink-deep/70",
+                "group absolute flex -translate-x-1/2 items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-club-red focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                goal
+                  ? "size-6 rounded-full transition-transform duration-200 hover:scale-110 active:scale-95 sm:size-7"
+                  : "h-6 w-4 sm:h-7",
+                goal &&
+                  (ours
+                    ? "bg-club-red text-white"
+                    : "bg-ink-deep text-chalk dark:bg-chalk dark:text-ink-deep"),
               )}
               style={{
                 left: `${item.position}%`,
                 ...(side === "home"
-                  ? { marginBottom: offset }
-                  : { marginTop: offset }),
+                  ? { bottom: distance }
+                  : { top: distance }),
               }}
             >
+              {/* Noga — veže znak za njegovu minutu na šini. */}
+              <span
+                aria-hidden
+                className={cn(
+                  "pointer-events-none absolute left-1/2 w-px -translate-x-1/2 bg-foreground/30",
+                  side === "home" ? "top-full" : "bottom-full",
+                )}
+                style={{ height: distance }}
+              />
               <EventIcon
                 kind={item.eventKind}
                 className={cn(
-                  goal && "size-3.5 sm:size-4",
-                  item.eventKind === "goal" && "text-chalk",
-                  !goal && "h-3.5 w-2.5 shadow-sm sm:h-[1.1rem] sm:w-3",
+                  goal && "size-3.5 text-current sm:size-4",
+                  !goal &&
+                    "h-3.5 w-2.5 transition-transform duration-200 group-hover:scale-110 sm:h-4 sm:w-[0.7rem]",
                 )}
               />
-              <span
-                className={cn(
-                  "pointer-events-none absolute left-1/2 z-10 hidden -translate-x-1/2 whitespace-nowrap bg-ink-deep px-2.5 py-1.5 text-[0.6rem] font-bold uppercase tracking-[0.14em] text-chalk opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100 sm:block",
-                  side === "home" ? "bottom-full mb-2" : "top-full mt-2",
-                )}
-              >
-                {item.label}
-              </span>
             </button>
           );
         })}
     </div>
   );
 
+  // Crtica svakih 15', plus kraj osi kad produžeci ne padnu na višekratnik.
+  const minutes = Array.from(
+    { length: Math.floor(length / 15) + 1 },
+    (_, i) => i * 15,
+  );
+
+  if (minutes.at(-1) !== length) minutes.push(length);
+
+  const crest = (team: Match["homeTeam"]) => (
+    <HnsCrest
+      picture={team?.picture}
+      name={team?.name}
+      size={28}
+      className="size-6 sm:size-7"
+    />
+  );
+
   return (
-    <div className="border border-foreground/10 bg-white/60 px-4 py-5 sm:px-6 dark:bg-white/5">
-      <div className="grid grid-cols-[1.75rem_minmax(0,1fr)] gap-x-3 sm:grid-cols-[2.25rem_minmax(0,1fr)] sm:gap-x-5">
-        {/* Grbovi označavaju redove: domaći iznad šine, gosti ispod. */}
-        <div className="flex items-end justify-center pb-1.5">
-          <HnsCrest
-            picture={match.homeTeam?.picture}
-            name={match.homeTeam?.name}
-            size={36}
-            className="size-7 rounded-full bg-white p-0.5 ring-1 ring-black/5 sm:size-9"
-          />
-        </div>
-        <div className="mx-4">{lane("home")}</div>
+    <div className="grid grid-cols-[1.5rem_minmax(0,1fr)] gap-x-4 sm:grid-cols-[1.75rem_minmax(0,1fr)] sm:gap-x-6">
+      <div />
+      {/* Visina je rezervirana i kad je prazno, da lenta ne skače. */}
+      <p
+        aria-live="polite"
+        className={cn(
+          "mx-3 mb-3 h-4 truncate text-[0.62rem] font-bold uppercase leading-4 tracking-[0.16em] transition-opacity duration-150",
+          active ? "opacity-100" : "opacity-0",
+        )}
+      >
+        {active?.label}
+      </p>
 
-        <div />
-        <div className="relative mx-4 h-px bg-foreground/25">
-          {/* Početak, poluvrijeme, kraj */}
-          {[0, (45 / length) * 100, 100].map((at) => (
-            <span
-              key={at}
-              aria-hidden
-              className={cn(
-                "absolute top-1/2 w-px -translate-x-1/2 -translate-y-1/2 bg-foreground/40",
-                at > 0 && at < 100 ? "h-5" : "h-3",
-              )}
-              style={{ left: `${at}%` }}
-            />
-          ))}
-        </div>
+      {/* Grbovi označavaju redove: domaći iznad šine, gosti ispod. */}
+      <div className="flex items-end pb-2">{crest(match.homeTeam)}</div>
+      <div className="mx-3">{lane("home")}</div>
 
-        <div className="flex items-start justify-center pt-1.5">
-          <HnsCrest
-            picture={match.awayTeam?.picture}
-            name={match.awayTeam?.name}
-            size={36}
-            className="size-7 rounded-full bg-white p-0.5 ring-1 ring-black/5 sm:size-9"
-          />
-        </div>
-        <div className="mx-4">{lane("away")}</div>
-
-        <div />
-        <div className="relative mx-4 mt-2 h-3 text-[0.58rem] font-bold uppercase leading-none tracking-[0.16em] text-muted-foreground tabular-nums">
-          <span className="absolute left-0 -translate-x-1/2">0&apos;</span>
+      <div />
+      <div className="relative mx-3 h-0.5 bg-foreground/15">
+        {minutes.map((minute) => (
           <span
-            className="absolute -translate-x-1/2 whitespace-nowrap"
-            style={{ left: `${(45 / length) * 100}%` }}
+            key={minute}
+            aria-hidden
+            className={cn(
+              "absolute top-1/2 w-px -translate-x-1/2 -translate-y-1/2",
+              minute === 45
+                ? "h-4 bg-foreground/50"
+                : "hidden h-2 bg-foreground/25 sm:block",
+              (minute === 0 || minute === length) && "block h-2",
+            )}
+            style={{ left: `${(minute / length) * 100}%` }}
+          />
+        ))}
+      </div>
+
+      <div className="flex items-start pt-2">{crest(match.awayTeam)}</div>
+      <div className="mx-3">{lane("away")}</div>
+
+      <div />
+      <div className="relative mx-3 mt-1 h-3 text-[0.58rem] font-bold leading-none tracking-[0.12em] text-muted-foreground tabular-nums">
+        {minutes.map((minute) => (
+          <span
+            key={minute}
+            className={cn(
+              "absolute top-0 flex h-3 -translate-x-1/2 items-center whitespace-nowrap",
+              minute !== 0 &&
+                minute !== 45 &&
+                minute !== length &&
+                "hidden sm:block",
+              minute === 45 && "text-foreground",
+            )}
+            style={{ left: `${(minute / length) * 100}%` }}
           >
-            45&apos;
-            {halfScore && (
-              <span className="ml-1.5 text-foreground">{halfScore}</span>
+            {minute}&apos;
+            {minute === 45 && halfScore && (
+              <span className="ml-1.5 font-display text-[0.7rem] leading-none tracking-normal text-club-red">
+                {halfScore}
+              </span>
             )}
           </span>
-          <span className="absolute right-0 translate-x-1/2">
-            {length}&apos;
-          </span>
-        </div>
+        ))}
       </div>
     </div>
   );
