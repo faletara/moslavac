@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Match, MatchEvent, MatchEventKind, Team } from "@/types/hns";
-import { buildRows, ribbonItems, type EventRow } from "./timeline";
+import { buildRows, floors, ribbonItems, type EventRow } from "./timeline";
 
 const HOME_ID = 10;
 const AWAY_ID = 20;
@@ -209,5 +209,25 @@ describe("ribbonItems", () => {
 
     expect(first?.position).toBe(50);
     expect(last?.position).toBe(100);
+  });
+});
+
+describe("floors", () => {
+  const at = (key: string, position: number) => ({
+    key,
+    anchor: key,
+    position,
+    side: "home" as const,
+    eventKind: "yellow" as const,
+    label: key,
+  });
+
+  it("drops a marker back to the rail once there is room", () => {
+    const level = floors(
+      [at("31", 34), at("36", 40), at("45", 50), at("48", 53), at("64", 71)],
+      12,
+    );
+
+    expect([...level.values()]).toEqual([0, 1, 0, 1, 0]);
   });
 });

@@ -6,7 +6,7 @@ import { HnsCrest } from "@/components/HnsCrest";
 import { cn } from "@/lib/utils";
 import type { Match, MatchSide } from "@/types/hns";
 import { EventIcon } from "./EventIcon";
-import type { RibbonItem } from "./timeline";
+import { floors, type RibbonItem } from "./timeline";
 
 /**
  * Koliko posto osi dva znaka trebaju razmaka prije nego se preklope. Na
@@ -34,26 +34,6 @@ function useWide(): boolean {
 /** Visina jednog "kata" kad se znakovi slažu jedan iznad drugoga, u px. */
 const FLOOR = 26;
 
-/**
- * Znakovi koji stoje preblizu na osi slažu se u katove, dalje od šine — kao na
- * TV match centrima — pa se ne preklapaju ni kad padnu dva gola u tri minute.
- */
-function floors(items: RibbonItem[], gap: number): Map<string, number> {
-  const level = new Map<string, number>();
-
-  for (const side of ["home", "away"] as const) {
-    let last = -100;
-    let floor = 0;
-
-    for (const item of items.filter((i) => i.side === side)) {
-      floor = item.position - last < gap ? floor + 1 : 0;
-      level.set(item.key, floor);
-      last = item.position;
-    }
-  }
-
-  return level;
-}
 
 /**
  * Lenta utakmice — vodoravna os od 0' do 90' iznad popisa. Domaći golovi i

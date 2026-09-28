@@ -355,3 +355,33 @@ export function ribbonItems(rows: Row[]): {
 
   return { length, items };
 }
+
+/**
+ * Znakovi koji stoje preblizu na osi slažu se u katove, dalje od šine — kao na
+ * TV match centrima. Svaki znak ide na NAJNIŽI kat na kojem ima mjesta, a ne
+ * kat iznad prethodnog: inače niz bliskih događaja (36', 45', 48') naraste u
+ * toranj, iako bi 45' stao natrag uz šinu.
+ */
+export function floors(
+  items: RibbonItem[],
+  gap: number,
+): Map<string, number> {
+  const level = new Map<string, number>();
+
+  for (const side of ["home", "away"] as const) {
+    // Pozicija zadnjeg znaka na svakom katu.
+    const lastOnFloor: number[] = [];
+
+    for (const item of items.filter((i) => i.side === side)) {
+      let floor = lastOnFloor.findIndex(
+        (last) => item.position - last >= gap,
+      );
+
+      if (floor === -1) floor = lastOnFloor.length;
+      lastOnFloor[floor] = item.position;
+      level.set(item.key, floor);
+    }
+  }
+
+  return level;
+}
