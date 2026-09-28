@@ -146,7 +146,8 @@ function CardEvent({ row, divider }: { row: EventRow; divider: boolean }) {
 }
 
 /**
- * Izmjena — sažet redak u pola visine: tko ulazi, tko izlazi, u jednom retku.
+ * Izmjena — sažet redak: tko ulazi pa ispod tko izlazi. Uvijek dva retka, da
+ * sve izmjene budu iste visine bez obzira na duljinu imena.
  * Ostaje na svom mjestu u tijeku, ali ne vuče pogled s golova.
  */
 function SubEvent({ row, divider }: { row: EventRow; divider: boolean }) {
@@ -176,7 +177,7 @@ function SubEvent({ row, divider }: { row: EventRow; divider: boolean }) {
         className="size-5 shrink-0 rounded-full bg-white p-px ring-1 ring-black/5"
       />
 
-      <p className="flex min-w-0 flex-1 flex-wrap items-center gap-x-4 gap-y-0.5 text-[0.7rem] font-bold uppercase tracking-[0.08em] sm:text-xs">
+      <p className="flex min-w-0 flex-1 flex-col gap-0.5 text-[0.7rem] font-bold uppercase tracking-[0.08em] sm:text-xs">
         <span className="flex min-w-0 items-center gap-1">
           <ArrowUp
             aria-label="Ulazi"
