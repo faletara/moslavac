@@ -184,7 +184,7 @@ function SubEvent({ row, divider }: { row: EventRow; divider: boolean }) {
             strokeWidth={3}
             className="size-3 shrink-0 text-emerald-700 dark:text-emerald-400"
           />
-          <span className="wrap-break-word">{row.player}</span>
+          <span className="truncate" title={row.player}>{row.player}</span>
         </span>
         {row.subOut && (
           <span className="flex min-w-0 items-center gap-1 text-muted-foreground">
@@ -193,7 +193,7 @@ function SubEvent({ row, divider }: { row: EventRow; divider: boolean }) {
               strokeWidth={3}
               className="size-3 shrink-0 text-club-red"
             />
-            <span className="wrap-break-word">{row.subOut}</span>
+            <span className="truncate" title={row.subOut}>{row.subOut}</span>
           </span>
         )}
       </p>
