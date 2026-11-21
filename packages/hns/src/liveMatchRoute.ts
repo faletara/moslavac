@@ -1,5 +1,6 @@
 import "server-only";
 
+import { parsePositiveInt } from "@/lib/helpers/validate";
 import { fetchLiveMatch, HnsUnavailableError } from "./matches";
 
 /**
@@ -19,12 +20,6 @@ const LIVE_CACHE_CONTROL = "public, s-maxage=30, stale-while-revalidate=30";
 /** Grešku CDN ne kešira, pa idući dohvat odmah pokuša ponovno. */
 const NO_STORE = "no-store";
 
-/**
- * Samo pozitivan cijeli broj u decimalnom zapisu, i to prije bilo kakvog poziva
- * HNS-u — ruta se ne smije moći iskoristiti za proizvoljne HNS putanje.
- */
-const MATCH_ID_RE = /^[1-9][0-9]{0,15}$/;
-
 interface LiveMatchRouteContext {
   params: Promise<{ id: string }>;
 }
@@ -41,12 +36,14 @@ export function createLiveMatchRoute() {
     _request: Request,
     ctx: LiveMatchRouteContext,
   ): Promise<Response> {
-    const { id } = await ctx.params;
+    // Id se provjerava prije bilo kakvog poziva HNS-u — ruta se ne smije moći
+    // iskoristiti za proizvoljne HNS putanje.
+    const matchId = parsePositiveInt((await ctx.params).id);
 
-    if (!MATCH_ID_RE.test(id)) return errorResponse(400, "invalid match id");
+    if (matchId == null) return errorResponse(400, "invalid match id");
 
     try {
-      const live = await fetchLiveMatch({ matchId: Number(id) });
+      const live = await fetchLiveMatch({ matchId });
 
       if (!live) return errorResponse(404, "match not found");
 

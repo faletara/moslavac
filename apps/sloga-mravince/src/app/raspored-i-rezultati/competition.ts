@@ -1,13 +1,11 @@
 import type { Competition } from "@/types/hns";
 
-/** Id natjecanja iz putanje `/raspored-i-rezultati/natjecanje/<id>`. */
-export function parseCompetitionId(value: string | undefined): number | null {
-  const id = Number(value);
-
-  return Number.isInteger(id) && id > 0 ? id : null;
-}
-
 export const SCHEDULE_PATH = "/raspored-i-rezultati";
+
+/** Vlastita putanja natjecanja koje nije zadano. */
+export function competitionPagePath(competitionId: number): string {
+  return `${SCHEDULE_PATH}/natjecanje/${competitionId}`;
+}
 
 /**
  * Zadano natjecanje nema vlastitu putanju: ono je sam popis, pa ista stranica
@@ -19,7 +17,7 @@ export function competitionPath(
 ): string {
   return competitionId === defaultId
     ? SCHEDULE_PATH
-    : `${SCHEDULE_PATH}/natjecanje/${competitionId}`;
+    : competitionPagePath(competitionId);
 }
 
 type CompetitionWithId = Competition & { id: number };
@@ -50,20 +48,20 @@ function defaultCompetition(
   return senior ?? competitions[0] ?? null;
 }
 
-/** Vlastite putanje natjecanja (bez zadanog) za prerender i sitemap. */
-export function competitionPagePaths({
+/** Natjecanja s vlastitom putanjom (sva osim zadanog), za prerender i sitemap. */
+export function competitionPageIds({
   competitions,
   seniorFilter,
 }: {
   competitions: Competition[];
   seniorFilter: string | null;
-}): string[] {
+}): number[] {
   const valid = withId(competitions);
   const defaultId = defaultCompetition(valid, seniorFilter)?.id ?? null;
 
   return valid
-    .map((competition) => competitionPath(competition.id, defaultId))
-    .filter((path) => path !== SCHEDULE_PATH);
+    .map((competition) => competition.id)
+    .filter((id) => id !== defaultId);
 }
 
 /**

@@ -158,7 +158,7 @@ describe("GET /api/utakmice/[id]/uzivo", () => {
     expect(response.status).toBe(502);
   });
 
-  it.each(["abc", "0", "-5", "1.5", "12abc", "1e3", ""])(
+  it.each(["abc", "0", "-5", "1.5", "12abc", "1e3", "012", ""])(
     "vraća 400 za ID %j bez poziva HNS-u",
     async (id) => {
       let called = false;

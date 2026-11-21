@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { clampInt, isNumericId, isUuid } from "./validate";
+import { clampInt, isNumericId, isUuid, parsePositiveInt } from "./validate";
 
 describe("isUuid", () => {
   it("prihvaća HNS UUID neovisno o veličini slova", () => {
@@ -46,5 +46,33 @@ describe("clampInt", () => {
 
   it("odbacuje decimalni dio umjesto zaokruživanja", () => {
     expect(clampInt("5.9", 1, 1, 10)).toBe(5);
+  });
+});
+
+describe("parsePositiveInt", () => {
+  it("čita pozitivan cijeli broj u kanonskom obliku", () => {
+    expect(parsePositiveInt("1")).toBe(1);
+    expect(parsePositiveInt("27")).toBe(27);
+    expect(parsePositiveInt("117166594")).toBe(117166594);
+  });
+
+  it.each([
+    "",
+    "abc",
+    "0",
+    "-5",
+    "1.5",
+    "2.0",
+    "012",
+    "1e1",
+    "0x10",
+    " 3",
+    "3 ",
+    "3abc",
+    "+3",
+    "9007199254740993",
+    undefined,
+  ])("odbacuje sve što nije kanonski pozitivan cijeli broj: %j", (value) => {
+    expect(parsePositiveInt(value)).toBeNull();
   });
 });
