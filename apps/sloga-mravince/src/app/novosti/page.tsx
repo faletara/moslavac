@@ -9,7 +9,7 @@ import { fetchNewsPaginated } from "@/lib/payload/getNews";
 import { getTenant } from "@/lib/payload/getTenant";
 import type { News } from "@/types/news";
 
-export const revalidate = 60;
+export const revalidate = 86400;
 
 type NewsWithSlug = News & { slug: string };
 

@@ -23,7 +23,9 @@ const anton = Anton({
 
 async function getClubDetailsForLayout() {
   try {
-    return await fetchClubDetails();
+    // Podaci o klubu se praktički ne mijenjaju. Kraći rok bi kroz layout
+    // skratio `revalidate` svake stranice.
+    return await fetchClubDetails({ revalidate: 86_400 });
   } catch (error) {
     console.error("Failed to fetch HNS club details for layout", error);
 

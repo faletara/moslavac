@@ -5,7 +5,7 @@ import { fetchClubDetails } from "@/lib/hns/team";
 import { getTenant } from "@/lib/payload/getTenant";
 import { BASE_URL } from "@/lib/siteUrl";
 
-export const revalidate = 3600;
+export const revalidate = 86400;
 
 export async function generateMetadata(): Promise<Metadata> {
   const tenant = await getTenant();
@@ -23,7 +23,10 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function ContactPage() {
   // The tenant record is the club's explicit control; HNS club details fill any
   // gaps (e.g. phone), so every club gets contact data without manual entry.
-  const [tenant, club] = await Promise.all([getTenant(), fetchClubDetails()]);
+  const [tenant, club] = await Promise.all([
+    getTenant(),
+    fetchClubDetails({ revalidate: 86_400 }),
+  ]);
   const name = tenant.displayName;
   const email = tenant.contact?.email ?? club?.email ?? null;
   // Phone intentionally CMS-only — the HNS landline is unformatted/undesired.

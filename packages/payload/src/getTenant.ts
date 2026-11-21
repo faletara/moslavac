@@ -1,6 +1,7 @@
 import "server-only";
 import { cache } from "react";
 import { payloadFetch } from "./client";
+import { CMS_CONTENT_TTL } from "./context";
 import { tenantSlug } from "./tenant";
 import { payloadPage, tenantSchema } from "./schemas";
 import type { FrontendTenant } from "./schemas";
@@ -27,7 +28,7 @@ export const getTenant = cache(async (): Promise<FrontendTenant> => {
     payloadPage(tenantSchema),
     {
       authenticated: true,
-      next: { revalidate: 300, tags: [`tenant-${slug}`] },
+      next: { revalidate: CMS_CONTENT_TTL, tags: [`tenant-${slug}`] },
     },
   );
 

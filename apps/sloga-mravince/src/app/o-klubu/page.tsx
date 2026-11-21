@@ -5,7 +5,7 @@ import { fetchPageByKey } from "@/lib/payload/getPages";
 import { getTenant } from "@/lib/payload/getTenant";
 import { BASE_URL } from "@/lib/siteUrl";
 
-export const revalidate = 3600;
+export const revalidate = 86400;
 
 const PAGE_KEY = "povijest" as const;
 
