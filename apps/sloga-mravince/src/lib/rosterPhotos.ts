@@ -1,5 +1,6 @@
 import "server-only";
 import { getCometImageUrl } from "@/lib/hns/imageUrl";
+import type { HnsCacheOptions } from "@/lib/hns/fetchResource";
 import { fetchPlayerDetails } from "@/lib/hns/players";
 import type { RosterEntry } from "@/types/roster";
 
@@ -9,6 +10,7 @@ import type { RosterEntry } from "@/types/roster";
  */
 export async function resolveCometPhotoUrls(
   entries: RosterEntry[],
+  opts: HnsCacheOptions = {},
 ): Promise<Map<number, string>> {
   const needed = entries.filter(
     (entry) => !entry.photo?.url && entry.personId != null,
@@ -18,6 +20,7 @@ export async function resolveCometPhotoUrls(
     needed.map(async (entry) => {
       const details = await fetchPlayerDetails({
         personId: String(entry.personId),
+        revalidate: opts.revalidate,
       }).catch(() => null);
 
       return [entry.personId, details?.picture ?? null] as const;

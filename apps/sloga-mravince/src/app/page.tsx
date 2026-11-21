@@ -21,7 +21,8 @@ import { fetchRoster } from "@/lib/payload/getRoster";
 import { getTenant } from "@/lib/payload/getTenant";
 import type { Match, MatchSlots } from "@/types/hns";
 
-export const revalidate = 60;
+// 10 min; HNS pozivi dobivaju isti rok, inače bi njihov kraći TTL skratio stranicu.
+export const revalidate = 600;
 
 function isRealMatch(
   match: Match | null | undefined,
@@ -100,13 +101,13 @@ export default async function HomePage() {
   const [tenant, newsPage, matchSlots, roster, senior] = await Promise.all([
     getTenant(),
     fetchNewsPaginated({ page: 1, size: 8 }),
-    fetchMatchSlots(),
+    fetchMatchSlots({ revalidate }),
     fetchRoster(),
-    fetchSeniorCompetition(),
+    fetchSeniorCompetition({ revalidate }),
   ]);
 
   const standings = senior?.id
-    ? await fetchTeamStandings({ competitionId: senior.id })
+    ? await fetchTeamStandings({ competitionId: senior.id, revalidate })
     : [];
 
   const allNews = newsPage.content.filter((n) => n.slug);
@@ -131,7 +132,7 @@ export default async function HomePage() {
 
       <NextMatchBar slots={matchSlots} />
 
-      <PlayersSection players={roster} />
+      <PlayersSection players={roster} revalidate={revalidate} />
 
       <StandingsSection rows={standings} />
       {webshopUrl && <WebshopSection url={webshopUrl} />}

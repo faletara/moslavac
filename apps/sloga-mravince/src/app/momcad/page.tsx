@@ -12,7 +12,8 @@ import type { MediaImage } from "@/lib/payload/types";
 import type { RosterEntry, RosterPosition } from "@/types/roster";
 import type { JsonLdNode, SportsTeamJsonLd } from "@/types/jsonld";
 
-export const revalidate = 300;
+// 1 h; HNS pozivi dobivaju isti rok.
+export const revalidate = 3600;
 
 const POSITION_ORDER: RosterPosition[] = [
   "vratar",
@@ -131,11 +132,11 @@ export default async function TeamPage() {
   const [tenant, roster, senior] = await Promise.all([
     getTenant(),
     fetchRoster(),
-    fetchSeniorCompetition(),
+    fetchSeniorCompetition({ revalidate }),
   ]);
 
   const crestSrc = getCrestSrc(tenant.branding?.logo);
-  const cometPhotos = await resolveCometPhotoUrls(roster);
+  const cometPhotos = await resolveCometPhotoUrls(roster, { revalidate });
   const competitionSlug = senior ? buildCompetitionSlug(senior) : null;
   const grouped = groupRoster(roster);
 

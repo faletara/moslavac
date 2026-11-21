@@ -21,7 +21,8 @@ interface Props {
   params: Promise<{ playerId: string; competitionId: string }>;
 }
 
-export const revalidate = 600;
+// 1 h; HNS pozivi (i u layout.tsx) dobivaju isti rok.
+export const revalidate = 3600;
 
 /** Ime razdvojeno na dio ispred prezimena i samo prezime. */
 interface SplitName {
@@ -48,8 +49,8 @@ export default async function PlayerStatsPage({ params }: Props) {
   const cid = parseTrailingId(competitionId);
 
   const [playerDetails, playerStats, tenant, roster] = await Promise.all([
-    fetchPlayerDetails({ personId }),
-    fetchPlayerStats({ personId, competitionId: cid }),
+    fetchPlayerDetails({ personId, revalidate }),
+    fetchPlayerStats({ personId, competitionId: cid, revalidate }),
     getTenant(),
     fetchRoster(),
   ]);
