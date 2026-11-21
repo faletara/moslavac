@@ -4,7 +4,7 @@ import {
   competitionPageIds,
   competitionPath,
   resolveCompetitionRoute,
-} from "./competition";
+} from "./competitionRoute";
 
 function competition(id: number | null, name: string): Competition {
   return { id, name } as Competition;

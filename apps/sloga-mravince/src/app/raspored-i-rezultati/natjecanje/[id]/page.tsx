@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { parsePositiveInt } from "@/lib/helpers/validate";
-import { competitionPagePath, SCHEDULE_PATH } from "../../competition";
-import { fetchCompetitionPageIds } from "../../fetchCompetitionPageIds";
-import { ScheduleView, scheduleMetadata } from "../../ScheduleView";
+import { competitionPagePath, SCHEDULE_PATH } from "@/lib/competitionRoute";
+import { fetchCompetitionPageIds } from "@/lib/fetchCompetitionPageIds";
+import { ScheduleView, scheduleMetadata } from "@/components/features/schedule/ScheduleView";
 
 // 30 min, isto kao u ScheduleView (Next segmentnu konfiguraciju čita statički).
 export const revalidate = 1800;

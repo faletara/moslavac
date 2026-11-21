@@ -1,7 +1,7 @@
 import "server-only";
 import { fetchCurrentSeasonCompetitions } from "@/lib/hns/competitions";
 import { getSeniorCompetitionFilter } from "@/lib/hns/client";
-import { competitionPageIds } from "./competition";
+import { competitionPageIds } from "./competitionRoute";
 
 /**
  * Id-evi natjecanja tekuće sezone osim zadanog. Rok daje pozivatelj, inače bi

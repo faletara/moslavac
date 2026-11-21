@@ -6,8 +6,8 @@ import {
   playerSource,
 } from "@/lib/app-shell/seo/sources";
 import { BASE_URL } from "@/lib/siteUrl";
-import { competitionPagePath } from "./raspored-i-rezultati/competition";
-import { fetchCompetitionPageIds } from "./raspored-i-rezultati/fetchCompetitionPageIds";
+import { competitionPagePath } from "@/lib/competitionRoute";
+import { fetchCompetitionPageIds } from "@/lib/fetchCompetitionPageIds";
 
 export const revalidate = 3600;
 
