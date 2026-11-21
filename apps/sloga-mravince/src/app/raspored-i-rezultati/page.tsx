@@ -18,7 +18,8 @@ import { getTenant } from "@/lib/payload/getTenant";
 import { buildMatchSlug } from "@/lib/helpers/slug";
 import type { Competition, Match, TeamRanking } from "@/types/hns";
 
-export const revalidate = 300;
+// 30 min; HNS pozivi dobivaju isti rok, inače bi njihov kraći TTL skratio stranicu.
+export const revalidate = 1800;
 
 const MATCH_FORMS = {
   one: "utakmica",
@@ -357,7 +358,7 @@ export default async function ScheduleResultsPage({ searchParams }: Props) {
 
   const [{ competitions, ok: competitionsOk }, seniorFilter] =
     await Promise.all([
-      fetchCurrentSeasonCompetitionsResult(),
+      fetchCurrentSeasonCompetitionsResult({ revalidate }),
       getSeniorCompetitionFilter(),
     ]);
 
@@ -371,8 +372,14 @@ export default async function ScheduleResultsPage({ searchParams }: Props) {
 
   const [matches, standings] = selectedCompetition?.id
     ? await Promise.all([
-        fetchAllCompetitionMatches({ competitionId: selectedCompetition.id }),
-        fetchTeamStandings({ competitionId: selectedCompetition.id }),
+        fetchAllCompetitionMatches({
+          competitionId: selectedCompetition.id,
+          revalidate,
+        }),
+        fetchTeamStandings({
+          competitionId: selectedCompetition.id,
+          revalidate,
+        }),
       ])
     : empty;
 

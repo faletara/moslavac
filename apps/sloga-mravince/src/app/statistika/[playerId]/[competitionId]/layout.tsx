@@ -8,6 +8,9 @@ import {
   parseTrailingId,
 } from "@/lib/helpers/slug";
 
+// Isti rok kao page.tsx, da metapodaci ne skraćuju keš stranice.
+export const revalidate = 3600;
+
 interface Params {
   playerId: string;
   competitionId: string;
@@ -23,8 +26,8 @@ export async function generateMetadata({
   const cid = parseTrailingId(competitionId);
 
   const [playerResult, competitionResult] = await Promise.allSettled([
-    fetchPlayerDetails({ personId: String(personId) }),
-    fetchCompetitionInfo({ competitionId: cid }),
+    fetchPlayerDetails({ personId: String(personId), revalidate }),
+    fetchCompetitionInfo({ competitionId: cid, revalidate }),
   ]);
 
   const player =

@@ -11,16 +11,19 @@ import PlayersCarousel, { type CarouselPlayer } from "./PlayersCarousel";
  */
 export default async function PlayersSection({
   players,
+  revalidate,
 }: {
   players: RosterEntry[];
+  /** Rok keša HNS poziva — `revalidate` stranice koja renderira sekciju. */
+  revalidate?: number;
 }) {
   const squad = players.filter((p) => p.position !== "trener");
 
   if (squad.length === 0) return null;
 
   const [cometPhotos, senior] = await Promise.all([
-    resolveCometPhotoUrls(squad),
-    fetchSeniorCompetition(),
+    resolveCometPhotoUrls(squad, { revalidate }),
+    fetchSeniorCompetition({ revalidate }),
   ]);
 
   const competitionSlug = senior ? buildCompetitionSlug(senior) : null;
