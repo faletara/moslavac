@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
-import MatchHero from "@/components/features/matches/MatchHero";
-import MatchTabs from "@/components/features/matches/MatchTabs";
-import { RefreshWhile } from "@/components/ui/refresh-while";
+import MatchLive from "@/components/features/matches/MatchLive";
 import { redirectToCanonical } from "@/lib/helpers/canonical";
 import { formatDateTime } from "@/lib/helpers/date";
 import {
@@ -16,12 +13,11 @@ import {
   fetchMatchLineups,
   fetchMatchReferees,
 } from "@/lib/hns/matches";
-import { isFinished, isLive } from "@/lib/hns/matchStatus";
 import { fetchTeamStandings } from "@/lib/hns/standings";
 import { getTenant } from "@/lib/payload/getTenant";
 import { BASE_URL } from "@/lib/siteUrl";
 import { buildMatchSlug, parseTrailingId } from "@/lib/helpers/slug";
-import type { Match } from "@/types/hns";
+import type { LiveMatch, Match } from "@/types/hns";
 import type {
   JsonLdNode,
   PostalAddressJsonLd,
@@ -32,9 +28,16 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
-// Kept in step with the 30s TTL on the live match/events fetchers — a longer
-// page TTL would cap them and freeze a live score behind a stale render.
-export const revalidate = 30;
+// Statična stranica: rezultat uživo dohvaća preglednik (`useLiveMatch` →
+// `/api/utakmice/[id]/uzivo`, ADR 0003), pa se HTML renderira najviše jednom
+// dnevno. Mora ostati literal — Next ga čita statički.
+export const revalidate = 86400;
+
+/**
+ * Rok keša za HNS pozive stranice. Next uzima najkraći rok na stranici, pa bi
+ * zadani TTL fetchera (30–180 s) skratio `revalidate` iznad.
+ */
+const PAGE_TTL = 86_400;
 
 function matchTitle(match: Match): string {
   const home = match.homeTeam?.name ?? "Domaćin";
@@ -48,7 +51,9 @@ function matchTitle(match: Match): string {
 }
 
 export async function generateStaticParams() {
-  const competitions = await fetchCurrentSeasonCompetitions();
+  const competitions = await fetchCurrentSeasonCompetitions({
+    revalidate: PAGE_TTL,
+  });
 
   const withId = competitions.filter(
     (competition): competition is typeof competition & { id: number } =>
@@ -58,7 +63,10 @@ export async function generateStaticParams() {
   // One competition failing must not sink the whole build — take what resolves.
   const results = await Promise.allSettled(
     withId.map((competition) =>
-      fetchAllCompetitionMatches({ competitionId: competition.id }),
+      fetchAllCompetitionMatches({
+        competitionId: competition.id,
+        revalidate: PAGE_TTL,
+      }),
     ),
   );
 
@@ -77,7 +85,11 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const match = await fetchMatchInfo({ matchId: parseTrailingId(slug) });
+
+  const match = await fetchMatchInfo({
+    matchId: parseTrailingId(slug),
+    revalidate: PAGE_TTL,
+  });
 
   if (!match) return {};
 
@@ -108,10 +120,10 @@ export default async function MatchPage({ params }: Props) {
   const matchId = parseTrailingId(slug);
 
   const [match, events, lineups, info] = await Promise.all([
-    fetchMatchInfo({ matchId }),
-    fetchMatchEvents({ matchId }),
-    fetchMatchLineups({ matchId }),
-    fetchMatchReferees({ matchId }),
+    fetchMatchInfo({ matchId, revalidate: PAGE_TTL }),
+    fetchMatchEvents({ matchId, revalidate: PAGE_TTL }),
+    fetchMatchLineups({ matchId, revalidate: PAGE_TTL }),
+    fetchMatchReferees({ matchId, revalidate: PAGE_TTL }),
   ]);
 
   if (!match) notFound();
@@ -128,10 +140,21 @@ export default async function MatchPage({ params }: Props) {
   const competitionId = match.competition?.id ?? null;
 
   const standings =
-    competitionId != null ? await fetchTeamStandings({ competitionId }) : [];
+    competitionId != null
+      ? await fetchTeamStandings({ competitionId, revalidate: PAGE_TTL })
+      : [];
 
-  const live = isLive(match);
-  const started = live || isFinished(match);
+  // Početno stanje za `useLiveMatch` — isti podaci koje je server upravo dohvatio.
+  const initialLive: LiveMatch = {
+    matchId,
+    score: match.score,
+    liveStatus: match.liveStatus,
+    minute: match.minute,
+    currentMinute: match.currentMinute,
+    events,
+    lineups,
+  };
+
   const tenant = await getTenant();
   const jsonLd = buildJsonLd({ match, tenantName: tenant.displayName });
 
@@ -145,23 +168,12 @@ export default async function MatchPage({ params }: Props) {
         />
       ))}
 
-      {/* Dok utakmica traje, stranica se sama osvježava — bez F5 na tribini. */}
-      <RefreshWhile active={live} intervalMs={30_000} />
-
-      <MatchHero match={match} />
-
-      <section className="mx-auto max-w-6xl px-6 py-16 md:py-24 lg:px-8">
-        <Suspense fallback={null}>
-          <MatchTabs
-            match={match}
-            events={events}
-            lineups={lineups}
-            info={info}
-            standings={standings}
-            started={started}
-          />
-        </Suspense>
-      </section>
+      <MatchLive
+        match={match}
+        initialLive={initialLive}
+        info={info}
+        standings={standings}
+      />
     </div>
   );
 }
