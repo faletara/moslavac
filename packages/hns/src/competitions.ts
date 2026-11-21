@@ -9,6 +9,7 @@ import type {
 import { adaptCompetition, adaptMatch } from "./adapters";
 import { currentSeasonTag, getSeniorCompetitionFilter } from "./client";
 import { hnsList, hnsListResult, hnsResource } from "./fetchResource";
+import type { HnsCacheOptions } from "./fetchResource";
 import { isFinished } from "./matchStatus";
 import { fetchUpcomingMatches } from "./matches";
 
@@ -19,14 +20,16 @@ const COMPETITIONS_TTL = 3600;
  * means the request failed (so callers can show "temporarily unavailable"
  * instead of misreporting a failure as "no active competitions").
  */
-export async function fetchCurrentSeasonCompetitionsResult(): Promise<{
+export async function fetchCurrentSeasonCompetitionsResult(
+  opts: HnsCacheOptions = {},
+): Promise<{
   competitions: Competition[];
   ok: boolean;
 }> {
   const { data, ok } = await hnsListResult<HnsCompetition>({
     path: (teamId) => `/api/live/competition/list/active/${teamId}`,
     tag: "competitions",
-    revalidate: COMPETITIONS_TTL,
+    revalidate: opts.revalidate ?? COMPETITIONS_TTL,
   });
 
   const seasonTag = currentSeasonTag();
@@ -39,13 +42,17 @@ export async function fetchCurrentSeasonCompetitionsResult(): Promise<{
   return { competitions, ok };
 }
 
-export async function fetchCurrentSeasonCompetitions(): Promise<Competition[]> {
-  return (await fetchCurrentSeasonCompetitionsResult()).competitions;
+export async function fetchCurrentSeasonCompetitions(
+  opts: HnsCacheOptions = {},
+): Promise<Competition[]> {
+  return (await fetchCurrentSeasonCompetitionsResult(opts)).competitions;
 }
 
-export async function fetchSeniorCompetition(): Promise<Competition | null> {
+export async function fetchSeniorCompetition(
+  opts: HnsCacheOptions = {},
+): Promise<Competition | null> {
   const [competitions, filter] = await Promise.all([
-    fetchCurrentSeasonCompetitions(),
+    fetchCurrentSeasonCompetitions(opts),
     getSeniorCompetitionFilter(),
   ]);
 
@@ -54,13 +61,13 @@ export async function fetchSeniorCompetition(): Promise<Competition | null> {
   return competitions.find((c) => c.name.includes(filter)) ?? null;
 }
 
-export async function fetchCompetitionInfo(params: {
-  competitionId: number;
-}): Promise<Competition | null> {
+export async function fetchCompetitionInfo(
+  params: { competitionId: number } & HnsCacheOptions,
+): Promise<Competition | null> {
   const competition = await hnsResource<HnsCompetition>({
     path: () => `/api/live/competition/${params.competitionId}`,
     tag: `competition-${params.competitionId}`,
-    revalidate: COMPETITIONS_TTL,
+    revalidate: params.revalidate ?? COMPETITIONS_TTL,
   });
 
   return adaptCompetition(competition);
@@ -68,12 +75,13 @@ export async function fetchCompetitionInfo(params: {
 
 async function fetchPastCompetitionMatches(
   competitionId: number,
+  revalidate: number,
 ): Promise<Match[]> {
   const matches = await hnsList<HnsMatch>({
     path: (teamId) =>
       `/api/live/competition/${competitionId}/matches/paginated/past/2/${teamId}?page=1&pageSize=75`,
     tag: `competition-${competitionId}-matches`,
-    revalidate: COMPETITIONS_TTL,
+    revalidate,
     paginated: true,
   });
 
@@ -82,24 +90,27 @@ async function fetchPastCompetitionMatches(
 
 async function fetchFutureCompetitionMatches(
   competitionId: number,
+  revalidate: number,
 ): Promise<Match[]> {
   const matches = await hnsList<HnsMatch>({
     path: (teamId) =>
       `/api/live/competition/${competitionId}/matches/paginated/future/2/${teamId}?page=1&pageSize=75`,
     tag: `competition-${competitionId}-matches`,
-    revalidate: COMPETITIONS_TTL,
+    revalidate,
     paginated: true,
   });
 
   return matches.map(adaptMatch);
 }
 
-export async function fetchCompetitionMatches(params: {
-  competitionId: number;
-}): Promise<Match[]> {
+export async function fetchCompetitionMatches(
+  params: { competitionId: number } & HnsCacheOptions,
+): Promise<Match[]> {
+  const revalidate = params.revalidate ?? COMPETITIONS_TTL;
+
   const [past, future] = await Promise.all([
-    fetchPastCompetitionMatches(params.competitionId),
-    fetchFutureCompetitionMatches(params.competitionId),
+    fetchPastCompetitionMatches(params.competitionId, revalidate),
+    fetchFutureCompetitionMatches(params.competitionId, revalidate),
   ]);
 
   return [...past, ...future];
@@ -114,6 +125,7 @@ const MATCHES_MAX_PAGES = 10;
 async function fetchAllMatchesPaged(
   competitionId: number,
   direction: "past" | "future",
+  revalidate: number,
 ): Promise<Match[]> {
   const all: Match[] = [];
 
@@ -123,7 +135,7 @@ async function fetchAllMatchesPaged(
         path: (teamId) =>
           `/api/live/competition/${competitionId}/matches/paginated/${direction}/2/${teamId}?page=${page}&pageSize=${MATCHES_PAGE_SIZE}`,
         tag: `competition-${competitionId}-all-matches`,
-        revalidate: COMPETITIONS_TTL,
+        revalidate,
         paginated: true,
       })
     ).map(adaptMatch);
@@ -136,12 +148,14 @@ async function fetchAllMatchesPaged(
   return all;
 }
 
-export async function fetchAllCompetitionMatches(params: {
-  competitionId: number;
-}): Promise<Match[]> {
+export async function fetchAllCompetitionMatches(
+  params: { competitionId: number } & HnsCacheOptions,
+): Promise<Match[]> {
+  const revalidate = params.revalidate ?? COMPETITIONS_TTL;
+
   const [past, future] = await Promise.all([
-    fetchAllMatchesPaged(params.competitionId, "past"),
-    fetchAllMatchesPaged(params.competitionId, "future"),
+    fetchAllMatchesPaged(params.competitionId, "past", revalidate),
+    fetchAllMatchesPaged(params.competitionId, "future", revalidate),
   ]);
 
   return [...past, ...future];
@@ -149,8 +163,10 @@ export async function fetchAllCompetitionMatches(params: {
 
 const MATCH_SLOT_TTL = 30;
 
-export async function fetchMatchSlots(): Promise<MatchSlots> {
-  const senior = await fetchSeniorCompetition();
+export async function fetchMatchSlots(
+  opts: HnsCacheOptions = {},
+): Promise<MatchSlots> {
+  const senior = await fetchSeniorCompetition(opts);
 
   if (!senior?.id) return { next: null, previous: null };
 
@@ -159,14 +175,14 @@ export async function fetchMatchSlots(): Promise<MatchSlots> {
       path: (teamId) =>
         `/api/live/competition/${senior.id}/matches/paginated/past/2/${teamId}?page=1&pageSize=3`,
       tag: "match-slots",
-      revalidate: MATCH_SLOT_TTL,
+      revalidate: opts.revalidate ?? MATCH_SLOT_TTL,
       paginated: true,
     }),
     hnsList<HnsMatch>({
       path: (teamId) =>
         `/api/live/competition/${senior.id}/matches/paginated/future/2/${teamId}?page=1&pageSize=1`,
       tag: "match-slots",
-      revalidate: MATCH_SLOT_TTL,
+      revalidate: opts.revalidate ?? MATCH_SLOT_TTL,
       paginated: true,
     }),
   ]);
@@ -192,7 +208,7 @@ export async function fetchMatchSlots(): Promise<MatchSlots> {
 
   if (!next) {
     const filter = await getSeniorCompetitionFilter();
-    const upcoming = await fetchUpcomingMatches();
+    const upcoming = await fetchUpcomingMatches(opts);
     next =
       upcoming.find((m) =>
         filter ? m.competition?.name.includes(filter) : false,

@@ -13,18 +13,19 @@ import {
   adaptPlayerSearchResult,
 } from "./adapters";
 import { hnsList, hnsResource } from "./fetchResource";
+import type { HnsCacheOptions } from "./fetchResource";
 
 const PLAYER_TTL = 3600;
 
-export async function fetchPlayerDetails(params: {
-  personId: string;
-}): Promise<Player | null> {
+export async function fetchPlayerDetails(
+  params: { personId: string } & HnsCacheOptions,
+): Promise<Player | null> {
   if (!params.personId) return null;
 
   const player = await hnsResource<HnsTeamPlayer>({
     path: () => `/api/live/player/${params.personId}`,
     tag: `player-${params.personId}`,
-    revalidate: PLAYER_TTL,
+    revalidate: params.revalidate ?? PLAYER_TTL,
   });
 
   return adaptPlayer(player);
@@ -35,9 +36,9 @@ export async function fetchPlayerDetails(params: {
  * momčadi, pa se ide igrač po igrač — pozivi su keširani (`PLAYER_TTL`) i idu
  * paralelno. Igrači bez fotke se izostavljaju iz mape.
  */
-export async function fetchPlayerPhotos(params: {
-  personIds: number[];
-}): Promise<Record<number, string>> {
+export async function fetchPlayerPhotos(
+  params: { personIds: number[] } & HnsCacheOptions,
+): Promise<Record<number, string>> {
   const unique = [
     ...new Set(params.personIds.filter((id) => Number.isFinite(id))),
   ];
@@ -46,7 +47,10 @@ export async function fetchPlayerPhotos(params: {
 
   const entries = await Promise.all(
     unique.map(async (personId) => {
-      const player = await fetchPlayerDetails({ personId: String(personId) });
+      const player = await fetchPlayerDetails({
+        personId: String(personId),
+        revalidate: params.revalidate,
+      });
 
       return [personId, player?.picture ?? null] as const;
     }),
@@ -59,16 +63,15 @@ export async function fetchPlayerPhotos(params: {
   );
 }
 
-export async function fetchPlayerStats(params: {
-  personId: string;
-  competitionId: number;
-}): Promise<PlayerCompetitionStats | null> {
+export async function fetchPlayerStats(
+  params: { personId: string; competitionId: number } & HnsCacheOptions,
+): Promise<PlayerCompetitionStats | null> {
   if (!params.personId || params.competitionId == null) return null;
 
   const stats = await hnsList<HnsPlayerCompetitionStats>({
     path: (teamId) => `/api/live/player/${params.personId}/stats/${teamId}`,
     tag: `player-${params.personId}-stats-${params.competitionId}`,
-    revalidate: PLAYER_TTL,
+    revalidate: params.revalidate ?? PLAYER_TTL,
   });
 
   const stat =
@@ -81,9 +84,9 @@ export async function fetchPlayerStats(params: {
   return stat ? adaptPlayerCompetitionStats(stat) : null;
 }
 
-export async function searchPlayers(params: {
-  keyword: string;
-}): Promise<PlayerSearchResult[]> {
+export async function searchPlayers(
+  params: { keyword: string } & HnsCacheOptions,
+): Promise<PlayerSearchResult[]> {
   const keyword = params.keyword.trim();
 
   if (!keyword) return [];
@@ -91,7 +94,7 @@ export async function searchPlayers(params: {
   const result = await hnsResource<HnsPaginatedResultsTeamPlayer>({
     path: () =>
       `/api/live/player/search?keyword=${encodeURIComponent(keyword)}&page=0&pageSize=100`,
-    revalidate: PLAYER_TTL,
+    revalidate: params.revalidate ?? PLAYER_TTL,
   });
 
   return (

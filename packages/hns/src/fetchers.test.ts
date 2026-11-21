@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type {
   HnsLineups,
   HnsMatch,
@@ -11,9 +11,36 @@ import type {
 } from "@/types/hns";
 import { runWithHnsContext } from "./context";
 import type { HnsTransport } from "./context";
-import { fetchMatchEvents, fetchMatchInfo, fetchMatchLineups, fetchMatchReferees } from "./matches";
-import { fetchPlayerDetails, fetchPlayerStats, searchPlayers } from "./players";
-import { fetchCompetitionGoalStats, fetchTeamStandings } from "./standings";
+import { currentSeasonTag } from "./client";
+import {
+  fetchAllCompetitionMatches,
+  fetchCompetitionInfo,
+  fetchCompetitionMatches,
+  fetchCurrentSeasonCompetitions,
+  fetchCurrentSeasonCompetitionsResult,
+  fetchMatchSlots,
+  fetchSeniorCompetition,
+} from "./competitions";
+import {
+  fetchAllMatches,
+  fetchMatchEvents,
+  fetchMatchInfo,
+  fetchMatchLineups,
+  fetchMatchReferees,
+  fetchUpcomingMatches,
+} from "./matches";
+import { fetchPlayerDetails, fetchPlayerPhotos, fetchPlayerStats, searchPlayers } from "./players";
+import {
+  fetchAllCompetitionRedCards,
+  fetchAllCompetitionScorers,
+  fetchAllCompetitionYellowCards,
+  fetchCompetitionGoalStats,
+  fetchCompetitionRedCardStats,
+  fetchCompetitionYellowCardStats,
+  fetchTeamStandings,
+  fetchTeamStandingsUnofficial,
+} from "./standings";
+import { fetchClubDetails, fetchTeamDetails } from "./team";
 
 const ctx = (transport: HnsTransport) => ({
   transport,
@@ -236,5 +263,99 @@ describe("HNS fetchers", () => {
         shirtNumber: 10,
       },
     ]);
+  });
+});
+
+describe("HNS fetcher cache TTL", () => {
+  type Fetch = (opts: { revalidate?: number }) => Promise<object | null>;
+
+  // [name, call, the TTLs the fetcher used before per-call TTLs existed]
+  const cases: [string, Fetch, number[]][] = [
+    ["fetchMatchInfo", (o) => fetchMatchInfo({ matchId: 99, ...o }), [30]],
+    ["fetchMatchEvents", (o) => fetchMatchEvents({ matchId: 99, ...o }), [30]],
+    ["fetchMatchLineups", (o) => fetchMatchLineups({ matchId: 99, ...o }), [60]],
+    ["fetchMatchReferees", (o) => fetchMatchReferees({ matchId: 99, ...o }), [60]],
+    ["fetchAllMatches", (o) => fetchAllMatches(o), [60]],
+    ["fetchUpcomingMatches", (o) => fetchUpcomingMatches(o), [60]],
+    ["fetchCurrentSeasonCompetitionsResult", (o) => fetchCurrentSeasonCompetitionsResult(o), [3600]],
+    ["fetchCurrentSeasonCompetitions", (o) => fetchCurrentSeasonCompetitions(o), [3600]],
+    ["fetchSeniorCompetition", (o) => fetchSeniorCompetition(o), [3600]],
+    ["fetchCompetitionInfo", (o) => fetchCompetitionInfo({ competitionId: 8, ...o }), [3600]],
+    ["fetchCompetitionMatches", (o) => fetchCompetitionMatches({ competitionId: 8, ...o }), [3600]],
+    ["fetchAllCompetitionMatches", (o) => fetchAllCompetitionMatches({ competitionId: 8, ...o }), [3600]],
+    // competitions list → slots (none found) → team-wide upcoming fallback
+    ["fetchMatchSlots", (o) => fetchMatchSlots(o), [3600, 30, 60]],
+    ["fetchTeamStandings", (o) => fetchTeamStandings({ competitionId: 8, ...o }), [180]],
+    ["fetchTeamStandingsUnofficial", (o) => fetchTeamStandingsUnofficial({ competitionId: 8, ...o }), [180]],
+    ["fetchCompetitionGoalStats", (o) => fetchCompetitionGoalStats({ competitionId: 8, ...o }), [180]],
+    ["fetchCompetitionRedCardStats", (o) => fetchCompetitionRedCardStats({ competitionId: 8, ...o }), [180]],
+    ["fetchCompetitionYellowCardStats", (o) => fetchCompetitionYellowCardStats({ competitionId: 8, ...o }), [180]],
+    ["fetchAllCompetitionScorers", (o) => fetchAllCompetitionScorers({ competitionId: 8, ...o }), [180]],
+    ["fetchAllCompetitionYellowCards", (o) => fetchAllCompetitionYellowCards({ competitionId: 8, ...o }), [180]],
+    ["fetchAllCompetitionRedCards", (o) => fetchAllCompetitionRedCards({ competitionId: 8, ...o }), [180]],
+    ["fetchTeamDetails", (o) => fetchTeamDetails({ teamId: "7", ...o }), [3600]],
+    ["fetchClubDetails", (o) => fetchClubDetails(o), [3600]],
+    ["fetchPlayerDetails", (o) => fetchPlayerDetails({ personId: "33", ...o }), [3600]],
+    ["fetchPlayerPhotos", (o) => fetchPlayerPhotos({ personIds: [33], ...o }), [3600]],
+    ["fetchPlayerStats", (o) => fetchPlayerStats({ personId: "33", competitionId: 8, ...o }), [3600]],
+    ["searchPlayers", (o) => searchPlayers({ keyword: "igrac", ...o }), [3600]],
+  ];
+
+  async function recordedTtls(call: Fetch, opts: { revalidate?: number }) {
+    const ttls: (number | undefined)[] = [];
+
+    const transport: HnsTransport = async (endpoint, fetchOpts) => {
+      ttls.push(fetchOpts?.revalidate);
+
+      if (endpoint.startsWith("/api/live/competition/list/active/")) {
+        return [{ id: 8, name: `Seniori ${currentSeasonTag()}` }];
+      }
+
+      return [];
+    };
+
+    await runWithHnsContext(
+      { ...ctx(transport), seniorCompetitionFilter: "Seniori" },
+      () => call(opts),
+    );
+
+    return ttls;
+  }
+
+  it.each(cases)("%s passes a per-call revalidate to the transport", async (_name, call) => {
+    const ttls = await recordedTtls(call, { revalidate: 86_400 });
+
+    expect(ttls.length).toBeGreaterThan(0);
+    expect(new Set(ttls)).toEqual(new Set([86_400]));
+  });
+
+  it.each(cases)("%s keeps its default TTL without one", async (_name, call, defaultTtls) => {
+    const ttls = await recordedTtls(call, {});
+
+    expect(new Set(ttls)).toEqual(new Set(defaultTtls));
+  });
+});
+
+describe("CMS cron (explicit HNS context, HTTP transport)", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("fetches without cache even when a per-call revalidate is passed", async () => {
+    const fetchMock = vi.fn(
+      async (_url: string, _init: RequestInit & { next?: unknown }) =>
+        Response.json(null),
+    );
+
+    vi.stubGlobal("fetch", fetchMock);
+
+    await runWithHnsContext({ teamId: "42", apiKey: "test-key" }, () =>
+      fetchMatchInfo({ matchId: 99, revalidate: 86_400 }),
+    );
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const init = fetchMock.mock.calls[0]![1];
+    expect(init.cache).toBe("no-store");
+    expect(init.next).toBeUndefined();
   });
 });
