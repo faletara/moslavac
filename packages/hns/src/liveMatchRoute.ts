@@ -1,7 +1,8 @@
 import "server-only";
 
 import { parsePositiveInt } from "@/lib/helpers/validate";
-import { fetchLiveMatch, HnsUnavailableError } from "./matches";
+import { HnsUnavailableError } from "./context";
+import { fetchLiveMatch } from "./matches";
 
 /**
  * `GET /api/utakmice/[id]/uzivo` — trenutno stanje utakmice (`LiveMatch`) za

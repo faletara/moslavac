@@ -18,6 +18,7 @@ import {
   hnsResourceResult,
 } from "./fetchResource";
 import type { HnsCacheOptions } from "./fetchResource";
+import { HnsUnavailableError } from "./context";
 
 const MATCH_TTL = 60;
 
@@ -172,14 +173,6 @@ export async function fetchMatchReferees(
   return adaptMatchInfo(info);
 }
 
-/** HNS nije odgovorio ili je vratio grešku — različito od "utakmica ne postoji". */
-export class HnsUnavailableError extends Error {
-  constructor(matchId: number) {
-    super(`HNS nedostupan za utakmicu ${matchId}`);
-    this.name = "HnsUnavailableError";
-  }
-}
-
 /**
  * Trenutno stanje utakmice za rutu uživo: utakmica, događaji i postave, svi s
  * rokom keša od 30 s. `null` znači da utakmica ne postoji. Ako zakaže bilo koji
@@ -214,18 +207,40 @@ export async function fetchLiveMatch(params: {
   if (match.ok && !match.data) return null;
 
   if (!match.ok || !events.ok || !lineups.ok || !match.data) {
-    throw new HnsUnavailableError(matchId);
+    throw new HnsUnavailableError(`/api/live/match/${matchId}`);
   }
 
-  const adapted = adaptMatch(match.data);
-
-  return {
+  return toLiveMatch({
     matchId,
-    score: adapted.score,
-    liveStatus: adapted.liveStatus,
-    minute: adapted.minute,
-    currentMinute: adapted.currentMinute,
+    match: adaptMatch(match.data),
     events: events.data.map(adaptMatchEvent),
     lineups: adaptLineups(lineups.data),
+  });
+}
+
+/**
+ * Dio utakmice koji se mijenja uživo. Jedno mjesto za izbor polja: koristi ga
+ * ruta uživo i stranica utakmice za početno stanje `useLiveMatch`, pa HTML i
+ * odgovor rute ne mogu nositi različit oblik.
+ */
+export function toLiveMatch({
+  matchId,
+  match,
+  events,
+  lineups,
+}: {
+  matchId: number;
+  match: Match;
+  events: MatchEvent[];
+  lineups: Lineups | null;
+}): LiveMatch {
+  return {
+    matchId,
+    score: match.score,
+    liveStatus: match.liveStatus,
+    minute: match.minute,
+    currentMinute: match.currentMinute,
+    events,
+    lineups,
   };
 }
