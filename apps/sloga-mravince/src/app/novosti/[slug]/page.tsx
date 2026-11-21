@@ -17,7 +17,14 @@ import type {
   OrganizationJsonLd,
 } from "@/types/jsonld";
 
-export const revalidate = 60;
+export const revalidate = 86400;
+
+// Prazan popis: nijedna novost se ne gradi pri buildu, ali se svaka prvim
+// posjetom renderira statično i drži dan (ISR). Bez ovoga ruta je dinamična i
+// renderira se na svaki zahtjev, pa `revalidate` ne bi imao učinka.
+export async function generateStaticParams() {
+  return [];
+}
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -145,9 +152,10 @@ export default async function NewsDetailPage({ params }: Props) {
 
   // Automatski izvještaj nosi `sourceMatchId`; ručno pisana novost ga nema i
   // stranica onda ne dira HNS. Ako HNS zakaže, izvještaj ostaje čitljiv kao
-  // običan tekst — zato `null` prolazi bez greške.
+  // običan tekst — zato `null` prolazi bez greške. Utakmica iz izvještaja je
+  // odigrana i više se ne mijenja, pa smije u keš na dan kao i sama novost.
   const match = news.sourceMatchId
-    ? await fetchMatchInfo({ matchId: news.sourceMatchId })
+    ? await fetchMatchInfo({ matchId: news.sourceMatchId, revalidate: 86_400 })
     : null;
 
   const logoUrl = tenant.branding?.logo?.url ?? null;

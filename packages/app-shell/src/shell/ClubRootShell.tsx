@@ -19,10 +19,12 @@ import { getTenant } from "@/lib/payload/getTenant";
 /**
  * Koordinate stadiona za `SportsOrganization`. HNS je vanjski servis, a ovo je
  * root layout svake stranice — ispad smije izostaviti `geo`, ne srušiti sajt.
+ * Stadion se praktički ne mijenja, a kraći rok bi kroz layout skratio
+ * `revalidate` svake stranice, pa je rok 1 dan.
  */
 async function loadFacility() {
   try {
-    const team = await fetchClubDetails();
+    const team = await fetchClubDetails({ revalidate: 86_400 });
 
     return team?.facility ?? null;
   } catch {

@@ -69,7 +69,7 @@ describe("fetchList", () => {
     expect(path).toContain("limit=50");
     expect(path).toContain("depth=2");
     expect(call.opts?.next?.tags).toEqual(["widgets-test-club"]);
-    expect(call.opts?.next?.revalidate).toBe(60);
+    expect(call.opts?.next?.revalidate).toBe(86_400);
   });
 
   it("uses tagPrefix when the cache tag differs from the collection name", async () => {

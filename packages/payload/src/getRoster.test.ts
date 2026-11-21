@@ -61,7 +61,7 @@ describe("adaptRoster", () => {
 });
 
 describe("fetchRoster", () => {
-  it("is authenticated, revalidates at 300, tags roster-<slug>", async () => {
+  it("is authenticated, revalidates daily, tags roster-<slug>", async () => {
     const calls: { path: string; opts?: PayloadFetchOptions }[] = [];
 
     const transport: PayloadTransport = async (path, opts) => {
@@ -78,7 +78,7 @@ describe("fetchRoster", () => {
     expect(res).toHaveLength(1);
     expect(decodeURIComponent(calls[0]!.path)).toContain("/roster?");
     expect(calls[0]!.opts?.authenticated).toBe(true);
-    expect(calls[0]!.opts?.next?.revalidate).toBe(300);
+    expect(calls[0]!.opts?.next?.revalidate).toBe(86_400);
     expect(calls[0]!.opts?.next?.tags).toEqual(["roster-moslavac"]);
   });
 });

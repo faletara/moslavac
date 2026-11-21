@@ -7,6 +7,13 @@ import type { JsonValue } from "@/types/json";
 // callers instead inject them and run the fetchers inside `runWithPayloadContext`.
 // Mirrors the HNS context in `packages/hns/src/context.ts`.
 
+/**
+ * Rok keša za sadržaj iz CMS-a: 1 dan. Svježinu ne drži ovaj rok nego CMS
+ * webhook (`/api/revalidate`), koji pri svakom spremanju poništava tagove i
+ * cijeli layout. Kratak rok bi samo tjerao stranice na render svake minute.
+ */
+export const CMS_CONTENT_TTL = 86_400;
+
 export interface PayloadFetchOptions {
   authenticated?: boolean;
   next?: { revalidate?: number; tags?: string[] };

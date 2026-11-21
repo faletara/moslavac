@@ -39,6 +39,5 @@ export const fetchRoster = (): Promise<RosterEntry[]> =>
     sort: "displayName",
     limit: 100,
     authenticated: true,
-    revalidate: 300,
     adapt: adaptRoster,
   });

@@ -74,11 +74,13 @@ export function clubNextConfig(
       root: repoRoot,
     },
     // Koliko dugo CDN smije servirati staru (stale) verziju ISR stranice dok se
-    // nova gradi u pozadini. Next default je godina dana, pa je prvi posjetitelj
-    // nakon isteka `revalidate` uvijek dobivao stari sadržaj i tek okidao obnovu
-    // — zbog toga se nova novost nije vidjela do hard refresha. 120 s je iznad
-    // najkraćeg `revalidate` u aplikacijama (30 s), pa SWR i dalje radi, kratko.
-    expireTime: 120,
+    // nova gradi u pozadini. Nekad je ovo bilo 120 s jer se nova novost nije
+    // vidjela do hard refresha. To sada rješava CMS webhook (`/api/revalidate`
+    // → `revalidateTag` + `revalidatePath("/", "layout")`), koji pri svakom
+    // spremanju odmah poništava sadržaj. Kratki rok je samo izbacivao stranice
+    // iz CDN-a nakon dvije minute bez posjeta i tjerao ih na novi render, pa je
+    // sada 1 dan, koliko i najduži `revalidate`.
+    expireTime: 86_400,
     async headers() {
       return [
         {

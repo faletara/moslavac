@@ -1,6 +1,7 @@
 import "server-only";
 import type { z } from "zod";
 import { resolveTransport } from "./client";
+import { CMS_CONTENT_TTL } from "./context";
 import type { PayloadFetchOptions } from "./context";
 import { appendWhere, tenantWhere } from "./query";
 import { payloadPage } from "./schemas";
@@ -54,7 +55,7 @@ async function queryCollection<Raw>(
   const opts: PayloadFetchOptions = {
     authenticated: o.authenticated,
     next: {
-      revalidate: o.revalidate ?? 60,
+      revalidate: o.revalidate ?? CMS_CONTENT_TTL,
       tags: o.tags ?? [`${o.tagPrefix ?? o.collection}-${slug}`],
     },
   };
