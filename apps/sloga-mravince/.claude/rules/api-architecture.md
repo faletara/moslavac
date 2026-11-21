@@ -24,8 +24,9 @@ RSC ──► @/lib/payload/* | @/lib/hns/* ──► Payload CMS / HNS
 - No React Query, no client data stack, and no HTTP round-trip from server code
   to this app's own route handlers. The one sanctioned browser fetch is the
   live-match route below.
-- Live data stays fresh through server re-fetching (`next: { revalidate }` plus
-  `<RefreshWhile>` from `@/components/ui/refresh-while`), not a client cache.
+- Server data stays fresh through `next: { revalidate }`, not a client cache.
+  The live score on the match page is the one exception: it comes from the
+  live-match route below, not from re-rendering the page.
 
 Two route handlers exist to serve the browser:
 
@@ -62,6 +63,17 @@ browser ──► GET /api/utakmice/[id]/uzivo ──► fetchLiveMatch ──�
   - 404 for an unknown match, 502 when HNS fails — both `no-store`.
 - Exposed by `sloga-mravince`. Another club opts in by adding the same
   three-line `route.ts`; it never writes its own handler or mapping.
+- The browser side is **one** shared hook, `useLiveMatch` in
+  `packages/ui/src/use-live-match.ts`: it starts from the server-rendered
+  `LiveMatch`, and polls the route every 30 s only while `liveFetchPlan`
+  (`packages/hns/src/livePolling.ts`, pure and tested) says so — from 60 min
+  before kick-off until `PLAYED`, at most 3 h after. Past that window, a page
+  whose cached HTML is not `PLAYED` fetches once. Played, called-off and distant
+  matches fetch nothing. Paused on a hidden tab; a failed fetch keeps the last
+  state.
+- The match page (`raspored-i-rezultati/[slug]`) is static (`revalidate =
+  86400`) and passes the same 1-day TTL to every HNS fetcher it calls, so a
+  short fetcher default cannot cap it.
 
 ## The CMS-to-app path: cache revalidation
 
