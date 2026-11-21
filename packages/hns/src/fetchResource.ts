@@ -9,6 +9,15 @@ import type { JsonValue } from "@/types/json";
 // append → cache tag → transport → unwrap → error contract) lives here once.
 // The transport is a seam (see context.ts): HTTP in prod, a fake in tests.
 
+/**
+ * Per-call cache options every page-facing HNS fetcher accepts. `revalidate`
+ * overrides the fetcher's default TTL (seconds), so a page can align its HNS
+ * fetches with its own `revalidate` — Next uses the shortest of the two.
+ */
+export interface HnsCacheOptions {
+  revalidate?: number;
+}
+
 interface HnsSpec {
   /** Builds the endpoint. The own-team id is injected for in-path use. */
   path: (teamId: string) => string;
