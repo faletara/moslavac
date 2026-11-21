@@ -1,6 +1,7 @@
 import "server-only";
 import { tenantSlug } from "@/lib/payload/getTenant";
 import { getHnsTeamId, resolveTransport } from "./client";
+import { HnsHttpError } from "./context";
 import { anyList, bareList, pagedList } from "./schemas";
 import type { JsonValue } from "@/types/json";
 
@@ -36,7 +37,7 @@ interface HnsSpec {
  */
 async function runHnsQuery<T>(
   spec: HnsSpec,
-): Promise<{ data: T | null; ok: boolean }> {
+): Promise<{ data: T | null; ok: boolean; notFound?: boolean }> {
   const teamId = await getHnsTeamId();
   let endpoint = spec.path(teamId);
 
@@ -58,7 +59,9 @@ async function runHnsQuery<T>(
   } catch (err) {
     console.error(`hnsFetch failed: ${endpoint}`, err);
 
-    return { data: null, ok: false };
+    const notFound = err instanceof HnsHttpError && err.status === 404;
+
+    return { data: null, ok: false, notFound };
   }
 }
 
@@ -105,6 +108,19 @@ export async function hnsList<T>(
   const raw = await hnsQuery<JsonValue>(spec);
 
   return unwrapList<T>(raw, spec.paginated);
+}
+
+/**
+ * Like `hnsResource`, but also reports whether the fetch itself succeeded, so a
+ * missing resource (`ok: true`, `data: null`) is told apart from a failed fetch.
+ * HNS na nepostojeći resurs odgovara s 404, a to je "ne postoji", ne kvar.
+ */
+export async function hnsResourceResult<T>(
+  spec: HnsSpec,
+): Promise<{ data: T | null; ok: boolean }> {
+  const { data, ok, notFound } = await runHnsQuery<T>(spec);
+
+  return { data, ok: ok || notFound === true };
 }
 
 /**

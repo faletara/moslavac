@@ -293,6 +293,23 @@ export interface Lineups {
   away: TeamLineup | null;
 }
 
+/**
+ * Dio utakmice koji se mijenja dok traje: rezultat, status, minuta, događaji i
+ * postave. Preglednik ga dohvaća s rute uživo (`/api/utakmice/[id]/uzivo`) i
+ * spaja preko `Match` iz serverskog renderiranja; timovi, natjecanje, tablica i
+ * suci ostaju na statičnoj stranici. Polja nose ista imena kao u `Match`, pa
+ * spajanje i pomoćnici poput `liveMinute` rade bez prevođenja.
+ */
+export interface LiveMatch {
+  matchId: number;
+  score: MatchScore;
+  liveStatus: HnsLiveStatus | null;
+  minute: number | null;
+  currentMinute: string | null;
+  events: MatchEvent[];
+  lineups: Lineups | null;
+}
+
 export interface MatchInfo {
   refereeKit: string | null;
   refereeKitPng: string | null;

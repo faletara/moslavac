@@ -7,6 +7,22 @@ export interface HnsFetchOptions {
   tags?: string[];
 }
 
+/**
+ * HNS je odgovorio, ali s HTTP greškom. Status ostaje uz grešku, pa pozivatelj
+ * može razlikovati "resurs ne postoji" (404) od kvara. Lažni transport u testu
+ * baca istu grešku.
+ */
+export class HnsHttpError extends Error {
+  constructor(
+    readonly status: number,
+    endpoint: string,
+    statusText = "",
+  ) {
+    super(`HNS fetch failed (${status} ${statusText}): ${endpoint}`);
+    this.name = "HnsHttpError";
+  }
+}
+
 /** Turns an HNS endpoint into parsed JSON. Prod = HTTP; tests = in-memory fake. */
 export type HnsTransport = (
   endpoint: string,
