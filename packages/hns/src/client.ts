@@ -1,6 +1,6 @@
 import "server-only";
 import { getTenant } from "@/lib/payload/getTenant";
-import { getActiveHnsContext } from "./context";
+import { getActiveHnsContext, HnsHttpError } from "./context";
 import type { HnsTransport } from "./context";
 
 const HNS_API_BASE =
@@ -36,9 +36,7 @@ export const httpTransport: HnsTransport = async (
 	const response = await fetch(url, init);
 
 	if (!response.ok) {
-		throw new Error(
-			`HNS fetch failed (${response.status} ${response.statusText}): ${endpoint}`,
-		);
+		throw new HnsHttpError(response.status, endpoint, response.statusText);
 	}
 
 	return response.json();

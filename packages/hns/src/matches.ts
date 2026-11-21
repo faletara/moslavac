@@ -5,12 +5,18 @@ import type {
   HnsMatchEvent,
   HnsMatchInfo,
   Lineups,
+  LiveMatch,
   Match,
   MatchEvent,
   MatchInfo,
 } from "@/types/hns";
 import { adaptLineups, adaptMatch, adaptMatchEvent, adaptMatchInfo } from "./adapters";
-import { hnsList, hnsResource } from "./fetchResource";
+import {
+  hnsList,
+  hnsListResult,
+  hnsResource,
+  hnsResourceResult,
+} from "./fetchResource";
 
 const MATCH_TTL = 60;
 
@@ -155,4 +161,62 @@ export async function fetchMatchReferees(params: {
   });
 
   return adaptMatchInfo(info);
+}
+
+/** HNS nije odgovorio ili je vratio grešku — različito od "utakmica ne postoji". */
+export class HnsUnavailableError extends Error {
+  constructor(matchId: number) {
+    super(`HNS nedostupan za utakmicu ${matchId}`);
+    this.name = "HnsUnavailableError";
+  }
+}
+
+/**
+ * Trenutno stanje utakmice za rutu uživo: utakmica, događaji i postave, svi s
+ * rokom keša od 30 s. `null` znači da utakmica ne postoji. Ako zakaže bilo koji
+ * od tri poziva, baca `HnsUnavailableError` umjesto da vrati djelomično stanje —
+ * prazni događaji ili postave pregazili bi u pregledniku zadnje ispravno stanje.
+ */
+export async function fetchLiveMatch(params: {
+  matchId: number;
+}): Promise<LiveMatch | null> {
+  const { matchId } = params;
+
+  const [match, events, lineups] = await Promise.all([
+    hnsResourceResult<HnsMatch>({
+      path: () => `/api/live/match/${matchId}`,
+      tag: `match-${matchId}`,
+      revalidate: LIVE_MATCH_TTL,
+    }),
+    hnsListResult<HnsMatchEvent>({
+      path: () => `/api/live/match/${matchId}/events?showComments=true`,
+      tag: `match-${matchId}-events`,
+      revalidate: LIVE_MATCH_TTL,
+    }),
+    hnsResourceResult<HnsLineups>({
+      path: () => `/api/live/match/${matchId}/lineups`,
+      tag: `match-${matchId}-lineups`,
+      revalidate: LIVE_MATCH_TTL,
+    }),
+  ]);
+
+  // Na nepoznatu utakmicu HNS vraća 404 za utakmicu, ali 400 za događaje i
+  // postave — zato se "ne postoji" provjerava prije grešaka ostala dva poziva.
+  if (match.ok && !match.data) return null;
+
+  if (!match.ok || !events.ok || !lineups.ok || !match.data) {
+    throw new HnsUnavailableError(matchId);
+  }
+
+  const adapted = adaptMatch(match.data);
+
+  return {
+    matchId,
+    score: adapted.score,
+    liveStatus: adapted.liveStatus,
+    minute: adapted.minute,
+    currentMinute: adapted.currentMinute,
+    events: events.data.map(adaptMatchEvent),
+    lineups: adaptLineups(lineups.data),
+  };
 }

@@ -47,9 +47,15 @@ at 256×256 and 180×180 — the sizes `buildClubManifest` declares.
   raw **Payload doc** / **HNS payload**. Mapping from raw → domain lives inside
   the `payload`/`hns` fetchers (no separate public adapter module).
 - **One data path** — server components call `packages/payload` & `packages/hns`
-  directly; nothing fetches data from the browser. The single route handler that
-  serves the browser is `/api/images/[uuid]`, which proxies HNS crest bytes. See
-  each app's `.claude/rules/api-architecture.md`.
+  directly. Two route handlers serve the browser: `/api/images/[uuid]`, which
+  proxies HNS crest bytes, and the live-match route `/api/utakmice/[id]/uzivo`,
+  which returns a **LiveMatch** so a static match page can show the live score
+  (ADR 0003). Both are thin calls of shared factories in `packages/hns`. See each
+  app's `.claude/rules/api-architecture.md`.
+- **LiveMatch** — the part of a Match that changes while it is played: score,
+  `liveStatus`, minute, events and lineups (no teams, standings or referees).
+  Returned by `fetchLiveMatch`; the browser fetches it from the live-match route,
+  which the CDN caches for 30 s for all visitors at once.
 
 ## Match reports
 
