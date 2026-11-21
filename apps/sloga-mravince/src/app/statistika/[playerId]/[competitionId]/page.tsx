@@ -24,6 +24,13 @@ interface Props {
 // 1 h; HNS pozivi (i u layout.tsx) dobivaju isti rok.
 export const revalidate = 3600;
 
+// Prazan popis: nijedan igrač se ne gradi pri buildu, ali se svaka statistika
+// prvim posjetom renderira statično i drži sat (ISR). Bez ovoga ruta je
+// dinamična i renderira se na svaki zahtjev, pa `revalidate` ne bi imao učinka.
+export async function generateStaticParams() {
+  return [];
+}
+
 /** Ime razdvojeno na dio ispred prezimena i samo prezime. */
 interface SplitName {
   first: string;
