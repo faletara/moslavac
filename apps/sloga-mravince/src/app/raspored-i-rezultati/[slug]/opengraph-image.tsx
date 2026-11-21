@@ -11,6 +11,17 @@ export const contentType = "image/png";
 
 export const alt = "Utakmica";
 
+// Slika se renderira najviše jednom dnevno po utakmici (ISR). Rezultat na njoj
+// smije kasniti: dijeli se uglavnom prije ili nakon utakmice. Mora ostati
+// literal — Next ga čita statički.
+export const revalidate = 86400;
+
+// Prazan popis: nijedna slika se ne gradi pri buildu, nego prvim zahtjevom.
+// Bez ovoga ruta je dinamična i renderira se na svaki zahtjev.
+export async function generateStaticParams() {
+  return [];
+}
+
 const INK = "#1b1b20";
 
 const RED = "#de2025";
@@ -55,7 +66,11 @@ export default async function MatchOgImage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const match = await fetchMatchInfo({ matchId: parseTrailingId(slug) });
+  const match = await fetchMatchInfo({
+    matchId: parseTrailingId(slug),
+    // Zadani TTL utakmice (30 s) skratio bi `revalidate` iznad.
+    revalidate: 86_400,
+  });
 
   if (!match) {
     return new ImageResponse(
