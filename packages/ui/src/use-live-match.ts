@@ -49,8 +49,8 @@ export function useLiveMatch(
 
         if (!res.ok) return;
 
-        // SAFETY: the route serialises `fetchLiveMatch`'s `LiveMatch` on 200,
-        // and `res.ok` was checked above; errors (400/404/502) never get here.
+        // SAFETY: ruta na 200 serijalizira `LiveMatch` iz `fetchLiveMatch`, a
+        // `res.ok` je provjeren gore; greške (400/404/502) ne dolaze dovde.
         const next = (await res.json()) as LiveMatch;
 
         statusRef.current = next.liveStatus;

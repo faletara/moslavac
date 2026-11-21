@@ -5,6 +5,7 @@ import Header from "@/components/layout/Header";
 import ClubRootShell from "@/lib/app-shell/shell/ClubRootShell";
 import { clubMetadataRoute } from "@/lib/app-shell/shell/clubRoutes";
 import { fetchClubDetails } from "@/lib/hns/team";
+import { ONE_DAY_TTL } from "@/lib/helpers/cacheTtl";
 import { getTenant } from "@/lib/payload/getTenant";
 import { BASE_URL } from "@/lib/siteUrl";
 
@@ -25,7 +26,7 @@ async function getClubDetailsForLayout() {
   try {
     // Podaci o klubu se praktički ne mijenjaju. Kraći rok bi kroz layout
     // skratio `revalidate` svake stranice.
-    return await fetchClubDetails({ revalidate: 86_400 });
+    return await fetchClubDetails({ revalidate: ONE_DAY_TTL });
   } catch (error) {
     console.error("Failed to fetch HNS club details for layout", error);
 

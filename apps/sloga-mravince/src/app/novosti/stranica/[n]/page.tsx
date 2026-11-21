@@ -4,7 +4,7 @@ import {
   NewsArchive,
   newsArchiveMetadata,
 } from "@/components/features/news/NewsArchive";
-import { parseNewsPageSegment } from "@/lib/newsPagination";
+import { parsePositiveInt } from "@/lib/helpers/validate";
 
 export const revalidate = 86400;
 
@@ -18,8 +18,10 @@ type Props = {
   params: Promise<{ n: string }>;
 };
 
+// Samo kanonski broj (`2`, ne `02`): ista stranica nema više adresa, a sve
+// ostalo je 404.
 async function pageFrom(params: Props["params"]): Promise<number> {
-  const page = parseNewsPageSegment((await params).n);
+  const page = parsePositiveInt((await params).n);
   if (page === null) notFound();
   if (page === 1) permanentRedirect("/novosti");
   return page;

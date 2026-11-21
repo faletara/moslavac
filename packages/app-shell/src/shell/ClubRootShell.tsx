@@ -1,6 +1,7 @@
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import ClubJsonLd from "@/lib/app-shell/identity/ClubJsonLd";
+import { ONE_DAY_TTL } from "@/lib/helpers/cacheTtl";
 import Providers from "@/components/providers/Providers";
 import { fetchClubDetails } from "@/lib/hns/team";
 import { getTenant } from "@/lib/payload/getTenant";
@@ -24,7 +25,7 @@ import { getTenant } from "@/lib/payload/getTenant";
  */
 async function loadFacility() {
   try {
-    const team = await fetchClubDetails({ revalidate: 86_400 });
+    const team = await fetchClubDetails({ revalidate: ONE_DAY_TTL });
 
     return team?.facility ?? null;
   } catch {

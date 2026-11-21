@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MatchResultCard } from "@/components/features/news/MatchResultCard";
+import { ONE_DAY_TTL } from "@/lib/helpers/cacheTtl";
 import { formatDateLong } from "@/lib/helpers/date";
 import { fetchMatchInfo } from "@/lib/hns/matches";
 import { htmlToMetaDescription } from "@/lib/helpers/text";
@@ -155,7 +156,7 @@ export default async function NewsDetailPage({ params }: Props) {
   // običan tekst — zato `null` prolazi bez greške. Utakmica iz izvještaja je
   // odigrana i više se ne mijenja, pa smije u keš na dan kao i sama novost.
   const match = news.sourceMatchId
-    ? await fetchMatchInfo({ matchId: news.sourceMatchId, revalidate: 86_400 })
+    ? await fetchMatchInfo({ matchId: news.sourceMatchId, revalidate: ONE_DAY_TTL })
     : null;
 
   const logoUrl = tenant.branding?.logo?.url ?? null;

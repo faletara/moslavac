@@ -25,6 +25,12 @@ export interface LiveFetchPlan {
  * - prozor je istekao, a status nije "PLAYED" → `fetchOnce`, jer stranica je
  *   statična i HTML je možda renderiran prije utakmice;
  * - odigrana, otkazana ili odgođena utakmica, ili nepoznat početak → ništa.
+ *
+ * Status `null` znači da HNS ne prati utakmicu uživo (polje izostaje). Takav
+ * status nikad ne postane "PLAYED", pa bi `fetchOnce` dohvaćao pri svakom
+ * otvaranju zauvijek — zato nakon prozora nema dohvata. U prozoru se ipak
+ * dohvaća: HNS upisuje događaje i postave i kad ne vodi status (mlađe
+ * kategorije Sloge za vrijeme utakmice imaju golove uz status "SCHEDULED").
  */
 export function liveFetchPlan(
   kickoffAtUtcMs: number | null,
@@ -48,5 +54,5 @@ export function liveFetchPlan(
     return { poll: true, fetchOnce: false };
   }
 
-  return { poll: false, fetchOnce: true };
+  return { poll: false, fetchOnce: liveStatus != null };
 }

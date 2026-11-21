@@ -1,11 +1,10 @@
 import { describe, expect, it } from "vitest";
 import type { Competition } from "@/types/hns";
 import {
-  competitionPagePaths,
+  competitionPageIds,
   competitionPath,
-  parseCompetitionId,
   resolveCompetitionRoute,
-} from "./competition";
+} from "./competitionRoute";
 
 function competition(id: number | null, name: string): Competition {
   return { id, name } as Competition;
@@ -16,11 +15,10 @@ const senior = competition(7, "1. ŽNL Seniori");
 const cup = competition(12, "Kup ŽNS");
 const competitions = [competition(null, "Bez id-a"), youth, senior, cup];
 
-describe("competitionPagePaths", () => {
-  it("vraća putanje svih natjecanja osim zadanog", () => {
-    expect(competitionPagePaths({ competitions, seniorFilter: "Seniori" })).toEqual([
-      "/raspored-i-rezultati/natjecanje/3",
-      "/raspored-i-rezultati/natjecanje/12",
+describe("competitionPageIds", () => {
+  it("vraća id-eve svih natjecanja osim zadanog", () => {
+    expect(competitionPageIds({ competitions, seniorFilter: "Seniori" })).toEqual([
+      3, 12,
     ]);
   });
 });
@@ -91,17 +89,5 @@ describe("competitionPath", () => {
 
   it("ostala natjecanja dobivaju vlastitu putanju", () => {
     expect(competitionPath(12, 7)).toBe("/raspored-i-rezultati/natjecanje/12");
-  });
-});
-
-describe("parseCompetitionId", () => {
-  it("čita pozitivan cijeli broj iz putanje", () => {
-    expect(parseCompetitionId("123")).toBe(123);
-  });
-
-  it("odbacuje sve što nije pozitivan cijeli broj", () => {
-    for (const value of ["", "abc", "0", "-5", "1.5", undefined]) {
-      expect(parseCompetitionId(value)).toBeNull();
-    }
   });
 });

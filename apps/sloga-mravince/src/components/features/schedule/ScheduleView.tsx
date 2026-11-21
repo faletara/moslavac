@@ -17,8 +17,9 @@ import StandingsTable from "@/components/features/standings/StandingsTable";
 import { isFinished } from "@/lib/hns/matchStatus";
 import { getTenant } from "@/lib/payload/getTenant";
 import { buildMatchSlug } from "@/lib/helpers/slug";
+import { pageMetadata } from "@/lib/pageMetadata";
 import type { Competition, Match, TeamRanking } from "@/types/hns";
-import { competitionPath, resolveCompetitionRoute } from "./competition";
+import { competitionPath, resolveCompetitionRoute } from "@/lib/competitionRoute";
 
 /**
  * Popis i putanje natjecanja dijele ovaj prikaz. 30 min; HNS pozivi dobivaju
@@ -313,21 +314,13 @@ function MatchCard({
 
 export async function scheduleMetadata(canonical: string): Promise<Metadata> {
   const tenant = await getTenant();
-  const description = `Raspored utakmica i rezultati kluba ${tenant.displayName}.`;
 
-  return {
+  return pageMetadata({
     title: "Raspored i rezultati",
-    description,
-    alternates: { canonical },
-    openGraph: {
-      title: `Raspored i rezultati | ${tenant.displayName}`,
-      description,
-    },
-    twitter: {
-      title: `Raspored i rezultati | ${tenant.displayName}`,
-      description,
-    },
-  };
+    description: `Raspored utakmica i rezultati kluba ${tenant.displayName}.`,
+    canonical,
+    clubName: tenant.displayName,
+  });
 }
 
 /** `requestedId: null` je sam popis sa zadanim natjecanjem. */

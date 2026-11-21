@@ -1,5 +1,5 @@
 ---
-description: How data reaches a component — the single server data path and the one image route handler
+description: How data reaches a component — the single server data path and the two browser route handlers (HNS images, live match)
 globs: src/app/**/*.tsx,src/app/api/**/*.ts,src/components/**/*.tsx
 alwaysApply: false
 ---
@@ -68,9 +68,11 @@ browser ──► GET /api/utakmice/[id]/uzivo ──► fetchLiveMatch ──�
   `LiveMatch`, and polls the route every 30 s only while `liveFetchPlan`
   (`packages/hns/src/livePolling.ts`, pure and tested) says so — from 60 min
   before kick-off until `PLAYED`, at most 3 h after. Past that window, a page
-  whose cached HTML is not `PLAYED` fetches once. Played, called-off and distant
-  matches fetch nothing. Paused on a hidden tab; a failed fetch keeps the last
-  state.
+  whose cached HTML is not `PLAYED` fetches once — unless `liveStatus` is
+  `null` (HNS does not track the match, so it never turns `PLAYED`): such a
+  match polls in the window but fetches nothing after it. Played, called-off
+  and distant matches fetch nothing. Paused on a hidden tab; a failed fetch
+  keeps the last state.
 - The match page (`raspored-i-rezultati/[slug]`) is static (`revalidate =
   86400`) and passes the same 1-day TTL to every HNS fetcher it calls, so a
   short fetcher default cannot cap it.
@@ -102,6 +104,11 @@ Payload afterChange ──► apps/cms/src/lib/revalidateFrontend
 2. Return a domain type from `packages/types` — do the mapping inside the
    fetcher, never in a route handler or a component.
 3. Call it directly from the Server Component that needs it.
+4. A page-facing HNS fetcher accepts `HnsCacheOptions`
+   (`packages/hns/src/fetchResource.ts`) and the page passes its own
+   `revalidate` (or `ONE_DAY_TTL` from `@/lib/helpers/cacheTtl` for a 1-day
+   page). Next caches a page for the shortest TTL on it, so a fetcher's short
+   default would otherwise cap the page's `revalidate`.
 
 Both packages are tested through their interface with an injected transport
 (`context.ts`), so a new fetcher gets a test without touching the network.

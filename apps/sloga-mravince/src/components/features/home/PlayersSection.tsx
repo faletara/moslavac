@@ -15,7 +15,7 @@ export default async function PlayersSection({
 }: {
   players: RosterEntry[];
   /** Rok keša HNS poziva — `revalidate` stranice koja renderira sekciju. */
-  revalidate?: number;
+  revalidate: number;
 }) {
   const squad = players.filter((p) => p.position !== "trener");
 

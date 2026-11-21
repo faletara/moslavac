@@ -1,5 +1,5 @@
 ---
-description: How data reaches a component — the single server data path and the one image route handler
+description: How data reaches a component — the single server data path and the two browser route handlers (HNS images, live match)
 globs: src/app/**/*.tsx,src/app/api/**/*.ts,src/components/**/*.tsx
 alwaysApply: false
 ---

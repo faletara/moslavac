@@ -7,6 +7,7 @@ import NewsFallbackArt from "@/components/features/news/NewsFallbackArt";
 import { InkPageHero } from "@/components/layout/InkPageHero";
 import { formatDateShort } from "@/lib/helpers/date";
 import { newsPageHref } from "@/lib/newsPagination";
+import { pageMetadata } from "@/lib/pageMetadata";
 import { fetchNewsPaginated } from "@/lib/payload/getNews";
 import { getTenant } from "@/lib/payload/getTenant";
 import type { News } from "@/types/news";
@@ -161,22 +162,13 @@ function Pagination({
 /** Metapodaci stranice popisa; canonical je adresa upravo te stranice. */
 export async function newsArchiveMetadata(page: number): Promise<Metadata> {
   const tenant = await getTenant();
-  const description = `Najnovije vijesti, najave i izvještaji s utakmica te sva događanja u klubu ${tenant.displayName}.`;
-  const title = page === 1 ? "Novosti" : `Novosti, stranica ${page}`;
 
-  return {
-    title,
-    description,
-    alternates: { canonical: newsPageHref(page) },
-    openGraph: {
-      title: `${title} | ${tenant.displayName}`,
-      description,
-    },
-    twitter: {
-      title: `${title} | ${tenant.displayName}`,
-      description,
-    },
-  };
+  return pageMetadata({
+    title: page === 1 ? "Novosti" : `Novosti, stranica ${page}`,
+    description: `Najnovije vijesti, najave i izvještaji s utakmica te sva događanja u klubu ${tenant.displayName}.`,
+    canonical: newsPageHref(page),
+    clubName: tenant.displayName,
+  });
 }
 
 /** Jedna stranica popisa novosti. Stranica iza zadnje je 404. */

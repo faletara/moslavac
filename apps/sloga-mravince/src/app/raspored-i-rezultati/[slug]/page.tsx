@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import MatchLive from "@/components/features/matches/MatchLive";
 import { redirectToCanonical } from "@/lib/helpers/canonical";
+import { ONE_DAY_TTL } from "@/lib/helpers/cacheTtl";
 import { formatDateTime } from "@/lib/helpers/date";
 import {
   fetchAllCompetitionMatches,
@@ -12,12 +13,13 @@ import {
   fetchMatchInfo,
   fetchMatchLineups,
   fetchMatchReferees,
+  toLiveMatch,
 } from "@/lib/hns/matches";
 import { fetchTeamStandings } from "@/lib/hns/standings";
 import { getTenant } from "@/lib/payload/getTenant";
 import { BASE_URL } from "@/lib/siteUrl";
 import { buildMatchSlug, parseTrailingId } from "@/lib/helpers/slug";
-import type { LiveMatch, Match } from "@/types/hns";
+import type { Match } from "@/types/hns";
 import type {
   JsonLdNode,
   PostalAddressJsonLd,
@@ -34,10 +36,11 @@ interface Props {
 export const revalidate = 86400;
 
 /**
- * Rok keša za HNS pozive stranice. Next uzima najkraći rok na stranici, pa bi
- * zadani TTL fetchera (30–180 s) skratio `revalidate` iznad.
+ * Rok keša za HNS pozive stranice, isti kao `revalidate` iznad. Next uzima
+ * najkraći rok na stranici, pa bi zadani TTL fetchera (30–180 s) skratio
+ * `revalidate`.
  */
-const PAGE_TTL = 86_400;
+const PAGE_TTL = ONE_DAY_TTL;
 
 function matchTitle(match: Match): string {
   const home = match.homeTeam?.name ?? "Domaćin";
@@ -145,15 +148,7 @@ export default async function MatchPage({ params }: Props) {
       : [];
 
   // Početno stanje za `useLiveMatch` — isti podaci koje je server upravo dohvatio.
-  const initialLive: LiveMatch = {
-    matchId,
-    score: match.score,
-    liveStatus: match.liveStatus,
-    minute: match.minute,
-    currentMinute: match.currentMinute,
-    events,
-    lineups,
-  };
+  const initialLive = toLiveMatch({ matchId, match, events, lineups });
 
   const tenant = await getTenant();
   const jsonLd = buildJsonLd({ match, tenantName: tenant.displayName });

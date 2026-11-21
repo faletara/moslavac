@@ -23,6 +23,18 @@ export class HnsHttpError extends Error {
   }
 }
 
+/**
+ * HNS nije odgovorio ili je vratio grešku, pa podatak nije poznat — različito
+ * od "resurs ne postoji". Baca je fetcher koji ne smije vratiti djelomično
+ * stanje umjesto greške.
+ */
+export class HnsUnavailableError extends Error {
+  constructor(resource: string) {
+    super(`HNS unavailable: ${resource}`);
+    this.name = "HnsUnavailableError";
+  }
+}
+
 /** Turns an HNS endpoint into parsed JSON. Prod = HTTP; tests = in-memory fake. */
 export type HnsTransport = (
   endpoint: string,

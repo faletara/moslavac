@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { parseCompetitionId, SCHEDULE_PATH } from "../../competition";
-import { fetchCompetitionPagePaths } from "../../fetchCompetitionPagePaths";
-import { ScheduleView, scheduleMetadata } from "../../ScheduleView";
+import { parsePositiveInt } from "@/lib/helpers/validate";
+import { competitionPagePath, SCHEDULE_PATH } from "@/lib/competitionRoute";
+import { fetchCompetitionPageIds } from "@/lib/fetchCompetitionPageIds";
+import { ScheduleView, scheduleMetadata } from "@/components/features/schedule/ScheduleView";
 
 // 30 min, isto kao u ScheduleView (Next segmentnu konfiguraciju čita statički).
 export const revalidate = 1800;
@@ -12,20 +13,23 @@ interface Props {
 }
 
 export async function generateStaticParams() {
-  const paths = await fetchCompetitionPagePaths({ revalidate });
+  const ids = await fetchCompetitionPageIds({ revalidate });
 
-  return paths.map((path) => ({ id: path.slice(path.lastIndexOf("/") + 1) }));
+  return ids.map((id) => ({ id: String(id) }));
 }
 
+// Kanonska adresa gradi se iz raščlanjenog id-a, nikad iz sirovog segmenta;
+// neispravan segment (`012`, `1e1`) ionako preusmjerava na popis.
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = await params;
+  const competitionId = parsePositiveInt((await params).id);
 
-  return scheduleMetadata(`${SCHEDULE_PATH}/natjecanje/${id}`);
+  return scheduleMetadata(
+    competitionId == null ? SCHEDULE_PATH : competitionPagePath(competitionId),
+  );
 }
 
 export default async function CompetitionSchedulePage({ params }: Props) {
-  const { id } = await params;
-  const competitionId = parseCompetitionId(id);
+  const competitionId = parsePositiveInt((await params).id);
 
   // Kao i nepoznato natjecanje: nekad je neispravan `?competitionId=` prikazao popis.
   if (competitionId == null) redirect(SCHEDULE_PATH);

@@ -111,9 +111,9 @@ export async function hnsList<T>(
 }
 
 /**
- * Like `hnsResource`, but also reports whether the fetch itself succeeded, so a
- * missing resource (`ok: true`, `data: null`) is told apart from a failed fetch.
- * HNS na nepostojeći resurs odgovara s 404, a to je "ne postoji", ne kvar.
+ * Kao `hnsResource`, ali javlja i je li sam dohvat uspio, pa se resurs koji ne
+ * postoji (`ok: true`, `data: null`) razlikuje od neuspjelog dohvata. HNS na
+ * nepostojeći resurs odgovara s 404, a to je "ne postoji", ne kvar.
  */
 export async function hnsResourceResult<T>(
   spec: HnsSpec,

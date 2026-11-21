@@ -6,7 +6,8 @@ import {
   playerSource,
 } from "@/lib/app-shell/seo/sources";
 import { BASE_URL } from "@/lib/siteUrl";
-import { fetchCompetitionPagePaths } from "./raspored-i-rezultati/fetchCompetitionPagePaths";
+import { competitionPagePath } from "@/lib/competitionRoute";
+import { fetchCompetitionPageIds } from "@/lib/fetchCompetitionPageIds";
 
 export const revalidate = 3600;
 
@@ -24,8 +25,8 @@ export default function sitemap(): Promise<MetadataRoute.Sitemap> {
     sources: [
       newsSource({ segment: "/novosti", priority: 0.5 }),
       async () =>
-        (await fetchCompetitionPagePaths({ revalidate })).map((path) => ({
-          path,
+        (await fetchCompetitionPageIds({ revalidate })).map((id) => ({
+          path: competitionPagePath(id),
           changeFrequency: "daily" as const,
           priority: 0.6,
         })),
