@@ -1,6 +1,7 @@
 import { ExternalLink, Mail, MapPin, Phone } from "lucide-react";
 import type { Metadata } from "next";
 import { InkPageHero } from "@/components/layout/InkPageHero";
+import { ONE_DAY_TTL } from "@/lib/helpers/cacheTtl";
 import { fetchClubDetails } from "@/lib/hns/team";
 import { getTenant } from "@/lib/payload/getTenant";
 import { BASE_URL } from "@/lib/siteUrl";
@@ -25,7 +26,7 @@ export default async function ContactPage() {
   // gaps (e.g. phone), so every club gets contact data without manual entry.
   const [tenant, club] = await Promise.all([
     getTenant(),
-    fetchClubDetails({ revalidate: 86_400 }),
+    fetchClubDetails({ revalidate: ONE_DAY_TTL }),
   ]);
   const name = tenant.displayName;
   const email = tenant.contact?.email ?? club?.email ?? null;

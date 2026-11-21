@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { formatDateTime } from "@/lib/helpers/date";
+import { ONE_DAY_TTL } from "@/lib/helpers/cacheTtl";
 import { loadGoogleFont } from "@/lib/helpers/googleFont";
 import { fetchHnsCrestDataUri } from "@/lib/hns/images";
 import { fetchMatchInfo } from "@/lib/hns/matches";
@@ -69,7 +70,7 @@ export default async function MatchOgImage({
   const match = await fetchMatchInfo({
     matchId: parseTrailingId(slug),
     // Zadani TTL utakmice (30 s) skratio bi `revalidate` iznad.
-    revalidate: 86_400,
+    revalidate: ONE_DAY_TTL,
   });
 
   if (!match) {

@@ -1,5 +1,6 @@
 import "server-only";
 import { AsyncLocalStorage } from "node:async_hooks";
+import { ONE_DAY_TTL } from "@/lib/helpers/cacheTtl";
 import type { JsonValue } from "@/types/json";
 
 // Explicit Payload data-layer context. The frontend resolves its tenant + HTTP
@@ -12,7 +13,7 @@ import type { JsonValue } from "@/types/json";
  * webhook (`/api/revalidate`), koji pri svakom spremanju poništava tagove i
  * cijeli layout. Kratak rok bi samo tjerao stranice na render svake minute.
  */
-export const CMS_CONTENT_TTL = 86_400;
+export const CMS_CONTENT_TTL = ONE_DAY_TTL;
 
 export interface PayloadFetchOptions {
   authenticated?: boolean;
