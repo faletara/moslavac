@@ -13,5 +13,21 @@ export default clubNextConfig({
       statusCode: 301,
     },
     { source: "/novosti/stranica/1", destination: "/novosti", statusCode: 301 },
+    // Filtar natjecanja preselio je iz upita u putanju (popis je sad statičan).
+    // Neispravan id ne odgovara uzorku, pa pada na popis kao i prije. Next
+    // redirectu uvijek prilijepi izvorni upit; statičnoj stranici on ne smeta,
+    // a canonical je bez njega.
+    {
+      source: "/raspored-i-rezultati",
+      has: [
+        {
+          type: "query",
+          key: "competitionId",
+          value: "(?<competitionId>[1-9]\\d*)",
+        },
+      ],
+      destination: "/raspored-i-rezultati/natjecanje/:competitionId",
+      statusCode: 301,
+    },
   ],
 });
