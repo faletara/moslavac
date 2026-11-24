@@ -1,3 +1,4 @@
+import { lookup as systemLookup } from 'node:dns'
 import { Resolver } from 'node:dns/promises'
 import { Agent } from 'undici'
 
@@ -30,20 +31,15 @@ function publicDnsLookup(
   const callback = (typeof options === 'function' ? options : maybeCallback) as LookupCallback
   const opts: LookupOptions = typeof options === 'function' ? {} : options
 
+  // Javni DNS je prvi izbor, ali ne i jedini: kad upit na 1.1.1.1 iz Vercel
+  // funkcije padne, cron je dobivao samo "fetch failed" i nije objavljivao
+  // ništa. Tada pitamo sistemski resolver — isti onaj koji klupske stranice
+  // koriste bez problema.
+  const fallback = () => systemLookup(hostname, { all: opts.all === true }, callback)
+
   resolver.resolve4(hostname).then(
     (addresses) => {
-      if (addresses.length === 0) {
-        // SAFETY: `code` se postavlja u sljedećem redu; pozivatelji `dns.lookup`
-        // ga očekuju na grešci, a `Error` ga sam po sebi nema.
-        const err = new Error(
-          `No A records returned for ${hostname}`,
-        ) as NodeJS.ErrnoException
-
-        err.code = 'ENOTFOUND'
-        callback(err, '', 0)
-
-        return
-      }
+      if (addresses.length === 0) return fallback()
 
       if (opts.all) {
         callback(
@@ -54,7 +50,7 @@ function publicDnsLookup(
         callback(null, addresses[0], 4)
       }
     },
-    (err: NodeJS.ErrnoException) => callback(err, '', 0),
+    fallback,
   )
 }
 

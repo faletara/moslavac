@@ -30,6 +30,20 @@ interface HnsSpec {
 }
 
 /**
+ * Poruka greške s uzrokom. Node `fetch` mrežni kvar javlja samo kao
+ * "fetch failed", a pravi razlog (ENOTFOUND, ECONNRESET…) stoji u `cause`.
+ */
+function describeError(err: Error): string {
+  const cause = err.cause instanceof Error ? err.cause : null;
+
+  if (!cause) return err.message;
+
+  const code = "code" in cause ? ` ${String(cause.code)}` : "";
+
+  return `${err.message}:${code} ${cause.message}`;
+}
+
+/**
  * Runs the query and reports whether it succeeded, separately from the payload.
  * `ok: false` means the transport threw (network/HTTP error) — distinct from a
  * successful fetch that simply returned no data. Callers that must not present a
@@ -65,7 +79,7 @@ async function runHnsQuery<T>(
       data: null,
       ok: false,
       notFound,
-      error: err instanceof Error ? err.message : String(err),
+      error: err instanceof Error ? describeError(err) : String(err),
     };
   }
 }
