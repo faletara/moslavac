@@ -20,7 +20,7 @@ const loadMatchReports = () =>
 
 /**
  * Cron zna samo za `CRON_SECRET`. Bez njega bi bilo tko mogao pokrenuti
- * generiranje i potrošiti kredit kod OpenAI-a.
+ * generiranje i potrošiti dnevni limit Gemini API-ja.
  */
 function isAuthorized(req: PayloadRequest): boolean {
   const secret = process.env.CRON_SECRET
@@ -32,7 +32,7 @@ function isAuthorized(req: PayloadRequest): boolean {
 
 /**
  * Pisac za jedan tenant: model piše, provjera presuđuje, šablona hvata pad.
- * Bez `OPENAI_API_KEY` radi samo šablona — objava ne izostaje.
+ * Bez `GEMINI_API_KEY` radi samo šablona — objava ne izostaje.
  *
  * `fallbacks` skuplja razloge pada da ih odgovor cron-a može vratiti. Bez toga
  * se iz odgovora ne vidi razlika između „model je napisao” i „model je pao”, a
@@ -44,14 +44,14 @@ function writerFor(
   slug: string,
   fallbacks: FallbackEvent[],
 ): MatchReportWriter {
-  const apiKey = process.env.OPENAI_API_KEY
+  const apiKey = process.env.GEMINI_API_KEY
 
   if (!apiKey) return reports.templateWriter
 
   return reports.withFallback(
-    reports.openAiWriter({
+    reports.geminiWriter({
       apiKey,
-      model: process.env.OPENAI_MATCH_REPORT_MODEL,
+      model: process.env.GEMINI_MATCH_REPORT_MODEL,
     }),
     reports.templateWriter,
     (event) => {

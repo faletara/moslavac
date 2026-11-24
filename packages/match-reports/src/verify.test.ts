@@ -207,6 +207,35 @@ describe("withFallback", () => {
       problems: ["429 rate limit"],
     });
   });
+
+  it("pokuša ponovo prije šablone i pusti prvi tekst koji prođe", async () => {
+    const replies = [["Sloga je pobijedila 3:0."], good];
+    let calls = 0;
+
+    const write = withFallback(async () => replies[calls++] ?? [], templateWriter);
+
+    expect(await write(facts)).toEqual(good);
+    expect(calls).toBe(2);
+  });
+
+  it("odustane nakon zadanog broja pokušaja i javi samo jednom", async () => {
+    const events: FallbackEvent[] = [];
+    let calls = 0;
+
+    const write = withFallback(
+      async () => {
+        calls++;
+        throw new Error("503 high demand");
+      },
+      templateWriter,
+      (e) => events.push(e),
+      3,
+    );
+
+    expect(await write(facts)).toEqual(await templateWriter(facts));
+    expect(calls).toBe(3);
+    expect(events).toHaveLength(1);
+  });
 });
 
 describe("imena igrača u živoj rečenici", () => {

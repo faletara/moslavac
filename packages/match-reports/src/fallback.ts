@@ -9,36 +9,51 @@ export interface FallbackEvent {
 }
 
 /**
+ * Koliko puta model smije pokušati prije šablone. Mali model ne prođe provjeru
+ * otprilike svaki drugi put (ispusti minutu ili protivnika), a poziv je
+ * besplatan — novi pokušaj je jeftiniji od suhog šablonskog teksta.
+ */
+export const DEFAULT_ATTEMPTS = 3;
+
+/**
  * Spaja model i šablonu. Model piše, provjera presuđuje, šablona hvata pad.
  * Klub uvijek dobije objavu — u najgorem slučaju suhlju, nikad netočnu.
+ * `onFallback` javlja razlog zadnjeg pokušaja, i to samo kad svi padnu.
  */
 export const withFallback = (
   primary: MatchReportWriter,
   fallback: MatchReportWriter,
   onFallback?: (event: FallbackEvent) => void,
+  attempts = DEFAULT_ATTEMPTS,
 ): MatchReportWriter => {
   return async (facts: MatchFacts) => {
-    const report = (reason: FallbackEvent["reason"], problems: string[]) =>
-      onFallback?.({ matchId: facts.matchId, reason, problems });
+    let last: Omit<FallbackEvent, "matchId"> = {
+      reason: "greška",
+      problems: [],
+    };
 
-    let paragraphs: string[];
+    for (let attempt = 0; attempt < attempts; attempt++) {
+      let paragraphs: string[];
 
-    try {
-      paragraphs = await primary(facts);
-    } catch (error) {
-      report("greška", [error instanceof Error ? error.message : String(error)]);
+      try {
+        paragraphs = await primary(facts);
+      } catch (error) {
+        last = {
+          reason: "greška",
+          problems: [error instanceof Error ? error.message : String(error)],
+        };
+        continue;
+      }
 
-      return fallback(facts);
+      const verdict = verifyReport(paragraphs, facts);
+
+      if (verdict.ok) return paragraphs;
+
+      last = { reason: "provjera", problems: verdict.problems };
     }
 
-    const verdict = verifyReport(paragraphs, facts);
+    onFallback?.({ matchId: facts.matchId, ...last });
 
-    if (!verdict.ok) {
-      report("provjera", verdict.problems);
-
-      return fallback(facts);
-    }
-
-    return paragraphs;
+    return fallback(facts);
   };
 };

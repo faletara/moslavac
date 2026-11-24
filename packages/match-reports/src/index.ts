@@ -18,9 +18,9 @@ export type { MatchReportWriter } from "./template";
 
 export { templateWriter, templateTitle } from "./template";
 
-export { openAiWriter, DEFAULT_MODEL } from "./openai";
+export { geminiWriter, DEFAULT_MODEL } from "./gemini";
 
-export { withFallback, type FallbackEvent } from "./fallback";
+export { withFallback, DEFAULT_ATTEMPTS, type FallbackEvent } from "./fallback";
 
 export { verifyReport, type VerifyResult } from "./verify";
 
