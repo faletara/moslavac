@@ -1,20 +1,11 @@
-import OpenAI from "openai";
 import type { MatchFacts } from "./facts";
-import type { MatchReportWriter } from "./template";
-
-/**
- * Srednji sloj nove generacije, oko $0.21 po sezoni. Manji `gpt-5.6-luna` je
- * na provjeri padao na podjeli kartona po momčadima. Zamjena modela je ovaj
- * jedan string; vidi ADR 0002.
- */
-export const DEFAULT_MODEL = "gpt-5.6-terra";
 
 /**
  * Kratak prompt, namjerno. Dugi popisi pravila i primjera rečenica davali su
  * tekst koji zvuči kao ispunjen obrazac. Ovdje je samo ton i nekoliko tvrdih
  * pravila bez kojih `verifyReport` odbije tekst.
  */
-const INSTRUCTIONS = [
+export const INSTRUCTIONS = [
   "Ti si sportski novinar koji piše izvještaj s utakmice za web kluba",
   "`nasKlub`. Piši na hrvatskom, živo i prirodno, kao izvještaj u lokalnim",
   "novinama: jak prvi redak, zatim tijek utakmice kroz golove, pa kraj.",
@@ -36,34 +27,6 @@ const INSTRUCTIONS = [
   "Bez naslova, markdowna i uskličnika.",
 ].join("\n");
 
-export interface OpenAiWriterOptions {
-  apiKey: string;
-  model?: string;
-  /** Ubrizgava se u testovima; u produkciji se klijent radi iz `apiKey`. */
-  client?: Pick<OpenAI, "responses">;
-}
-
-/**
- * Model kao pisac. Namjerno ne hvata greške — `withFallback` ih pretvara u
- * pad na šablonu, pa je odluka o rezervi na jednom mjestu.
- */
-export const openAiWriter = (opts: OpenAiWriterOptions): MatchReportWriter => {
-  const client = opts.client ?? new OpenAI({ apiKey: opts.apiKey });
-  // `||`, ne `??`: prazan OPENAI_MATCH_REPORT_MODEL inače ruši svaki poziv.
-  const model = opts.model || DEFAULT_MODEL;
-
-  return async (facts: MatchFacts) => {
-    const response = await client.responses.create({
-      model,
-      reasoning: { effort: "low" },
-      instructions: INSTRUCTIONS,
-      input: JSON.stringify(promptFacts(facts)),
-    });
-
-    return splitParagraphs(response.output_text ?? "");
-  };
-};
-
 /**
  * Model vidi samo ovo. `matchId` i `matchSlug` su interni podaci i ne šalju se —
  * u tekstu nemaju što raditi, a mogli bi završiti u njemu.
@@ -72,7 +35,7 @@ export const openAiWriter = (opts: OpenAiWriterOptions): MatchReportWriter => {
  * čiji je ovo web, pa je izvještaj na stranici Sloge pisao iz kuta protivnika
  * („Primorac je poražen…”). Zato ide van kao `nasKlub`.
  */
-function promptFacts(facts: MatchFacts) {
+export function promptFacts(facts: MatchFacts) {
   const {
     matchId: _id,
     matchSlug: _slug,

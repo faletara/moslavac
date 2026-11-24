@@ -31,3 +31,13 @@ u procesu nema čovjeka koji bi grešku uhvatio.
   najizloženiji dio teksta; od modela nema što dobiti.
 - **Duplikat se sprječava kroz `sourceMatchId` na News.** Svjesno ne rješavamo
   slučaj u kojem HNS naknadno ispravi podatke — pretpostavljamo da su točni.
+- **Model je Gemini Flash-Lite na besplatnom tieru.** OpenAI radi samo na
+  prepaid kreditima koji istječu nakon godinu dana; kad su istekli, svaki poziv je
+  pao i sve se tiho objavljivalo šablonom. Gemini API za jedan izvještaj tjedno
+  ostaje unutar besplatnog limita, bez kredita koji istječu. Cijena: Google na
+  besplatnom tieru smije koristiti poslane podatke — a šalju se samo javni podaci
+  s utakmice.
+- **Model ima tri pokušaja prije šablone.** Mali model ne prođe provjeru otprilike
+  svaki drugi put. Svaki pokušaj prolazi istu provjeru, pa ponavljanje ne pušta
+  netočan tekst kroz drugu rupu — ali poznate rupe u `verifyReport` dobivaju više
+  prilika.
