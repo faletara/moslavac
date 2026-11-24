@@ -15,7 +15,7 @@ export const httpTransport: HnsTransport = async (
 	const apiKey = ctx ? ctx.apiKey : (await getTenant()).hns.apiKey;
 	const url = `${HNS_API_BASE}${endpoint}`;
 
-	const init: RequestInit & { dispatcher?: unknown; next?: unknown } = {
+	const init: RequestInit & { next?: unknown } = {
 		headers: {
 			API_KEY: apiKey,
 			"Accept-Language": "hr",
@@ -25,10 +25,8 @@ export const httpTransport: HnsTransport = async (
 
 	if (ctx) {
 		// Explicit-context callers (the CMS cron) want fresh data, have no
-		// per-request Next cache to tag, and may need a custom DNS dispatcher.
+		// per-request Next cache to tag.
 		init.cache = "no-store";
-
-		if (ctx.dispatcher) init.dispatcher = ctx.dispatcher;
 	} else {
 		init.next = { revalidate, tags };
 	}

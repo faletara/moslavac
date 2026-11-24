@@ -1,15 +1,6 @@
 import type { HnsTeamPlayer, PlayerSearchResult } from '@/types/hns'
 import { adaptPlayerSearchResult } from '@/lib/hns/adapters'
 import { z } from 'zod'
-import { hnsDispatcher } from './hnsDispatcher'
-
-/**
- * Node-ov `fetch` (undici ispod haube) prima `dispatcher`, ali ga standardni
- * `RequestInit` ne opisuje. Imenovani ugovor je ovdje umjesto `as object`.
- */
-interface UndiciRequestInit extends RequestInit {
-  dispatcher?: typeof hnsDispatcher
-}
 
 /** Straničena ovojnica HNS-ove pretrage; stavke ostaju neraščlanjene. */
 const searchEnvelope = z.object({
@@ -43,14 +34,13 @@ export async function searchHnsPlayers(args: {
     `&page=0&pageSize=${pageSize}` +
     `&teamIdFilter=${encodeURIComponent(teamId)}`
 
-  const init: UndiciRequestInit = {
+  const init: RequestInit = {
     headers: {
       API_KEY: apiKey,
       'Accept-Language': 'hr',
       Accept: 'application/json',
       'User-Agent': 'moslavac-cms/1.0',
     },
-    dispatcher: hnsDispatcher,
   }
 
   const response = await fetch(url, init)

@@ -51,9 +51,6 @@ export interface HnsContext {
   apiKey: string;
   teamId: string;
   seniorCompetitionFilter?: string | null;
-  // Optional undici dispatcher. The CMS server resolves the HNS host via a
-  // custom DNS dispatcher; server-to-server callers pass it through here.
-  dispatcher?: unknown;
 }
 
 const store = new AsyncLocalStorage<HnsContext>();

@@ -4,7 +4,6 @@ import type {
   MatchReportWriter,
   PublishSummary,
 } from '@/lib/match-reports/index'
-import { hnsDispatcher } from '../lib/hnsDispatcher'
 import { payloadNewsStore } from '../lib/matchReportsStore'
 
 /**
@@ -108,7 +107,6 @@ async function handler(req: PayloadRequest): Promise<Response> {
           apiKey,
           teamId,
           seniorCompetitionFilter: tenant.hns?.seniorCompetitionFilter ?? null,
-          dispatcher: hnsDispatcher,
         },
         () =>
           reports.publishMatchReports({
