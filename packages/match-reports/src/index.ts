@@ -2,7 +2,7 @@ import { getCompetitionCategory } from "@/lib/helpers/competition";
 import { getActiveHnsContext } from "@/lib/hns/context";
 import { formatDateLong, formatDateTime } from "@/lib/helpers/date";
 import {
-  fetchAllMatches,
+  fetchPastMatchesOrThrow,
   fetchMatchEvents,
   fetchMatchInfo,
   fetchUpcomingMatches,
@@ -149,7 +149,7 @@ export async function publishMatchReports(
 
   const summary: PublishSummary = { published: [], skipped: [], failed: [] };
 
-  const matches = (await fetchAllMatches()).filter((m) =>
+  const matches = (await fetchPastMatchesOrThrow()).filter((m) =>
     isCandidate(m, fromMs, nowMs),
   );
 
@@ -164,7 +164,7 @@ export async function publishMatchReports(
         continue;
       }
 
-      // `fetchAllMatches` daje sažetak; detalj nosi gledatelje i poluvremena.
+      // Popis daje sažetak; detalj nosi gledatelje i poluvremena.
       const [detail, events] = await Promise.all([
         fetchMatchInfo({ matchId }),
         fetchMatchEvents({ matchId }),

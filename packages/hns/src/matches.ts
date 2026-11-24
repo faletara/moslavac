@@ -48,6 +48,26 @@ async function fetchFutureTeamMatches(revalidate: number): Promise<Match[]> {
   return matches.map(adaptMatch);
 }
 
+/**
+ * Odigrane utakmice momčadi, bez tihog pada. `fetchAllMatches` grešku vraća kao
+ * prazan niz, pa je cron izvještaja pri kvaru HNS-a „uspješno” javljao da nema
+ * utakmica. Ovdje kvar baca `HnsUnavailableError` s razlogom transporta.
+ */
+export async function fetchPastMatchesOrThrow(): Promise<Match[]> {
+  const { data, ok, error } = await hnsListResult<HnsMatch>({
+    path: (teamId) =>
+      `/api/live/team/${teamId}/matches/paginated/past/2?page=1&pageSize=75`,
+    revalidate: MATCH_TTL,
+    paginated: true,
+  });
+
+  if (!ok) {
+    throw new HnsUnavailableError(`popis odigranih utakmica (${error ?? "?"})`);
+  }
+
+  return data.map(adaptMatch);
+}
+
 export async function fetchAllMatches(
   opts: HnsCacheOptions = {},
 ): Promise<Match[]> {

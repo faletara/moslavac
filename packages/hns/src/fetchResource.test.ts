@@ -140,7 +140,7 @@ describe("hnsListResult", () => {
       hnsListResult({ path: () => `/api/live/x`, revalidate: 60 }),
     );
 
-    expect(result).toEqual({ data: [], ok: false });
+    expect(result).toEqual({ data: [], ok: false, error: "boom" });
     expect(spy).toHaveBeenCalledOnce();
     spy.mockRestore();
   });

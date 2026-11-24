@@ -37,7 +37,7 @@ interface HnsSpec {
  */
 async function runHnsQuery<T>(
   spec: HnsSpec,
-): Promise<{ data: T | null; ok: boolean; notFound?: boolean }> {
+): Promise<{ data: T | null; ok: boolean; notFound?: boolean; error?: string }> {
   const teamId = await getHnsTeamId();
   let endpoint = spec.path(teamId);
 
@@ -61,7 +61,12 @@ async function runHnsQuery<T>(
 
     const notFound = err instanceof HnsHttpError && err.status === 404;
 
-    return { data: null, ok: false, notFound };
+    return {
+      data: null,
+      ok: false,
+      notFound,
+      error: err instanceof Error ? err.message : String(err),
+    };
   }
 }
 
@@ -125,12 +130,13 @@ export async function hnsResourceResult<T>(
 
 /**
  * Like `hnsList`, but also reports whether the fetch itself succeeded so callers
- * can tell "HNS failed" apart from "HNS returned nothing".
+ * can tell "HNS failed" apart from "HNS returned nothing". `error` nosi poruku
+ * transporta (npr. HTTP status) kad dohvat padne.
  */
 export async function hnsListResult<T>(
   spec: HnsSpec & { paginated?: boolean },
-): Promise<{ data: T[]; ok: boolean }> {
-  const { data, ok } = await runHnsQuery<JsonValue>(spec);
+): Promise<{ data: T[]; ok: boolean; error?: string }> {
+  const { data, ok, error } = await runHnsQuery<JsonValue>(spec);
 
-  return { data: unwrapList<T>(data, spec.paginated), ok };
+  return { data: unwrapList<T>(data, spec.paginated), ok, error };
 }

@@ -229,6 +229,20 @@ describe("publishMatchReports", () => {
     expect(closing).not.toContain("RNK Split 1912");
   });
 
+  it("kvar HNS-a na popisu utakmica javi grešku, ne prazan rezultat", async () => {
+    const { store } = memoryStore();
+
+    const down: HnsTransport = async () => {
+      throw new Error("HNS fetch failed (403 Forbidden)");
+    };
+
+    await expect(
+      runWithHnsContext({ transport: down, teamId: "1", apiKey: "k" }, () =>
+        publishMatchReports({ writer: templateWriter, store, now: NOW }),
+      ),
+    ).rejects.toThrow("403 Forbidden");
+  });
+
   it("greška na jednoj utakmici ne ruši obradu", async () => {
     const { store } = memoryStore();
 
